@@ -4,7 +4,7 @@
  * for Laya. The actual call is done by the MCP `index.ts` so it can
  * catch `LayaUnavailableError` uniformly and return `isError: true`.
  */
-import type { LayaClient } from "./client.js";
+import type { LayaClient, PredictOpts } from "./client.js";
 
 export type QuestionBuilder = (args: Record<string, unknown>) => Record<string, unknown>;
 
@@ -40,9 +40,10 @@ export async function runTool(
   args: Record<string, unknown>,
   questions: Record<string, unknown>,
   present: (raw: Awaited<ReturnType<LayaClient["predict"]>>) => string,
+  opts?: PredictOpts,
 ): Promise<ToolResult> {
   try {
-    const result = await client.predict(args, questions);
+    const result = await client.predict(args, questions, undefined, opts);
     return { ok: true, content: present(result) };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

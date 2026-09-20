@@ -6,15 +6,20 @@
  * - Logs every transition but never blocks the MCP request loop.
  */
 import type { HealthResult, LayaClient } from "./client.js";
+import type { GlinerClient, GlinerHealth } from "./gliner.js";
+
+type WatchedClient = Pick<LayaClient | GlinerClient, "health">;
+type WatchedStatus = HealthResult | GlinerHealth;
 
 export class HealthWatch {
-  private status: HealthResult = { ready: false, error: "not checked yet" };
+  private status: WatchedStatus = { ready: false, error: "not checked yet" };
   private timer: NodeJS.Timeout | null = null;
-  private listeners: Array<(s: HealthResult) => void> = [];
+  private listeners: Array<(s: WatchedStatus) => void> = [];
 
   constructor(
-    private readonly client: LayaClient,
+    private readonly client: WatchedClient,
     private readonly checkIntervalMs = Number(process.env.LAYA_HEALTH_INTERVAL_MS ?? 10000),
+    private readonly label = "laya-server",
   ) {}
 
   start(): void {
@@ -31,11 +36,11 @@ export class HealthWatch {
     }
   }
 
-  current(): HealthResult {
+  current(): WatchedStatus {
     return this.status;
   }
 
-  onChange(listener: (s: HealthResult) => void): void {
+  onChange(listener: (s: WatchedStatus) => void): void {
     this.listeners.push(listener);
   }
 
@@ -47,7 +52,7 @@ export class HealthWatch {
       if (changed) {
         const tag = next.ready ? "READY" : "DOWN";
         console.error(
-          `[laya-mcp] laya-server ${tag}${next.error ? `: ${next.error}` : ""}`,
+          `[laya-mcp] ${this.label} ${tag}${next.error ? `: ${next.error}` : ""}`,
         );
         for (const fn of this.listeners) fn(next);
       }

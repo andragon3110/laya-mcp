@@ -6,34 +6,41 @@
 
 `laya-mcp` is a [Model Context Protocol](https://modelcontextprotocol.org)
 server that gives your coding agent ten typed-decision tools backed by a
-local [Laya](https://huggingface.co/convaiinnovations/laya) instance.
-Every tool returns **calibrated probabilities** so the agent can branch,
+local [Laya](https://huggingface.co/convaiinnovations/laya) instance,
+plus one PII tool backed by an optional
+[GLiNER2.5](https://huggingface.co/fastino/gliner2.5-multi-v1) sidecar.
+Every Laya tool returns **calibrated probabilities** so the agent can branch,
 sort, and gate on real confidence instead of vibe-checking its own
 output.
 
 ```
 ┌──────────────────┐  stdio JSON-RPC  ┌────────────────────┐  HTTP  ┌────────────────────┐
 │ OpenCode CLI     │ ───────────────▶ │ laya-mcp (Node/TS) │ ─────▶ │ laya-server (Py)   │
-│ Claude Code      │                  │  - 10 tools        │        │  - FastAPI         │
-│ Codex            │                  │  - health watcher  │        │  - Laya SDK        │
-│ Pi              │ ◀─────────────── │  - graceful fail   │ ◀───── │  - HuggingFace model│
+│ Claude Code      │                  │  - 10+1 tools      │        │  - FastAPI :8765   │
+│ Codex            │                  │  - health watchers │ ─────▶ │ gliner-server (Py) │
+│ Pi              │ ◀─────────────── │  - graceful fail   │ ◀───── │  - FastAPI :8766   │
 └──────────────────┘                  └────────────────────┘        └────────────────────┘
 ```
 
-The ten tools (one per file under `src/tools/`):
+The tools (one per file under `src/tools/`):
 
-| Tool                | What it does                                                                 | Laya primitive |
-|---------------------|------------------------------------------------------------------------------|----------------|
-| `laya_screen`       | Prompt-injection / substance / relevance guard before content enters context | `noul` × 3     |
-| `laya_verify`       | Verify one or more claims against supplied evidence                          | `noul` per claim |
-| `laya_find`         | Pick the best candidate id for a query (or `none`)                            | `choice`       |
-| `laya_rerank`       | Score and sort all candidates by relevance                                   | `noul` per candidate |
-| `laya_classify`     | Batch-classify items against a shared catalog                                 | `choice` per item |
-| `laya_decide`       | Pick one of 2-6 bounded options + optional per-requirement checks              | `choice` + `noul` |
-| `laya_compare`      | Compare two passages overall and per aspect                                   | `choice` per aspect |
-| `laya_extract`      | Pull structured field values from a document (regex + judgment)                | `choice` over regex matches |
-| `laya_review`       | Score a proposed diff against the original request before merging             | `score` + `noul` |
-| `laya_gate`         | Completion gate: `laya_review` plus per-claim verification                     | combined       |
+| Tool                | What it does                                                                 | Backend |
+|---------------------|------------------------------------------------------------------------------|---------|
+| `laya_screen`       | Prompt-injection / substance / relevance guard before content enters context | Laya `noul` × 3 |
+| `laya_verify`       | Verify one or more claims against supplied evidence                          | Laya `noul` per claim |
+| `laya_find`         | Pick the best candidate id for a query (or `none`)                            | Laya `choice` |
+| `laya_rerank`       | Score and sort all candidates by relevance                                   | Laya `noul` per candidate |
+| `laya_classify`     | Batch-classify items against a shared catalog                                 | Laya `choice` per item |
+| `laya_decide`       | Pick one of 2-6 bounded options + optional per-requirement checks              | Laya `choice` + `noul` |
+| `laya_compare`      | Compare two passages overall and per aspect                                   | Laya `choice` per aspect |
+| `laya_extract`      | Pull structured field values: regex candidates **or** GLiNER spans, Laya judges | Laya `choice` over matches/spans |
+| `laya_review`       | Score a proposed diff against the original request before merging             | Laya `score` + `noul` |
+| `laya_gate`         | Completion gate: `laya_review` plus per-claim verification                     | combined |
+| `laya_pii`          | Scan for PII/secrets with character offsets (**needs** the GLiNER sidecar)    | GLiNER spans |
+
+Design rule: **GLiNER proposes, Laya disposes.** GLiNER finds *where*
+things are (spans + offsets); Laya decides *what they mean* (calibrated
+probabilities). GLiNER span scores are never used for gating.
 
 The shape and purpose of each tool is modeled after
 [`jkudish/jev-mcp`](https://github.com/jkudish/jev-mcp) (155 ★, the
@@ -133,7 +140,8 @@ curl http://127.0.0.1:8765/health
 ```
 
 If `ready: true` and `loaded` lists all three checkpoints, the MCP server
-will advertise all ten tools.
+will advertise all ten Laya tools (plus `laya_pii` when the GLiNER sidecar
+is up).
 
 ### How the Router picks a checkpoint (default behaviour)
 
@@ -319,6 +327,37 @@ Expected output (everything healthy):
 Run this first whenever something looks wrong -- paste the output when
 asking for help and the failure is usually obvious from the check name.
 
+## Optional GLiNER sidecar (span extraction + PII)
+
+`install.sh --with-gliner` adds a second Python process,
+`gliner-server` (default port **8766**), backed by
+[GLiNER2.5-multilingual](https://huggingface.co/fastino/gliner2.5-multi-v1)
+(287M, Apache 2.0, CPU-friendly). It finds *where* things are in text;
+Laya keeps judging *what they mean*:
+
+```bash
+./install.sh --with-gliner
+$HOME/laya-mcp/start_gliner.sh   # terminal 2 (optional)
+```
+
+What changes when the sidecar is up:
+
+- `laya_extract` gains `source: "regex" | "entities" | "auto"` (default
+  `auto` = GLiNER spans when reachable, regex fallback otherwise) plus
+  per-field `entity_type`. Entity mode returns `start`/`end` offsets for
+  grounding, and fixes the old regex path to return the matched substring
+  instead of the match key.
+- New tool `laya_pii`: PII/secret scan with offsets. `block` when an
+  `api_key`, `token_secreto` or `password` is found, `review` on other
+  PII, `pass` when clean. Fails clearly (not silently) when the sidecar
+  is down.
+- `doctor.sh` gains 4 checks: `gliner-sdk`, `gliner-checkpoint`,
+  `gliner-server`, and a live `gliner-spanish` smoke test.
+
+Without `--with-gliner` (or with the sidecar down) everything behaves
+exactly as before: `laya_pii` is not advertised and `laya_extract`
+uses regex.
+
 ## Test the install
 
 After installing and starting `start_laya.sh`:
@@ -333,13 +372,17 @@ $HOME/laya-mcp/tests/test_health.sh
 # End-to-end smoke (loads Laya and runs one /predict call)
 $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke.py
 
+# GLiNER smoke (needs install.sh --with-gliner + start_gliner.sh)
+$HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke_gliner.py
+
 # MCP-level smoke (uses the official inspector)
 cd $HOME/laya-mcp && npm run inspect
 ```
 
 Expected: `doctor.sh` shows `0 fail`; the inspector shows **10 tools**
-in the left panel. With the Python server down, `doctor.sh` shows a
-`laya-server` warning and the inspector shows **0 tools**.
+in the left panel (**11** with the GLiNER sidecar up). With the Python
+server down, `doctor.sh` shows a `laya-server` warning and the inspector
+shows **0 tools**.
 
 ---
 
@@ -372,6 +415,12 @@ All env vars (with defaults):
 | `LAYA_TOOL_TIMEOUT_MS`       | `8000`                           | Per-tool MCP timeout                                      |
 | `LAYA_HEALTH_INTERVAL_MS`    | `10000`                          | Background watcher poll interval                         |
 | `LAYA_LOG_LEVEL`             | `WARNING`                        | uvicorn log level                                         |
+| `GLINER_URL`                 | `http://127.0.0.1:8766`          | Where the GLiNER sidecar listens                          |
+| `GLINER_HOST` / `GLINER_PORT`| `127.0.0.1` / `8766`             | Bind address for the GLiNER sidecar                       |
+| `GLINER_DEVICE`              | `auto`                           | `auto` (cuda → mps → cpu) / `cpu` / `cuda` / `mps`       |
+| `GLINER_MODEL`               | `fastino/gliner2.5-multi-v1`     | HuggingFace model id                                      |
+| `GLINER_TIMEOUT_MS`          | `10000`                          | Per-call HTTP timeout from MCP to GLiNER                  |
+| `GLINER_HEALTH_INTERVAL_MS`  | *(falls back to LAYA_*)*         | Watcher poll interval for the sidecar                     |
 
 `LAYA_MODEL` and `LAYA_SUBFOLDER` are no longer used by `laya_server.py`
 itself -- the Router selects checkpoints automatically. They are still

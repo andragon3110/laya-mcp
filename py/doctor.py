@@ -27,6 +27,9 @@ from typing import Any, Dict, List, Optional, Tuple
 # Where the install lives. Default matches install.sh.
 INSTALL_DIR = Path(os.environ.get("LAYA_MCP_HOME", Path.home() / "laya-mcp")).expanduser()
 HF_CACHE = Path(os.environ.get("HF_HOME", Path.home() / ".cache" / "huggingface")).expanduser()
+# Model snapshots live under $HF_HOME/hub/models--org--repo/snapshots/<rev>/.
+# Fall back to $HF_HOME itself for non-standard layouts (e.g. HF_HUB_CACHE).
+HF_HUB = HF_CACHE / "hub" if (HF_CACHE / "hub").exists() else HF_CACHE
 
 # The three checkpoints we expect when Router mode is on.
 EXPECTED_CHECKPOINTS = [
@@ -36,11 +39,11 @@ EXPECTED_CHECKPOINTS = [
 ]
 
 # The HF cache layout for the bundled repo: `models--{org}--{repo}/snapshots/<rev>/<subfolder>/`.
-HF_BUNDLE_REPO_DIR = HF_CACHE / "models--convaiinnovations--laya"
+HF_BUNDLE_REPO_DIR = HF_HUB / "models--convaiinnovations--laya"
 HF_STANDALONE_DIRS = {
-    "english": HF_CACHE / "models--convaiinnovations--laya",
-    "multilingual": HF_CACHE / "models--convaiinnovations--laya-multilingual",
-    "typed-decisions": HF_CACHE / "models--convaiinnovations--laya-typed-decisions",
+    "english": HF_HUB / "models--convaiinnovations--laya",
+    "multilingual": HF_HUB / "models--convaiinnovations--laya-multilingual",
+    "typed-decisions": HF_HUB / "models--convaiinnovations--laya-typed-decisions",
 }
 
 
@@ -357,6 +360,149 @@ def check_live_predict(host: str, port: int) -> Dict[str, Any]:
         return _fail("live-predict", f"POST {url} failed: {exc!r}", url=url)
 
 
+GLINER_MODEL_ID = "fastino/gliner2.5-multi-v1"
+GLINER_CACHE_DIR = HF_HUB / "models--fastino--gliner2.5-multi-v1"
+
+# Smoke sentence in Spanish. Verified 2026-09-20 against the real
+# checkpoint: all three entity types found with confidence > 0.95.
+GLINER_SMOKE_TEXT = "María García trabaja en Acme España en Madrid."
+GLINER_SMOKE_EXPECTED = {"persona", "organización", "lugar"}
+
+
+def check_gliner_package() -> Dict[str, Any]:
+    """Is the gliner2 SDK importable? Absent means the user did not opt in -- skip, don't fail."""
+    try:
+        spec = importlib.util.find_spec("gliner2")
+        if spec is None:
+            return _skip(
+                "gliner-sdk",
+                "gliner2 not installed -- GLiNER features opt-in via install.sh --with-gliner",
+                install_hint="pip install -r py/requirements-gliner.txt",
+            )
+        gliner2 = importlib.import_module("gliner2")
+        has_auto = hasattr(gliner2, "AutoExtractor")
+        if not has_auto:
+            return _fail("gliner-sdk", "gliner2 installed but AutoExtractor is missing", version=_pkg_version("gliner2"))
+        return _ok(
+            "gliner-sdk",
+            f"gliner2 {_pkg_version('gliner2') or 'unknown'} installed with AutoExtractor",
+            version=_pkg_version("gliner2"),
+        )
+    except Exception as exc:  # noqa: BLE001
+        return _fail("gliner-sdk", f"failed to import gliner2: {exc!r}")
+
+
+def check_gliner_checkpoint() -> Dict[str, Any]:
+    """Is the GLiNER2.5 multilingual checkpoint cached? Skip when the SDK is absent."""
+    if importlib.util.find_spec("gliner2") is None:
+        return _skip("gliner-checkpoint", "gliner2 not installed -- skipping checkpoint check")
+    found_at: Optional[Path] = None
+    if GLINER_CACHE_DIR.exists():
+        for snap in GLINER_CACHE_DIR.glob("snapshots/*"):
+            found_at = snap
+            break
+    if found_at is None:
+        return _warn(
+            "gliner-checkpoint",
+            f"{GLINER_MODEL_ID} not cached -- server will download ~594 MB on first request",
+            repo=GLINER_MODEL_ID,
+        )
+    try:
+        size_bytes = sum(p.stat().st_size for p in found_at.rglob("*") if p.is_file())
+    except OSError:
+        size_bytes = 0
+    return _ok(
+        "gliner-checkpoint",
+        f"{GLINER_MODEL_ID} cached",
+        path=str(found_at),
+        size_mb=round(size_bytes / 1024 / 1024, 1),
+    )
+
+
+def check_gliner_server_reachable(host: str, port: int) -> Dict[str, Any]:
+    """Can we reach the gliner-server? Skip when the SDK is absent (not opted in)."""
+    if importlib.util.find_spec("gliner2") is None:
+        return _skip("gliner-server", "gliner2 not installed -- gliner-server is opt-in")
+    url = f"http://{host}:{port}/health"
+    started = time.time()
+    try:
+        import urllib.request
+
+        with urllib.request.urlopen(url, timeout=2) as r:
+            body = json.loads(r.read())
+        latency_ms = int((time.time() - started) * 1000)
+        if r.status != 200:
+            return _fail("gliner-server", f"GET {url} returned HTTP {r.status}", url=url, latency_ms=latency_ms)
+        if not body.get("ready"):
+            return _warn(
+                "gliner-server",
+                f"GET {url} returned ready=false: {body.get('error', 'no error detail')}",
+                url=url,
+                latency_ms=latency_ms,
+            )
+        return _ok(
+            "gliner-server",
+            f"GET {url} reachable in {latency_ms} ms",
+            url=url,
+            latency_ms=latency_ms,
+            model=body.get("model"),
+            device=body.get("device"),
+        )
+    except (urllib.error.URLError, socket.timeout, ConnectionRefusedError, OSError) as exc:
+        return _warn(
+            "gliner-server",
+            f"cannot reach {url}: {exc}. start it with $HOME/laya-mcp/start_gliner.sh",
+            url=url,
+            hint="$HOME/laya-mcp/start_gliner.sh",
+        )
+    except Exception as exc:  # noqa: BLE001
+        return _fail("gliner-server", f"unexpected error reaching {url}: {exc!r}", url=url)
+
+
+def check_gliner_live_spanish(host: str, port: int) -> Dict[str, Any]:
+    """End-to-end Spanish extraction smoke test against the running gliner-server."""
+    if importlib.util.find_spec("gliner2") is None:
+        return _skip("gliner-spanish", "gliner2 not installed -- skipping live Spanish smoke test")
+    url = f"http://{host}:{port}/extract_entities"
+    payload = {
+        "text": GLINER_SMOKE_TEXT,
+        "labels": ["persona", "organización", "lugar"],
+    }
+    started = time.time()
+    try:
+        import urllib.request
+
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode(),
+            headers={"content-type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            body = json.loads(r.read())
+        latency_ms = int((time.time() - started) * 1000)
+        if r.status != 200:
+            return _fail("gliner-spanish", f"POST {url} returned HTTP {r.status}", url=url)
+        entities = body.get("entities", {}) if isinstance(body, dict) else {}
+        found = {etype for etype, spans in entities.items() if spans}
+        missing = GLINER_SMOKE_EXPECTED - found
+        if missing:
+            return _fail(
+                "gliner-spanish",
+                f"Spanish smoke test missed entity types: {sorted(missing)}",
+                url=url,
+                latency_ms=latency_ms,
+                found=sorted(found),
+            )
+        return _ok(
+            "gliner-spanish",
+            f"Spanish smoke test ok in {latency_ms} ms (persona/organización/lugar found)",
+            url=url,
+            latency_ms=latency_ms,
+        )
+    except Exception as exc:  # noqa: BLE001
+        return _fail("gliner-spanish", f"POST {url} failed: {exc!r}", url=url)
+
+
 def check_mcp_server_starts() -> Dict[str, Any]:
     """Spawn the MCP server briefly to confirm it boots without errors."""
     import subprocess
@@ -438,6 +584,8 @@ def run_doctor(
     laya_host: str = "127.0.0.1",
     laya_port: int = 8765,
     include_live_calls: bool = True,
+    gliner_host: str = "127.0.0.1",
+    gliner_port: int = 8766,
 ) -> Dict[str, Any]:
     """Run every check and return the structured report."""
     checks: List[Dict[str, Any]] = []
@@ -448,9 +596,13 @@ def run_doctor(
     checks.append(check_memory_for_inference())
     checks.append(check_install_dir())
     checks.extend(check_checkpoints_present())
+    checks.append(check_gliner_package())
+    checks.append(check_gliner_checkpoint())
     if include_live_calls:
         checks.append(check_mcp_server_reachable(laya_host, laya_port))
         checks.append(check_live_predict(laya_host, laya_port))
+        checks.append(check_gliner_server_reachable(gliner_host, gliner_port))
+        checks.append(check_gliner_live_spanish(gliner_host, gliner_port))
     checks.append(check_mcp_server_starts())
     checks.extend(check_optional_agent_configs())
 
@@ -488,6 +640,8 @@ def main() -> int:
     )
     parser.add_argument("--host", default="127.0.0.1", help="laya-server host")
     parser.add_argument("--port", type=int, default=8765, help="laya-server port")
+    parser.add_argument("--gliner-host", default="127.0.0.1", help="gliner-server host")
+    parser.add_argument("--gliner-port", type=int, default=8766, help="gliner-server port")
     parser.add_argument(
         "--no-live",
         action="store_true",
@@ -510,6 +664,8 @@ def main() -> int:
         laya_host=args.host,
         laya_port=args.port,
         include_live_calls=not args.no_live,
+        gliner_host=args.gliner_host,
+        gliner_port=args.gliner_port,
     )
 
     if args.json:

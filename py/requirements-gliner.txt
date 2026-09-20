@@ -1,0 +1,10 @@
+# Optional GLiNER sidecar dependencies.
+#
+# Install only when you pass --with-gliner to install.sh (or run
+# `pip install -r py/requirements-gliner.txt` yourself). Shares the same
+# venv as the Laya server, so torch is installed once.
+#
+# protobuf is required at runtime: transformers needs it to load the
+# mDeBERTa tokenizer (ImportError without it -- verified 2026-09-20).
+gliner2[local]>=2.0.0,<3.0.0
+protobuf>=4.0

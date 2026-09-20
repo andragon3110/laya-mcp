@@ -126,3 +126,26 @@ to inline it.
 This is the same pattern that
 [`agentgateway`](https://github.com/agentgateway/agentgateway) uses for
 its production guardrail (`llm-guardrail-jev`), but local and free.
+
+## Pattern 4 (needs `--with-gliner`): PII pre-screen with `laya_pii`
+
+Before pasting any external text (issue bodies, logs, customer messages)
+into the agent context, run `laya_pii` on it. If `action` is `block`
+(a secret was found), redact the reported `[start:end]` spans first. If
+`review`, confirm each finding may enter context.
+
+Example skill line for `.opencode/agents/sdd-apply.md`:
+
+```markdown
+## Optional: PII pre-screen with laya-mcp
+
+If laya_pii is available, scan any external text before inlining it.
+On `block`, redact the reported spans before proceeding.
+```
+
+## Pattern 5 (needs `--with-gliner`): grounded extraction with `laya_extract`
+
+Call `laya_extract` with `source: "entities"` (or omit it for `auto`)
+and per-field `entity_type` instead of writing regexes. The response
+includes `start`/`end` offsets -- cite them when the value matters
+(e.g. "price is $29, see source[120:123]").

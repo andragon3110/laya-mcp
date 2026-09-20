@@ -3,16 +3,19 @@
  * laya-mcp server.
  *
  * Exposes 10 typed-decision tools (laya_screen, laya_verify, laya_find, etc.)
- * backed by a local Laya instance reachable via HTTP at LAYA_URL.
+ * backed by a local Laya instance reachable via HTTP at LAYA_URL, plus one
+ * optional tool (laya_pii) backed by the GLiNER sidecar at GLINER_URL.
  *
  * Behaviour contract:
  *   - If the laya-server (Python) is NOT reachable, `tools/list` returns []
  *     and every `tools/call` returns `{isError: true, ...}` -- the MCP host
  *     sees zero tools and the user-facing agent never crashes.
+ *   - `laya_pii` is advertised only while the gliner-server sidecar is
+ *     reachable. `laya_extract` uses GLiNER spans when available and falls
+ *     back to regex otherwise (unless source=entities is forced).
  *   - The server is intentionally stateless: each call is independent.
- *   - A background watcher polls /health every LAYA_HEALTH_INTERVAL_MS so
- *     tool availability flips automatically when the Python process comes
- *     up or goes down.
+ *   - Background watchers poll /health so tool availability flips
+ *     automatically when either Python process comes up or goes down.
  */
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -23,6 +26,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 import { LayaClient } from "./client.js";
+import { GlinerClient } from "./gliner.js";
 import { HealthWatch } from "./health.js";
 import { screenTool, handleScreen } from "./tools/screen.js";
 import { verifyTool, handleVerify } from "./tools/verify.js";
@@ -34,10 +38,17 @@ import { compareTool, handleCompare } from "./tools/compare.js";
 import { extractTool, handleExtract } from "./tools/extract.js";
 import { reviewTool, handleReview } from "./tools/review.js";
 import { gateTool, handleGate } from "./tools/gate.js";
+import { piiTool, handlePii } from "./tools/pii.js";
 
 const TOOL_TIMEOUT_MS = Number(process.env.LAYA_TOOL_TIMEOUT_MS ?? 8000);
 
-const ALL_TOOLS = [
+/** Shared per-request context handed to every tool handler. */
+export interface ToolContext {
+  gliner: GlinerClient;
+  glinerReady: () => boolean;
+}
+
+const BASE_TOOLS = [
   screenTool,
   verifyTool,
   findTool,
@@ -50,7 +61,10 @@ const ALL_TOOLS = [
   gateTool,
 ] as const;
 
-const HANDLERS: Record<string, (client: LayaClient, args: Record<string, unknown>) => Promise<string>> = {
+const HANDLERS: Record<
+  string,
+  (client: LayaClient, args: Record<string, unknown>, ctx: ToolContext) => Promise<string>
+> = {
   laya_screen: handleScreen,
   laya_verify: handleVerify,
   laya_find: handleFind,
@@ -61,14 +75,28 @@ const HANDLERS: Record<string, (client: LayaClient, args: Record<string, unknown
   laya_extract: handleExtract,
   laya_review: handleReview,
   laya_gate: handleGate,
+  laya_pii: handlePii,
 };
 
 const client = new LayaClient();
 const health = new HealthWatch(client);
 health.start();
 
+const gliner = new GlinerClient();
+const glinerHealth = new HealthWatch(
+  gliner,
+  Number(process.env.GLINER_HEALTH_INTERVAL_MS ?? process.env.LAYA_HEALTH_INTERVAL_MS ?? 10000),
+  "gliner-server",
+);
+glinerHealth.start();
+
+const ctx: ToolContext = {
+  gliner,
+  glinerReady: () => glinerHealth.current().ready === true,
+};
+
 const server = new Server(
-  { name: "laya-mcp", version: "0.3.0" },
+  { name: "laya-mcp", version: "0.4.0" },
   { capabilities: { tools: {} } },
 );
 
@@ -78,8 +106,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   if (!health.current().ready) {
     return { tools: [] };
   }
+  const tools = [...BASE_TOOLS];
+  if (ctx.glinerReady()) {
+    tools.push(piiTool);
+  }
   return {
-    tools: ALL_TOOLS.map((t) => ({
+    tools: tools.map((t) => ({
       name: t.name,
       description: t.description,
       inputSchema: t.inputSchema,
@@ -99,7 +131,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToo
   const args = (request.params.arguments ?? {}) as Record<string, unknown>;
 
   try {
-    const content = await handler(client, args);
+    const content = await handler(client, args, ctx);
     return { content: [{ type: "text", text: content }] };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -131,6 +163,7 @@ async function main(): Promise<void> {
   console.error(
     `[laya-mcp] ready (model=${process.env.LAYA_MODEL ?? "convaiinnovations/laya"}, ` +
       `url=${process.env.LAYA_URL ?? "http://127.0.0.1:8765"}, ` +
+      `gliner_url=${process.env.GLINER_URL ?? "http://127.0.0.1:8766"}, ` +
       `tool_timeout_ms=${TOOL_TIMEOUT_MS})`,
   );
 }

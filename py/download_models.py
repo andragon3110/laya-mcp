@@ -37,6 +37,11 @@ def main() -> int:
         action="store_true",
         help="Download all three official Laya checkpoints (English, multilingual, typed-decisions).",
     )
+    parser.add_argument(
+        "--gliner",
+        action="store_true",
+        help="Also download the GLiNER2.5 multilingual checkpoint (fastino/gliner2.5-multi-v1, ~594 MB).",
+    )
     args = parser.parse_args()
 
     try:
@@ -58,13 +63,19 @@ def main() -> int:
     else:
         models = [(args.model, args.subfolder)]
 
+    if args.gliner:
+        models.append(("fastino/gliner2.5-multi-v1", None))  # GLiNER2.5 multilingual / 287M
+
     for repo_id, subfolder in models:
         print(f"[download] {repo_id}" + (f" (subfolder={subfolder})" if subfolder else ""))
         try:
+            # NOTE: snapshot_download has no `subfolder` kwarg (that belongs
+            # to hf_hub_download). Scope with allow_patterns instead; paths
+            # are preserved repo-relative, so subfolder layout is kept.
+            patterns = [f"{subfolder}/*"] if subfolder else None
             snapshot_download(
                 repo_id=repo_id,
-                subfolder=subfolder,
-                allow_patterns=None,
+                allow_patterns=patterns,
                 tqdm_class=None,
             )
             print(f"[download] {repo_id}: ok")

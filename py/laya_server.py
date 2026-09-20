@@ -98,9 +98,11 @@ class _RouterHolder:
             raise
         return self._router
 
-    def predict(self, state: Any, questions: Dict[str, Any]) -> Dict[str, Any]:
+    def predict(self, state: Any, questions: Dict[str, Any], **kwargs: Any) -> Dict[str, Any]:
+        # kwargs passes Router routing overrides straight through:
+        # model="typed-decisions", task="typed_decisions", lang="es", ...
         router = self._ensure()
-        return router.predict(state, questions)
+        return router.predict(state, questions, **kwargs) if kwargs else router.predict(state, questions)
 
     def health(self) -> Dict[str, Any]:
         if self._router is None:
@@ -154,7 +156,7 @@ class PredictResponse(BaseModel):
     usage: Dict[str, int] = Field(default_factory=dict)
 
 
-app = FastAPI(title="laya-mcp", version="0.3.0")
+app = FastAPI(title="laya-mcp", version="0.4.0")
 
 # CORS is permissive because this process binds to 127.0.0.1 only.
 app.add_middleware(
@@ -196,7 +198,15 @@ async def doctor(live: bool = True) -> Dict[str, Any]:
 
     host = os.getenv("LAYA_HOST", "127.0.0.1")
     port = int(os.getenv("LAYA_PORT", "8765"))
-    report = doctor.run_doctor(laya_host=host, laya_port=port, include_live_calls=live)
+    gliner_host = os.getenv("GLINER_HOST", "127.0.0.1")
+    gliner_port = int(os.getenv("GLINER_PORT", "8766"))
+    report = doctor.run_doctor(
+        laya_host=host,
+        laya_port=port,
+        include_live_calls=live,
+        gliner_host=gliner_host,
+        gliner_port=gliner_port,
+    )
     # Always 200 -- the report carries the verdict. The MCP host and CLI
     # can branch on report["ok"].
     return report

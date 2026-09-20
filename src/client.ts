@@ -22,7 +22,7 @@ export interface HealthResult {
   error?: string;
 }
 
-export class LayaUnavailableError extends Error {
+export class BackendUnavailableError extends Error {
   public readonly code: "timeout" | "unreachable" | "http_error" | "invalid_json";
   public readonly status?: number;
 
@@ -32,10 +32,25 @@ export class LayaUnavailableError extends Error {
     status?: number,
   ) {
     super(message);
-    this.name = "LayaUnavailableError";
+    this.name = "BackendUnavailableError";
     this.code = code;
     this.status = status;
   }
+}
+
+/** Backwards-compatible alias. New code should use BackendUnavailableError. */
+export const LayaUnavailableError = BackendUnavailableError;
+export type LayaUnavailableError = BackendUnavailableError;
+
+export interface PredictOpts {
+  /** Force a Router checkpoint: "english" | "multilingual" | "typed-decisions". */
+  model?: string;
+  /** Force a task family (with auto_task_detection). */
+  task?: string;
+  /** Force a language hint (e.g. "es"). */
+  lang?: string;
+  /** Per-call timeout override. */
+  timeoutMs?: number;
 }
 
 export class LayaClient {
@@ -89,6 +104,7 @@ export class LayaClient {
     state: unknown,
     questions: Record<string, unknown>,
     timeoutMs?: number,
+    opts?: PredictOpts,
   ): Promise<PredictResult> {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeoutMs ?? this.defaultTimeoutMs);
@@ -97,7 +113,13 @@ export class LayaClient {
         method: "POST",
         headers: { "content-type": "application/json" },
         signal: ctrl.signal,
-        body: JSON.stringify({ state, questions }),
+        body: JSON.stringify({
+          state,
+          questions,
+          ...(opts?.model ? { model: opts.model } : {}),
+          ...(opts?.task ? { task: opts.task } : {}),
+          ...(opts?.lang ? { lang: opts.lang } : {}),
+        }),
       });
       if (!res.ok) {
         const text = await res.text().catch(() => "");
