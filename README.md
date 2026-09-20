@@ -90,13 +90,12 @@ The script:
 1. Creates a Python venv at `$HOME/laya-mcp/.venv/`
 2. Pins `laya>=0.3.0,<0.4.0` (the version line that ships the `typed-decisions` subfolder) and installs `laya`, `fastapi`, `uvicorn`, `huggingface_hub`
 3. Runs `npm install` and `tsc`
-4. **Pre-downloads the `laya-typed-decisions` checkpoint** (~440 MB) so the first `start_laya.sh` does not block on a model fetch
-5. **Also pre-downloads the base English + multilingual checkpoints** (~ +1 GB) so the multilingual path is ready offline
-6. Generates `start_laya.sh`, `start_mcp.sh`, `uninstall.sh`, `examples/opencode.snippet.json`
+4. **Pre-downloads all 3 Laya checkpoints** (~1.7 GB total) so the Router starts ready: `english` (~440 MB), `multilingual` (~320 MB), `typed-decisions` (~440 MB). All three are bundled under the `convaiinnovations/laya` repo at different subfolders; only the requested weights are downloaded.
+5. Generates `start_laya.sh`, `start_mcp.sh`, `uninstall.sh`, `examples/opencode.snippet.json`
 
 You can override paths with `LAYA_MCP_HOME`, `LAYA_HOST`, `LAYA_PORT`,
-`LAYA_MODEL`, `LAYA_MCP_NO_ALL=1` (skip the auxiliary checkpoints),
-`PYTHON`. See `install.sh`.
+`LAYA_MCP_NO_ALL=1` (skip the auxiliary checkpoints, Router will fetch
+them on first request), `PYTHON`. See `install.sh`.
 
 ### Start the laya-server
 
@@ -104,60 +103,87 @@ In one terminal:
 
 ```bash
 $HOME/laya-mcp/start_laya.sh
-# -> [laya-server] loading Laya router repo=convaiinnovations/laya-typed-decisions subfolder=typed-decisions
-# -> [laya-server] Laya router ready: convaiinnovations/laya-typed-decisions/typed-decisions
+# -> [laya-server] loading Laya Router (device=auto, preload=True, auto_task_detection=True, max_loaded=3)
+# -> [laya-server] Laya Router ready: loaded=['english', 'multilingual', 'typed-decisions'], laya_sdk=0.3.4
 # -> [laya-server] laya-server starting on http://127.0.0.1:8765
 ```
 
-Because the installer pre-downloaded the weights, the first start is
-seconds, not minutes.
+Because the installer pre-downloaded all three checkpoints, the first
+start is seconds, not minutes. The Router keeps all three resident so
+script detection + workflow auto-detection never pay a model-load cost.
+
+The Router picks a checkpoint per request:
+
+| Input language                                       | Detected script  | Checkpoint used           |
+|------------------------------------------------------|------------------|---------------------------|
+| Spanish (`"Me cobraron dos veces..."`)                | Latin, lang=es   | `multilingual`            |
+| English (`"I was charged twice..."`)                  | Latin, lang=en   | `english`                 |
+| Question ids match a typed-decisions workflow         | any              | `typed-decisions` (auto)  |
+| Caller passes `model="typed-decisions"`              | any              | `typed-decisions` (force) |
+
+Every `/predict` response includes a `routing` block with the model
+chosen and the reason. The MCP tools surface it in their text output so
+the agent can audit routing decisions.
 
 ### Verify
 
 ```bash
 curl http://127.0.0.1:8765/health
-# -> {"status":"ok","ready":true,"model":"convaiinnovations/laya-typed-decisions/typed-decisions","subfolder":"typed-decisions","device":"auto","language":"english","laya_sdk_version":"0.3.4"}
+# -> {"status":"ok","ready":true,"loaded":["english","multilingual","typed-decisions"],"auto_task_detection":true,"max_loaded":3,"device":"auto","laya_sdk_version":"0.3.4","uptime_seconds":2.3}
 ```
 
-If you see `ready: true`, the MCP server will advertise all ten tools.
+If `ready: true` and `loaded` lists all three checkpoints, the MCP server
+will advertise all ten tools.
 
-### Choosing the right model
+### How the Router picks a checkpoint (default behaviour)
 
-Laya ships three checkpoints. `install.sh` downloads all of them so you
-can switch at runtime without re-downloading:
+`install.sh` configures the server with three env vars:
 
-| Model id                                 | Subfolder        | Size  | When to use                                                                                              |
-|------------------------------------------|------------------|-------|----------------------------------------------------------------------------------------------------------|
-| `convaiinnovations/laya`                 | *(none)*         | ~440 MB | English-only base checkpoint. Zero-shot on `typed-decisions` is **near chance** (0.362). Avoid for our tools. |
-| `convaiinnovations/laya-typed-decisions` | `typed-decisions` | ~440 MB | **Default.** Fine-tuned for the `choice` / `score` / `noul` primitives. Accuracy 0.766 on typed decisions, ECE 0.21. Use this unless you have a specific reason not to. |
-| `convaiinnovations/laya-multilingual`    | `multilingual`   | ~320 MB | When `state` text is in a non-English language. Same accuracy on English (~0.66) but 1.5× better on non-English text. |
+| Var                        | Default | Effect                                                          |
+|----------------------------|---------|-----------------------------------------------------------------|
+| `LAYA_PRELOAD`             | `1`     | Load all 3 checkpoints up front so routing never pays a load cost |
+| `LAYA_AUTO_TASK_DETECTION` | `1`     | Use `typed-decisions` when question ids match its 4 workflows     |
+| `LAYA_MAX_LOADED`          | `3`     | Keep up to 3 resident (LRU eviction if you raise / lower this)  |
 
-To switch at runtime without reinstalling:
+With those defaults, every `/predict` call returns a `routing` block that
+the MCP tools surface to the agent:
+
+```json
+{
+  "model": "multilingual",
+  "repo": "convaiinnovations/laya/multilingual",
+  "reason": "Latin script but language looks like 'es', not English",
+  "detection": { "script": "latin", "language": "es", "is_english": false },
+  "workflow": null
+}
+```
+
+### Forcing a specific checkpoint
+
+Pass `model`, `task`, or `lang` on the `/predict` body to override the
+Router. The MCP tools do not currently expose these directly, but the
+HTTP endpoint accepts them and you can build wrappers around them:
 
 ```bash
-# Use the typed-decisions checkpoint (the default)
-LAYA_MODEL=convaiinnovations/laya-typed-decisions LAYA_SUBFOLDER=typed-decisions $HOME/laya-mcp/start_laya.sh
-
-# Use the multilingual checkpoint
-LAYA_MODEL=convaiinnovations/laya-multilingual LAYA_SUBFOLDER= $HOME/laya-mcp/start_laya.sh
-
-# Use the English base checkpoint (NOT recommended for our tools)
-LAYA_MODEL=convaiinnovations/laya LAYA_SUBFOLDER= $HOME/laya-mcp/start_laya.sh
+curl -X POST http://127.0.0.1:8765/predict \
+  -H 'Content-Type: application/json' \
+  -d '{"state":{"text":"Hola"},"questions":{"q":{"type":"choice","instructions":"...","criteria":{}}},"model":"multilingual"}'
 ```
 
-To pre-download a different model after the install, use the helper
-script directly:
+### Choosing a different setup
+
+If you only need one language (e.g. Spanish only), set
+`LAYA_MAX_LOADED=1 LAYA_PRELOAD=0` and preload just the checkpoint you
+want:
 
 ```bash
-$HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/py/download_models.py --all-checkpoints
+LAYA_MAX_LOADED=1 LAYA_PRELOAD=0 LAYA_AUTO_TASK_DETECTION=0 \
+  $HOME/laya-mcp/start_laya.sh
 ```
 
-To pre-download only the typed-decisions checkpoint (faster install on
-slow networks):
-
-```bash
-LAYA_MCP_NO_ALL=1 ./install.sh
-```
+The Router will lazily download the first checkpoint you hit and evict
+others. ~ 400 MB RAM instead of 1.7 GB, at the cost of paying a model
+load on first use of each language.
 
 ---
 
@@ -285,12 +311,20 @@ All env vars (with defaults):
 |------------------------------|----------------------------------|-----------------------------------------------------------|
 | `LAYA_URL`                   | `http://127.0.0.1:8765`          | Where the Python server listens                           |
 | `LAYA_HOST` / `LAYA_PORT`    | `127.0.0.1` / `8765`             | Bind address for the Python server                        |
-| `LAYA_MODEL`                 | `convaiinnovations/laya`         | HuggingFace model id                                       |
 | `LAYA_DEVICE`                | `auto`                           | `auto` / `cpu` / `cuda`                                  |
+| `LAYA_PRELOAD`               | `1`                              | Load all 3 checkpoints at startup                        |
+| `LAYA_AUTO_TASK_DETECTION`   | `1`                              | Auto-route to `typed-decisions` on workflow match         |
+| `LAYA_MAX_LOADED`            | `3`                              | Max resident checkpoints (LRU eviction)                  |
+| `LAYA_STANDALONE_REPOS`      | `0`                              | Use per-checkpoint repos instead of the hub repo          |
 | `LAYA_TIMEOUT_MS`            | `5000`                           | Per-call HTTP timeout from MCP to Python                  |
 | `LAYA_TOOL_TIMEOUT_MS`       | `8000`                           | Per-tool MCP timeout                                      |
 | `LAYA_HEALTH_INTERVAL_MS`    | `10000`                          | Background watcher poll interval                         |
 | `LAYA_LOG_LEVEL`             | `WARNING`                        | uvicorn log level                                         |
+
+`LAYA_MODEL` and `LAYA_SUBFOLDER` are no longer used by `laya_server.py`
+itself -- the Router selects checkpoints automatically. They are still
+honoured by `download_models.py` if you want to pre-fetch a single
+checkpoint.
 
 ---
 

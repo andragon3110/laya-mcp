@@ -8,6 +8,7 @@
 export interface PredictResult {
   answers: Record<string, unknown>;
   confidence: Record<string, number>;
+  routing: Record<string, unknown>;
   model: string;
   latencyMs: number;
   usage: Record<string, number>;
@@ -116,6 +117,7 @@ export class LayaClient {
       return {
         answers: body.answers as Record<string, unknown>,
         confidence: (body.confidence as Record<string, number>) ?? {},
+        routing: (body.routing as Record<string, unknown>) ?? {},
         model: (body.model as string) ?? "laya",
         latencyMs: Number(body.latency_ms ?? 0),
         usage: (body.usage as Record<string, number>) ?? {},

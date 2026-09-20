@@ -2,9 +2,13 @@
 """
 laya-mcp Python server.
 
-Minimal HTTP wrapper around the Laya decision engine. Exposes a single
-`/predict` endpoint that accepts a state + typed questions JSON payload
-and returns the same probability-shaped response Laya emits natively.
+Thin HTTP wrapper around the Laya Router. The server boots one `Router`
+that loads (or will load) up to three Laya checkpoints and routes each
+request to the best fit:
+
+  - `english`          (convaiinnovations/laya,                 ModernBERT-large, 512 ctx)
+  - `multilingual`     (convaiinnovations/laya-multilingual,    mmBERT-base,        1024 ctx, 100+ langs)
+  - `typed-decisions`  (convaiinnovations/laya-typed-decisions, ModernBERT-large, 1024 ctx, fine-tuned)
 
 This process is intentionally decoupled from the TypeScript MCP server:
 either layer can be restarted independently. If this process is not
@@ -31,79 +35,15 @@ logging.basicConfig(
 )
 log = logging.getLogger("laya-server")
 
-DEFAULT_MODEL = os.getenv("LAYA_MODEL", "convaiinnovations/laya-typed-decisions")
-DEFAULT_SUBFOLDER = os.getenv("LAYA_SUBFOLDER", "typed-decisions")
-DEFAULT_DEVICE = os.getenv("LAYA_DEVICE", "auto")  # auto|cpu|cuda
-DEFAULT_LANGUAGE = os.getenv("LAYA_LANGUAGE", "english")  # english|multilingual
+# Configuration via env vars. The default loads the Router with all three
+# checkpoints so script detection + typed-decisions auto-detection work
+# out of the box.
+ROUTER_DEVICE = os.getenv("LAYA_DEVICE", "auto")  # auto|cpu|cuda
+ROUTER_MAX_LOADED = int(os.getenv("LAYA_MAX_LOADED", "3"))
+ROUTER_PRELOAD = os.getenv("LAYA_PRELOAD", "1") not in ("0", "false", "False")
+ROUTER_AUTO_TASK = os.getenv("LAYA_AUTO_TASK_DETECTION", "1") not in ("0", "false", "False")
+ROUTER_STANDALONE_REPOS = os.getenv("LAYA_STANDALONE_REPOS", "0") in ("1", "true", "True")
 
-
-class _Router:
-    """Lazy Laya loader so the HTTP server boots even when Laya is missing."""
-
-    def __init__(self) -> None:
-        self._router = None
-        self._load_error: str | None = None
-        self._loaded_model: str | None = None
-
-    def _ensure(self) -> Any:
-        if self._router is not None:
-            return self._router
-        if self._load_error is not None:
-            raise RuntimeError(self._load_error)
-        try:
-            from laya import Router
-
-            log.info(
-                "loading Laya router repo=%s subfolder=%s device=%s",
-                DEFAULT_MODEL,
-                DEFAULT_SUBFOLDER,
-                DEFAULT_DEVICE,
-            )
-            # Newer Laya SDKs (>=0.3.0) accept subfolder= so we can load the
-            # fine-tuned typed-decisions checkpoint explicitly.
-            try:
-                self._router = Router(
-                    repo_id=DEFAULT_MODEL,
-                    subfolder=DEFAULT_SUBFOLDER,
-                    device=DEFAULT_DEVICE if DEFAULT_DEVICE != "auto" else None,
-                )
-            except TypeError:
-                # Older SDKs only accept `model=`.
-                self._router = Router(
-                    model=DEFAULT_MODEL,
-                    device=DEFAULT_DEVICE if DEFAULT_DEVICE != "auto" else None,
-                )
-            self._loaded_model = f"{DEFAULT_MODEL}/{DEFAULT_SUBFOLDER}"
-            log.info("Laya router ready: %s", self._loaded_model)
-        except Exception as exc:  # noqa: BLE001
-            self._load_error = f"laya not loaded: {exc!r}"
-            log.exception("Laya load failed")
-            raise
-        return self._router
-
-    def predict(self, state: Any, questions: Dict[str, Any]) -> Dict[str, Any]:
-        return self._ensure().predict(state, questions)
-
-    def health(self) -> Dict[str, Any]:
-        if self._router is None:
-            try:
-                self._ensure()
-            except Exception as exc:  # noqa: BLE001
-                return {"ready": False, "error": str(exc)}
-        return {
-            "ready": True,
-            "model": self._loaded_model or DEFAULT_MODEL,
-            "subfolder": DEFAULT_SUBFOLDER,
-            "device": DEFAULT_DEVICE,
-            "language": DEFAULT_LANGUAGE,
-            "laya_sdk_version": _laya_version(),
-        }
-
-
-router = _Router()
-
-
-# -- HTTP contract ----------------------------------------------------------
 
 def _laya_version() -> str:
     try:
@@ -114,28 +54,107 @@ def _laya_version() -> str:
         return "unknown"
 
 
+class _RouterHolder:
+    """Lazy Router loader so the HTTP server boots even when Laya is missing."""
+
+    def __init__(self) -> None:
+        self._router = None
+        self._load_error: str | None = None
+        self._loaded_at: float | None = None
+
+    def _ensure(self) -> Any:
+        if self._router is not None:
+            return self._router
+        if self._load_error is not None:
+            raise RuntimeError(self._load_error)
+        try:
+            from laya import Router
+
+            log.info(
+                "loading Laya Router (device=%s, preload=%s, auto_task_detection=%s, "
+                "max_loaded=%d, standalone_repos=%s)",
+                ROUTER_DEVICE,
+                ROUTER_PRELOAD,
+                ROUTER_AUTO_TASK,
+                ROUTER_MAX_LOADED,
+                ROUTER_STANDALONE_REPOS,
+            )
+            self._router = Router(
+                device=None if ROUTER_DEVICE == "auto" else ROUTER_DEVICE,
+                max_loaded=ROUTER_MAX_LOADED,
+                auto_task_detection=ROUTER_AUTO_TASK,
+                standalone_repos=ROUTER_STANDALONE_REPOS,
+                preload=ROUTER_PRELOAD,
+            )
+            self._loaded_at = time.time()
+            log.info(
+                "Laya Router ready: loaded=%s, laya_sdk=%s",
+                self._router.loaded,
+                _laya_version(),
+            )
+        except Exception as exc:  # noqa: BLE001
+            self._load_error = f"laya not loaded: {exc!r}"
+            log.exception("Laya load failed")
+            raise
+        return self._router
+
+    def predict(self, state: Any, questions: Dict[str, Any]) -> Dict[str, Any]:
+        router = self._ensure()
+        return router.predict(state, questions)
+
+    def health(self) -> Dict[str, Any]:
+        if self._router is None:
+            try:
+                self._ensure()
+            except Exception as exc:  # noqa: BLE001
+                return {"ready": False, "error": str(exc), "laya_sdk_version": _laya_version()}
+        return {
+            "ready": True,
+            "loaded": list(self._router.loaded),
+            "auto_task_detection": ROUTER_AUTO_TASK,
+            "max_loaded": ROUTER_MAX_LOADED,
+            "device": ROUTER_DEVICE,
+            "laya_sdk_version": _laya_version(),
+            "uptime_seconds": (time.time() - self._loaded_at) if self._loaded_at else 0.0,
+        }
+
+
+router = _RouterHolder()
+
+
+# -- HTTP contract ----------------------------------------------------------
+
 class PredictRequest(BaseModel):
     state: Any = Field(..., description="State (string or JSON object) to evaluate.")
     questions: Dict[str, Any] = Field(
         ..., description="Map of question_id to {type, instructions, criteria?}"
     )
     model: str | None = Field(
-        default=None, description="Override the model repo (default: convaiinnovations/laya-typed-decisions)."
+        default=None,
+        description=(
+            "Force a specific checkpoint: 'english', 'multilingual', 'typed-decisions' "
+            "(or alias 'typed'). With auto_task_detection on, leave unset to let the Router decide."
+        ),
     )
-    subfolder: str | None = Field(
-        default=None, description="Override the model subfolder (default: typed-decisions)."
+    task: str | None = Field(
+        default=None,
+        description="Force a task family. With auto_task_detection, leave unset.",
+    )
+    lang: str | None = Field(
+        default=None,
+        description="Force a language hint (e.g. 'en', 'es', 'fr').",
     )
 
 
 class PredictResponse(BaseModel):
     answers: Dict[str, Any]
     confidence: Dict[str, float] = Field(default_factory=dict)
-    model: str
+    routing: Dict[str, Any] = Field(default_factory=dict)
     latency_ms: float
     usage: Dict[str, int] = Field(default_factory=dict)
 
 
-app = FastAPI(title="laya-mcp", version="0.1.0")
+app = FastAPI(title="laya-mcp", version="0.2.0")
 
 # CORS is permissive because this process binds to 127.0.0.1 only.
 app.add_middleware(
@@ -163,12 +182,22 @@ async def ready() -> Dict[str, Any]:
 
 @app.post("/predict", response_model=PredictResponse)
 async def predict(req: PredictRequest) -> PredictResponse:
-    """Run Laya on state + questions and return typed answers with confidence."""
+    """Run Laya on state + questions. Routing is decided by the Router unless caller forces it."""
     start = time.perf_counter()
     try:
-        result = await asyncio.to_thread(router.predict, req.state, req.questions)
+        kwargs: Dict[str, Any] = {}
+        if req.model is not None:
+            kwargs["model"] = req.model
+        if req.task is not None:
+            kwargs["task"] = req.task
+        if req.lang is not None:
+            kwargs["lang"] = req.lang
+        result = await asyncio.to_thread(
+            lambda: router.predict(req.state, req.questions, **kwargs)
+            if kwargs
+            else router.predict(req.state, req.questions)
+        )
     except RuntimeError as exc:
-        # Laya failed to load (or predict failed) -- surface a structured error.
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=f"prediction error: {exc!r}") from exc
@@ -179,13 +208,14 @@ async def predict(req: PredictRequest) -> PredictResponse:
         for qid, answer in answers.items()
         if isinstance(answer, dict)
     }
+    routing = result.get("routing", {}) if isinstance(result, dict) else {}
     latency_ms = (time.perf_counter() - start) * 1000.0
     usage = result.get("usage", {}) if isinstance(result, dict) else {}
 
     return PredictResponse(
         answers=answers,
         confidence=confidence,
-        model=req.model or DEFAULT_MODEL,
+        routing=routing,
         latency_ms=latency_ms,
         usage=usage,
     )

@@ -46,10 +46,14 @@ def main() -> int:
         return 2
 
     if args.all_checkpoints:
+        # The three checkpoints Laya.Router can route between when preload=True
+        # is set. All three are bundled under the `convaiinnovations/laya` repo
+        # at different subfolders; huggingface_hub only downloads the requested
+        # subfolder's weights.
         models = [
-            ("convaiinnovations/laya", None),
-            ("convaiinnovations/laya-multilingual", None),
-            ("convaiinnovations/laya-typed-decisions", "typed-decisions"),
+            ("convaiinnovations/laya", None),                         # english / ModernBERT-large
+            ("convaiinnovations/laya-multilingual", None),            # multilingual / mmBERT-base
+            ("convaiinnovations/laya-typed-decisions", "typed-decisions"),  # english / fine-tuned
         ]
     else:
         models = [(args.model, args.subfolder)]

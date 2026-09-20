@@ -56,21 +56,21 @@ npm run build --silent
 
 # -- pre-download Laya model(s) ---------------------------------------------
 
-LAYA_MODEL="${LAYA_MODEL:-convaiinnovations/laya-typed-decisions}"
-say "pre-downloading Laya checkpoint: $LAYA_MODEL"
-if ! "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --model "$LAYA_MODEL"; then
-  warn "model download failed (will retry on first laya-server start)"
-fi
-
-# Offer to also pull the multilingual + base checkpoints.
+# laya-mcp uses laya.Router with auto_task_detection=True, which loads all
+# three checkpoints (english, multilingual, typed-decisions) so script
+# detection + workflow auto-detection work for both English and Spanish
+# (and any other language Router can classify). Total disk: ~1.7 GB.
+say "Router mode requires all 3 Laya checkpoints (english + multilingual + typed-decisions)"
 if [ -z "${LAYA_MCP_NO_ALL:-}" ]; then
-  say "also pulling base + multilingual checkpoints (~ +1 GB) so the multilingual model is ready offline"
-  if "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --model convaiinnovations/laya >/dev/null 2>&1 \
-    && "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --model convaiinnovations/laya-multilingual >/dev/null 2>&1; then
-    say "all three checkpoints ready in the HuggingFace cache"
+  if "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --all-checkpoints 2>&1 | sed "s/^/  /"; then
+    say "all 3 checkpoints (~1.7 GB) ready in the HuggingFace cache"
   else
-    warn "one or more auxiliary checkpoints failed to download -- only $LAYA_MODEL is local"
+    warn "one or more checkpoints failed to download -- the server will retry on first start"
   fi
+else
+  warn "LAYA_MCP_NO_ALL=1 -- only the default checkpoint will be downloaded; Router will download the others on first request"
+  LAYA_MODEL="${LAYA_MODEL:-convaiinnovations/laya-typed-decisions}"
+  "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --model "$LAYA_MODEL" || true
 fi
 
 # -- helper scripts ---------------------------------------------------------
