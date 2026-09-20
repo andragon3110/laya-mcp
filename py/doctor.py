@@ -186,7 +186,29 @@ def check_torch_and_device() -> List[Dict[str, Any]]:
     cuda = bool(getattr(torch.cuda, "is_available", lambda: False)())
     if cuda:
         device_name = torch.cuda.get_device_name(0)
-        free_mem = torch.cuda.mem_get_info(0)[0] / 1024 ** 3
+        try:
+            # mem_get_info itself throws when VRAM is exhausted (e.g. all
+            # checkpoints resident on a small card) -- the doctor must
+            # report that, not crash.
+            free_mem = torch.cuda.mem_get_info(0)[0] / 1024 ** 3
+        except Exception:  # noqa: BLE001
+            free_mem = 0.0
+        if free_mem < 0.5:
+            return [
+                _ok(
+                    "torch",
+                    f"torch {version} installed",
+                    version=version,
+                ),
+                _warn(
+                    "gpu",
+                    f"CUDA available: {device_name} but VRAM is (nearly) full "
+                    f"({free_mem:.1f} GB free) -- if servers fail to load, "
+                    f"set LAYA_DEVICE=cpu and/or GLINER_DEVICE=cpu",
+                    device=device_name,
+                    free_memory_gb=round(free_mem, 1),
+                ),
+            ]
         return [
             _ok(
                 "torch",
