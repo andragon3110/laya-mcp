@@ -49,6 +49,8 @@ if os.getenv("LAYA_SKIP") == "1":
 # 2. Try to spawn laya-server and exercise one tool.
 env = os.environ.copy()
 env.setdefault("LAYA_PORT", "8766")  # avoid clashing with a dev server
+env.setdefault("LAYA_MODEL", "convaiinnovations/laya-typed-decisions")
+env.setdefault("LAYA_SUBFOLDER", "typed-decisions")
 proc = subprocess.Popen(
     [sys.executable, str(ROOT / "py" / "laya_server.py")],
     cwd=str(ROOT),

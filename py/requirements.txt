@@ -1,4 +1,10 @@
-laya>=0.2.0
+# Pinned to the 0.3.x line: this is the version that ships the typed-decisions
+# checkpoint (`laya.load(..., subfolder="typed-decisions")`) which we depend on.
+# Bump the upper bound only after re-testing the smoke harness.
+laya>=0.3.0,<0.4.0
 fastapi>=0.110.0
 uvicorn[standard]>=0.27.0
 pydantic>=2.5.0
+# huggingface_hub is needed by the installer for explicit, resumable model
+# downloads (so the first laya-server boot does not block on a 1 GB pull).
+huggingface_hub>=0.24.0

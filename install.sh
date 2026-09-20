@@ -54,6 +54,25 @@ fi
 npm install --silent
 npm run build --silent
 
+# -- pre-download Laya model(s) ---------------------------------------------
+
+LAYA_MODEL="${LAYA_MODEL:-convaiinnovations/laya-typed-decisions}"
+say "pre-downloading Laya checkpoint: $LAYA_MODEL"
+if ! "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --model "$LAYA_MODEL"; then
+  warn "model download failed (will retry on first laya-server start)"
+fi
+
+# Offer to also pull the multilingual + base checkpoints.
+if [ -z "${LAYA_MCP_NO_ALL:-}" ]; then
+  say "also pulling base + multilingual checkpoints (~ +1 GB) so the multilingual model is ready offline"
+  if "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --model convaiinnovations/laya >/dev/null 2>&1 \
+    && "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --model convaiinnovations/laya-multilingual >/dev/null 2>&1; then
+    say "all three checkpoints ready in the HuggingFace cache"
+  else
+    warn "one or more auxiliary checkpoints failed to download -- only $LAYA_MODEL is local"
+  fi
+fi
+
 # -- helper scripts ---------------------------------------------------------
 
 cat > "$INSTALL_DIR/start_laya.sh" <<EOF
@@ -114,7 +133,9 @@ cat > "$INSTALL_DIR/examples/opencode.snippet.json" <<EOF
       "type": "local",
       "command": ["node", "$INSTALL_DIR/dist/index.js"],
       "environment": {
-        "LAYA_URL": "http://${HOST}:${PORT}"
+        "LAYA_URL": "http://${HOST}:${PORT}",
+        "LAYA_MODEL": "${LAYA_MODEL}",
+        "LAYA_SUBFOLDER": "typed-decisions"
       },
       "enabled": true
     }

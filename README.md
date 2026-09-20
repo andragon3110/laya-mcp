@@ -88,12 +88,14 @@ cd laya-mcp
 The script:
 
 1. Creates a Python venv at `$HOME/laya-mcp/.venv/`
-2. Installs `laya`, `fastapi`, `uvicorn`
+2. Pins `laya>=0.3.0,<0.4.0` (the version line that ships the `typed-decisions` subfolder) and installs `laya`, `fastapi`, `uvicorn`, `huggingface_hub`
 3. Runs `npm install` and `tsc`
-4. Generates `start_laya.sh`, `start_mcp.sh`, `uninstall.sh`,
-   `examples/opencode.snippet.json`
+4. **Pre-downloads the `laya-typed-decisions` checkpoint** (~440 MB) so the first `start_laya.sh` does not block on a model fetch
+5. **Also pre-downloads the base English + multilingual checkpoints** (~ +1 GB) so the multilingual path is ready offline
+6. Generates `start_laya.sh`, `start_mcp.sh`, `uninstall.sh`, `examples/opencode.snippet.json`
 
 You can override paths with `LAYA_MCP_HOME`, `LAYA_HOST`, `LAYA_PORT`,
+`LAYA_MODEL`, `LAYA_MCP_NO_ALL=1` (skip the auxiliary checkpoints),
 `PYTHON`. See `install.sh`.
 
 ### Start the laya-server
@@ -102,20 +104,60 @@ In one terminal:
 
 ```bash
 $HOME/laya-mcp/start_laya.sh
+# -> [laya-server] loading Laya router repo=convaiinnovations/laya-typed-decisions subfolder=typed-decisions
+# -> [laya-server] Laya router ready: convaiinnovations/laya-typed-decisions/typed-decisions
 # -> [laya-server] laya-server starting on http://127.0.0.1:8765
 ```
 
-First startup downloads the Laya weights (~1 GB) and warms up. Subsequent
-starts are seconds.
+Because the installer pre-downloaded the weights, the first start is
+seconds, not minutes.
 
 ### Verify
 
 ```bash
 curl http://127.0.0.1:8765/health
-# -> {"status":"ok","ready":true,"model":"convaiinnovations/laya",...}
+# -> {"status":"ok","ready":true,"model":"convaiinnovations/laya-typed-decisions/typed-decisions","subfolder":"typed-decisions","device":"auto","language":"english","laya_sdk_version":"0.3.4"}
 ```
 
 If you see `ready: true`, the MCP server will advertise all ten tools.
+
+### Choosing the right model
+
+Laya ships three checkpoints. `install.sh` downloads all of them so you
+can switch at runtime without re-downloading:
+
+| Model id                                 | Subfolder        | Size  | When to use                                                                                              |
+|------------------------------------------|------------------|-------|----------------------------------------------------------------------------------------------------------|
+| `convaiinnovations/laya`                 | *(none)*         | ~440 MB | English-only base checkpoint. Zero-shot on `typed-decisions` is **near chance** (0.362). Avoid for our tools. |
+| `convaiinnovations/laya-typed-decisions` | `typed-decisions` | ~440 MB | **Default.** Fine-tuned for the `choice` / `score` / `noul` primitives. Accuracy 0.766 on typed decisions, ECE 0.21. Use this unless you have a specific reason not to. |
+| `convaiinnovations/laya-multilingual`    | `multilingual`   | ~320 MB | When `state` text is in a non-English language. Same accuracy on English (~0.66) but 1.5× better on non-English text. |
+
+To switch at runtime without reinstalling:
+
+```bash
+# Use the typed-decisions checkpoint (the default)
+LAYA_MODEL=convaiinnovations/laya-typed-decisions LAYA_SUBFOLDER=typed-decisions $HOME/laya-mcp/start_laya.sh
+
+# Use the multilingual checkpoint
+LAYA_MODEL=convaiinnovations/laya-multilingual LAYA_SUBFOLDER= $HOME/laya-mcp/start_laya.sh
+
+# Use the English base checkpoint (NOT recommended for our tools)
+LAYA_MODEL=convaiinnovations/laya LAYA_SUBFOLDER= $HOME/laya-mcp/start_laya.sh
+```
+
+To pre-download a different model after the install, use the helper
+script directly:
+
+```bash
+$HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/py/download_models.py --all-checkpoints
+```
+
+To pre-download only the typed-decisions checkpoint (faster install on
+slow networks):
+
+```bash
+LAYA_MCP_NO_ALL=1 ./install.sh
+```
 
 ---
 

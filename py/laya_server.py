@@ -31,7 +31,8 @@ logging.basicConfig(
 )
 log = logging.getLogger("laya-server")
 
-DEFAULT_MODEL = os.getenv("LAYA_MODEL", "convaiinnovations/laya")
+DEFAULT_MODEL = os.getenv("LAYA_MODEL", "convaiinnovations/laya-typed-decisions")
+DEFAULT_SUBFOLDER = os.getenv("LAYA_SUBFOLDER", "typed-decisions")
 DEFAULT_DEVICE = os.getenv("LAYA_DEVICE", "auto")  # auto|cpu|cuda
 DEFAULT_LANGUAGE = os.getenv("LAYA_LANGUAGE", "english")  # english|multilingual
 
@@ -52,13 +53,28 @@ class _Router:
         try:
             from laya import Router
 
-            log.info("loading Laya router model=%s device=%s", DEFAULT_MODEL, DEFAULT_DEVICE)
-            self._router = Router(
-                model=DEFAULT_MODEL,
-                device=DEFAULT_DEVICE if DEFAULT_DEVICE != "auto" else None,
+            log.info(
+                "loading Laya router repo=%s subfolder=%s device=%s",
+                DEFAULT_MODEL,
+                DEFAULT_SUBFOLDER,
+                DEFAULT_DEVICE,
             )
-            self._loaded_model = DEFAULT_MODEL
-            log.info("Laya router ready")
+            # Newer Laya SDKs (>=0.3.0) accept subfolder= so we can load the
+            # fine-tuned typed-decisions checkpoint explicitly.
+            try:
+                self._router = Router(
+                    repo_id=DEFAULT_MODEL,
+                    subfolder=DEFAULT_SUBFOLDER,
+                    device=DEFAULT_DEVICE if DEFAULT_DEVICE != "auto" else None,
+                )
+            except TypeError:
+                # Older SDKs only accept `model=`.
+                self._router = Router(
+                    model=DEFAULT_MODEL,
+                    device=DEFAULT_DEVICE if DEFAULT_DEVICE != "auto" else None,
+                )
+            self._loaded_model = f"{DEFAULT_MODEL}/{DEFAULT_SUBFOLDER}"
+            log.info("Laya router ready: %s", self._loaded_model)
         except Exception as exc:  # noqa: BLE001
             self._load_error = f"laya not loaded: {exc!r}"
             log.exception("Laya load failed")
@@ -77,8 +93,10 @@ class _Router:
         return {
             "ready": True,
             "model": self._loaded_model or DEFAULT_MODEL,
+            "subfolder": DEFAULT_SUBFOLDER,
             "device": DEFAULT_DEVICE,
             "language": DEFAULT_LANGUAGE,
+            "laya_sdk_version": _laya_version(),
         }
 
 
@@ -87,13 +105,25 @@ router = _Router()
 
 # -- HTTP contract ----------------------------------------------------------
 
+def _laya_version() -> str:
+    try:
+        from importlib.metadata import version
+
+        return version("laya")
+    except Exception:  # noqa: BLE001
+        return "unknown"
+
+
 class PredictRequest(BaseModel):
     state: Any = Field(..., description="State (string or JSON object) to evaluate.")
     questions: Dict[str, Any] = Field(
         ..., description="Map of question_id to {type, instructions, criteria?}"
     )
     model: str | None = Field(
-        default=None, description="Override the model checkpoint (English/multilingual/typed-decisions)."
+        default=None, description="Override the model repo (default: convaiinnovations/laya-typed-decisions)."
+    )
+    subfolder: str | None = Field(
+        default=None, description="Override the model subfolder (default: typed-decisions)."
     )
 
 
