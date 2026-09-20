@@ -1,0 +1,4 @@
+laya>=0.2.0
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.0

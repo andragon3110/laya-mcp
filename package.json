@@ -1,0 +1,46 @@
+{
+  "name": "laya-mcp",
+  "version": "0.1.0",
+  "description": "MCP server that exposes Laya typed decisions to coding agents. 100% optional - your existing setup runs unchanged if Laya or this server are missing.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "laya-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "files": [
+    "dist",
+    "py",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "laya",
+    "ai",
+    "decision-models",
+    "system-one",
+    "coding-agent",
+    "guardrail",
+    "code-review"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
