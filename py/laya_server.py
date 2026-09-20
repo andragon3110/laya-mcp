@@ -154,7 +154,7 @@ class PredictResponse(BaseModel):
     usage: Dict[str, int] = Field(default_factory=dict)
 
 
-app = FastAPI(title="laya-mcp", version="0.2.0")
+app = FastAPI(title="laya-mcp", version="0.3.0")
 
 # CORS is permissive because this process binds to 127.0.0.1 only.
 app.add_middleware(
@@ -178,6 +178,28 @@ async def ready() -> Dict[str, Any]:
     if not info.get("ready"):
         raise HTTPException(status_code=503, detail=info)
     return {"status": "ready", **info}
+
+
+@app.get("/doctor")
+async def doctor(live: bool = True) -> Dict[str, Any]:
+    """Run the full laya-mcp diagnostic report.
+
+    Re-uses the same checks as `py/doctor.py` so the HTTP endpoint and
+    the CLI are guaranteed to agree. Pass `?live=false` to skip the
+    /health and /predict probes (useful when the server itself is down
+    or you want a fast read-only check).
+    """
+    # Import locally so the doctor module can be patched without restarting
+    # the server, and so its transitive imports (psutil, torch) are not
+    # required for the server to start.
+    import doctor
+
+    host = os.getenv("LAYA_HOST", "127.0.0.1")
+    port = int(os.getenv("LAYA_PORT", "8765"))
+    report = doctor.run_doctor(laya_host=host, laya_port=port, include_live_calls=live)
+    # Always 200 -- the report carries the verdict. The MCP host and CLI
+    # can branch on report["ok"].
+    return report
 
 
 @app.post("/predict", response_model=PredictResponse)

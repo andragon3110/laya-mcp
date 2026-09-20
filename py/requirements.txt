@@ -8,3 +8,5 @@ pydantic>=2.5.0
 # huggingface_hub is needed by the installer for explicit, resumable model
 # downloads (so the first laya-server boot does not block on a 1 GB pull).
 huggingface_hub>=0.24.0
+# psutil lets the doctor report free RAM and disk without shelling out.
+psutil>=5.9.0

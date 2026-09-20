@@ -271,11 +271,62 @@ your agent's skill files (e.g. `.opencode/agents/sdd-apply.md`).
 
 ---
 
+## Diagnose with `doctor`
+
+`doctor` checks the whole stack and tells you exactly what is broken, if
+anything: Laya SDK import + version, downloaded checkpoints, torch/CUDA,
+free disk, free RAM, install-dir layout, MCP bundle boot, the live
+`/health` and `/predict` probes, and the optional `opencode.json` entry.
+
+```bash
+# Human-readable report (--no-live skips the server probes)
+$HOME/laya-mcp/doctor.sh
+$HOME/laya-mcp/doctor.sh --no-live
+
+# JSON for scripts/CI (exit 1 when any check fails)
+$HOME/laya-mcp/doctor.sh --json
+$HOME/laya-mcp/doctor.sh --json --fail-on warn   # stricter: 1 also on warnings
+
+# Same report over HTTP while the server is running (?live=false skips probes)
+curl http://127.0.0.1:8765/doctor | python3 -m json.tool
+curl 'http://127.0.0.1:8765/doctor?live=false' | python3 -m json.tool
+```
+
+Expected output (everything healthy):
+
+```
+[ laya-mcp doctor ]  [OK]  11 pass  2 warn  0 fail  1 skip
+  install_dir: /home/you/laya-mcp
+  hf_cache:    /home/you/.cache/huggingface
+  python:      3.12.1  platform: linux
+
+  ✓ [PASS] laya-sdk                laya 0.3.4 installed with Router
+  ✓ [PASS] laya-version            laya 0.3.4 supports subfolder kwarg
+  ✓ [PASS] torch                   torch 2.5.1 installed
+  ! [WARN] gpu                      no CUDA GPU detected -- Laya will run on CPU (~200 ms/call)
+  ✓ [PASS] disk                    42.1 GB free at /home/you
+  ✓ [PASS] memory                  12.4 GB available of 15.6 GB total
+  ✓ [PASS] install-dir             /home/you/laya-mcp looks complete
+  ✓ [PASS] checkpoint:english      convaiinnovations/laya (root) cached
+  ✓ [PASS] checkpoint:multilingual convaiinnovations/laya-multilingual (root) cached
+  ✓ [PASS] checkpoint:typed-decisions convaiinnovations/laya-typed-decisions (typed-decisions) cached
+  ✓ [PASS] laya-server             GET http://127.0.0.1:8765/health reachable in 12 ms
+  ✓ [PASS] live-predict            POST http://127.0.0.1:8765/predict ok in 210 ms
+  ✓ [PASS] mcp-server-boot         index.js booted and was reachable for stdio
+  - [SKIP] opencode-config         ~/.config/opencode/opencode.json exists but no mcp.laya entry
+```
+
+Run this first whenever something looks wrong -- paste the output when
+asking for help and the failure is usually obvious from the check name.
+
 ## Test the install
 
 After installing and starting `start_laya.sh`:
 
 ```bash
+# Full diagnostic (preferred -- runs every check at once)
+$HOME/laya-mcp/doctor.sh
+
 # Sanity-check the Python wrapper
 $HOME/laya-mcp/tests/test_health.sh
 
@@ -286,8 +337,9 @@ $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke.py
 cd $HOME/laya-mcp && npm run inspect
 ```
 
-Expected: the inspector shows **10 tools** in the left panel. With the
-Python server down, it shows **0 tools**.
+Expected: `doctor.sh` shows `0 fail`; the inspector shows **10 tools**
+in the left panel. With the Python server down, `doctor.sh` shows a
+`laya-server` warning and the inspector shows **0 tools**.
 
 ---
 

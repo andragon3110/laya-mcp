@@ -95,6 +95,17 @@ exec node "\$INSTALL_DIR/dist/index.js"
 EOF
 chmod +x "$INSTALL_DIR/start_mcp.sh"
 
+cat > "$INSTALL_DIR/doctor.sh" <<EOF
+#!/usr/bin/env bash
+# Run laya-mcp's diagnostic report. JSON output via --json.
+set -euo pipefail
+INSTALL_DIR="\$(cd "\$(dirname "\$0")" && pwd)"
+HOST="\${LAYA_HOST:-${HOST}}"
+PORT="\${LAYA_PORT:-${PORT}}"
+exec "\$INSTALL_DIR/.venv/bin/python" "\$INSTALL_DIR/py/doctor.py" --host "\$HOST" --port "\$PORT" "\$@"
+EOF
+chmod +x "$INSTALL_DIR/doctor.sh"
+
 cat > "$INSTALL_DIR/uninstall.sh" <<'EOF'
 #!/usr/bin/env bash
 # Uninstall laya-mcp. Removes the install dir and any opencode.json MCP entry.

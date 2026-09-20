@@ -68,7 +68,7 @@ const health = new HealthWatch(client);
 health.start();
 
 const server = new Server(
-  { name: "laya-mcp", version: "0.1.0" },
+  { name: "laya-mcp", version: "0.3.0" },
   { capabilities: { tools: {} } },
 );
 

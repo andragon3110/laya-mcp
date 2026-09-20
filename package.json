@@ -1,6 +1,6 @@
 {
   "name": "laya-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "MCP server that exposes Laya typed decisions to coding agents. 100% optional - your existing setup runs unchanged if Laya or this server are missing.",
   "type": "module",
   "main": "dist/index.js",
