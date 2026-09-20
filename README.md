@@ -259,10 +259,30 @@ expose `laya-server`'s HTTP endpoint to whatever script wraps Pi.
 
 ---
 
+## Gentle-AI orchestrator policy (recommended)
+
+The file `examples/gentle-orchestrator-policy.md` is a marker-delimited
+policy block for the `gentle-orchestrator` agent prompt in `opencode.json`.
+It tells the orchestrator: **if any `laya_*` tool is present, use the
+applicable ones on every request; if none is present, ignore the section
+and work exactly as before.** Install it with:
+
+```bash
+./scripts/apply-orchestrator-policy.sh            # install / refresh (idempotent)
+./scripts/apply-orchestrator-policy.sh --check    # verify it is present and current
+./scripts/apply-orchestrator-policy.sh --remove   # remove it again
+```
+
+The script backs up `opencode.json` first, inserts before Gentle-AI's
+own `sdd-model-assignments` marker, and refuses to guess if that anchor
+is missing. Re-run it after any `gentle-ai sync` or upgrade, since sync
+regenerates managed prompts.
+
 ## Optional: integrate with Gentle-AI sub-agents
 
 Gentle-AI orchestrates SDD/Odd/RDD workflows across many sub-agents on
-top of OpenCode/Pi/Claude Code. Two opt-in patterns make sense:
+top of OpenCode/Pi/Claude Code. Two opt-in patterns make sense
+(besides the orchestrator policy above):
 
 1. **`sdd-apply` -> `laya_review`**: Before declaring an SDD task done,
    the orchestrator (or the `sdd-apply` agent) calls `laya_review` on
