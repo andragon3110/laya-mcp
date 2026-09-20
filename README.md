@@ -159,26 +159,83 @@ Every response carries `latency_ms`, and Laya answers include the
 
 ---
 
+## Architecture
+
+```mermaid
+flowchart LR
+    Agent["Coding agent<br/>(OpenCode · Claude Code · Codex · Pi)"]
+    MCP["laya-mcp<br/>Node.js + TypeScript<br/>stdio JSON-RPC"]
+    Laya["laya-server :8765<br/>Python + FastAPI"]
+    Router{"Laya Router<br/>per-request routing"}
+    EN["english<br/>ModernBERT-large"]
+    ML["multilingual<br/>mmBERT · 100+ langs"]
+    TD["typed-decisions<br/>fine-tuned · 0.766 acc"]
+    Gliner["gliner-server :8766<br/>OPTIONAL sidecar"]
+    GLM["GLiNER2.5-multilingual<br/>287M · spans + offsets"]
+
+    Agent -->|"tools/list · tools/call"| MCP
+    MCP -->|"POST /predict<br/>timeout 5s"| Laya
+    Laya --> Router
+    Router -->|"English text"| EN
+    Router -->|"non-English text"| ML
+    Router -->|"workflow match<br/>or span judging"| TD
+    MCP -.->|"POST /extract_entities<br/>/pii_scan · timeout 10s<br/>OPTIONAL"| Gliner
+    Gliner --> GLM
+
+    style Gliner stroke-dasharray: 5 5
+    style GLM stroke-dasharray: 5 5
+```
+
+When a backend is unreachable the MCP server degrades instead of
+failing: zero tools advertised if `laya-server` is down; regex fallback
+(with a note) and a clear error for `laya_pii` if the sidecar is down.
+Every call has a hard timeout, so the agent never hangs.
+
+### GLiNER proposes, Laya disposes
+
+This is the core composition — span finding without calibration would
+be untrustworthy, and calibrated judging without spans needs regexes:
+
+```mermaid
+sequenceDiagram
+    participant A as Agent
+    participant M as laya-mcp
+    participant G as gliner-server
+    participant L as laya-server (typed-decisions)
+
+    A->>M: laya_extract {document, fields, source: entities}
+    M->>G: POST /extract_entities {text, labels}
+    G-->>M: spans + [start:end] offsets
+    M->>L: POST /predict {span choices + none}
+    L-->>M: choice g2 @ 0.78 + routing proof
+    M-->>A: value + offsets + both confidences
+```
+
 ## How it fits your workflow
 
-```
-EXTERNAL TEXT (issues, pages, mail)
- │  laya_screen + laya_pii  →  only clean text reaches context
- ▼
-UNDERSTANDING (explore, docs)
- │  laya_find / laya_rerank  →  right file, no index
- │  laya_classify  →  triaged, labeled, routed
- ▼
-DECISIONS
- │  laya_decide  →  bounded options with requirements
- │  laya_compare  →  changelog says what the code does?
- │  laya_extract  →  structured facts with citable offsets
- ▼
-IMPLEMENTATION (apply / build)
- │  laya_review  →  diff vs task, before "done"
- │  laya_gate  →  "tests pass" checked against the log
- ▼
-REVIEW / ARCHIVE → an independent, calibrated second opinion
+```mermaid
+flowchart TD
+    IN(["External text<br/>issues · pages · mail"])
+    SCR["laya_screen + laya_pii<br/>only clean text reaches context"]
+    UND["Understanding<br/>explore · docs"]
+    FR["laya_find / laya_rerank<br/>right file, no index"]
+    CLS["laya_classify<br/>triaged · labeled · routed"]
+    DEC["Decisions"]
+    DCD["laya_decide<br/>bounded options + requirements"]
+    CMP["laya_compare<br/>changelog says what code does?"]
+    EXT["laya_extract<br/>structured facts + citable offsets"]
+    IMP["Implementation<br/>apply / build"]
+    REV["laya_review<br/>diff vs task, before done"]
+    GATE["laya_gate<br/>tests pass checked vs the log"]
+    OUT(["Review / Archive<br/>independent calibrated second opinion"])
+
+    IN --> SCR --> UND
+    UND --> FR --> DEC
+    UND --> CLS --> DEC
+    DEC --> DCD --> IMP
+    DEC --> CMP --> IMP
+    DEC --> EXT --> IMP
+    IMP --> REV --> GATE --> OUT
 ```
 
 The pattern that pays for everything: **screen on ingress, review + gate
