@@ -1,271 +1,200 @@
-# laya-mcp
+<p align="center">
+  <img src="assets/banner.png" alt="laya-mcp — Typed decisions for coding agents" width="100%">
+</p>
 
-> **MCP server that exposes Laya's typed decisions to coding agents.**
-> Optional by design. Your existing setup runs unchanged if Laya or this
-> server are missing.
+<p align="center">
+  <img src="https://img.shields.io/badge/version-0.4.0-blue" alt="version 0.4.0">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="license MIT">
+  <img src="https://img.shields.io/badge/python-3.10%2B-yellow" alt="python 3.10+">
+  <img src="https://img.shields.io/badge/node-20%2B-brightgreen" alt="node 20+">
+  <img src="https://img.shields.io/badge/AI-local%20%7C%20%240%20%7C%20multilingual-purple" alt="local, free, multilingual">
+</p>
 
-`laya-mcp` is a [Model Context Protocol](https://modelcontextprotocol.org)
-server that gives your coding agent ten typed-decision tools backed by a
-local [Laya](https://huggingface.co/convaiinnovations/laya) instance,
-plus one PII tool backed by an optional
-[GLiNER2.5](https://huggingface.co/fastino/gliner2.5-multi-v1) sidecar.
-Every Laya tool returns **calibrated probabilities** so the agent can branch,
-sort, and gate on real confidence instead of vibe-checking its own
-output.
-
-```
-┌──────────────────┐  stdio JSON-RPC  ┌────────────────────┐  HTTP  ┌────────────────────┐
-│ OpenCode CLI     │ ───────────────▶ │ laya-mcp (Node/TS) │ ─────▶ │ laya-server (Py)   │
-│ Claude Code      │                  │  - 10+1 tools      │        │  - FastAPI :8765   │
-│ Codex            │                  │  - health watchers │ ─────▶ │ gliner-server (Py) │
-│ Pi              │ ◀─────────────── │  - graceful fail   │ ◀───── │  - FastAPI :8766   │
-└──────────────────┘                  └────────────────────┘        └────────────────────┘
-```
-
-The tools (one per file under `src/tools/`):
-
-| Tool                | What it does                                                                 | Backend |
-|---------------------|------------------------------------------------------------------------------|---------|
-| `laya_screen`       | Prompt-injection / substance / relevance guard before content enters context | Laya `noul` × 3 |
-| `laya_verify`       | Verify one or more claims against supplied evidence                          | Laya `noul` per claim |
-| `laya_find`         | Pick the best candidate id for a query (or `none`)                            | Laya `choice` |
-| `laya_rerank`       | Score and sort all candidates by relevance                                   | Laya `noul` per candidate |
-| `laya_classify`     | Batch-classify items against a shared catalog                                 | Laya `choice` per item |
-| `laya_decide`       | Pick one of 2-6 bounded options + optional per-requirement checks              | Laya `choice` + `noul` |
-| `laya_compare`      | Compare two passages overall and per aspect                                   | Laya `choice` per aspect |
-| `laya_extract`      | Pull structured field values: regex candidates **or** GLiNER spans, Laya judges | Laya `choice` over matches/spans |
-| `laya_review`       | Score a proposed diff against the original request before merging             | Laya `score` + `noul` |
-| `laya_gate`         | Completion gate: `laya_review` plus per-claim verification                     | combined |
-| `laya_pii`          | Scan for PII/secrets with character offsets (**needs** the GLiNER sidecar)    | GLiNER spans |
-
-Design rule: **GLiNER proposes, Laya disposes.** GLiNER finds *where*
-things are (spans + offsets); Laya decides *what they mean* (calibrated
-probabilities). GLiNER span scores are never used for gating.
-
-The shape and purpose of each tool is modeled after
-[`jkudish/jev-mcp`](https://github.com/jkudish/jev-mcp) (155 ★, the
-reference Jev MCP server) and
-[`itsmostafa/typesafe-mcp`](https://github.com/itsmostafa/typesafe-mcp)
-(133 ★). Replace Jev with self-hosted Laya and keep the same ergonomics.
+<p align="center">
+  <b>Give your coding agent judgment calls instead of vibes.</b><br>
+  Eleven MCP tools backed by local decision models — calibrated probabilities
+  your code can branch on, sort by, and gate with.
+  <br><br>
+  <a href="#quickstart">Quickstart</a> ·
+  <a href="#tools">Tools</a> ·
+  <a href="#gentle-ai-orchestrator-policy-recommended">Gentle-AI</a> ·
+  <a href="#diagnose-with-doctor">Doctor</a>
+</p>
 
 ---
 
-## Why this exists
+## What is this
 
-Jev is a hosted decision model from [TypeSafe AI](https://typesafe.ai)
-($0.042/M input tokens, ~264 ms p50, English-only, closed weights).
-Laya is the open-source answer ([NandhaKishorM/laya](https://github.com/NandhaKishorM/laya),
-Apache 2.0, $0 self-hosted, ~38 ms p50, 100+ languages, open weights).
-`laya-mcp` is the glue: it lets any MCP-compatible coding agent use Laya
-the same way it would use Jev, with the same ten tools and the same
-typed outputs, but locally, cheaply, and multilingual.
+Large language models generate *text*. When your agent needs a *judgment*
+— is this a jailbreak? which file answers the question? is this diff safe
+to merge? — you are coercing a text generator into a decision machine,
+then parsing the answer back and hoping the format holds.
 
-The MCP server is **completely independent**:
+`laya-mcp` skips that round-trip. It exposes **System One decision models**
+as MCP tools: state in, **typed answers with calibrated probabilities**
+out. No text generation, nothing to parse, nothing to hallucinate.
 
-- If `laya-mcp` is not installed, your agent runs exactly as it does today.
-- If `laya-server` (the Python process) is down, the MCP server advertises
-  **zero tools** and every call returns a structured error. The agent
-  keeps working.
-- If Laya itself is missing, the Python wrapper exits with a clear error
-  at startup time -- nothing silently breaks.
+- 🧠 **Laya** ([NandhaKishorM/laya](https://huggingface.co/convaiinnovations/laya),
+  Apache 2.0) — `choice` / `score` / `noul` answers in ~33 ms, trained
+  with RLCD so honest probabilities are the only way to maximize reward.
+- 🔍 **GLiNER2.5** ([fastino/gliner2.5-multi-v1](https://huggingface.co/fastino/gliner2.5-multi-v1),
+  Apache 2.0) — zero-shot span extraction with character offsets, PII and
+  secrets included. Rule of the house: **GLiNER proposes, Laya disposes.**
+  Spans locate, calibrated probabilities gate.
+- 🌍 **Multilingual.** Spanish first-class: entity extraction, PII scan
+  and classification verified live in Spanish.
+- 💸 **$0, self-hosted, private.** No API keys, no per-token billing, no
+  data egress. CPU-friendly.
+- 🔌 **Optional by design.** If the servers are down — or never
+  installed — your agent works exactly as before. Zero tools advertised,
+  zero crashes, zero slowdowns.
+
+The tool shapes follow
+[`jkudish/jev-mcp`](https://github.com/jkudish/jev-mcp) (the reference
+Jev MCP server) and
+[`itsmostafa/typesafe-mcp`](https://github.com/itsmostafa/typesafe-mcp),
+with a self-hosted backend instead of a hosted API.
 
 ---
 
-## Install
+## See it work
 
-The installer is **idempotent** and does **not** touch any of your
-existing agent configuration. It only creates `$HOME/laya-mcp/`.
+Real outputs from a live session (OpenCode + Gentle-AI orchestrator):
 
-### Requirements
+```
+> Usá laya_pii para escanear: "Escribí a juan.perez@acme.com. Token: ghp_AbC123xYz."
 
-- **Python 3.10+** with `pip`
-- **Node.js 20+** with `npm`
-- **~1 GB disk** for the Laya model weights (downloaded on first run)
-- Optional: **NVIDIA GPU with CUDA** for ~30 ms inference. CPU works
-  too (~200 ms per call).
+action: block — secrets detected, redactá antes de que entre a cualquier contexto.
+  - email ......... [10:29] juan.perez@acme.com (0.98)
+  - token_secreto . [38:51] (0.99)
+```
 
-### One-command install
+```
+> laya_extract { document: "María García trabaja en Acme España en Madrid.",
+                 source: "entities",
+                 fields: [{ id: "persona" }, { id: "lugar" }] }
+
+persona → "María García" [0:12]   lugar → "Madrid" [39:45]
+```
+
+```
+> laya_review { request: "tolerate empty stdin config", diff: "…" }
+
+correctness 1.63 · spec_match 1.65 · test_gap 0.45 · safe_to_apply 0.59
+action: review   ← correctly flagged the missing test coverage
+```
+
+---
+
+## Quickstart
+
+**Requirements:** Python 3.10+, Node.js 20+, ~1.7 GB disk for the three
+Laya checkpoints (+ ~594 MB if you add GLiNER), no GPU needed (CPU works;
+CUDA/MPS used when available).
 
 ```bash
 git clone https://github.com/andragon3110/laya-mcp.git
 cd laya-mcp
-./install.sh
+./install.sh                 # base: 10 Laya tools
+# ./install.sh --with-gliner # + span extraction & PII tool
 ```
 
-The script:
-
-1. Creates a Python venv at `$HOME/laya-mcp/.venv/`
-2. Pins `laya>=0.3.0,<0.4.0` (the version line that ships the `typed-decisions` subfolder) and installs `laya`, `fastapi`, `uvicorn`, `huggingface_hub`
-3. Runs `npm install` and `tsc`
-4. **Pre-downloads all 3 Laya checkpoints** (~1.7 GB total) so the Router starts ready: `english` (~440 MB), `multilingual` (~320 MB), `typed-decisions` (~440 MB). All three are bundled under the `convaiinnovations/laya` repo at different subfolders; only the requested weights are downloaded.
-5. Generates `start_laya.sh`, `start_mcp.sh`, `uninstall.sh`, `examples/opencode.snippet.json`
-
-You can override paths with `LAYA_MCP_HOME`, `LAYA_HOST`, `LAYA_PORT`,
-`LAYA_MCP_NO_ALL=1` (skip the auxiliary checkpoints, Router will fetch
-them on first request), `PYTHON`. See `install.sh`.
-
-### Start the laya-server
-
-In one terminal:
+The installer is idempotent, touches only `$HOME/laya-mcp`, pre-downloads
+the models, and generates `start_laya.sh`, `start_gliner.sh`,
+`doctor.sh` and `uninstall.sh`. Your agent configuration is never
+modified without your say-so.
 
 ```bash
-$HOME/laya-mcp/start_laya.sh
-# -> [laya-server] loading Laya Router (device=auto, preload=True, auto_task_detection=True, max_loaded=3)
-# -> [laya-server] Laya Router ready: loaded=['english', 'multilingual', 'typed-decisions'], laya_sdk=0.3.4
-# -> [laya-server] laya-server starting on http://127.0.0.1:8765
-```
+$HOME/laya-mcp/start_laya.sh    # terminal 1 — :8765
+$HOME/laya-mcp/start_gliner.sh  # terminal 2 — :8766 (only with --with-gliner)
 
-Because the installer pre-downloaded all three checkpoints, the first
-start is seconds, not minutes. The Router keeps all three resident so
-script detection + workflow auto-detection never pay a model-load cost.
-
-The Router picks a checkpoint per request:
-
-| Input language                                       | Detected script  | Checkpoint used           |
-|------------------------------------------------------|------------------|---------------------------|
-| Spanish (`"Me cobraron dos veces..."`)                | Latin, lang=es   | `multilingual`            |
-| English (`"I was charged twice..."`)                  | Latin, lang=en   | `english`                 |
-| Question ids match a typed-decisions workflow         | any              | `typed-decisions` (auto)  |
-| Caller passes `model="typed-decisions"`              | any              | `typed-decisions` (force) |
-
-Every `/predict` response includes a `routing` block with the model
-chosen and the reason. The MCP tools surface it in their text output so
-the agent can audit routing decisions.
-
-### Verify
-
-```bash
 curl http://127.0.0.1:8765/health
-# -> {"status":"ok","ready":true,"loaded":["english","multilingual","typed-decisions"],"auto_task_detection":true,"max_loaded":3,"device":"auto","laya_sdk_version":"0.3.4","uptime_seconds":2.3}
+$HOME/laya-mcp/doctor.sh        # full diagnostic, see below
 ```
 
-If `ready: true` and `loaded` lists all three checkpoints, the MCP server
-will advertise all ten Laya tools (plus `laya_pii` when the GLiNER sidecar
-is up).
-
-### How the Router picks a checkpoint (default behaviour)
-
-`install.sh` configures the server with three env vars:
-
-| Var                        | Default | Effect                                                          |
-|----------------------------|---------|-----------------------------------------------------------------|
-| `LAYA_PRELOAD`             | `1`     | Load all 3 checkpoints up front so routing never pays a load cost |
-| `LAYA_AUTO_TASK_DETECTION` | `1`     | Use `typed-decisions` when question ids match its 4 workflows     |
-| `LAYA_MAX_LOADED`          | `3`     | Keep up to 3 resident (LRU eviction if you raise / lower this)  |
-
-With those defaults, every `/predict` call returns a `routing` block that
-the MCP tools surface to the agent:
+Then register the server with your agent (details per agent below) —
+e.g. for OpenCode, merge `examples/opencode.snippet.json` into the
+`"mcp"` object of `~/.config/opencode/opencode.json` and restart the
+session:
 
 ```json
 {
-  "model": "multilingual",
-  "repo": "convaiinnovations/laya/multilingual",
-  "reason": "Latin script but language looks like 'es', not English",
-  "detection": { "script": "latin", "language": "es", "is_english": false },
-  "workflow": null
-}
-```
-
-### Forcing a specific checkpoint
-
-Pass `model`, `task`, or `lang` on the `/predict` body to override the
-Router. The MCP tools do not currently expose these directly, but the
-HTTP endpoint accepts them and you can build wrappers around them:
-
-```bash
-curl -X POST http://127.0.0.1:8765/predict \
-  -H 'Content-Type: application/json' \
-  -d '{"state":{"text":"Hola"},"questions":{"q":{"type":"choice","instructions":"...","criteria":{}}},"model":"multilingual"}'
-```
-
-### Choosing a different setup
-
-If you only need one language (e.g. Spanish only), set
-`LAYA_MAX_LOADED=1 LAYA_PRELOAD=0` and preload just the checkpoint you
-want:
-
-```bash
-LAYA_MAX_LOADED=1 LAYA_PRELOAD=0 LAYA_AUTO_TASK_DETECTION=0 \
-  $HOME/laya-mcp/start_laya.sh
-```
-
-The Router will lazily download the first checkpoint you hit and evict
-others. ~ 400 MB RAM instead of 1.7 GB, at the cost of paying a model
-load on first use of each language.
-
----
-
-## Wire into your agent
-
-`laya-mcp` is an optional MCP server. Your agent only sees its tools if
-you register it. None of the snippets below modify anything you already
-have -- they only **add** an `mcp.laya` entry.
-
-### OpenCode
-
-Edit `~/.config/opencode/opencode.json` and merge the snippet:
-
-```bash
-SNIPPET="$HOME/laya-mcp/examples/opencode.snippet.json"
-python3 - <<PY
-import json, pathlib
-cfg = json.loads(pathlib.Path("$HOME/.config/opencode/opencode.json").read_text())
-cfg.setdefault("mcp", {}).setdefault("laya", json.loads("""$SNIPPET""")["mcp"]["laya"])
-pathlib.Path("$HOME/.config/opencode/opencode.json").write_text(json.dumps(cfg, indent=2))
-PY
-```
-
-Restart OpenCode. The ten `laya_*` tools now appear in the agent's tool
-palette (only when the Python server is reachable).
-
-### Claude Code
-
-Add to `~/.claude.json` (or the project's `.mcp.json`):
-
-```json
-{
-  "mcpServers": {
+  "mcp": {
     "laya": {
-      "command": "node",
-      "args": ["$HOME/laya-mcp/dist/index.js"],
-      "env": { "LAYA_URL": "http://127.0.0.1:8765" }
+      "type": "local",
+      "command": ["node", "$HOME/laya-mcp/dist/index.js"],
+      "environment": {
+        "LAYA_URL": "http://127.0.0.1:8765",
+        "GLINER_URL": "http://127.0.0.1:8766"
+      },
+      "enabled": true
     }
   }
 }
 ```
 
-Restart Claude Code.
+Ask your agent: *"do you see the `laya_*` tools? list them."* You should
+get all eleven back.
 
-### Codex
+---
 
-Add to `~/.codex/config.toml`:
+## Tools
 
-```toml
-[mcp_servers.laya]
-command = "node"
-args = ["$HOME/laya-mcp/dist/index.js"]
-env = { LAYA_URL = "http://127.0.0.1:8765" }
+| Tool | What it does | Backend |
+|---|---|---|
+| `laya_screen` | Prompt-injection / substance / relevance guard before content enters context. `pass` / `review` / `block` / `skip`. | Laya `noul` × 3 |
+| `laya_pii` | PII + secrets scan (email, phone, API keys, tokens, passwords, names) with character offsets. Needs the GLiNER sidecar. | GLiNER spans |
+| `laya_verify` | Claim-by-claim fact check against supplied evidence. | Laya `noul` per claim |
+| `laya_find` | Best candidate id for a query (or `none`), up to 250 candidates, no embeddings. | Laya `choice` |
+| `laya_rerank` | Score + sort every candidate by relevance. | Laya `noul` per candidate |
+| `laya_classify` | Batch-label items against your catalog. Auto-apply at confidence ≥ 0.85. | Laya `choice` per item |
+| `laya_decide` | Bounded choice (2–6 options) with per-requirement checks and `ask_user` escape hatches. | Laya `choice` + `noul` |
+| `laya_compare` | How two passages relate (`same_fact` / `contradicts` / `different_facts`), overall + per aspect. | Laya `choice` per aspect |
+| `laya_extract` | Field values as verbatim substrings — via your regex **or** GLiNER spans (`source: auto`, the default). Entity mode returns `[start:end]` offsets and forces the fine-tuned judge. | Laya `choice` over matches/spans |
+| `laya_review` | Diff scored 0–2 on correctness, spec match, test gap, blast radius + `safe_to_apply`. Call it before declaring any task done. | Laya `score` + `noul` |
+| `laya_gate` | Completion gate: `laya_review` plus every "tests pass"-style claim verified against evidence. Contradicted claims escalate. | combined |
+
+Every response carries `latency_ms`, and Laya answers include the
+`routing` block (which checkpoint served the call and why) for audit.
+
+---
+
+## How it fits your workflow
+
+```
+EXTERNAL TEXT (issues, pages, mail)
+ │  laya_screen + laya_pii  →  only clean text reaches context
+ ▼
+UNDERSTANDING (explore, docs)
+ │  laya_find / laya_rerank  →  right file, no index
+ │  laya_classify  →  triaged, labeled, routed
+ ▼
+DECISIONS
+ │  laya_decide  →  bounded options with requirements
+ │  laya_compare  →  changelog says what the code does?
+ │  laya_extract  →  structured facts with citable offsets
+ ▼
+IMPLEMENTATION (apply / build)
+ │  laya_review  →  diff vs task, before "done"
+ │  laya_gate  →  "tests pass" checked against the log
+ ▼
+REVIEW / ARCHIVE → an independent, calibrated second opinion
 ```
 
-Restart Codex.
-
-### Pi
-
-Pi has no MCP client. The reference companion is
-[`gentle-pi`](https://github.com/Gentleman-Programming/gentle-pi) which
-ships its own native extensions. To wire `laya-mcp` into Pi today, run
-the server as a child process via Pi's extension API (see Pi docs), or
-expose `laya-server`'s HTTP endpoint to whatever script wraps Pi.
+The pattern that pays for everything: **screen on ingress, review + gate
+on completion.** Context stays clean coming in, claims stay honest going
+out — and because it's all local, you can afford to run it on *every*
+diff and *every* fetched page, not just the important ones.
 
 ---
 
 ## Gentle-AI orchestrator policy (recommended)
 
-The file `examples/gentle-orchestrator-policy.md` is a marker-delimited
-policy block for the `gentle-orchestrator` agent prompt in `opencode.json`.
-It tells the orchestrator: **if any `laya_*` tool is present, use the
-applicable ones on every request; if none is present, ignore the section
-and work exactly as before.** Install it with:
+`examples/gentle-orchestrator-policy.md` is a marker-delimited policy
+block for the `gentle-orchestrator` agent. It teaches the orchestrator
+one rule: **if any `laya_*` tool is present, use the applicable ones on
+every request; if none is present, ignore the section and work exactly
+as before.**
 
 ```bash
 ./scripts/apply-orchestrator-policy.sh            # install / refresh (idempotent)
@@ -273,198 +202,160 @@ and work exactly as before.** Install it with:
 ./scripts/apply-orchestrator-policy.sh --remove   # remove it again
 ```
 
-The script backs up `opencode.json` first, inserts before Gentle-AI's
-own `sdd-model-assignments` marker, and refuses to guess if that anchor
-is missing. Re-run it after any `gentle-ai sync` or upgrade, since sync
-regenerates managed prompts.
+Backs up `opencode.json` first, anchors on Gentle-AI's own
+`sdd-model-assignments` marker, refuses to guess if the anchor moved,
+and validates the JSON. Re-run after any `gentle-ai sync` or upgrade,
+since sync regenerates managed prompts. Verified live: the orchestrator
+calls `laya_screen` + `laya_pii` unprompted on pasted third-party text,
+rejects jailbreaks, and routes `laya_review` after writers.
 
-## Optional: integrate with Gentle-AI sub-agents
-
-Gentle-AI orchestrates SDD/Odd/RDD workflows across many sub-agents on
-top of OpenCode/Pi/Claude Code. Two opt-in patterns make sense
-(besides the orchestrator policy above):
-
-1. **`sdd-apply` -> `laya_review`**: Before declaring an SDD task done,
-   the orchestrator (or the `sdd-apply` agent) calls `laya_review` on
-   the diff against the original task. A contradicted `safe_to_apply`
-   (probability < 0.5) escalates instead of auto-archiving.
-2. **GitHub issues -> `laya_classify`**: A webhook action calls
-   `laya_classify` against your label set with each new issue body.
-   Auto-label only when confidence >= 0.85.
-
-Both patterns are documented in
+Sub-agent patterns (`sdd-apply` → `laya_review`, issues → `laya_classify`,
+PII pre-screen, grounded extraction) live in
 [`examples/gentle-ai-integration.md`](examples/gentle-ai-integration.md).
-**None of these are enabled by default** -- you wire them by editing
-your agent's skill files (e.g. `.opencode/agents/sdd-apply.md`).
+
+---
+
+## Optional GLiNER sidecar
+
+`install.sh --with-gliner` adds `gliner-server` (default port **8766**):
+zero-shot entity spans, relations, PII/secrets, multi-label
+classification — no regex required. What changes when it's up:
+
+- `laya_extract` uses spans (with offsets) instead of patterns;
+- `laya_pii` appears as the 11th tool;
+- `doctor.sh` gains 4 GLiNER checks including a live Spanish smoke test.
+
+Sidecar down or never installed? `laya_pii` simply isn't advertised and
+`laya_extract` falls back to regex with a note. Nothing breaks, ever.
+
+> **VRAM note (6 GB cards):** the three Laya checkpoints fill a small
+> GPU on their own. Run the sidecar on CPU — it answers in ~90 ms there:
+> `export GLINER_DEVICE=cpu` (or `LAYA_DEVICE=cpu` if you prefer it the
+> other way around).
+
+---
+
+## How the Router picks a checkpoint
+
+`laya-server` (default port **8765**) keeps all three Laya checkpoints
+resident and routes per request:
+
+| Input | Checkpoint |
+|---|---|
+| English text | `english` (ModernBERT-large) |
+| Non-English text (Spanish, French, …) | `multilingual` (mmBERT, 100+ languages) |
+| Question ids matching a typed-decisions workflow | `typed-decisions` (fine-tuned, 0.766 acc) |
+| Span-choice judging (`laya_extract` entity mode) | `typed-decisions` (forced — the multilingual checkpoint picks `none` at ~0.86 zero-shot on this shape) |
+
+Every `/predict` response includes the `routing` block (model + reason),
+surfaced by the MCP tools for audit. Override per call with `model`,
+`task` or `lang` on the HTTP API.
 
 ---
 
 ## Diagnose with `doctor`
 
-`doctor` checks the whole stack and tells you exactly what is broken, if
-anything: Laya SDK import + version, downloaded checkpoints, torch/CUDA,
-free disk, free RAM, install-dir layout, MCP bundle boot, the live
-`/health` and `/predict` probes, and the optional `opencode.json` entry.
+One command tells you exactly which layer is broken, if any:
 
 ```bash
-# Human-readable report (--no-live skips the server probes)
-$HOME/laya-mcp/doctor.sh
-$HOME/laya-mcp/doctor.sh --no-live
-
-# JSON for scripts/CI (exit 1 when any check fails)
-$HOME/laya-mcp/doctor.sh --json
-$HOME/laya-mcp/doctor.sh --json --fail-on warn   # stricter: 1 also on warnings
-
-# Same report over HTTP while the server is running (?live=false skips probes)
+$HOME/laya-mcp/doctor.sh              # human-readable
+$HOME/laya-mcp/doctor.sh --no-live    # skip server probes (CI-friendly)
+$HOME/laya-mcp/doctor.sh --json       # machine-readable (exit 2 on fail)
 curl http://127.0.0.1:8765/doctor | python3 -m json.tool
-curl 'http://127.0.0.1:8765/doctor?live=false' | python3 -m json.tool
 ```
 
-Expected output (everything healthy):
-
-```
-[ laya-mcp doctor ]  [OK]  11 pass  2 warn  0 fail  1 skip
-  install_dir: /home/you/laya-mcp
-  hf_cache:    /home/you/.cache/huggingface
-  python:      3.12.1  platform: linux
-
-  ✓ [PASS] laya-sdk                laya 0.3.4 installed with Router
-  ✓ [PASS] laya-version            laya 0.3.4 supports subfolder kwarg
-  ✓ [PASS] torch                   torch 2.5.1 installed
-  ! [WARN] gpu                      no CUDA GPU detected -- Laya will run on CPU (~200 ms/call)
-  ✓ [PASS] disk                    42.1 GB free at /home/you
-  ✓ [PASS] memory                  12.4 GB available of 15.6 GB total
-  ✓ [PASS] install-dir             /home/you/laya-mcp looks complete
-  ✓ [PASS] checkpoint:english      convaiinnovations/laya (root) cached
-  ✓ [PASS] checkpoint:multilingual convaiinnovations/laya-multilingual (root) cached
-  ✓ [PASS] checkpoint:typed-decisions convaiinnovations/laya-typed-decisions (typed-decisions) cached
-  ✓ [PASS] laya-server             GET http://127.0.0.1:8765/health reachable in 12 ms
-  ✓ [PASS] live-predict            POST http://127.0.0.1:8765/predict ok in 210 ms
-  ✓ [PASS] mcp-server-boot         index.js booted and was reachable for stdio
-  - [SKIP] opencode-config         ~/.config/opencode/opencode.json exists but no mcp.laya entry
-```
-
-Run this first whenever something looks wrong -- paste the output when
-asking for help and the failure is usually obvious from the check name.
-
-## Optional GLiNER sidecar (span extraction + PII)
-
-`install.sh --with-gliner` adds a second Python process,
-`gliner-server` (default port **8766**), backed by
-[GLiNER2.5-multilingual](https://huggingface.co/fastino/gliner2.5-multi-v1)
-(287M, Apache 2.0, CPU-friendly). It finds *where* things are in text;
-Laya keeps judging *what they mean*:
-
-```bash
-./install.sh --with-gliner
-$HOME/laya-mcp/start_gliner.sh   # terminal 2 (optional)
-```
-
-What changes when the sidecar is up:
-
-- `laya_extract` gains `source: "regex" | "entities" | "auto"` (default
-  `auto` = GLiNER spans when reachable, regex fallback otherwise) plus
-  per-field `entity_type`. Entity mode returns `start`/`end` offsets for
-  grounding, and fixes the old regex path to return the matched substring
-  instead of the match key.
-- New tool `laya_pii`: PII/secret scan with offsets. `block` when an
-  `api_key`, `token_secreto` or `password` is found, `review` on other
-  PII, `pass` when clean. Fails clearly (not silently) when the sidecar
-  is down.
-- `doctor.sh` gains 4 checks: `gliner-sdk`, `gliner-checkpoint`,
-  `gliner-server`, and a live `gliner-spanish` smoke test.
-
-Without `--with-gliner` (or with the sidecar down) everything behaves
-exactly as before: `laya_pii` is not advertised and `laya_extract`
-uses regex.
+Checks cover: Laya SDK + version, torch/CUDA (+ honest VRAM-full
+warning), disk, RAM, install layout, all cached checkpoints, both
+servers live, a real `/predict` call, a live Spanish extraction, MCP
+bundle boot, and the optional agent config entry. Run this first when
+something looks off — paste the output when asking for help.
 
 ## Test the install
 
-After installing and starting `start_laya.sh`:
-
 ```bash
-# Full diagnostic (preferred -- runs every check at once)
-$HOME/laya-mcp/doctor.sh
-
-# Sanity-check the Python wrapper
-$HOME/laya-mcp/tests/test_health.sh
-
-# End-to-end smoke (loads Laya and runs one /predict call)
-$HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke.py
-
-# GLiNER smoke (needs install.sh --with-gliner + start_gliner.sh)
-$HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke_gliner.py
-
-# MCP-level smoke (uses the official inspector)
-cd $HOME/laya-mcp && npm run inspect
+$HOME/laya-mcp/doctor.sh                                          # full diagnostic first
+$HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke.py    # Laya end-to-end
+$HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke_gliner.py  # GLiNER end-to-end (needs sidecar)
+cd $HOME/laya-mcp && npm run inspect                              # MCP inspector: 10 tools (11 with sidecar)
 ```
-
-Expected: `doctor.sh` shows `0 fail`; the inspector shows **10 tools**
-in the left panel (**11** with the GLiNER sidecar up). With the Python
-server down, `doctor.sh` shows a `laya-server` warning and the inspector
-shows **0 tools**.
 
 ---
 
-## Uninstall
+## Wire into your agent
 
-```bash
-$HOME/laya-mcp/uninstall.sh
+**OpenCode** — merge `examples/opencode.snippet.json` into `"mcp"` in
+`~/.config/opencode/opencode.json`, restart the session.
+
+**Claude Code** — add to `~/.claude.json` (or project `.mcp.json`):
+
+```json
+{ "mcpServers": { "laya": {
+  "command": "node", "args": ["$HOME/laya-mcp/dist/index.js"],
+  "env": { "LAYA_URL": "http://127.0.0.1:8765", "GLINER_URL": "http://127.0.0.1:8766" } } } }
 ```
 
-Removes `$HOME/laya-mcp` and the `mcp.laya` entry from
-`~/.config/opencode/opencode.json` (with timestamped backup). The rest
-of your setup is untouched.
+**Codex** — add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.laya]
+command = "node"
+args = ["$HOME/laya-mcp/dist/index.js"]
+env = { LAYA_URL = "http://127.0.0.1:8765", GLINER_URL = "http://127.0.0.1:8766" }
+```
+
+**Pi** — no MCP client; run the servers and point Pi extensions at the
+HTTP endpoints, or wrap via your own extension (see Pi docs).
 
 ---
 
 ## Configuration
 
-All env vars (with defaults):
-
-| Var                          | Default                          | Purpose                                                   |
-|------------------------------|----------------------------------|-----------------------------------------------------------|
-| `LAYA_URL`                   | `http://127.0.0.1:8765`          | Where the Python server listens                           |
-| `LAYA_HOST` / `LAYA_PORT`    | `127.0.0.1` / `8765`             | Bind address for the Python server                        |
-| `LAYA_DEVICE`                | `auto`                           | `auto` / `cpu` / `cuda`                                  |
-| `LAYA_PRELOAD`               | `1`                              | Load all 3 checkpoints at startup                        |
-| `LAYA_AUTO_TASK_DETECTION`   | `1`                              | Auto-route to `typed-decisions` on workflow match         |
-| `LAYA_MAX_LOADED`            | `3`                              | Max resident checkpoints (LRU eviction)                  |
-| `LAYA_STANDALONE_REPOS`      | `0`                              | Use per-checkpoint repos instead of the hub repo          |
-| `LAYA_TIMEOUT_MS`            | `5000`                           | Per-call HTTP timeout from MCP to Python                  |
-| `LAYA_TOOL_TIMEOUT_MS`       | `8000`                           | Per-tool MCP timeout                                      |
-| `LAYA_HEALTH_INTERVAL_MS`    | `10000`                          | Background watcher poll interval                         |
-| `LAYA_LOG_LEVEL`             | `WARNING`                        | uvicorn log level                                         |
-| `GLINER_URL`                 | `http://127.0.0.1:8766`          | Where the GLiNER sidecar listens                          |
-| `GLINER_HOST` / `GLINER_PORT`| `127.0.0.1` / `8766`             | Bind address for the GLiNER sidecar                       |
-| `GLINER_DEVICE`              | `auto`                           | `auto` (cuda → mps → cpu) / `cpu` / `cuda` / `mps`       |
-| `GLINER_MODEL`               | `fastino/gliner2.5-multi-v1`     | HuggingFace model id                                      |
-| `GLINER_TIMEOUT_MS`          | `10000`                          | Per-call HTTP timeout from MCP to GLiNER                  |
-| `GLINER_HEALTH_INTERVAL_MS`  | *(falls back to LAYA_*)*         | Watcher poll interval for the sidecar                     |
-
-`LAYA_MODEL` and `LAYA_SUBFOLDER` are no longer used by `laya_server.py`
-itself -- the Router selects checkpoints automatically. They are still
-honoured by `download_models.py` if you want to pre-fetch a single
-checkpoint.
+| Var | Default | Purpose |
+|---|---|---|
+| `LAYA_URL` | `http://127.0.0.1:8765` | MCP → laya-server |
+| `LAYA_HOST` / `LAYA_PORT` | `127.0.0.1` / `8765` | laya-server bind |
+| `LAYA_DEVICE` | `auto` | `auto` / `cpu` / `cuda` |
+| `LAYA_PRELOAD` | `1` | Load all 3 checkpoints at startup |
+| `LAYA_AUTO_TASK_DETECTION` | `1` | Auto-route to `typed-decisions` on workflow match |
+| `LAYA_MAX_LOADED` | `3` | Max resident checkpoints (LRU eviction) |
+| `LAYA_TIMEOUT_MS` | `5000` | Per-call HTTP timeout, MCP → Python |
+| `LAYA_TOOL_TIMEOUT_MS` | `8000` | Per-tool MCP timeout |
+| `LAYA_HEALTH_INTERVAL_MS` | `10000` | Watcher poll interval |
+| `LAYA_LOG_LEVEL` | `WARNING` | uvicorn log level |
+| `GLINER_URL` | `http://127.0.0.1:8766` | MCP → gliner-server |
+| `GLINER_HOST` / `GLINER_PORT` | `127.0.0.1` / `8766` | sidecar bind |
+| `GLINER_DEVICE` | `auto` | `auto` (cuda → mps → cpu) / `cpu` / `cuda` / `mps` |
+| `GLINER_MODEL` | `fastino/gliner2.5-multi-v1` | HuggingFace model id |
+| `GLINER_TIMEOUT_MS` | `10000` | Per-call HTTP timeout, MCP → GLiNER |
 
 ---
 
 ## Architecture & guarantees
 
-- **Three independent layers**: laya-mcp (Node stdio) → laya-server (FastAPI HTTP) → Laya (Python SDK). Any layer can be restarted without restarting the others.
-- **No silent degradation**: if Laya is unreachable, the MCP server advertises **zero tools** so the agent sees nothing rather than tools that always fail.
-- **Hard timeouts**: every HTTP call has a bounded timeout. The agent never hangs because of `laya-mcp`.
-- **Structured errors**: when a tool does fail, the response is `{isError: true, content: [{type: "text", text: ...}]}` with a `hint` describing how to recover.
-- **Stateless**: the MCP server holds no conversation state. Each tool call is independent.
+- **Three independent layers**: MCP server (Node stdio) → Python HTTP
+  sidecars → local models. Any layer restarts without touching the others.
+- **No silent degradation**: unreachable backend ⇒ zero tools advertised
+  (or regex fallback with a note, or a clear error) — never a hang.
+- **Hard timeouts everywhere**; structured `{isError: true}` failures
+  with recovery hints.
+- **Stateless**: every tool call is independent.
+- **Your setup is untouched**: install/uninstall only ever add or remove
+  `$HOME/laya-mcp` (plus one optional `mcp.laya` key you merge yourself).
+
+```bash
+$HOME/laya-mcp/uninstall.sh   # removes the dir + the opencode.json entry (timestamped backup)
+```
 
 ---
+
+## Acknowledgments
+
+- [Laya](https://github.com/NandhaKishorM/laya) (Apache 2.0) — the decision engine.
+- [GLiNER2.5](https://github.com/fastino-ai/GLiNER2) ([paper](https://arxiv.org/abs/2507.18546), Apache 2.0) — the extraction sidecar.
+- [TypeSafe AI](https://typesafe.ai) for the System One framing, and
+  [jkudish/jev-mcp](https://github.com/jkudish/jev-mcp) + [itsmostafa/typesafe-mcp](https://github.com/itsmostafa/typesafe-mcp)
+  whose tool shapes this server mirrors with a self-hosted backend.
 
 ## License
 
 MIT. See [`LICENSE`](LICENSE).
-
-The Laya model itself is Apache 2.0
-([NandhaKishorM/laya](https://github.com/NandhaKishorM/laya)) and the
-TypeSafe AI patterns this server is patterned on are theirs.
-
-[mc
