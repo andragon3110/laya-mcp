@@ -88,9 +88,10 @@ action: review   ← correctly flagged the missing test coverage
 
 ## Quickstart
 
-**Requirements:** Python 3.10+, Node.js 20+, ~1.7 GB disk for the three
+**Requirements:** Python 3.10+, Node.js 20+, bash, ~1.7 GB disk for the three
 Laya checkpoints (+ ~594 MB if you add GLiNER), no GPU needed (CPU works;
-CUDA/MPS used when available).
+CUDA/MPS used when available). On Windows, run everything from git-bash
+(the installer, `doctor.sh` and the `start_*.sh` scripts are bash).
 
 ```bash
 git clone https://github.com/andragon3110/laya-mcp.git
