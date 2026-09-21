@@ -48,13 +48,13 @@ python3 - <<'PY'
 import json, os, re, sys, time, pathlib
 
 cfg_path = pathlib.Path(os.environ["CFG_PY"])
-policy = pathlib.Path(os.environ["POLICY_FILE"]).read_text()
+policy = pathlib.Path(os.environ["POLICY_FILE"]).read_text(encoding="utf-8")
 anchor = os.environ["ANCHOR"]
 open_mark = os.environ["OPEN_MARK"]
 close_mark = os.environ["CLOSE_MARK"]
 mode = os.environ["MODE"]
 
-data = json.loads(cfg_path.read_text())
+data = json.loads(cfg_path.read_text(encoding="utf-8"))
 # V1 shape (agent.*.prompt) first, native V2 shape (agents.*.system) fallback.
 prompt = None
 shape = ""
@@ -88,7 +88,7 @@ if mode == "check":
 
 # Backup before any write.
 backup = cfg_path.with_name(f"{cfg_path.name}.backup.{int(time.time())}")
-backup.write_text(cfg_path.read_text())
+backup.write_text(cfg_path.read_text(encoding="utf-8"), encoding="utf-8")
 
 if mode == "remove":
     if not has_block:
@@ -108,6 +108,6 @@ if shape == "v2":
     data["agents"]["gentle-orchestrator"]["system"] = prompt
 else:
     data["agent"]["gentle-orchestrator"]["prompt"] = prompt
-cfg_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+cfg_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 print(f"done ({mode}); backup at {backup}")
 PY

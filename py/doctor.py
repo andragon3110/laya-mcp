@@ -606,7 +606,7 @@ def check_optional_agent_configs() -> List[Dict[str, Any]]:
     try:
         import json
 
-        with cfg.open() as f:
+        with cfg.open(encoding="utf-8") as f:
             data = json.load(f)
         mcp_laya, shape = _find_laya_entry(data)
         if not mcp_laya:
@@ -697,6 +697,13 @@ import json
 
 
 def main() -> int:
+    # Windows consoles default to cp1252, which cannot print the ✓/✗/!
+    # markers -- force UTF-8 so the human report never crashes (modern
+    # terminals render it; legacy ones show mojibake instead of a traceback).
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:  # noqa: BLE001
+        pass
     import argparse
 
     parser = argparse.ArgumentParser(

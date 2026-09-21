@@ -344,6 +344,7 @@ $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke_gliner.py  # GLiNER e
 cd $HOME/laya-mcp && npm run inspect                              # MCP inspector: 10 tools (11 with sidecar)
 cd $HOME/laya-mcp && .venv/bin/python tests/test_opencode_v2.py  # config-layer unit tests (no models needed)
 ```
+(On Windows git-bash the venv lives at `.venv/Scripts` instead of `.venv/bin`.)
 
 ---
 

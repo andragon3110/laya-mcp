@@ -91,7 +91,9 @@ class DoctorConfigTest(unittest.TestCase):
 
     def _cfg(self, data):
         p = Path(self.tmp.name) / "opencode.json"
-        p.write_text(json.dumps(data), encoding="utf-8")
+        # Raw UTF-8 (ensure_ascii=False), like real-world configs -- this is
+        # what catches locale-default reads on Windows (cp1252).
+        p.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
         os.environ["OPENCODE_JSON"] = str(p)
         return p
 
@@ -125,6 +127,16 @@ class DoctorConfigTest(unittest.TestCase):
     def test_missing_file_skip(self):
         os.environ["OPENCODE_JSON"] = str(Path(self.tmp.name) / "nope.json")
         self.assertEqual(self._statuses(), ["skip"])
+
+    def test_v2_nonascii_config_pass(self):
+        """Regression: configs with Spanish text (accents/ñ) must parse as UTF-8."""
+        data = _v2_entry()
+        data["agent"] = {
+            "gentle-orchestrator": {"prompt": "Orquestación con decisión explícita: ñandú y comunicación al 100%"}
+        }
+        self._cfg(data)
+        out = doctor.check_optional_agent_configs()
+        self.assertEqual([c["status"] for c in out], ["pass"])
 
     def test_config_dir_resolution(self):
         cfg_dir = Path(self.tmp.name) / "cfgdir"
