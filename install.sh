@@ -187,17 +187,35 @@ if [ -d "$INSTALL_DIR" ]; then
   rm -rf "$INSTALL_DIR"
   echo "[laya-mcp] removed $INSTALL_DIR"
 fi
-CFG="$HOME/.config/opencode/opencode.json"
+CFG="${OPENCODE_JSON:-}"
+if [ -z "$CFG" ]; then
+  if [ -n "${OPENCODE_CONFIG_DIR:-}" ]; then CFG="$OPENCODE_CONFIG_DIR/opencode.json";
+  else CFG="$HOME/.config/opencode/opencode.json"; fi
+fi
+# Windows python cannot open msys-style /c/... paths; normalize deterministically.
+if command -v cygpath >/dev/null 2>&1; then CFG_PY=$(cygpath -w "$CFG"); else CFG_PY=$CFG; fi
 if [ -f "$CFG" ]; then
   cp "$CFG" "$CFG.backup.$(date +%s)"
   if command -v python3 >/dev/null 2>&1; then
+    export CFG_PY
     python3 - <<PY
-import json, pathlib
-cfg_path = pathlib.Path("$CFG")
+import json, os, pathlib
+cfg_path = pathlib.Path(os.environ["CFG_PY"])
 cfg = json.loads(cfg_path.read_text())
-if "mcp" in cfg and "laya" in cfg.get("mcp", {}):
-    del cfg["mcp"]["laya"]
-cfg_path.write_text(json.dumps(cfg, indent=2))
+mcp = cfg.get("mcp")
+if isinstance(mcp, dict):
+    # Native V2 shape.
+    servers = mcp.get("servers")
+    if isinstance(servers, dict) and "laya" in servers:
+        del servers["laya"]
+        if not servers:
+            del mcp["servers"]
+    # Legacy V1 shape (for configs predating the V2 migration).
+    if "laya" in mcp:
+        del mcp["laya"]
+    if not mcp:
+        del cfg["mcp"]
+cfg_path.write_text(json.dumps(cfg, indent=2, ensure_ascii=False) + "\n")
 PY
     echo "[laya-mcp] removed 'laya' from $CFG"
   fi
@@ -212,14 +230,16 @@ mkdir -p "$INSTALL_DIR/examples"
 cat > "$INSTALL_DIR/examples/opencode.snippet.json" <<EOF
 {
   "mcp": {
-    "laya": {
-      "type": "local",
-      "command": ["node", "$INSTALL_DIR/dist/index.js"],
-      "environment": {
-        "LAYA_URL": "http://${HOST}:${PORT}",
-        "GLINER_URL": "http://${GLINER_HOST}:${GLINER_PORT}"
-      },
-      "enabled": true
+    "servers": {
+      "laya": {
+        "type": "local",
+        "command": ["node", "$INSTALL_DIR/dist/index.js"],
+        "environment": {
+          "LAYA_URL": "http://${HOST}:${PORT}",
+          "GLINER_URL": "http://${GLINER_HOST}:${GLINER_PORT}"
+        },
+        "disabled": false
+      }
     }
   }
 }

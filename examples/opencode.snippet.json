@@ -1,0 +1,15 @@
+{
+  "mcp": {
+    "servers": {
+      "laya": {
+        "type": "local",
+        "command": ["node", "REPLACE_WITH_ABSOLUTE_PATH/laya-mcp/dist/index.js"],
+        "environment": {
+          "LAYA_URL": "http://127.0.0.1:8765",
+          "GLINER_URL": "http://127.0.0.1:8766"
+        },
+        "disabled": false
+      }
+    }
+  }
+}

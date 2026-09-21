@@ -4,7 +4,8 @@
  *
  * Exposes 10 typed-decision tools (laya_screen, laya_verify, laya_find, etc.)
  * backed by a local Laya instance reachable via HTTP at LAYA_URL, plus one
- * optional tool (laya_pii) backed by the GLiNER sidecar at GLINER_URL.
+ * optional tool (laya_pii) backed by the GLiNER sidecar at GLINER_URL
+ * (11 tools total with the sidecar up, 10 without it).
  *
  * Behaviour contract:
  *   - If the laya-server (Python) is NOT reachable, `tools/list` returns []
