@@ -7,6 +7,10 @@
 
 set -euo pipefail
 
+say() { printf '\033[1;34m[laya-mcp]\033[0m %s\n' "$*"; }
+warn() { printf '\033[1;33m[laya-mcp]\033[0m %s\n' "$*"; }
+err() { printf '\033[1;31m[laya-mcp]\033[0m %s\n' "$*" >&2; }
+
 WITH_GLINER=0
 for arg in "$@"; do
   case "$arg" in
@@ -27,10 +31,6 @@ HOST="${LAYA_HOST:-127.0.0.1}"
 GLINER_PORT="${GLINER_PORT:-8766}"
 GLINER_HOST="${GLINER_HOST:-127.0.0.1}"
 
-say() { printf '\033[1;34m[laya-mcp]\033[0m %s\n' "$*"; }
-warn() { printf '\033[1;33m[laya-mcp]\033[0m %s\n' "$*"; }
-err() { printf '\033[1;31m[laya-mcp]\033[0m %s\n' "$*" >&2; }
-
 # -- preflight -------------------------------------------------------------
 
 command -v "$PYTHON_BIN" >/dev/null 2>&1 || { err "python3 not found (set PYTHON env var to override)"; exit 1; }
@@ -39,6 +39,9 @@ command -v npm >/dev/null 2>&1 || { err "npm required"; exit 1; }
 
 NODE_MAJOR=$(node -p "process.versions.node.split('.')[0]")
 if [ "$NODE_MAJOR" -lt 20 ]; then err "Node 20+ required (have $(node -v))"; exit 1; fi
+
+"$PYTHON_BIN" -c "import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)" \
+  || { err "Python 3.10+ required (have $("$PYTHON_BIN" --version 2>&1))"; exit 1; }
 
 # -- install directory ------------------------------------------------------
 #
@@ -259,7 +262,7 @@ $(printf '\033[1;32m✓\033[0m') laya-mcp installed to $INSTALL_DIR
 $(if [ "$WITH_GLINER" = 1 ]; then printf '  Start the gliner-server sidecar (terminal 2, optional):\n    %s/start_gliner.sh\n\n' "$INSTALL_DIR"; fi)
   Then register laya-mcp with your agent:
     Edit ~/.config/opencode/opencode.json and merge examples/opencode.snippet.json
-    into its "mcp" object. See README.md for one-line merge examples for each agent.
+    into its "mcp.servers" object (OpenCode V2), then check 'opencode mcp list'.
 
   Verify with:
     curl http://$HOST:$PORT/health
