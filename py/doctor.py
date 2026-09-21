@@ -556,33 +556,75 @@ def check_mcp_server_starts() -> Dict[str, Any]:
         return _fail("mcp-server-boot", f"failed to spawn {dist}: {exc!r}")
 
 
+def _default_opencode_cfg() -> Path:
+    """Resolve the effective global opencode.json.
+
+    Honors OPENCODE_JSON first, then OPENCODE_CONFIG_DIR (which redirects
+    the whole config dir, e.g. managed setups), then the standard location.
+    """
+    override = os.environ.get("OPENCODE_JSON")
+    if override:
+        return Path(override).expanduser()
+    cfg_dir = os.environ.get("OPENCODE_CONFIG_DIR")
+    if cfg_dir:
+        return Path(cfg_dir).expanduser() / "opencode.json"
+    return Path.home() / ".config" / "opencode" / "opencode.json"
+
+
+def _find_laya_entry(data: Dict[str, Any]) -> Tuple[Optional[Dict[str, Any]], str]:
+    """Return (entry, shape) for the laya MCP server.
+
+    Prefers the native V2 shape (mcp.servers.laya), falls back to the
+    legacy V1 shape (mcp.laya). Returns (None, "") when absent.
+    """
+    mcp = data.get("mcp") or {}
+    if isinstance(mcp, dict):
+        servers = mcp.get("servers") or {}
+        if isinstance(servers, dict) and isinstance(servers.get("laya"), dict):
+            return servers["laya"], "mcp.servers.laya"
+        if isinstance(mcp.get("laya"), dict):
+            return mcp["laya"], "mcp.laya (legacy V1)"
+    return None, ""
+
+
+def _entry_disabled(entry: Dict[str, Any]) -> Tuple[bool, str]:
+    """Return (disabled, field) honoring V2 `disabled` and legacy `enabled`."""
+    if "disabled" in entry:
+        return bool(entry["disabled"]), "disabled"
+    if "enabled" in entry:
+        return not bool(entry["enabled"]), "enabled (legacy V1)"
+    return False, "(default)"
+
+
 def check_optional_agent_configs() -> List[Dict[str, Any]]:
     """Are the optional opencode.json / Claude / Codex MCP entries present and well-formed?"""
     out: List[Dict[str, Any]] = []
-    cfg = Path.home() / ".config" / "opencode" / "opencode.json"
+    cfg = _default_opencode_cfg()
     if not cfg.exists():
         out.append(_skip("opencode-config", f"{cfg} does not exist -- MCP server is fully optional"))
         return out
     try:
         import json
 
-        with cfg.open() as f:
+        with cfg.open(encoding="utf-8") as f:
             data = json.load(f)
-        mcp_laya = (data.get("mcp") or {}).get("laya")
+        mcp_laya, shape = _find_laya_entry(data)
         if not mcp_laya:
             out.append(
                 _skip(
                     "opencode-config",
-                    f"{cfg} exists but no mcp.laya entry -- agent will not see laya-mcp tools",
+                    f"{cfg} exists but no {shape or 'mcp.servers.laya'} entry -- agent will not see laya-mcp tools",
                     path=str(cfg),
                 )
             )
             return out
-        if not mcp_laya.get("enabled", True):
+        disabled, field = _entry_disabled(mcp_laya)
+        if disabled:
             out.append(
                 _warn(
                     "opencode-config",
-                    f"mcp.laya is configured but disabled={mcp_laya.get('enabled')} -- set enabled=true",
+                    f"{shape} is configured but {field} disables it -- "
+                    + ("set disabled=false" if field == "disabled" else "set enabled=true"),
                     path=str(cfg),
                 )
             )
@@ -590,7 +632,7 @@ def check_optional_agent_configs() -> List[Dict[str, Any]]:
         return [
             _ok(
                 "opencode-config",
-                f"mcp.laya registered in {cfg}",
+                f"{shape} registered in {cfg}",
                 command=mcp_laya.get("command"),
                 env=mcp_laya.get("environment", {}),
             )
@@ -655,6 +697,13 @@ import json
 
 
 def main() -> int:
+    # Windows consoles default to cp1252, which cannot print the ✓/✗/!
+    # markers -- force UTF-8 so the human report never crashes (modern
+    # terminals render it; legacy ones show mojibake instead of a traceback).
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:  # noqa: BLE001
+        pass
     import argparse
 
     parser = argparse.ArgumentParser(

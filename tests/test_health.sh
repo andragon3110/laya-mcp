@@ -24,7 +24,11 @@ echo "With laya-server down (try after killing start_laya.sh), expect 0 tools."
 
 # Run the Python health check separately -- that's the part bash can verify.
 if [ -d .venv ]; then
-  source .venv/bin/activate
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*|Windows_NT*) VBS=Scripts ;;
+    *) VBS=bin ;;
+  esac
+  source .venv/$VBS/activate
 else
   echo "no .venv found -- skipping python health probe"
   exit 0

@@ -7,6 +7,10 @@
 
 set -euo pipefail
 
+say() { printf '\033[1;34m[laya-mcp]\033[0m %s\n' "$*"; }
+warn() { printf '\033[1;33m[laya-mcp]\033[0m %s\n' "$*"; }
+err() { printf '\033[1;31m[laya-mcp]\033[0m %s\n' "$*" >&2; }
+
 WITH_GLINER=0
 for arg in "$@"; do
   case "$arg" in
@@ -27,18 +31,32 @@ HOST="${LAYA_HOST:-127.0.0.1}"
 GLINER_PORT="${GLINER_PORT:-8766}"
 GLINER_HOST="${GLINER_HOST:-127.0.0.1}"
 
-say() { printf '\033[1;34m[laya-mcp]\033[0m %s\n' "$*"; }
-warn() { printf '\033[1;33m[laya-mcp]\033[0m %s\n' "$*"; }
-err() { printf '\033[1;31m[laya-mcp]\033[0m %s\n' "$*" >&2; }
+# Windows venvs use Scripts/ instead of bin/.
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*|Windows_NT*) VENV_SUBDIR="Scripts" ;;
+  *) VENV_SUBDIR="bin" ;;
+esac
+VENV_PY="$INSTALL_DIR/.venv/$VENV_SUBDIR/python"
 
 # -- preflight -------------------------------------------------------------
 
-command -v "$PYTHON_BIN" >/dev/null 2>&1 || { err "python3 not found (set PYTHON env var to override)"; exit 1; }
+command -v "$PYTHON_BIN" >/dev/null 2>&1 || {
+  # Windows git-bash typically has only `python`, not `python3`.
+  if [ "$PYTHON_BIN" = "python3" ] && command -v python >/dev/null 2>&1; then
+    warn "python3 not found -- falling back to 'python'"
+    PYTHON_BIN=python
+  else
+    err "python3 not found (set PYTHON env var to override)"; exit 1
+  fi
+}
 command -v node >/dev/null 2>&1 || { err "Node.js 20+ required (https://nodejs.org)"; exit 1; }
 command -v npm >/dev/null 2>&1 || { err "npm required"; exit 1; }
 
 NODE_MAJOR=$(node -p "process.versions.node.split('.')[0]")
 if [ "$NODE_MAJOR" -lt 20 ]; then err "Node 20+ required (have $(node -v))"; exit 1; fi
+
+"$PYTHON_BIN" -c "import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)" \
+  || { err "Python 3.10+ required (have $("$PYTHON_BIN" --version 2>&1))"; exit 1; }
 
 # -- install directory ------------------------------------------------------
 #
@@ -84,9 +102,9 @@ say "installing into $INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"
 "$PYTHON_BIN" -m venv "$INSTALL_DIR/.venv"
 # shellcheck disable=SC1091
-source "$INSTALL_DIR/.venv/bin/activate"
-pip install --upgrade pip --quiet
-pip install --quiet -r "$INSTALL_DIR/py/requirements.txt"
+source "$INSTALL_DIR/.venv/$VENV_SUBDIR/activate"
+"$VENV_PY" -m pip install --upgrade pip --quiet
+"$VENV_PY" -m pip install --quiet -r "$INSTALL_DIR/py/requirements.txt"
 
 # -- node deps -------------------------------------------------------------
 
@@ -106,7 +124,7 @@ npm run build --silent
 # (and any other language Router can classify). Total disk: ~1.7 GB.
 say "Router mode requires all 3 Laya checkpoints (english + multilingual + typed-decisions)"
 if [ -z "${LAYA_MCP_NO_ALL:-}" ]; then
-  if "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --all-checkpoints 2>&1 | sed "s/^/  /"; then
+  if "$VENV_PY" "$INSTALL_DIR/py/download_models.py" --all-checkpoints 2>&1 | sed "s/^/  /"; then
     say "all 3 checkpoints (~1.7 GB) ready in the HuggingFace cache"
   else
     warn "one or more checkpoints failed to download -- the server will retry on first start"
@@ -114,7 +132,7 @@ if [ -z "${LAYA_MCP_NO_ALL:-}" ]; then
 else
   warn "LAYA_MCP_NO_ALL=1 -- only the default checkpoint will be downloaded; Router will download the others on first request"
   LAYA_MODEL="${LAYA_MODEL:-convaiinnovations/laya-typed-decisions}"
-  "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --model "$LAYA_MODEL" || true
+  "$VENV_PY" "$INSTALL_DIR/py/download_models.py" --model "$LAYA_MODEL" || true
 fi
 
 # -- optional GLiNER sidecar --------------------------------------------------
@@ -122,10 +140,10 @@ fi
 if [ "$WITH_GLINER" = 1 ]; then
   say "installing GLiNER sidecar dependencies (gliner2 + protobuf + torch, shared venv)"
   # shellcheck disable=SC1091
-  source "$INSTALL_DIR/.venv/bin/activate"
-  pip install --quiet -r "$INSTALL_DIR/py/requirements-gliner.txt"
+  source "$INSTALL_DIR/.venv/$VENV_SUBDIR/activate"
+  "$VENV_PY" -m pip install --quiet -r "$INSTALL_DIR/py/requirements-gliner.txt"
   say "pre-downloading GLiNER2.5 multilingual checkpoint (~594 MB)"
-  if "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/py/download_models.py" --gliner 2>&1 | sed "s/^/  /"; then
+  if "$VENV_PY" "$INSTALL_DIR/py/download_models.py" --gliner 2>&1 | sed "s/^/  /"; then
     say "gliner2.5-multi-v1 ready in the HuggingFace cache"
   else
     warn "GLiNER checkpoint download failed -- gliner-server will retry on first start"
@@ -141,7 +159,7 @@ set -euo pipefail
 INSTALL_DIR="\$(cd "\$(dirname "\$0")" && pwd)"
 HOST="\${LAYA_HOST:-${HOST}}"
 PORT="\${LAYA_PORT:-${PORT}}"
-exec "\$INSTALL_DIR/.venv/bin/python" "\$INSTALL_DIR/py/laya_server.py"
+exec "\$INSTALL_DIR/.venv/$VENV_SUBDIR/python" "\$INSTALL_DIR/py/laya_server.py"
 EOF
 chmod +x "$INSTALL_DIR/start_laya.sh"
 
@@ -161,7 +179,7 @@ set -euo pipefail
 INSTALL_DIR="\$(cd "\$(dirname "\$0")" && pwd)"
 HOST="\${GLINER_HOST:-${GLINER_HOST}}"
 PORT="\${GLINER_PORT:-${GLINER_PORT}}"
-exec "\$INSTALL_DIR/.venv/bin/python" "\$INSTALL_DIR/py/gliner_server.py"
+exec "\$INSTALL_DIR/.venv/$VENV_SUBDIR/python" "\$INSTALL_DIR/py/gliner_server.py"
 EOF
 chmod +x "$INSTALL_DIR/start_gliner.sh"
 
@@ -174,7 +192,7 @@ HOST="\${LAYA_HOST:-${HOST}}"
 PORT="\${LAYA_PORT:-${PORT}}"
 GHOST="\${GLINER_HOST:-${GLINER_HOST}}"
 GPORT="\${GLINER_PORT:-${GLINER_PORT}}"
-exec "\$INSTALL_DIR/.venv/bin/python" "\$INSTALL_DIR/py/doctor.py" --host "\$HOST" --port "\$PORT" --gliner-host "\$GHOST" --gliner-port "\$GPORT" "\$@"
+exec "\$INSTALL_DIR/.venv/$VENV_SUBDIR/python" "\$INSTALL_DIR/py/doctor.py" --host "\$HOST" --port "\$PORT" --gliner-host "\$GHOST" --gliner-port "\$GPORT" "\$@"
 EOF
 chmod +x "$INSTALL_DIR/doctor.sh"
 
@@ -187,17 +205,35 @@ if [ -d "$INSTALL_DIR" ]; then
   rm -rf "$INSTALL_DIR"
   echo "[laya-mcp] removed $INSTALL_DIR"
 fi
-CFG="$HOME/.config/opencode/opencode.json"
+CFG="${OPENCODE_JSON:-}"
+if [ -z "$CFG" ]; then
+  if [ -n "${OPENCODE_CONFIG_DIR:-}" ]; then CFG="$OPENCODE_CONFIG_DIR/opencode.json";
+  else CFG="$HOME/.config/opencode/opencode.json"; fi
+fi
+# Windows python cannot open msys-style /c/... paths; normalize deterministically.
+if command -v cygpath >/dev/null 2>&1; then CFG_PY=$(cygpath -w "$CFG"); else CFG_PY=$CFG; fi
 if [ -f "$CFG" ]; then
   cp "$CFG" "$CFG.backup.$(date +%s)"
   if command -v python3 >/dev/null 2>&1; then
+    export CFG_PY
     python3 - <<PY
-import json, pathlib
-cfg_path = pathlib.Path("$CFG")
-cfg = json.loads(cfg_path.read_text())
-if "mcp" in cfg and "laya" in cfg.get("mcp", {}):
-    del cfg["mcp"]["laya"]
-cfg_path.write_text(json.dumps(cfg, indent=2))
+import json, os, pathlib
+cfg_path = pathlib.Path(os.environ["CFG_PY"])
+cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+mcp = cfg.get("mcp")
+if isinstance(mcp, dict):
+    # Native V2 shape.
+    servers = mcp.get("servers")
+    if isinstance(servers, dict) and "laya" in servers:
+        del servers["laya"]
+        if not servers:
+            del mcp["servers"]
+    # Legacy V1 shape (for configs predating the V2 migration).
+    if "laya" in mcp:
+        del mcp["laya"]
+    if not mcp:
+        del cfg["mcp"]
+cfg_path.write_text(json.dumps(cfg, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 PY
     echo "[laya-mcp] removed 'laya' from $CFG"
   fi
@@ -209,17 +245,26 @@ chmod +x "$INSTALL_DIR/uninstall.sh"
 # -- snippet for the user ---------------------------------------------------
 
 mkdir -p "$INSTALL_DIR/examples"
+# The MCP host (a native process) must receive a path it understands:
+# on Windows git-bash $INSTALL_DIR is /c/... form, so convert to C:/...
+if command -v cygpath >/dev/null 2>&1; then
+  SNIPPET_CMD=$(cygpath -w "$INSTALL_DIR/dist/index.js" | sed 's|\\|/|g')
+else
+  SNIPPET_CMD="$INSTALL_DIR/dist/index.js"
+fi
 cat > "$INSTALL_DIR/examples/opencode.snippet.json" <<EOF
 {
   "mcp": {
-    "laya": {
-      "type": "local",
-      "command": ["node", "$INSTALL_DIR/dist/index.js"],
-      "environment": {
-        "LAYA_URL": "http://${HOST}:${PORT}",
-        "GLINER_URL": "http://${GLINER_HOST}:${GLINER_PORT}"
-      },
-      "enabled": true
+    "servers": {
+      "laya": {
+        "type": "local",
+        "command": ["node", "$SNIPPET_CMD"],
+        "environment": {
+          "LAYA_URL": "http://${HOST}:${PORT}",
+          "GLINER_URL": "http://${GLINER_HOST}:${GLINER_PORT}"
+        },
+        "disabled": false
+      }
     }
   }
 }
@@ -239,7 +284,7 @@ $(printf '\033[1;32m✓\033[0m') laya-mcp installed to $INSTALL_DIR
 $(if [ "$WITH_GLINER" = 1 ]; then printf '  Start the gliner-server sidecar (terminal 2, optional):\n    %s/start_gliner.sh\n\n' "$INSTALL_DIR"; fi)
   Then register laya-mcp with your agent:
     Edit ~/.config/opencode/opencode.json and merge examples/opencode.snippet.json
-    into its "mcp" object. See README.md for one-line merge examples for each agent.
+    into its "mcp.servers" object (OpenCode V2), then check 'opencode mcp list'.
 
   Verify with:
     curl http://$HOST:$PORT/health

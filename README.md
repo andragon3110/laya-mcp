@@ -88,9 +88,10 @@ action: review   ← correctly flagged the missing test coverage
 
 ## Quickstart
 
-**Requirements:** Python 3.10+, Node.js 20+, ~1.7 GB disk for the three
+**Requirements:** Python 3.10+, Node.js 20+, bash, ~1.7 GB disk for the three
 Laya checkpoints (+ ~594 MB if you add GLiNER), no GPU needed (CPU works;
-CUDA/MPS used when available).
+CUDA/MPS used when available). On Windows, run everything from git-bash
+(the installer, `doctor.sh` and the `start_*.sh` scripts are bash).
 
 ```bash
 git clone https://github.com/andragon3110/laya-mcp.git
@@ -114,24 +115,32 @@ $HOME/laya-mcp/doctor.sh        # full diagnostic, see below
 
 Then register the server with your agent (details per agent below) —
 e.g. for OpenCode, merge `examples/opencode.snippet.json` into the
-`"mcp"` object of `~/.config/opencode/opencode.json` and restart the
-session:
+`"mcp"` → `"servers"` object of your effective `opencode.json`
+(`~/.config/opencode/opencode.json`, or `$OPENCODE_CONFIG_DIR/opencode.json`
+when that env var is set) and restart the session:
 
 ```json
 {
   "mcp": {
-    "laya": {
-      "type": "local",
-      "command": ["node", "$HOME/laya-mcp/dist/index.js"],
-      "environment": {
-        "LAYA_URL": "http://127.0.0.1:8765",
-        "GLINER_URL": "http://127.0.0.1:8766"
-      },
-      "enabled": true
+    "servers": {
+      "laya": {
+        "type": "local",
+        "command": ["node", "/ABS/PATH/TO/laya-mcp/dist/index.js"],
+        "environment": {
+          "LAYA_URL": "http://127.0.0.1:8765",
+          "GLINER_URL": "http://127.0.0.1:8766"
+        },
+        "disabled": false
+      }
     }
   }
 }
 ```
+
+> OpenCode V2 only reads servers under `mcp.servers` (names directly
+> under `mcp` are ignored). Use an **absolute path** in `command` —
+> `$HOME` does not expand inside JSON. Verify with
+> `opencode mcp list` (expect `✓ laya connected`).
 
 Ask your agent: *"do you see the `laya_*` tools? list them."* You should
 get all eleven back.
@@ -334,14 +343,18 @@ $HOME/laya-mcp/doctor.sh                                          # full diagnos
 $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke.py    # Laya end-to-end
 $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke_gliner.py  # GLiNER end-to-end (needs sidecar)
 cd $HOME/laya-mcp && npm run inspect                              # MCP inspector: 10 tools (11 with sidecar)
+cd $HOME/laya-mcp && .venv/bin/python tests/test_opencode_v2.py  # config-layer unit tests (no models needed)
 ```
+(On Windows git-bash the venv lives at `.venv/Scripts` instead of `.venv/bin`.)
 
 ---
 
 ## Wire into your agent
 
-**OpenCode** — merge `examples/opencode.snippet.json` into `"mcp"` in
-`~/.config/opencode/opencode.json`, restart the session.
+**OpenCode** — merge `examples/opencode.snippet.json` into `mcp.servers`
+in your effective `opencode.json` (`~/.config/opencode/opencode.json`,
+or `$OPENCODE_CONFIG_DIR/opencode.json` when set), restart the session,
+and confirm with `opencode mcp list`.
 
 **Claude Code** — add to `~/.claude.json` (or project `.mcp.json`):
 
@@ -397,7 +410,7 @@ HTTP endpoints, or wrap via your own extension (see Pi docs).
   with recovery hints.
 - **Stateless**: every tool call is independent.
 - **Your setup is untouched**: install/uninstall only ever add or remove
-  `$HOME/laya-mcp` (plus one optional `mcp.laya` key you merge yourself).
+  `$HOME/laya-mcp` (plus one optional `mcp.servers.laya` key you merge yourself).
 
 ```bash
 $HOME/laya-mcp/uninstall.sh   # removes the dir + the opencode.json entry (timestamped backup)
