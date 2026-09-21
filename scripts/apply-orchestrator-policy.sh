@@ -43,8 +43,19 @@ CLOSE_MARK="<!-- /laya-mcp:orchestrator-policy -->"
 [ -f "$CFG" ] || { echo "config not found: $CFG" >&2; exit 1; }
 [ -f "$POLICY_FILE" ] || { echo "policy file not found: $POLICY_FILE" >&2; exit 1; }
 
+PYBIN="${PYTHON:-python3}"
+command -v "$PYBIN" >/dev/null 2>&1 || {
+  # Windows git-bash typically has only `python`, not `python3`.
+  if [ "$PYBIN" = "python3" ] && command -v python >/dev/null 2>&1; then
+    echo "python3 not found -- falling back to 'python'" >&2
+    PYBIN=python
+  else
+    echo "python3 not found (set PYTHON env var to override)" >&2; exit 1
+  fi
+}
+
 export CFG CFG_PY POLICY_FILE ANCHOR OPEN_MARK CLOSE_MARK MODE
-python3 - <<'PY'
+"$PYBIN" - <<'PY'
 import json, os, re, sys, time, pathlib
 
 cfg_path = pathlib.Path(os.environ["CFG_PY"])
