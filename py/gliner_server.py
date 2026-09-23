@@ -18,6 +18,7 @@ Default port 8766 (laya-server uses 8765).
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import math
 import os
@@ -30,7 +31,7 @@ from typing import Any, Dict, List, Optional, Union
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 logging.basicConfig(
     level=os.getenv("GLINER_LOG_LEVEL", os.getenv("LAYA_LOG_LEVEL", "WARNING")),
@@ -139,6 +140,98 @@ def _backoff_delay_s(attempts: int, cfg: Dict[str, float]) -> float:
 def _retry_after_header(seconds: float) -> Dict[str, str]:
     # Retry-After takes whole seconds; always at least 1 on a 503.
     return {"Retry-After": str(max(1, math.ceil(seconds)))}
+
+
+# -- Input limits (T6) --------------------------------------------------------
+# Defaults are documented HERE (module, not README — single source of truth).
+# Every value was validated against the real system, not copied blindly:
+#   - MAX_TEXT_CHARS=50000: GLiNER2.5 does span extraction over whole
+#     documents (no 512/1024-token judge window like Laya), so the cap is
+#     roomier than LAYA_LIMITS_MAX_STATE_CHARS=20000 — still a DoS/memory
+#     guard, far above legit PII/extract payloads (TS tools already trim
+#     criteria to 240 chars and rerank candidates to 2000).
+#   - MAX_LABELS=64: one zero-shot head per label per forward pass; bounds
+#     compute. Matches the TS extract fan-out (2 labels per field max, 64
+#     fields → worst case still near budget; the server stays authoritative).
+#   - MAX_TASKS=32 / MAX_EXTRA_TYPES=32: maps whose entries each cost a
+#     classification/extraction head; 32 keeps /classify and /pii_scan inside
+#     one cheap forward pass each.
+#   - MAX_BODY_CHARS=100000: total-JSON DoS guard, same scale as laya-server.
+
+
+def _limits_cfg() -> Dict[str, int]:
+    """Size guards for /extract_entities, /classify and /pii_scan, all via
+    env. Read dynamically per validation (like _load_retry_cfg) so tests tune
+    via env without a module reload."""
+
+    def _i(name: str, default: int) -> int:
+        try:
+            return max(1, int(os.getenv(name, str(default))))
+        except ValueError:
+            return default
+
+    return {
+        "max_text_chars": _i("GLINER_LIMITS_MAX_TEXT_CHARS", 50000),
+        "max_labels": _i("GLINER_LIMITS_MAX_LABELS", 64),
+        "max_tasks": _i("GLINER_LIMITS_MAX_TASKS", 32),
+        "max_extra_types": _i("GLINER_LIMITS_MAX_EXTRA_TYPES", 32),
+        "max_body_chars": _i("GLINER_LIMITS_MAX_BODY_CHARS", 100000),
+    }
+
+
+class _InputTooLarge(Exception):
+    """Size-guard refusal. Answered as 413 (not 422): the payload is
+    syntactically valid but exceeds the admitted size — the fix is to shrink
+    it, not to correct the schema. Identical structured body {code, field,
+    limit, actual, hint} on both servers, no Retry-After (retrying the same
+    payload can never succeed)."""
+
+    def __init__(self, field: str, limit: int, actual: int, hint: str) -> None:
+        super().__init__(f"input too large: {field} actual={actual} limit={limit}: {hint}")
+        self.field = field
+        self.limit = limit
+        self.actual = actual
+        self.hint = hint
+
+
+def _too_large_response(exc: _InputTooLarge) -> JSONResponse:
+    return JSONResponse(
+        status_code=413,
+        content={
+            "code": "input_too_large",
+            "field": exc.field,
+            "limit": exc.limit,
+            "actual": exc.actual,
+            "hint": exc.hint,
+        },
+    )
+
+
+def _check_text(field: str, text: str) -> str:
+    limit = _limits_cfg()["max_text_chars"]
+    if len(text) > limit:
+        raise _InputTooLarge(
+            field,
+            limit,
+            len(text),
+            "reduce text to within GLINER_LIMITS_MAX_TEXT_CHARS chars or split the document",
+        )
+    return text
+
+
+def _check_body(payload: Dict[str, Any]) -> None:
+    limit = _limits_cfg()["max_body_chars"]
+    try:
+        actual = len(json.dumps(payload, default=str))
+    except Exception:  # noqa: BLE001
+        return  # unmeasurable here: endpoint serialization decides
+    if actual > limit:
+        raise _InputTooLarge(
+            "body",
+            limit,
+            actual,
+            "total JSON body exceeds GLINER_LIMITS_MAX_BODY_CHARS chars; shorten text or split the request",
+        )
 
 
 class _InflightSaturated(RuntimeError):
@@ -495,6 +588,30 @@ class ExtractRequest(BaseModel):
     include_spans: bool = True
     include_confidence: bool = True
 
+    @field_validator("text")
+    @classmethod
+    def _cap_text(cls, v: str) -> str:
+        return _check_text("text", v)
+
+    @field_validator("labels")
+    @classmethod
+    def _cap_labels(cls, v: Labels) -> Labels:
+        limit = _limits_cfg()["max_labels"]
+        actual = len(v)
+        if actual > limit:
+            raise _InputTooLarge(
+                "labels",
+                limit,
+                actual,
+                "send at most GLINER_LIMITS_MAX_LABELS labels per request; split into batches",
+            )
+        return v
+
+    @model_validator(mode="after")
+    def _cap_body(self) -> "ExtractRequest":
+        _check_body({"text": self.text, "labels": self.labels})
+        return self
+
 
 class ClassifyRequest(BaseModel):
     text: str = Field(..., description="Text to classify.")
@@ -503,6 +620,29 @@ class ClassifyRequest(BaseModel):
         description="Tasks map passed straight to classify_text, e.g. {\"intent\": [\"a\", \"b\"]}.",
     )
 
+    @field_validator("text")
+    @classmethod
+    def _cap_text(cls, v: str) -> str:
+        return _check_text("text", v)
+
+    @field_validator("tasks")
+    @classmethod
+    def _cap_tasks(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+        limit = _limits_cfg()["max_tasks"]
+        if len(v) > limit:
+            raise _InputTooLarge(
+                "tasks",
+                limit,
+                len(v),
+                "send at most GLINER_LIMITS_MAX_TASKS tasks per request; split into batches",
+            )
+        return v
+
+    @model_validator(mode="after")
+    def _cap_body(self) -> "ClassifyRequest":
+        _check_body({"text": self.text, "tasks": self.tasks})
+        return self
+
 
 class PiiRequest(BaseModel):
     text: str = Field(..., description="Text to scan for PII and secrets.")
@@ -510,6 +650,29 @@ class PiiRequest(BaseModel):
         default_factory=list,
         description="Extra zero-shot entity types to look for alongside the PII set.",
     )
+
+    @field_validator("text")
+    @classmethod
+    def _cap_text(cls, v: str) -> str:
+        return _check_text("text", v)
+
+    @field_validator("extra_types")
+    @classmethod
+    def _cap_extra_types(cls, v: List[str]) -> List[str]:
+        limit = _limits_cfg()["max_extra_types"]
+        if len(v) > limit:
+            raise _InputTooLarge(
+                "extra_types",
+                limit,
+                len(v),
+                "send at most GLINER_LIMITS_MAX_EXTRA_TYPES extra types per request",
+            )
+        return v
+
+    @model_validator(mode="after")
+    def _cap_body(self) -> "PiiRequest":
+        _check_body({"text": self.text, "extra_types": self.extra_types})
+        return self
 
 
 app = FastAPI(title="gliner-server", version=SERVER_VERSION)
@@ -521,6 +684,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(_InputTooLarge)
+async def _input_too_large_handler(_request: Any, exc: _InputTooLarge) -> JSONResponse:
+    # Custom exceptions raised inside pydantic validators propagate unwrapped
+    # (verified: only ValueError/AssertionError become 422), so the size
+    # guards above land here as structured 413s.
+    return _too_large_response(exc)
 
 
 @app.get("/live")

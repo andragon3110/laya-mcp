@@ -1,18 +1,50 @@
 import type { LayaClient } from "../client.js";
+import { LIMITS, assertCount } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
+
+export interface RerankCandidate {
+  id?: string;
+  text?: string;
+}
+
+export interface RerankTruncation {
+  candidates: RerankCandidate[];
+  truncated: boolean;
+  truncatedIds: string[];
+}
+
+/**
+ * Apply the documented 2000-char per-candidate truncation for real (the
+ * description always claimed it; no code did). Pure function so it is
+ * testable without a server. State sent to /predict carries the truncated
+ * texts; ids and ordering keys are untouched.
+ */
+export function truncateRerankCandidates(candidates: RerankCandidate[]): RerankTruncation {
+  const truncatedIds: string[] = [];
+  const out = candidates.map((c) => {
+    const text = String(c?.text ?? "");
+    if (text.length <= LIMITS.maxRerankCandidateChars) return c;
+    if (typeof c?.id === "string") truncatedIds.push(c.id);
+    return { ...c, text: text.slice(0, LIMITS.maxRerankCandidateChars) };
+  });
+  return { candidates: out, truncated: truncatedIds.length > 0, truncatedIds };
+}
 
 export const rerankTool: ToolDefinition = {
   name: "laya_rerank",
   description:
     "Score every candidate's relevance to a query and return them sorted. Each candidate gets its own probability, " +
-    "so the whole ordering survives. Use for retrieval reranking, near-duplicate triage, or ordering a feed.",
+    "so the whole ordering survives. Use for retrieval reranking, near-duplicate triage, or ordering a feed. " +
+    "At most 64 candidates per call; each candidate text is truncated to 2,000 chars and the response sets " +
+    "truncated:true (with truncated_ids) when any candidate was cut.",
   inputSchema: {
     type: "object",
     properties: {
       query: { type: "string", description: "Query the candidates should be ranked against." },
       candidates: {
         type: "array",
-        description: "Candidate list. Each entry needs `id` and `text` (truncated to 2,000 chars internally).",
+        maxItems: LIMITS.maxRerankCandidates,
+        description: "Candidate list (max 64). Each entry needs `id` and `text` (truncated to 2,000 chars internally).",
         items: {
           type: "object",
           properties: { id: { type: "string" }, text: { type: "string" } },
@@ -25,6 +57,12 @@ export const rerankTool: ToolDefinition = {
   },
   buildQuestions: (args) => {
     const candidates = Array.isArray(args.candidates) ? args.candidates : [];
+    assertCount(
+      candidates.length,
+      LIMITS.maxRerankCandidates,
+      "candidates",
+      `laya_rerank accepts at most ${LIMITS.maxRerankCandidates} candidates per call (one question each); split the list`,
+    );
     const out: Record<string, unknown> = {};
     candidates.forEach((c: { id?: string }, i: number) => {
       if (!c || typeof c.id !== "string") return;
@@ -43,7 +81,12 @@ export const rerankTool: ToolDefinition = {
 
 export async function handleRerank(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const candidates = Array.isArray(args.candidates) ? args.candidates : [];
-  const result = await runTool(client, args, rerankTool.buildQuestions(args), (raw) => {
+  const { candidates: truncated, truncated: wasTruncated, truncatedIds } =
+    truncateRerankCandidates(candidates as RerankCandidate[]);
+  // State sent to /predict carries the truncated texts; scoring keys below
+  // still use the original ids/order so ranks line up.
+  const state = { ...args, candidates: truncated };
+  const result = await runTool(client, state, rerankTool.buildQuestions(args), (raw) => {
     const a = raw.answers as Record<string, { noul: number }>;
     const scored = candidates
       .map((c: { id?: string }, i: number) => ({
@@ -53,7 +96,11 @@ export async function handleRerank(client: LayaClient, args: Record<string, unkn
       }))
       .sort((a, b) => b.relevance - a.relevance)
       .map((entry, idx) => ({ ...entry, rank: idx + 1 }));
-    return JSON.stringify({ ranked: scored, latency_ms: raw.latencyMs }, null, 2);
+    return JSON.stringify(
+      { ranked: scored, truncated: wasTruncated, truncated_ids: truncatedIds, latency_ms: raw.latencyMs },
+      null,
+      2,
+    );
   });
   if (!result.ok) throw new Error(result.error);
   return result.content;

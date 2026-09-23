@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const verifyTool: ToolDefinition = {
@@ -6,18 +7,21 @@ export const verifyTool: ToolDefinition = {
   description:
     "Verify one or more claims against the supplied evidence. Each claim is judged independently " +
     "(verified / contradicted / unsupported) with a calibrated probability. Use to fact-check PR descriptions, " +
-    "agent briefs, or any statement before relying on it.",
+    "agent briefs, or any statement before relying on it. At most 64 claims per call (one question each) " +
+    "and evidence at most 20,000 chars (larger inputs are rejected with input_too_large).",
   inputSchema: {
     type: "object",
     properties: {
       claims: {
         type: "array",
+        maxItems: LIMITS.maxVerifyClaims,
         items: { type: "string" },
-        description: "Claims to verify. One independent judgment per claim.",
+        description: "Claims to verify (max 64). One independent judgment per claim.",
       },
       evidence: {
         type: "string",
-        description: "Evidence text. The agent's instructions for what to judge are explicit; do not let other fields leak in.",
+        maxLength: LIMITS.maxStateChars,
+        description: "Evidence text (max 20,000 chars). The agent's instructions for what to judge are explicit; do not let other fields leak in.",
       },
     },
     required: ["claims", "evidence"],
@@ -25,6 +29,18 @@ export const verifyTool: ToolDefinition = {
   },
   buildQuestions: (args) => {
     const claims = Array.isArray(args.claims) ? args.claims : [];
+    assertCount(
+      claims.length,
+      LIMITS.maxVerifyClaims,
+      "claims",
+      `laya_verify accepts at most ${LIMITS.maxVerifyClaims} claims per call (one server question each); split into batches`,
+    );
+    assertLength(
+      String(args.evidence ?? ""),
+      LIMITS.maxStateChars,
+      "evidence",
+      `evidence exceeds ${LIMITS.maxStateChars} chars; shorten it or verify per section`,
+    );
     const out: Record<string, unknown> = {};
     claims.forEach((claim, i) => {
       out[`claim_${i}`] = {

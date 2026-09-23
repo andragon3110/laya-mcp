@@ -18,6 +18,7 @@ without interruption.
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import math
 import os
@@ -30,7 +31,7 @@ from typing import Any, Dict
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 logging.basicConfig(
     level=os.getenv("LAYA_LOG_LEVEL", "WARNING"),
@@ -134,6 +135,79 @@ def _backoff_delay_s(attempts: int, cfg: Dict[str, float]) -> float:
 def _retry_after_header(seconds: float) -> Dict[str, str]:
     # Retry-After takes whole seconds; always at least 1 on a 503.
     return {"Retry-After": str(max(1, math.ceil(seconds)))}
+
+
+# -- Input limits (T6) --------------------------------------------------------
+# Defaults are documented HERE (module, not README — single source of truth).
+# Every value was validated against the real system, not copied blindly:
+#   - Model context windows (see module docstring): english 512 tokens,
+#     multilingual/typed-decisions 1024 tokens ≈ at most ~4000 chars of real
+#     signal. MAX_STATE_CHARS=20000 is ~5x that: anything larger is truncated
+#     by the Router anyway, so the guard only rejects abuse/accidents, never
+#     legit judge payloads (verified: existing TS tools send at most a few KB
+#     of state; the 240-char criterion slices and 2000-char rerank cap below).
+#   - MAX_QUESTIONS=64: one forward judgment per question; bounds compute and
+#     latency per request. Mirrors the TS fan-out caps 1:1 (classify items,
+#     verify claims, rerank candidates each become exactly one question).
+#   - MAX_BODY_CHARS=100000: total-JSON DoS guard ≈ 5x the state cap, leaving
+#     room for questions/criteria overhead.
+
+
+def _limits_cfg() -> Dict[str, int]:
+    """Size guards for /predict, all via env. Read dynamically per validation
+    (like _load_retry_cfg) so tests tune via env without a module reload."""
+
+    def _i(name: str, default: int) -> int:
+        try:
+            return max(1, int(os.getenv(name, str(default))))
+        except ValueError:
+            return default
+
+    return {
+        "max_state_chars": _i("LAYA_LIMITS_MAX_STATE_CHARS", 20000),
+        "max_questions": _i("LAYA_LIMITS_MAX_QUESTIONS", 64),
+        "max_body_chars": _i("LAYA_LIMITS_MAX_BODY_CHARS", 100000),
+    }
+
+
+class _InputTooLarge(Exception):
+    """Size-guard refusal. Answered as 413 (not 422): the payload is
+    syntactically valid but exceeds the admitted size — the fix is to shrink
+    it, not to correct the schema. Carries field/limit/actual/hint so both
+    servers answer the identical structured body {code, field, limit, actual,
+    hint} with no Retry-After (retrying the same payload can never succeed).
+    """
+
+    def __init__(self, field: str, limit: int, actual: int, hint: str) -> None:
+        super().__init__(f"input too large: {field} actual={actual} limit={limit}: {hint}")
+        self.field = field
+        self.limit = limit
+        self.actual = actual
+        self.hint = hint
+
+
+def _too_large_response(exc: _InputTooLarge) -> JSONResponse:
+    return JSONResponse(
+        status_code=413,
+        content={
+            "code": "input_too_large",
+            "field": exc.field,
+            "limit": exc.limit,
+            "actual": exc.actual,
+            "hint": exc.hint,
+        },
+    )
+
+
+def _state_len(state: Any) -> int:
+    """Measurable size of a state payload: raw length for strings, JSON
+    length for structured states (the form that actually hits the wire)."""
+    if isinstance(state, str):
+        return len(state)
+    try:
+        return len(json.dumps(state, default=str))
+    except Exception:  # noqa: BLE001
+        return 0
 
 
 class _InflightSaturated(RuntimeError):
@@ -527,6 +601,49 @@ class PredictRequest(BaseModel):
         description="Force a language hint (e.g. 'en', 'es', 'fr').",
     )
 
+    @field_validator("state")
+    @classmethod
+    def _cap_state(cls, v: Any) -> Any:
+        limit = _limits_cfg()["max_state_chars"]
+        actual = _state_len(v)
+        if actual > limit:
+            raise _InputTooLarge(
+                "state",
+                limit,
+                actual,
+                "reduce state text to within LAYA_LIMITS_MAX_STATE_CHARS chars or split the request",
+            )
+        return v
+
+    @field_validator("questions")
+    @classmethod
+    def _cap_questions(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+        limit = _limits_cfg()["max_questions"]
+        if len(v) > limit:
+            raise _InputTooLarge(
+                "questions",
+                limit,
+                len(v),
+                "send at most LAYA_LIMITS_MAX_QUESTIONS questions per request; split into batches",
+            )
+        return v
+
+    @model_validator(mode="after")
+    def _cap_body(self) -> "PredictRequest":
+        limit = _limits_cfg()["max_body_chars"]
+        try:
+            actual = len(json.dumps({"state": self.state, "questions": self.questions}, default=str))
+        except Exception:  # noqa: BLE001
+            return self  # unmeasurable here: endpoint serialization decides
+        if actual > limit:
+            raise _InputTooLarge(
+                "body",
+                limit,
+                actual,
+                "total JSON body exceeds LAYA_LIMITS_MAX_BODY_CHARS chars; shorten text or split the request",
+            )
+        return self
+
 
 class PredictResponse(BaseModel):
     answers: Dict[str, Any]
@@ -545,6 +662,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(_InputTooLarge)
+async def _input_too_large_handler(_request: Any, exc: _InputTooLarge) -> JSONResponse:
+    # Custom exceptions raised inside pydantic validators propagate unwrapped
+    # (verified: only ValueError/AssertionError become 422), so the size
+    # guards above land here as structured 413s.
+    return _too_large_response(exc)
 
 
 @app.get("/live")

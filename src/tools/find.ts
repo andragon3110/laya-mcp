@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { LIMITS, assertCount } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const findTool: ToolDefinition = {
@@ -6,6 +7,7 @@ export const findTool: ToolDefinition = {
   description:
     "Pick the best candidate id for a query from a list, or report that none of them answers. " +
     "Cheaper than calling the main LLM for routing decisions over up to 250 candidates. " +
+    "Lists above 250 are rejected with input_too_large (no silent truncation). " +
     "Returns a winner and a confidence probability.",
   inputSchema: {
     type: "object",
@@ -13,7 +15,8 @@ export const findTool: ToolDefinition = {
       query: { type: "string", description: "Plain-language query the candidate should answer." },
       candidates: {
         type: "array",
-        description: "Candidate list. Each entry needs `id` (returned verbatim) and `text` (the candidate's body).",
+        maxItems: LIMITS.maxFindCandidates,
+        description: "Candidate list (max 250). Each entry needs `id` (returned verbatim) and `text` (the candidate's body).",
         items: {
           type: "object",
           properties: {
@@ -29,6 +32,12 @@ export const findTool: ToolDefinition = {
   },
   buildQuestions: (args) => {
     const candidates = Array.isArray(args.candidates) ? args.candidates : [];
+    assertCount(
+      candidates.length,
+      LIMITS.maxFindCandidates,
+      "candidates",
+      `laya_find accepts at most ${LIMITS.maxFindCandidates} candidates per call; split the list and merge winners`,
+    );
     const criteria: Record<string, string> = {};
     for (const c of candidates) {
       if (c && typeof c.id === "string") criteria[c.id] = String(c.text ?? "").slice(0, 240);

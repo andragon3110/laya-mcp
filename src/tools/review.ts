@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { LIMITS, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const reviewTool: ToolDefinition = {
@@ -6,18 +7,26 @@ export const reviewTool: ToolDefinition = {
   description:
     "Score a proposed diff against the request before merging. Returns 0-2 scores for correctness, " +
     "spec_match, test_gap, blast_radius, plus a safe_to_apply probability. Use this BEFORE declaring " +
-    "any coding task done -- it judges the diff against your stated request.",
+    "any coding task done -- it judges the diff against your stated request. " +
+    "Diff at most 20,000 chars (larger inputs are rejected with input_too_large).",
   inputSchema: {
     type: "object",
     properties: {
       request: { type: "string", description: "What the diff is supposed to accomplish." },
-      diff: { type: "string", description: "Unified diff or patch." },
+      diff: { type: "string", maxLength: LIMITS.maxStateChars, description: "Unified diff or patch (max 20,000 chars)." },
       tests: { type: "string", description: "Optional test output or description." },
     },
     required: ["request", "diff"],
     additionalProperties: false,
   },
-  buildQuestions: () => ({
+  buildQuestions: (args) => {
+    assertLength(
+      String(args.diff ?? ""),
+      LIMITS.maxStateChars,
+      "diff",
+      `diff exceeds ${LIMITS.maxStateChars} chars; review per file or per hunk instead of the whole patch at once`,
+    );
+    return {
     correctness: {
       type: "score",
       instructions: "Does the diff correctly implement the request?",
@@ -46,7 +55,8 @@ export const reviewTool: ToolDefinition = {
         false: "Diff needs human review before applying.",
       },
     },
-  }),
+  };
+  },
 };
 
 export async function handleReview(client: LayaClient, args: Record<string, unknown>): Promise<string> {

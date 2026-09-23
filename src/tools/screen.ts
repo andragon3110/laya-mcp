@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { LIMITS, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool, passthrough } from "../tool.js";
 
 export const screenTool: ToolDefinition = {
@@ -6,11 +7,12 @@ export const screenTool: ToolDefinition = {
   description:
     "Screen text for prompt injection, jailbreaks, and substance before it enters the agent's context. " +
     "Returns a verdict (allow/review/block/skip) with calibrated probabilities. " +
-    "Use for fetched pages, pasted user content, and external issue bodies.",
+    "Use for fetched pages, pasted user content, and external issue bodies. " +
+    "Text at most 20,000 chars (larger inputs are rejected with input_too_large).",
   inputSchema: {
     type: "object",
     properties: {
-      text: { type: "string", description: "Text to screen." },
+      text: { type: "string", maxLength: LIMITS.maxStateChars, description: "Text to screen (max 20,000 chars)." },
       purpose: {
         type: "string",
         description: "Stated purpose for processing this text. Helps judge relevance.",
@@ -19,7 +21,14 @@ export const screenTool: ToolDefinition = {
     required: ["text", "purpose"],
     additionalProperties: false,
   },
-  buildQuestions: (args) => ({
+  buildQuestions: (args) => {
+    assertLength(
+      String(args.text ?? ""),
+      LIMITS.maxStateChars,
+      "text",
+      `text exceeds ${LIMITS.maxStateChars} chars; screen per chunk instead of the whole page at once`,
+    );
+    return {
     is_injection: {
       type: "noul",
       instructions:
@@ -47,7 +56,8 @@ export const screenTool: ToolDefinition = {
         false: "Content does not address the purpose.",
       },
     },
-  }),
+  };
+  },
 };
 
 export async function handleScreen(client: LayaClient, args: Record<string, unknown>): Promise<string> {

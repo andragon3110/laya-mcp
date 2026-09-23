@@ -1,11 +1,14 @@
 import type { LayaClient } from "../client.js";
+import { LIMITS, assertCount, inputTooLarge } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const decideTool: ToolDefinition = {
   name: "laya_decide",
   description:
     "Pick one of 2-6 bounded options, with optional per-requirement checks evaluated independently in the same call. " +
-    "Use when the choice space is small and the criteria are explicit. Returns the winner and a confidence probability.",
+    "Use when the choice space is small and the criteria are explicit. Fewer than 2 or more than 6 options, " +
+    "or more than 32 requirements, are rejected with input_too_large. " +
+    "Returns the winner and a confidence probability.",
   inputSchema: {
     type: "object",
     properties: {
@@ -23,8 +26,9 @@ export const decideTool: ToolDefinition = {
       },
       requirements: {
         type: "array",
+        maxItems: LIMITS.maxDecideRequirements,
         items: { type: "string" },
-        description: "Optional constraints. Each one is evaluated independently.",
+        description: "Optional constraints (max 32). Each one is evaluated independently.",
       },
     },
     required: ["decision", "candidates"],
@@ -33,6 +37,28 @@ export const decideTool: ToolDefinition = {
   buildQuestions: (args) => {
     const candidates = Array.isArray(args.candidates) ? args.candidates : [];
     const requirements = Array.isArray(args.requirements) ? args.requirements : [];
+    // The schema declares minItems 2 / maxItems 6, but MCP hosts do not
+    // always enforce schemas -- enforce here too so the bound is real.
+    if (candidates.length < LIMITS.minDecideOptions) {
+      throw inputTooLarge(
+        "candidates",
+        LIMITS.minDecideOptions,
+        candidates.length,
+        "laya_decide needs at least 2 options; with a single option there is nothing to decide",
+      );
+    }
+    assertCount(
+      candidates.length,
+      LIMITS.maxDecideOptions,
+      "candidates",
+      "laya_decide accepts 2-6 options; use laya_find for larger candidate lists",
+    );
+    assertCount(
+      requirements.length,
+      LIMITS.maxDecideRequirements,
+      "requirements",
+      `at most ${LIMITS.maxDecideRequirements} requirements per call to stay within the ${LIMITS.maxQuestions}-question server budget`,
+    );
     const criteria: Record<string, string> = {};
     for (const c of candidates) {
       if (c && typeof c.id === "string") criteria[c.id] = String(c.description ?? "").slice(0, 240);
