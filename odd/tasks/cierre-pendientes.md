@@ -11,8 +11,12 @@ Resolver los pendientes de las Fases 1-8: commitear untracked (AUDIT.md, artifac
 - [x] T1 (inline): tracking + rama — DONE.
 - [x] T2 (inline): commit untracked — DONE (1b72bad docs: AUDIT.md + artifacts/ + odd/, 17 ficheros).
 - [x] T3 (delegated): bash + .sh + fixture — DONE sin commit (bash Git 5.2.37 funcional; test_tools_offline.sh exit 0 PASS; test_health.sh exit 0 no-op sin .venv; policy.sh matriz completa en fixture sintética TEMP; hallazgo: test_health.sh texto stale 0/10 → corrección T7).
-- [x] T4 (delegated): dataset laya_compare + wiring — DONE (W2: evals/suites/compare.mjs 8 casos + run/score; 88/88).
-- [ ] T5 (delegated): verificación pins == en venv temporal (aplicar solo si seguro).
+- [x] T4 (delegated): dataset laya_compare + wiring — DONE (W2 commit 59108f3; evals/suites/compare.mjs 8 casos + run/score; 88/88; CERO src/; bench.mjs sigue con 10 suites — nota T7 docs).
+- [x] T5 (delegated): pins verificados — DONE (commit 51eee28; 8 pins == verificados en venv2 limpio + imports + pip check; huggingface_hub 0.36.2 por interacción gliner2; venvs borrados; py 57 intacto).
+- [x] T6 (delegated): backends live — DONE sin commit (venv TEMP CPU-only; :8765 3 checkpoints + :8766 gliner vivos; doctor live 16/0/0; smoke+gliner live OK; juicios live registrados; integration live 2/5 gate externo; 2 bugs tests: mcp_smoke race+deepEqual, smoke.py puerto 8766; limpieza total).
+- [x] T7 (delegated): fixes + stale + no-regresión — DONE (commit b99f8ed +93/-21; mcp_smoke race+deepEqual; smoke.py LAYA_PORT; test_health.sh; EVALUATION compare; todo verde offline).
+- [x] T7b (delegated): re-verificación live — DONE sin commit (mcp_smoke live ALL PASSED 12 tools; smoke.py :8767 OK; doctor live 16/0/0 EXIT=0; 3 fixes CONFIRMADOS; limpieza total verificada).
+- [ ] T8 (inline): readback + spot-check + reporte + pregunta push/PR/merge — IN PROGRESS.
 - [ ] T6 (delegated): backends live (pip laya, boot, doctor/smoke/mcp_smoke live, registro honesto).
 - [ ] T7 (delegated): no-regresión + actualizar FINAL_REPORT limitaciones.
 - [ ] T8 (inline): readback + spot-check + reporte + pregunta push/PR/merge.
