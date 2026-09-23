@@ -7,6 +7,16 @@
  * file orchestrates --save), no EVALUATION.md, no integration (T6).
  * No models, no GPU, no network, no pip.
  *
+ * COMPARE NOTE (cierre-pendientes T7): `laya_compare` has a T3 dataset
+ * (evals/suites/compare.mjs) plus run/score wiring (88/88), but NO bench
+ * row here -- deliberately, not by omission. The T5 bench froze at 10
+ * primitive rows with versioned results under evals/results/v1/ (bench.json
+ * + manifest linkage + the 14 structural checks in
+ * tests/fase7_t5_bench_manifest.mjs pin that shape); adding an 11th row
+ * would invalidate the recorded run without a re-record protocol. If a
+ * compare bench row is ever wanted, record it as a new results version
+ * (evals/results/vN/) and extend the battery together -- never silently.
+ *
  * METHOD (inherits fase-4 T7; absolutes only, never asserted, never compared
  * across machines, no improvement claimed -- there is no baseline):
  * - Stub LayaClient reports a configurable `latencyMs` field; the measured
@@ -70,6 +80,8 @@ import {
 } from "../dist/tools/rerank.js";
 
 export const BENCH_SUITES = [classify, decide, verify, screen, pii, extract, find, rerank, review, gate];
+// 10 suites by version-freeze (see COMPARE NOTE in the header): laya_compare
+// is covered by evals/run.mjs + evals/score.mjs, not benched here.
 
 export const BENCH_METHOD =
   "single process; stub-reported latency_ms kept separate from measured wall " +

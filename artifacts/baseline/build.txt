@@ -1,0 +1,12 @@
+# baseline — build (tsc)
+# Timestamp (UTC): 2026-09-23T03:0XZ (tras typecheck OK)
+# Modificaciones previas: SOLO artifacts/baseline/ + `npm install`. dist/ no existia antes (DIST_ABSENT).
+# Comando exacto: `npm run build`  (script package.json: "build": "tsc")
+# Duracion: 1.30 s | Exit: 0 | Resultado: OK
+# stdout/stderr completo:
+> laya-mcp@0.4.0 build
+> tsc
+# (sin errores ni warnings; dist/ generado)
+# Nota: `npm install` previo (node_modules ausente) -> "added 114 packages in 2s", 0 vulnerabilidades,
+# duracion 2.58 s, exit 0. `npm ls --depth=0`: laya-mcp@0.4.0 con @modelcontextprotocol/sdk@1.30.0,
+# @types/node@22.20.4, ts-node@10.9.2, typescript@5.9.3, exit 0.

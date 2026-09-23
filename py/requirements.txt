@@ -1,26 +1,28 @@
 # Pinned to the 0.3.x line: this is the version that ships the typed-decisions
 # checkpoint (`laya.load(..., subfolder="typed-decisions")`) which we depend on.
 # Bump the upper bound only after re-testing the smoke harness.
-laya>=0.3.0,<0.4.0
-fastapi>=0.110.0
-uvicorn[standard]>=0.27.0
-pydantic>=2.5.0
+laya==0.3.8,<0.4.0
+fastapi==0.141.1
+uvicorn[standard]==0.53.0
+pydantic==2.13.5
 # huggingface_hub is needed by the installer for explicit, resumable model
 # downloads (so the first laya-server boot does not block on a 1 GB pull).
-huggingface_hub>=0.24.0
+huggingface_hub==0.36.2
 # psutil lets the doctor report free RAM and disk without shelling out.
-psutil>=5.9.0
+psutil==7.2.2
 
-# -- fase-8-final T3: de facto lock (NOT == pins -- see note below) --------
-# Exact versions installed and verified 2026-09-23 (Windows, Python 3.11.9):
-#   fastapi==0.139.0  uvicorn==0.42.0  pydantic==2.12.5
-#   huggingface_hub==0.36.2  psutil==5.9.8  (laya itself: NOT installed here)
-# Why no `==` pins: pinning was NOT verified against a clean-room `pip
-# install` (no network install was run in this environment, and mutating the
-# shared interpreter is out of scope), so `==` could break resolution for
-# other users. Until pins are verified, reproduce with this de facto lock:
-#   pip install -r py/requirements.txt && pip freeze | <the five above>
-# or pin the five versions above explicitly after testing a fresh venv.
+# -- cierre-pendientes T5: verified == pins (2026-09-23, Python 3.11.9) -----
+# Verified against TWO clean-room venvs in %TEMP% (never the system/project
+# interpreter): venv1 resolved `>=` as-is, venv2 installed these `==` pins
+# plus requirements-gliner.txt in install.sh order (base first, gliner
+# second, shared venv). `pip check` clean, imports OK (fastapi, uvicorn,
+# pydantic, huggingface_hub, laya, gliner2, protobuf).
+#   laya==0.3.8  fastapi==0.141.1  uvicorn==0.53.0  pydantic==2.13.5
+#   huggingface_hub==0.36.2  psutil==7.2.2
+# NOTE: huggingface_hub is pinned to 0.36.2 (NOT the 1.32.0 that
+# requirements.txt alone resolves) because gliner2==2.0.0 constrains it:
+# the combined install.sh --with-gliner venv must converge on 0.36.2.
+# Ceilings (`<0.4.0`) are kept as redundant-but-harmless guards.
 # Node side is already lockfile-pinned: package-lock.json exists, so use
 # `npm ci` (exact, reproducible) instead of `npm install` (range-resolving).
 # install.sh still runs `npm install`; switching it to `npm ci` is a T4/doc

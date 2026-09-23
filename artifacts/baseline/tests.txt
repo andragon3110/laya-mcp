@@ -1,0 +1,63 @@
+# baseline — tests offline (sin modelos)
+# Timestamp (UTC): 2026-09-23T03:15Z aprox (sesion completa 03:05-03:16Z)
+# Modificaciones previas: SOLO `New-Item artifacts/baseline` (dir creado) + `npm install` (node_modules ausente).
+# Nota PowerShell: las lineas "NativeCommandError" en la consola son ruido del wrapper (stderr del programa),
+# NO errores del programa. Se conservan los mensajes reales.
+# Repo: laya-mcp@0.4.0, node v24.18.0, npm 11.17.0, python 3.11.9, rama main.
+
+## 1) python -m unittest tests.test_opencode_v2 -v
+# Duracion: 0.13 s | Exit: 0 | Resultado: OK
+test_config_dir_resolution (tests.test_opencode_v2.DoctorConfigTest.test_config_dir_resolution) ... ok
+test_missing_entry_skip (tests.test_opencode_v2.DoctorConfigTest.test_missing_entry_skip) ... ok
+test_missing_file_skip (tests.test_opencode_v2.DoctorConfigTest.test_missing_file_skip) ... ok
+test_v1_legacy_disabled_warn (tests.test_opencode_v2.DoctorConfigTest.test_v1_legacy_disabled_warn) ... ok
+test_v1_legacy_registered_pass (tests.test_opencode_v2.DoctorConfigTest.test_v1_legacy_registered_pass) ... ok
+test_v2_disabled_warn (tests.test_opencode_v2.DoctorConfigTest.test_v2_disabled_warn) ... ok
+test_v2_nonascii_config_pass (tests.test_opencode_v2.DoctorConfigTest.test_v2_nonascii_config_pass)
+Regression: configs with Spanish text (accents) must parse as UTF-8. ... ok
+test_v2_registered_pass (tests.test_opencode_v2.DoctorConfigTest.test_v2_registered_pass) ... ok
+test_snippet_is_native_v2 (tests.test_opencode_v2.SnippetTest.test_snippet_is_native_v2) ... ok
+----------------------------------------------------------------------
+Ran 9 tests in 0.007s
+OK
+
+## 2) LAYA_SKIP=1 python tests/smoke.py
+# Duracion: 0.05 s | Exit: 0 | Resultado: OK
+OK -- all 10 workflow builders returned non-empty payloads
+LAYA_SKIP=1 -- skipping live /predict checks.
+
+## 3) EXPECT_PII=0 node tests/mcp_smoke.mjs
+# Duracion: 0.46 s | Exit: 1 | Resultado: FAIL (causa verificada, ver abajo)
+[laya-mcp] ready (model=convaiinnovations/laya, url=http://127.0.0.1:8765, gliner_url=http://127.0.0.1:8766, tool_timeout_ms=8000)
+FAIL -- laya_extract advertised
+# Causa: laya-server (:8765) esta CAIDO (curl exit 7, connection refused). src/index.ts:104-109
+# devuelve `tools: []` en ListTools cuando health.current().ready == false, asi que el smoke
+# (que exige laya_extract anunciado incluso con EXPECT_PII=0) no puede pasar offline.
+# EXPECT_PII=0 requiere laya-server ARRIBA + gliner ABAJO; aqui ambos estan abajo.
+# NO se levanto inferencia (coste modelos) segun restriccion de mision.
+
+## 4) bash tests/test_tools_offline.sh
+# Duracion: n/a | Exit: 1 (del propio intento) | Resultado: NO EJECUTABLE en este entorno
+# Comando exacto: `bash tests/test_tools_offline.sh`
+# Error literal:
+#   bash : <3>WSL (1082511 - Relay) ERROR: CreateProcessCommon:818: execvpe(/bin/bash) failed: No such file or directory
+# Hay `bash` como shim WSL sin backend; no existe git-bash ni WSL funcional. El .sh escribe
+# /tmp/laya-mcp-out.log (ruta POSIX inexistente en Windows nativo).
+# Equivalente nativo PowerShell EJECUTADO (evidencia supletoria, mismo protocolo JSON-RPC):
+#   @('{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"smoke","version":"0"}}}',
+#     '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}') | node dist/index.js
+# Duracion: 0.23 s | Exit: 0
+# Salida:
+#   {"result":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"serverInfo":{"name":"laya-mcp","version":"0.4.0"}},"jsonrpc":"2.0","id":1}
+#   {"result":{"tools":[]},"jsonrpc":"2.0","id":2}
+# Conclusion: con laya-server caido, tools/list -> "tools":[] — coincide con lo que el .sh espera
+# (grep '"tools":[]'). El comportamiento offline es CORRECTO; solo el runner bash falta.
+
+## 5) bash tests/test_health.sh (informativo)
+# Duracion: n/a | Exit: 1 (del propio intento) | Resultado: NO EJECUTABLE en este entorno
+# Comando exacto: `bash tests/test_health.sh`
+# Error literal:
+#   bash : <3>WSL (1082609 - Relay) ERROR: CreateProcessCommon:818: execvpe(/bin/bash) failed: No such file or directory
+# Nota de contenido: el script es mayormente informativo (imprime como usar el inspector) y su
+# unica comprobacion real requiere .venv (ausente aqui: no existe dir .venv) + curl a $LAYA_URL/health.
+# Parte Python verificada por equivalente nativo: curl.exe a :8765/health -> exit 7 (ver doctor.txt).

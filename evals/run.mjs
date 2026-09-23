@@ -1,5 +1,5 @@
 /**
- * Fase-7 T3 eval harness: ONE common runner for the 10 eval suites.
+ * Fase-7 T3 eval harness: ONE common runner for the 11 eval suites.
  *
  * SCOPE (T3 only): load each suite dataset, run every case against the REAL
  * handler (from dist/) with an oracle-derived deterministic stub, compare the
@@ -21,7 +21,7 @@
  * adapters (invoke + check); all orchestration lives here.
  *
  * Run from the repo root:  node evals/run.mjs [suite] [--json]
- *   suite  optional suite name filter (e.g. `verify`); default runs all 10.
+ *   suite  optional suite name filter (e.g. `verify`); default runs all 11.
  *   --json print a machine-readable summary instead of the per-case log.
  * Exit 0 when every gold matches, 1 otherwise.
  */
@@ -35,8 +35,9 @@ import * as find from "./suites/find.mjs";
 import * as rerank from "./suites/rerank.mjs";
 import * as review from "./suites/review.mjs";
 import * as gate from "./suites/gate.mjs";
+import * as compare from "./suites/compare.mjs";
 
-const SUITES = [classify, decide, verify, screen, pii, extract, find, rerank, review, gate];
+const SUITES = [classify, decide, verify, screen, pii, extract, find, rerank, review, gate, compare];
 
 /** Deterministic oracle stub: answers come FROM the case oracle (see above). */
 const fakeClient = (answers, capture) => ({

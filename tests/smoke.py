@@ -9,6 +9,15 @@ for local debugging -- run after `pip install -r py/requirements.txt`.
 Usage:
     python tests/smoke.py            # requires Laya installed (pip install laya)
     LAYA_SKIP=1 python tests/smoke.py  # skips the load check, still tests builders
+    LAYA_PORT=8770 python tests/smoke.py  # spawn/wait on another port
+
+Env:
+    LAYA_PORT  port for the spawned laya-server (default 8766,
+               backward-compatible). NOTE: 8766 is also the prescribed
+               gliner-server port (GLINER_PORT) -- set LAYA_PORT to a free
+               port whenever the gliner sidecar is up to avoid the bind
+               collision (cierre-pendientes T7).
+    LAYA_SKIP  "1" to skip the live /predict checks.
 """
 from __future__ import annotations
 
@@ -47,8 +56,12 @@ if os.getenv("LAYA_SKIP") == "1":
     sys.exit(0)
 
 # 2. Try to spawn laya-server and exercise one tool.
+# Cierre-pendientes T7: single explicit PORT honors LAYA_PORT (default 8766,
+# backward-compatible) for BOTH the spawned server env and the /health wait
+# base below -- they must never diverge.
+PORT = os.getenv("LAYA_PORT", "8766")
 env = os.environ.copy()
-env.setdefault("LAYA_PORT", "8766")  # avoid clashing with a dev server
+env["LAYA_PORT"] = PORT  # spawned laya_server.py binds $LAYA_PORT (own default 8765)
 env.setdefault("LAYA_MODEL", "convaiinnovations/laya-typed-decisions")
 env.setdefault("LAYA_SUBFOLDER", "typed-decisions")
 proc = subprocess.Popen(
@@ -61,7 +74,7 @@ proc = subprocess.Popen(
 
 try:
     # Wait for /health
-    base = f"http://127.0.0.1:{env['LAYA_PORT']}"
+    base = f"http://127.0.0.1:{PORT}"
     deadline = time.time() + 60
     ready = False
     while time.time() < deadline:

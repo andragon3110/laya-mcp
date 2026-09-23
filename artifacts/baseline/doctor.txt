@@ -1,0 +1,47 @@
+# baseline — doctor + probes de servidor
+# Timestamp (UTC): 2026-09-23T03:1XZ
+# Modificaciones: NINGUNA. No se levanto inferencia ni se descargaron modelos (restriccion de mision).
+# doctor.sh: AUSENTE en raiz (DOCTOR_SH_ABSENT) — se uso py/doctor.py directo, como indica la mision.
+
+## 1) python py/doctor.py --help
+# Duracion: instantanea | Exit: 0
+# (usage completo con flags --host/--port/--gliner-host/--gliner-port/--no-live/--json/--fail-on; ver salida en sesion)
+
+## 2) python py/doctor.py --no-live
+# Duracion: 2.48 s | Exit: 2 | Resultado: FAIL (1 fail bloqueante, ver abajo)
+[ laya-mcp doctor ]  [FAIL]  9 pass  1 warn  1 fail  3 skip
+  install_dir: C:\Users\Andragon\laya-mcp
+  hf_cache:    C:\Users\Andragon\.cache\huggingface
+  python:      3.11.9  platform: win32
+  x [FAIL] laya-sdk                laya Python package not installed
+  - [SKIP] laya-version            laya not installed -- skipped version check
+  + [PASS] torch                   torch 2.13.0+cu130 installed
+  + [PASS] gpu                     CUDA available: NVIDIA GeForce RTX 5060 Ti (14.8 GB free)
+  + [PASS] disk                    126.2 GB free at C:\Users\Andragon
+  ! [WARN] memory                  5.2 GB available -- enough for 1 checkpoint at a time, not all 3 resident
+  + [PASS] install-dir             C:\Users\Andragon\laya-mcp looks complete
+  + [PASS] checkpoint:english      convaiinnovations/laya (root) cached
+  + [PASS] checkpoint:multilingual  convaiinnovations/laya-multilingual (multilingual) cached
+  + [PASS] checkpoint:typed-decisions  convaiinnovations/laya-typed-decisions (typed-decisions) cached
+  - [SKIP] gliner-sdk              gliner2 not installed -- GLiNER features opt-in via install.sh --with-gliner
+  - [SKIP] gliner-checkpoint       gliner2 not installed -- skipping checkpoint check
+  + [PASS] mcp-server-boot         index.js booted and was reachable for stdio
+  + [PASS] opencode-config         mcp.servers.laya registered in C:\Users\Andragon\AppData\Roaming\orca\opencode-hooks\shared\opencode.json
+FAILURES -- laya-mcp will not work until these are fixed:
+  - laya-sdk: laya Python package not installed
+
+## 3) python py/doctor.py --no-live --json
+# Duracion: 2.64 s | Exit: 2 | Resultado: mismo veredicto (ok:false, pass 9, warn 1, fail 1, skip 3, total 14)
+# Detalles JSON relevantes (completo en sesion):
+#   laya-sdk fail, hint "pip install laya>=0.3.0,<0.4.0"; memory warn 5.2/31.9 GB (required 6.0);
+#   checkpoints cacheados: english 2262.7 MB, multilingual 646.8 MB, typed-decisions 807.0 MB;
+#   mcp-server-boot pass; opencode-config pass (command node C:/Users/Andragon/laya-mcp/dist/index.js,
+#   LAYA_URL :8765, GLINER_URL :8766). NOTA: install_dir/opencode-config apuntan a
+#   C:\Users\Andragon\laya-mcp (instalacion separada), NO al repo auditado (Documents\Github\laya-mcp).
+
+## 4) curl a :8765/health (servidor NO levantado por nosotros; solo sonda)
+# Comando exacto: `curl.exe --max-time 3 -fsS http://127.0.0.1:8765/health`
+# Duracion: ~2 s (timeout de conexion) | Exit: 7 | Resultado: NO EJECUTADO (servidor caido, sin inferencia que probar)
+# Error literal: curl: (7) Failed to connect to 127.0.0.1 port 8765 after 2047 ms: Could not connect to server
+# Probes /ready y /doctor y :8766 (gliner): NO EJECUTADOS por la misma razon (nada escuchando; no se
+# levanta inferencia pesada ni se descargan modelos por restriccion de mision). Estado: "no ejecutado por coste".

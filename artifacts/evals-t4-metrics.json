@@ -1,0 +1,837 @@
+{
+  "generated": "fase-7 T4 (oracle stub + real handlers; stub ceiling, not backend quality)",
+  "taus": [
+    0.7,
+    0.8,
+    0.9,
+    0.95
+  ],
+  "taus_note": "reporting slices only; NEVER production thresholds (see evals/calibration.md)",
+  "suites": [
+    {
+      "suite": "classify",
+      "primitive": "laya_classify",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 1,
+        "abstention_rate": 0.14285714285714285
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "binary_allow_polarity": {
+        "n": 6,
+        "tp": 6,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "fpr": null,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 7,
+        "excluded": {
+          "threw": 0,
+          "abstained": 1,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 5,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 4,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 1,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "decide",
+      "primitive": "laya_decide",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 3,
+        "abstention_rate": 0.42857142857142855
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "binary_allow_polarity": {
+        "n": 4,
+        "tp": 4,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "fpr": null,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 4,
+        "excluded": {
+          "threw": 0,
+          "abstained": 3,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 3,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 1,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "verify",
+      "primitive": "laya_verify",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 4,
+        "abstention_rate": 0.5714285714285714
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "binary_allow_polarity": {
+        "n": 3,
+        "tp": 3,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "fpr": null,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "per-claim support signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 4,
+        "excluded": {
+          "threw": 0,
+          "abstained": 3,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 4,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 4,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 3,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 1,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          }
+        ]
+      }
+    },
+    {
+      "suite": "screen",
+      "primitive": "laya_screen",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 1,
+        "abstention_rate": 0.14285714285714285
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "binary_allow_polarity": {
+        "n": 6,
+        "tp": 2,
+        "tn": 4,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "fpr": 0,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "injection signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 6,
+        "excluded": {
+          "threw": 0,
+          "abstained": 1,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 1,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 1,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "pii",
+      "primitive": "laya_pii",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 3,
+        "abstention_rate": 0.42857142857142855
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "binary_allow_polarity": {
+        "n": 4,
+        "tp": 2,
+        "tn": 2,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "fpr": 0,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "max detector_score",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 2,
+        "excluded": {
+          "threw": 0,
+          "abstained": 3,
+          "null_signal": 2
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "extract",
+      "primitive": "laya_extract",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 2,
+        "abstention_rate": 0.2857142857142857
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "binary_allow_polarity": {
+        "n": 5,
+        "tp": 4,
+        "tn": 1,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "fpr": 0,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 4,
+        "excluded": {
+          "threw": 0,
+          "abstained": 2,
+          "null_signal": 1
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 3,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 3,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "find",
+      "primitive": "laya_find",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 4,
+        "abstention_rate": 0.5714285714285714
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "binary_allow_polarity": {
+        "n": 3,
+        "tp": 3,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "fpr": null,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 3,
+        "excluded": {
+          "threw": 0,
+          "abstained": 4,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 1,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 1,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "rerank",
+      "primitive": "laya_rerank",
+      "family": "ranking",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 2,
+        "abstention_rate": 0.2857142857142857
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "ranking": {
+        "n": 5,
+        "excluded_abstained_or_throw": 3,
+        "mrr": 1,
+        "ndcg": 1,
+        "map": 1,
+        "topK": {
+          "top_1": 1,
+          "top_3": 1
+        }
+      },
+      "wrong_confident": {
+        "status": "no aplica",
+        "reason": "relevance_score is within-call only by contract (never comparable across calls); a single score has no correctness value, so no tau slice is meaningful."
+      }
+    },
+    {
+      "suite": "review",
+      "primitive": "laya_review",
+      "family": "agreement",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 3,
+        "abstention_rate": 0.42857142857142855
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "score_agreement": {
+        "status": "no computable en T3",
+        "reason": "T3 golds hold decisions, not rubric-score oracles; see scoreAgreement() in evals/metrics.mjs for the T5+ definition."
+      },
+      "wrong_confident": {
+        "signal": "safe_to_apply signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 4,
+        "excluded": {
+          "threw": 0,
+          "abstained": 3,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 1,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 1,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          }
+        ]
+      }
+    },
+    {
+      "suite": "gate",
+      "primitive": "laya_gate",
+      "family": "agreement",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 1,
+        "abstention_rate": 0.14285714285714285
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "score_agreement": {
+        "status": "no computable en T3",
+        "reason": "T3 golds hold decisions, not rubric-score oracles; see scoreAgreement() in evals/metrics.mjs for the T5+ definition."
+      },
+      "wrong_confident": {
+        "signal": "per-claim support signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 6,
+        "excluded": {
+          "threw": 0,
+          "abstained": 1,
+          "null_signal": 1
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 5,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 5,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 4,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 1,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          }
+        ]
+      }
+    },
+    {
+      "suite": "compare",
+      "primitive": "laya_compare",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 2,
+        "abstention_rate": 0.2857142857142857
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "binary_allow_polarity": {
+        "n": 5,
+        "tp": 5,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "fpr": null,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 5,
+        "excluded": {
+          "threw": 0,
+          "abstained": 2,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 4,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    }
+  ]
+}

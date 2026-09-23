@@ -2,8 +2,11 @@
 # Test that laya-mcp exposes the expected number of tools when laya-server is up.
 #
 # Usage: tests/test_health.sh [--down]
-#   default:  requires the laya-server to be running, expects 10 tools.
-#   --down:   assumes laya-server is NOT running, expects 0 tools.
+#   default:  requires the laya-server to be running, expects 11 tools
+#             (12 when the gliner sidecar is also up).
+#   --down:   assumes laya-server is NOT running, expects 1 tool
+#             (only laya_capabilities, per the fase-5 T5 exemption -- never 0:
+#             the host must tell MCP-alive/backend-down apart from MCP-dead).
 
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -19,8 +22,10 @@ fi
 # from bash" advisory and exit 0.
 echo "Smoke-testing laya-mcp requires the @modelcontextprotocol/inspector:"
 echo "  npm run inspect"
-echo "Then click 'List Tools' in the UI. With laya-server up, expect 10 tools."
-echo "With laya-server down (try after killing start_laya.sh), expect 0 tools."
+echo "Then click 'List Tools' in the UI. With laya-server up, expect 11 tools"
+echo "(12 with the gliner sidecar up: 10 base + laya_pii + laya_capabilities)."
+echo "With laya-server down (try after killing start_laya.sh), expect 1 tool"
+echo "(only laya_capabilities -- the fase-5 T5 exemption, never 0)."
 
 # Run the Python health check separately -- that's the part bash can verify.
 if [ -d .venv ]; then

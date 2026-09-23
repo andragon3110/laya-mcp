@@ -1,0 +1,13 @@
+# baseline — lint (verificacion de ausencia)
+# Timestamp (UTC): 2026-09-23T03:1XZ
+# Modificaciones: NINGUNA (solo lectura + glob). No se invento ningun lint.
+# Comandos exactos:
+#   1) lectura de package.json -> scripts: build, start, dev, inspect, typecheck. NO hay script "lint".
+#   2) glob en raiz: ".eslintrc* eslint.config.* .prettierrc* prettier.config.* ruff.toml .ruff.toml setup.cfg tox.ini .flake8 pyproject.toml Dockerfile .github/workflows/*"
+#      Resultado: No files found
+#   3) `Test-Path .github` -> GITHUB_DIR_ABSENT (sin CI en raiz)
+# Duracion: n/a (checks instantaneos) | Exit: n/a | Resultado: NO-APLICABLE (ausencia confirmada)
+# Hallazgo: el repo NO tiene linter configurado ni script lint, ni Dockerfile, ni pyproject, ni CI.
+# Nota: el ENTORNO (no el repo) trae ruff 0.15.14 instalable via `python -m ruff` y torch 2.13.0+cu130;
+# flake8 NO esta instalado (`import flake8` -> ModuleNotFoundError, exit 1). No se ejecuto ningun
+# linter sobre el codigo porque el repo no define esa comprobacion (orden de mision: no inventar lint).

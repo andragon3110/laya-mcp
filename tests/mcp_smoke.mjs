@@ -3,7 +3,9 @@
  * End-to-end MCP smoke test.
  *
  * Spawns dist/index.js over stdio (like a real agent host would) and:
- *   1. lists tools (expects 10, or 11 when the gliner sidecar is up)
+ *   1. lists tools (expects 11, or 12 when the gliner sidecar is up;
+ *      1 — only laya_capabilities — when laya-server is down per the
+ *      fase-5 T5 exemption)
  *   2. calls laya_pii on Spanish text with a secret (expects block)
  *   3. calls laya_extract source=entities (expects offsets)
  *   4. calls laya_extract source=auto (expects entities path when gliner up)
@@ -14,17 +16,28 @@
  *   LAYA_URL     laya-server base URL (default http://127.0.0.1:8765)
  *   GLINER_URL   gliner-server base URL (default http://127.0.0.1:8766)
  *   EXPECT_PII   "1" to require laya_pii advertised, "0" to require it absent
+ *   MCP_SMOKE_TOOL_WAIT_S  tools/list settle budget in seconds (default 15):
+ *                the first list can land before HealthWatch's first poll
+ *                settles, advertising only laya_capabilities even with the
+ *                backends up, so tools/list is retried until laya_extract
+ *                appears or the budget ends (offline stays FAIL by design).
  *
  * Exit 0 on success, 1 with a clear message on the first failed assertion.
  */
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { fileURLToPath } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 import path from "node:path";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DIST = process.env.MCP_DIST ?? path.join(HERE, "..", "dist", "index.js");
 const EXPECT_PII = process.env.EXPECT_PII ?? "1";
+// Cierre-pendientes T7: tools/list settle budget (seconds). HealthWatch
+// starts DOWN ("not checked yet") and settles on its first poll, so a list
+// issued right after spawn can advertise only laya_capabilities even with
+// the backends up. Retry below; offline still FAILs by design on budget end.
+const TOOL_WAIT_S = Number(process.env.MCP_SMOKE_TOOL_WAIT_S ?? 15);
 
 function assert(cond, msg) {
   if (!cond) {
@@ -43,7 +56,20 @@ const client = new Client({ name: "mcp-smoke", version: "0" }, { capabilities: {
 await client.connect(transport);
 
 try {
-  const { tools } = await client.listTools();
+  // Settle loop (race fix): retry tools/list until the backend-backed set
+  // shows up (laya_extract present) or the wait budget ends. With the
+  // backends up the first poll flips the list from 1 to 11/12 tools; with
+  // everything down the list stays at 1 and the asserts below FAIL by design.
+  let tools = [];
+  {
+    const deadline = Date.now() + TOOL_WAIT_S * 1000;
+    for (;;) {
+      ({ tools } = await client.listTools());
+      if (tools.some((t) => t.name === "laya_extract")) break;
+      if (Date.now() >= deadline) break;
+      await new Promise((r) => setTimeout(r, 500));
+    }
+  }
   const names = tools.map((t) => t.name);
   assert(names.includes("laya_extract"), "laya_extract advertised");
   assert(names.includes("laya_screen"), "laya_screen advertised");
@@ -63,7 +89,12 @@ try {
     // P1-T6: legacy `action: "block"` is now the engine decision DENY from
     // pii@1.0.0 (same secret cut, shared table). Updated, not deleted.
     assert(body.decision?.decision === "DENY", `laya_pii denies secrets (got ${body.decision?.decision})`);
-    assert.deepEqual(body.decision?.policy, { name: "pii", version: "1.0.0" }, "pii decision carries policy identity");
+    // Custom assert() above shadows the `assert` module name, so there is
+    // no assert.deepEqual here: compare with isDeepStrictEqual instead.
+    assert(
+      isDeepStrictEqual(body.decision?.policy, { name: "pii", version: "1.0.0" }),
+      "pii decision carries policy identity",
+    );
     const text = "Escribí a juan.perez@acme.com. Token: ghp_AbC123xYz.";
     assert(
       body.findings.every((f) => text.slice(f.start, f.end) === f.text),
