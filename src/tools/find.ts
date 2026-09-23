@@ -3,7 +3,7 @@ import { findEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
 
 export const findTool: ToolDefinition = {
   name: "laya_find",
@@ -39,6 +39,7 @@ export const findTool: ToolDefinition = {
       top_k: {
         type: "integer",
         minimum: 1,
+        maximum: LIMITS.maxFindCandidates,
         description:
           "Max candidates sent to the judge (default 250 = legacy behaviour: no pruning). " +
           "When below the pool size the pool is ranked by query token-overlap (exact duplicates " +
@@ -59,6 +60,45 @@ export const findTool: ToolDefinition = {
     required: ["query", "candidates"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    properties: {
+      winner: { type: "string", description: "Winning candidate id, or 'none'." },
+      exists: { type: "boolean" },
+      distribution: { type: "object" },
+      winner_probability: {
+        type: ["number", "null"],
+        description: "Top raw share (never a confidence); null when the dict came back empty.",
+      },
+      decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      latency_ms: { type: "number" },
+      evidence: evidenceSchema("Find evidence bundle (choice + distribution signals)."),
+      abstention: abstentionSchema(),
+      pruned: { type: "boolean" },
+      pruning: {
+        type: "object",
+        properties: {
+          kept: { type: "integer" },
+          dropped: { type: "integer" },
+          method: { type: "string" },
+        },
+        required: ["kept", "dropped", "method"],
+      },
+    },
+    required: [
+      "winner",
+      "exists",
+      "distribution",
+      "winner_probability",
+      "decision",
+      "latency_ms",
+      "evidence",
+      "abstention",
+      "pruned",
+      "pruning",
+    ],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: (args) => buildFindQuestionsWithInfo(args).questions,
 };
 

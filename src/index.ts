@@ -120,6 +120,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       name: t.name,
       description: t.description,
       inputSchema: t.inputSchema,
+      // Fase-5 T3: publish the typed output contract + annotations. The
+      // SDK server does NOT validate arguments against inputSchema or
+      // results against outputSchema (verified in
+      // node_modules/@modelcontextprotocol/sdk/dist/esm/server/index.js:
+      // only the tools/call request/result envelope is validated); real
+      // input rejection lives in each tool's buildQuestions
+      // (input_too_large), and outputSchema is an announcement for clients.
+      outputSchema: t.outputSchema,
+      annotations: t.annotations,
     })),
   };
 });

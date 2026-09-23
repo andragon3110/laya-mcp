@@ -5,7 +5,7 @@ import { extractEvidence, winnerOf, type ExtractFieldEvidence } from "../evidenc
 import { LIMITS, assertCount, assertLength, extractLimitsFromEnv } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
 
 export const extractTool: ToolDefinition = {
   name: "laya_extract",
@@ -93,6 +93,42 @@ export const extractTool: ToolDefinition = {
     required: ["document", "fields"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    properties: {
+      results: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            value: {
+              type: ["string", "null"],
+              description: "Verbatim document substring, or null when not found (never synthesized).",
+            },
+            status: { type: "string", enum: ["extracted", "not_found"] },
+            winner_probability: { type: ["number", "null"] },
+            start: { type: "integer" },
+            end: { type: "integer" },
+            entity_type: { type: "string" },
+            detector_score: { type: ["number", "null"] },
+          },
+          required: ["id", "value", "status", "winner_probability"],
+        },
+      },
+      source: { type: "string", enum: ["regex", "entities"] },
+      truncated: { type: "boolean" },
+      dropped: { type: "integer" },
+      fallback: { type: "string" },
+      routing: { type: "object" },
+      decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      latency_ms: { type: "number" },
+      evidence: evidenceSchema("Extract evidence bundle (per-field choice signals)."),
+      abstention: abstentionSchema(),
+    },
+    required: ["results", "source", "truncated", "dropped", "latency_ms", "decision", "evidence", "abstention"],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: (args) => buildRegexQuestions(args),
 };
 

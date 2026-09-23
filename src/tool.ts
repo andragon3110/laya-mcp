@@ -12,6 +12,19 @@ export interface ToolDefinition {
   name: string;
   description: string;
   inputSchema: Record<string, unknown>;
+  /**
+   * Fase-5 T3: JSON Schema (type "object") describing the envelope the
+   * handler's text-JSON parses into. Published verbatim on `tools/list`.
+   * Always additive: handlers keep returning the same JSON string.
+   */
+  outputSchema: Record<string, unknown>;
+  /**
+   * Fase-5 T3: MCP tool annotations (SDK ToolSchema annotations shape:
+   * title/readOnlyHint/destructiveHint/idempotentHint/openWorldHint).
+   * Every laya tool only runs inference and returns a judgment -- no side
+   * effects -- so the shared READONLY_TOOL_ANNOTATIONS below applies.
+   */
+  annotations?: Record<string, unknown>;
   buildQuestions: QuestionBuilder;
 }
 
@@ -30,6 +43,53 @@ export const passthrough: QuestionBuilder = (args) => {
   }
   return out;
 };
+
+/**
+ * Fase-5 T3: shared annotations for every laya tool. All tools are
+ * read-only judges (inference + deterministic policy, never mutate).
+ * `openWorldHint` is deliberately omitted (SDK default applies): tools
+ * reach a local HTTP backend, and we claim nothing about world scope.
+ */
+export const READONLY_TOOL_ANNOTATIONS: Record<string, unknown> = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+};
+
+/**
+ * Fase-5 T3: `decision` property descriptor for outputSchemas. `allowed`
+ * must mirror the tool description's contract (ALLOW/REVIEW/DENY/ESCALATE
+ * subset); the engine owns the values, this only advertises them.
+ */
+export function decisionSchema(allowed: readonly string[]): Record<string, unknown> {
+  return {
+    type: "object",
+    description: "Deterministic engine decision from the versioned policy.",
+    properties: {
+      decision: { type: "string", enum: [...allowed] },
+      reason_codes: { type: "array", items: { type: "string" } },
+      policy: {
+        type: "object",
+        properties: { name: { type: "string" }, version: { type: "string" } },
+        required: ["name", "version"],
+      },
+    },
+    required: ["decision", "reason_codes", "policy"],
+  };
+}
+
+/** Fase-5 T3: `evidence` property descriptor for outputSchemas. */
+export function evidenceSchema(description: string): Record<string, unknown> {
+  return { type: "object", description };
+}
+
+/** Fase-5 T3: `abstention` property descriptor for outputSchemas. */
+export function abstentionSchema(): Record<string, unknown> {
+  return {
+    type: "object",
+    description: "Abstention report: which questions lacked usable answers.",
+  };
+}
 
 /**
  * Run a Laya call and shape the MCP text response. The `present` callback

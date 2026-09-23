@@ -4,7 +4,7 @@ import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
 import type { RiskTier } from "../policy/types.js";
-import { type ToolDefinition, runTool } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
 
 const RISKS: readonly RiskTier[] = ["low", "normal", "high"];
 
@@ -62,6 +62,56 @@ export const gateTool: ToolDefinition = {
     required: ["request", "diff", "claims"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    properties: {
+      review: {
+        type: "object",
+        properties: {
+          correctness: {
+            type: "object",
+            properties: { score: { type: ["integer", "null"] } },
+            required: ["score"],
+          },
+          spec_match: {
+            type: "object",
+            properties: { score: { type: ["integer", "null"] } },
+            required: ["score"],
+          },
+          safe_to_apply: {
+            type: "object",
+            properties: { signal: { type: ["number", "null"] } },
+            required: ["signal"],
+          },
+        },
+        required: ["correctness", "spec_match", "safe_to_apply"],
+      },
+      claims: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            claim: { type: "string" },
+            signal: { type: ["number", "null"] },
+            verdict: {
+              type: "string",
+              enum: ["SUPPORTED", "INSUFFICIENT_EVIDENCE", "ABSTAIN", "CONTRADICTED"],
+              description: "CONTRADICTED is reserved for positive refutation evidence; v1 never emits it.",
+            },
+          },
+          required: ["claim", "signal", "verdict"],
+        },
+      },
+      decision: decisionSchema(["ALLOW", "REVIEW", "ESCALATE"]),
+      context: { type: "object" },
+      risk: { type: "string", enum: ["low", "normal", "high"] },
+      latency_ms: { type: "number" },
+      evidence: evidenceSchema("Gate evidence bundle (rubric + per-claim signals)."),
+      abstention: abstentionSchema(),
+    },
+    required: ["review", "claims", "decision", "context", "risk", "latency_ms", "evidence", "abstention"],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: (args) => {
     const claims = Array.isArray(args.claims) ? args.claims : [];
     assertCount(

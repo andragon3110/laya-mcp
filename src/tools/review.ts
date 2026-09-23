@@ -3,7 +3,7 @@ import { reviewEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
 
 export const reviewTool: ToolDefinition = {
   name: "laya_review",
@@ -25,6 +25,49 @@ export const reviewTool: ToolDefinition = {
     required: ["request", "diff"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    properties: {
+      rubric: {
+        type: "object",
+        description: "Rubric EVIDENCE ONLY: 0-2 scores plus the raw safe_to_apply signal (never an authorization).",
+        properties: {
+          correctness: {
+            type: "object",
+            properties: { score: { type: ["integer", "null"] } },
+            required: ["score"],
+          },
+          spec_match: {
+            type: "object",
+            properties: { score: { type: ["integer", "null"] } },
+            required: ["score"],
+          },
+          test_gap: {
+            type: "object",
+            properties: { score: { type: ["integer", "null"] } },
+            required: ["score"],
+          },
+          blast_radius: {
+            type: "object",
+            properties: { score: { type: ["integer", "null"] } },
+            required: ["score"],
+          },
+          safe_to_apply: {
+            type: "object",
+            properties: { signal: { type: ["number", "null"] } },
+            required: ["signal"],
+          },
+        },
+        required: ["correctness", "spec_match", "test_gap", "blast_radius", "safe_to_apply"],
+      },
+      decision: decisionSchema(["ALLOW", "REVIEW", "ESCALATE"]),
+      latency_ms: { type: "number" },
+      evidence: evidenceSchema("Review evidence bundle (rubric + safety signals)."),
+      abstention: abstentionSchema(),
+    },
+    required: ["rubric", "decision", "latency_ms", "evidence", "abstention"],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: (args) => {
     assertLength(
       String(args.diff ?? ""),

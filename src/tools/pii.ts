@@ -4,7 +4,7 @@ import { piiEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import type { ToolDefinition } from "../tool.js";
+import { type ToolDefinition, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
 
 export const piiTool: ToolDefinition = {
   name: "laya_pii",
@@ -31,6 +31,82 @@ export const piiTool: ToolDefinition = {
     required: ["text"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    properties: {
+      pipeline: {
+        type: "object",
+        properties: {
+          stages: { type: "array", items: { type: "string" } },
+          gliner_spans: { type: "integer" },
+          laya_judged: { type: "boolean" },
+          laya_note: { type: "string" },
+          policy: {
+            type: "object",
+            properties: { name: { type: "string" }, version: { type: "string" } },
+            required: ["name", "version"],
+          },
+        },
+        required: ["stages", "gliner_spans", "laya_judged", "laya_note", "policy"],
+      },
+      findings: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            text: { type: "string" },
+            start: { type: "integer" },
+            end: { type: "integer" },
+            type: { type: "string" },
+            entity_type: { type: "string" },
+            span: {
+              type: "object",
+              properties: { start: { type: "integer" }, end: { type: "integer" } },
+              required: ["start", "end"],
+            },
+            detector_score: { type: ["number", "null"] },
+            laya_signal: { type: "null", description: "Null in v1: no Laya risk cut is applied." },
+            category: {
+              type: "string",
+              enum: ["secret", "credential", "pii", "identifier", "unknown"],
+            },
+            finding_status: { type: "string", enum: ["candidate"] },
+          },
+          required: [
+            "text",
+            "start",
+            "end",
+            "type",
+            "entity_type",
+            "span",
+            "detector_score",
+            "laya_signal",
+            "category",
+            "finding_status",
+          ],
+        },
+      },
+      counts: { type: "object" },
+      secrets_found: { type: "integer" },
+      decision: decisionSchema(["ALLOW", "REVIEW", "DENY", "ESCALATE"]),
+      latency_ms: { type: "number" },
+      recommendation: { type: "string" },
+      evidence: evidenceSchema("PII evidence bundle (candidate spans + weak-type report)."),
+      abstention: abstentionSchema(),
+    },
+    required: [
+      "pipeline",
+      "findings",
+      "counts",
+      "secrets_found",
+      "decision",
+      "latency_ms",
+      "recommendation",
+      "evidence",
+      "abstention",
+    ],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: (args) => {
     // No Laya call: GLiNER spans are the whole answer. Still validate early
     // with the same vocabulary so oversized scans fail before any HTTP call
