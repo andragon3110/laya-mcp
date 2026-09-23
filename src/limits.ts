@@ -23,7 +23,12 @@
  * - maxRerankCandidateChars=2000 makes the old "(truncated to 2,000 chars
  *   internally)" description real -- previously zero code hits.
  * - maxExtractCandidates=20 keeps the existing slice(0,20) behaviour but
- *   surfaces it via truncated/dropped instead of silence.
+ *   surfaces it via truncated/dropped instead of silence. Since fase-4 T3
+ *   the extract candidate cap is operator-tunable at call time
+ *   (top_k/max_candidates params, validated with the same input_too_large
+ *   vocabulary) and via the LAYA_LIMITS_MAX_EXTRACT_CANDIDATES env ceiling
+ *   (see resolveExtractLimits below); defaults stay 20 so existing callers
+ *   see byte-identical behaviour.
  * - maxGlinerTextChars/maxExtraTypes mirror the /pii_scan and
  *   /extract_entities guards (50000 / 32).
  */
@@ -85,4 +90,39 @@ export function assertLength(text: string, limit: number, field: string, hint: s
 /** Throw inputTooLarge when `count` exceeds `limit` items. */
 export function assertCount(count: number, limit: number, field: string, hint: string): void {
   if (count > limit) throw inputTooLarge(field, limit, count, hint);
+}
+
+/**
+ * Fase-4 T3: env-tunable ceiling for the extract candidate pipeline.
+ *
+ * The Python servers stay the authority for oversized PAYLOADS (413 over
+ * HTTP); this ceiling only bounds the per-call top_k/max_candidates params
+ * before candidates are built, failing fast with the same input_too_large
+ * vocabulary instead of building ever-larger judge payloads.
+ *
+ *   - LAYA_LIMITS_MAX_EXTRACT_CANDIDATES (default 20 = LIMITS.maxExtractCandidates)
+ *
+ * Missing, non-integer, or <1 values fall back to the default (no throw:
+ * a misconfigured env must not break default callers). The resolver is pure
+ * (takes the env dict) so tests never touch process.env; extract.ts reads
+ * the live env at CALL time so operators can retune without a restart.
+ */
+export const EXTRACT_LIMIT_ENV_VARS = {
+  maxExtractCandidates: "LAYA_LIMITS_MAX_EXTRACT_CANDIDATES",
+} as const;
+
+export function resolveExtractLimits(env: Record<string, string | undefined>): {
+  maxExtractCandidates: number;
+} {
+  const raw = env[EXTRACT_LIMIT_ENV_VARS.maxExtractCandidates];
+  if (raw !== undefined) {
+    const v = Number(raw);
+    if (Number.isInteger(v) && v >= 1) return { maxExtractCandidates: v };
+  }
+  return { maxExtractCandidates: LIMITS.maxExtractCandidates };
+}
+
+/** I/O boundary: read the live process env. Called ONLY from extract.ts. */
+export function extractLimitsFromEnv(): { maxExtractCandidates: number } {
+  return resolveExtractLimits({ ...(process.env as Record<string, string | undefined>) });
 }
