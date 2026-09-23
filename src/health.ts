@@ -4,6 +4,9 @@
  * - Polls `laya-server /health` every `checkIntervalMs`.
  * - Exposes the latest status synchronously for tool listing.
  * - Logs every transition but never blocks the MCP request loop.
+ *
+ * T3 note: still polls /health (warming) intentionally; migration to the
+ * non-warming /live + /ready probes lands in T4. No behaviour change here.
  */
 import type { HealthResult, LayaClient } from "./client.js";
 import type { GlinerClient, GlinerHealth } from "./gliner.js";

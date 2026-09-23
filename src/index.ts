@@ -41,6 +41,7 @@ import { reviewTool, handleReview } from "./tools/review.js";
 import { gateTool, handleGate } from "./tools/gate.js";
 import { piiTool, handlePii } from "./tools/pii.js";
 
+// T3 note: logged at startup only; real per-call enforcement lands in T6.
 const TOOL_TIMEOUT_MS = Number(process.env.LAYA_TOOL_TIMEOUT_MS ?? 8000);
 
 /** Shared per-request context handed to every tool handler. */

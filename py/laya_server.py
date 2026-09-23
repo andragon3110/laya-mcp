@@ -26,6 +26,7 @@ from typing import Any, Dict
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 logging.basicConfig(
@@ -43,6 +44,18 @@ ROUTER_MAX_LOADED = int(os.getenv("LAYA_MAX_LOADED", "3"))
 ROUTER_PRELOAD = os.getenv("LAYA_PRELOAD", "1") not in ("0", "false", "False")
 ROUTER_AUTO_TASK = os.getenv("LAYA_AUTO_TASK_DETECTION", "1") not in ("0", "false", "False")
 ROUTER_STANDALONE_REPOS = os.getenv("LAYA_STANDALONE_REPOS", "0") in ("1", "true", "True")
+
+SERVER_VERSION = "0.4.0"
+_SERVER_START = time.time()
+
+# Known Router checkpoints. Repo ids are informational (used by /models);
+# per-model revision pins are NOT resolved here (offline-safe: revision=null
+# + revision_source="unpinned"). Never invent a hash (T3).
+LAYA_CHECKPOINTS = (
+    {"name": "english", "repo": "convaiinnovations/laya"},
+    {"name": "multilingual", "repo": "convaiinnovations/laya-multilingual"},
+    {"name": "typed-decisions", "repo": "convaiinnovations/laya-typed-decisions"},
+)
 
 
 def _laya_version() -> str:
@@ -120,6 +133,79 @@ class _RouterHolder:
             "uptime_seconds": (time.time() - self._loaded_at) if self._loaded_at else 0.0,
         }
 
+    def snapshot(self) -> Dict[str, Any]:
+        """Non-warming readiness snapshot. Never triggers a model load.
+
+        T3: breaks the opaque _load_error into a per-checkpoint `failed`
+        list in the *body* of /ready and /models only. The permanent-failure
+        behaviour itself is unchanged (retry/backoff/recovery is T4).
+        """
+        uptime = time.time() - _SERVER_START
+        versions = {"server": SERVER_VERSION, "laya_sdk": _laya_version()}
+        if self._router is None and self._load_error is None:
+            return {
+                "ready": False,
+                "reason": "not loaded yet (no load attempted)",
+                "loaded": [],
+                "failed": [
+                    {"name": c["name"], "repo": c["repo"], "error": "not loaded yet"}
+                    for c in LAYA_CHECKPOINTS
+                ],
+                "device": ROUTER_DEVICE,
+                "versions": versions,
+                "uptime_seconds": uptime,
+            }
+        if self._load_error is not None:
+            return {
+                "ready": False,
+                "reason": self._load_error,
+                "loaded": list(self._router.loaded) if self._router is not None else [],
+                # Global Router failure attributed per-checkpoint in the body
+                # only; per-checkpoint load tracking lands in T4.
+                "failed": [
+                    {"name": c["name"], "repo": c["repo"], "error": self._load_error}
+                    for c in LAYA_CHECKPOINTS
+                ],
+                "device": ROUTER_DEVICE,
+                "versions": versions,
+                "uptime_seconds": uptime,
+            }
+        loaded = list(self._router.loaded)
+        loaded_set = set(loaded)
+        return {
+            "ready": True,
+            "reason": None,
+            "loaded": loaded,
+            "failed": [
+                {"name": c["name"], "repo": c["repo"], "error": "not loaded"}
+                for c in LAYA_CHECKPOINTS
+                if c["name"] not in loaded_set
+            ],
+            "device": ROUTER_DEVICE,
+            "versions": versions,
+            "uptime_seconds": uptime,
+        }
+
+    def models_info(self) -> list[Dict[str, Any]]:
+        """Per-checkpoint inventory. Never triggers a model load.
+
+        `revision` is null + revision_source="unpinned" because pins are not
+        resolvable offline here; resolving them (cache/manifest lookup) is
+        future work, not T3.
+        """
+        loaded_set = set(self._router.loaded) if self._router is not None else set()
+        return [
+            {
+                "name": c["name"],
+                "repo": c["repo"],
+                "loaded": c["name"] in loaded_set,
+                "revision": None,
+                "revision_source": "unpinned",
+                "device": ROUTER_DEVICE,
+            }
+            for c in LAYA_CHECKPOINTS
+        ]
+
 
 router = _RouterHolder()
 
@@ -156,7 +242,7 @@ class PredictResponse(BaseModel):
     usage: Dict[str, int] = Field(default_factory=dict)
 
 
-app = FastAPI(title="laya-mcp", version="0.4.0")
+app = FastAPI(title="laya-mcp", version=SERVER_VERSION)
 
 # CORS is permissive because this process binds to 127.0.0.1 only.
 app.add_middleware(
@@ -167,19 +253,53 @@ app.add_middleware(
 )
 
 
+@app.get("/live")
+async def live() -> Dict[str, Any]:
+    """Liveness only. Immediate: never touches the holder, never loads models.
+
+    Safe to poll aggressively; works with models down or never loaded.
+    """
+    return {
+        "alive": True,
+        "service": "laya-server",
+        "version": SERVER_VERSION,
+        "uptime_seconds": time.time() - _SERVER_START,
+    }
+
+
 @app.get("/health")
 async def health() -> Dict[str, Any]:
-    """Liveness + readiness. The MCP server polls this to decide which tools to advertise."""
+    """Legacy liveness + readiness. WARNING: may warm up (lazy-load) models
+    via the holder on first call. Prefer /live (liveness) + /ready (readiness)
+    for k8s-style probes; the TS health watcher still polls here in T3 and
+    migrates in T4."""
     return {"status": "ok", **router.health()}
 
 
 @app.get("/ready")
 async def ready() -> Dict[str, Any]:
-    """Readiness only. 200 if Laya is loaded, 503 otherwise."""
-    info = router.health()
+    """Readiness only (non-warming snapshot). 200 when ready, else 503 with a
+    structured body {ready:false, reason, loaded, failed, device, versions,
+    uptime_seconds} -- a not-ready backend is never hidden."""
+    info = router.snapshot()
     if not info.get("ready"):
-        raise HTTPException(status_code=503, detail=info)
+        return JSONResponse(
+            status_code=503,
+            content={"status": "not_ready", **info},
+        )
     return {"status": "ready", **info}
+
+
+@app.get("/models")
+async def models() -> Dict[str, Any]:
+    """Per-checkpoint inventory. Always 200, never triggers a model load."""
+    return {
+        "service": "laya-server",
+        "device": ROUTER_DEVICE,
+        "versions": {"server": SERVER_VERSION, "laya_sdk": _laya_version()},
+        "uptime_seconds": time.time() - _SERVER_START,
+        "models": router.models_info(),
+    }
 
 
 @app.get("/doctor")

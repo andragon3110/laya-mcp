@@ -26,6 +26,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 logging.basicConfig(
@@ -37,6 +38,9 @@ log = logging.getLogger("gliner-server")
 
 DEFAULT_MODEL = os.getenv("GLINER_MODEL", "fastino/gliner2.5-multi-v1")
 DEFAULT_DEVICE_SETTING = os.getenv("GLINER_DEVICE", "auto")  # auto|cpu|cuda|mps
+
+SERVER_VERSION = "0.1.0"
+_SERVER_START = time.time()
 
 # Fixed label set for /pii_scan. Descriptions are short English phrases;
 # the multilingual encoder handles Spanish text against them (verified).
@@ -110,6 +114,74 @@ class _ExtractorHolder:
             "uptime_seconds": (time.time() - self._loaded_at) if self._loaded_at else 0.0,
         }
 
+    def snapshot(self) -> Dict[str, Any]:
+        """Non-warming readiness snapshot. Never triggers a model load.
+
+        T3: structured {ready, reason, loaded, failed, device, versions,
+        uptime}; the permanent-failure behaviour itself is unchanged
+        (retry/backoff/recovery is T4).
+        """
+        uptime = time.time() - _SERVER_START
+        versions = {"server": SERVER_VERSION}
+        if self._model is None and self._load_error is None:
+            return {
+                "ready": False,
+                "reason": "not loaded yet (no load attempted)",
+                "loaded": [],
+                "failed": [
+                    {
+                        "name": DEFAULT_MODEL,
+                        "repo": DEFAULT_MODEL,
+                        "error": "not loaded yet",
+                    }
+                ],
+                "device": self._device,
+                "versions": versions,
+                "uptime_seconds": uptime,
+            }
+        if self._load_error is not None:
+            return {
+                "ready": False,
+                "reason": self._load_error,
+                "loaded": [],
+                "failed": [
+                    {
+                        "name": DEFAULT_MODEL,
+                        "repo": DEFAULT_MODEL,
+                        "error": self._load_error,
+                    }
+                ],
+                "device": self._device,
+                "versions": versions,
+                "uptime_seconds": uptime,
+            }
+        return {
+            "ready": True,
+            "reason": None,
+            "loaded": [DEFAULT_MODEL],
+            "failed": [],
+            "device": self._device,
+            "versions": versions,
+            "uptime_seconds": uptime,
+        }
+
+    def models_info(self) -> List[Dict[str, Any]]:
+        """Single-model inventory. Never triggers a model load.
+
+        `revision` is null + revision_source="unpinned" because the pin is
+        not resolvable offline here; never invent a hash (T3).
+        """
+        return [
+            {
+                "name": DEFAULT_MODEL,
+                "repo": DEFAULT_MODEL,
+                "loaded": self._model is not None,
+                "revision": None,
+                "revision_source": "unpinned",
+                "device": self._device if self._device is not None else DEFAULT_DEVICE_SETTING,
+            }
+        ]
+
 
 holder = _ExtractorHolder()
 
@@ -145,7 +217,7 @@ class PiiRequest(BaseModel):
     )
 
 
-app = FastAPI(title="gliner-server", version="0.1.0")
+app = FastAPI(title="gliner-server", version=SERVER_VERSION)
 
 # CORS is permissive because this process binds to 127.0.0.1 only.
 app.add_middleware(
@@ -156,18 +228,53 @@ app.add_middleware(
 )
 
 
+@app.get("/live")
+async def live() -> Dict[str, Any]:
+    """Liveness only. Immediate: never touches the holder, never loads models.
+
+    Safe to poll aggressively; works with the model down or never loaded.
+    """
+    return {
+        "alive": True,
+        "service": "gliner-server",
+        "version": SERVER_VERSION,
+        "uptime_seconds": time.time() - _SERVER_START,
+    }
+
+
 @app.get("/health")
 async def health() -> Dict[str, Any]:
-    """Liveness + readiness. Ensures the model is loaded, so first call warms up here."""
+    """Legacy liveness + readiness. WARNING: may warm up (lazy-load) the model
+    on first call. Prefer /live (liveness) + /ready (readiness) for
+    k8s-style probes; the TS health watcher still polls here in T3 and
+    migrates in T4."""
     return {"status": "ok", **holder.health()}
 
 
 @app.get("/ready")
 async def ready() -> Dict[str, Any]:
-    info = holder.health()
+    """Readiness only (non-warming snapshot). 200 when ready, else 503 with a
+    structured body {ready:false, reason, loaded, failed, device, versions,
+    uptime_seconds} -- a not-ready backend is never hidden."""
+    info = holder.snapshot()
     if not info.get("ready"):
-        raise HTTPException(status_code=503, detail=info)
+        return JSONResponse(
+            status_code=503,
+            content={"status": "not_ready", **info},
+        )
     return {"status": "ready", **info}
+
+
+@app.get("/models")
+async def models() -> Dict[str, Any]:
+    """Model inventory. Always 200, never triggers a model load."""
+    return {
+        "service": "gliner-server",
+        "device": holder._device if holder._device is not None else DEFAULT_DEVICE_SETTING,
+        "versions": {"server": SERVER_VERSION},
+        "uptime_seconds": time.time() - _SERVER_START,
+        "models": holder.models_info(),
+    }
 
 
 @app.post("/extract_entities")

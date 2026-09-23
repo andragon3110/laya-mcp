@@ -6,6 +6,7 @@
  * degrade gracefully (regex fallback for extract, clear error for pii).
  */
 import { BackendUnavailableError } from "./client.js";
+import type { BackendModelInfo, LiveResult, ReadyResult } from "./client.js";
 
 export interface GlinerSpan {
   text: string;
@@ -68,8 +69,91 @@ export class GlinerClient {
     }
   }
 
-  private async post<T>(path: string, payload: unknown, timeoutMs?: number): Promise<T> {
+  private async get(path: string, timeoutMs: number): Promise<{ status: number; body: Record<string, unknown> }> {
     const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(`${this.baseUrl}${path}`, { signal: ctrl.signal });
+      const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+      return { status: res.status, body };
+    } catch (err) {
+      if ((err as Error).name === "AbortError") {
+        throw new BackendUnavailableError(
+          `gliner-server ${path} timed out after ${timeoutMs}ms`,
+          "timeout",
+        );
+      }
+      throw new BackendUnavailableError(
+        `gliner-server unreachable at ${this.baseUrl}`,
+        "unreachable",
+      );
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  /**
+   * T3: typed views over the new k8s-style probes (GET /live, /ready,
+   * /models). The background HealthWatch still polls /health (warming) in
+   * T3 and migrates to /live + /ready in T4, so no caller uses these yet.
+   */
+
+  /** Liveness probe: 200 with {alive:true} whenever the process is up. */
+  async live(timeoutMs = 1000): Promise<LiveResult> {
+    const { status, body } = await this.get("/live", timeoutMs);
+    if (status !== 200 || body.alive !== true) {
+      throw new BackendUnavailableError(
+        `gliner-server /live returned HTTP ${status}`,
+        "http_error",
+        status,
+      );
+    }
+    return {
+      alive: true,
+      service: typeof body.service === "string" ? body.service : undefined,
+      version: typeof body.version === "string" ? body.version : undefined,
+      uptimeSeconds: typeof body.uptime_seconds === "number" ? body.uptime_seconds : undefined,
+    };
+  }
+
+  /**
+   * Readiness probe: resolves on both 200 (ready) and 503 (not ready) with
+   * the structured body; rejects only on timeout/unreachable/invalid JSON.
+   */
+  async ready(timeoutMs = 1000): Promise<ReadyResult> {
+    const { status, body } = await this.get("/ready", timeoutMs);
+    if (status !== 200 && status !== 503) {
+      throw new BackendUnavailableError(
+        `gliner-server /ready returned HTTP ${status}`,
+        "http_error",
+        status,
+      );
+    }
+    return {
+      ready: body.ready === true,
+      reason: typeof body.reason === "string" ? body.reason : null,
+      loaded: Array.isArray(body.loaded) ? (body.loaded as string[]) : [],
+      failed: Array.isArray(body.failed) ? (body.failed as ReadyResult["failed"]) : [],
+      device: typeof body.device === "string" ? body.device : undefined,
+      versions: (body.versions as Record<string, string>) ?? undefined,
+      uptimeSeconds: typeof body.uptime_seconds === "number" ? body.uptime_seconds : undefined,
+    };
+  }
+
+  /** Model inventory: always 200, never triggers a load server-side. */
+  async models(timeoutMs = 1000): Promise<BackendModelInfo[]> {
+    const { status, body } = await this.get("/models", timeoutMs);
+    if (status !== 200 || !Array.isArray(body.models)) {
+      throw new BackendUnavailableError(
+        `gliner-server /models returned HTTP ${status}`,
+        "http_error",
+        status,
+      );
+    }
+    return body.models as BackendModelInfo[];
+  }
+
+  private async post<T>(path: string, payload: unknown, timeoutMs?: number): Promise<T> {    const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeoutMs ?? this.defaultTimeoutMs);
     try {
       const res = await fetch(`${this.baseUrl}${path}`, {
