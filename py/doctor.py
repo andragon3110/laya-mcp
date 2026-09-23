@@ -556,6 +556,396 @@ def check_mcp_server_starts() -> Dict[str, Any]:
         return _fail("mcp-server-boot", f"failed to spawn {dist}: {exc!r}")
 
 
+# -- fase-8-final T3: opt-in sections (real data only, never invented) --------
+#
+# --models:     probe GET /models live; when the backend is down report
+#               config+disk only (expected repos, HF cache paths, env pins).
+#               Revisions are NEVER invented: live nulls stay null, disk
+#               snapshots report path+size only.
+# --policy:     report the effective LAYA_MODE*/LAYA_POLICY_* env verbatim +
+#               validity. The registry lives in TS (src/policy/loader.ts);
+#               thresholds are NOT duplicated here (see the note in detail).
+# --mcp:        boot dist/index.js over stdio and run MCP initialize +
+#               tools/list (raw JSON-RPC, stdlib only). Reuses the same
+#               dist-missing skip as mcp-server-boot. Backend down is fine:
+#               tools/list then honestly returns [laya_capabilities].
+# --benchmark:  run `node evals/bench.mjs --json` live when the environment
+#               allows (node + dist + timeout); otherwise report the last
+#               versioned evals/results/v1 run with provenance. Numbers are
+#               only ever quoted from a real run -- never invented.
+# Every function below never raises: backend down / config absent produce
+# honest warn/skip verdicts, not throws.
+
+
+def _http_get_json(url: str, timeout: float) -> Tuple[int, Any]:
+    """GET url and parse the body as JSON. Raises on any transport error."""
+    import urllib.request
+
+    with urllib.request.urlopen(url, timeout=timeout) as r:
+        return r.status, json.loads(r.read())
+
+
+def check_models_inventory(host: str, port: int) -> Dict[str, Any]:
+    """Live GET /models inventory, or config+disk when the backend is down."""
+    url = f"http://{host}:{port}/models"
+    try:
+        status, body = _http_get_json(url, timeout=3)
+    except Exception as exc:  # noqa: BLE001 -- backend down is a verdict, not a throw
+        snapshots: Dict[str, str] = {}
+        for ckpt_name, repo_id in EXPECTED_CHECKPOINTS:
+            slug = repo_id.replace("/", "--")
+            snap_dir = HF_HUB / f"models--{slug}" / "snapshots"
+            snapshots[ckpt_name] = str(snap_dir) if snap_dir.exists() else "not cached"
+        return _warn(
+            "models-inventory",
+            f"laya-server unreachable at {url} -- reporting config+disk only (no live data; revisions never invented)",
+            url=url,
+            error=f"{exc!r}",
+            expected_repos=[repo for _, repo in EXPECTED_CHECKPOINTS],
+            snapshot_dirs=snapshots,
+            hf_cache=str(HF_CACHE),
+            env_pins={
+                "LAYA_MODEL": os.environ.get("LAYA_MODEL", "(unset; default convaiinnovations/laya-typed-decisions)"),
+                "LAYA_MODEL_REVISION": os.environ.get("LAYA_MODEL_REVISION", "(unset; unpinned)"),
+                "GLINER_MODEL_REVISION": os.environ.get("GLINER_MODEL_REVISION", "(unset; unpinned)"),
+            },
+            tokenizer="unknown",
+            tokenizer_note="neither GET /models nor laya_capabilities exposes a tokenizer; "
+            "one would only appear if the backend ever publishes it",
+        )
+    if status != 200 or not isinstance(body, dict) or "models" not in body:
+        return _fail(
+            "models-inventory",
+            f"GET {url} returned HTTP {status} or a body without 'models'",
+            url=url,
+            http_status=status,
+        )
+    models = body.get("models") or []
+    names = [m.get("name", "?") for m in models if isinstance(m, dict)]
+    loaded = [m.get("name", "?") for m in models if isinstance(m, dict) and m.get("loaded")]
+    # Revisions come from the wire verbatim (always null + unpinned by
+    # server design -- py/laya_server.py models_info). Unknown stays unknown.
+    summary = [
+        {
+            "name": m.get("name"),
+            "loaded": bool(m.get("loaded")),
+            "revision": m.get("revision"),  # null by design, never invented
+            "revision_source": m.get("revision_source", "unknown"),
+            "device": m.get("device", "unknown"),
+        }
+        for m in models
+        if isinstance(m, dict)
+    ]
+    return _ok(
+        "models-inventory",
+        f"GET {url} live: {len(models)} checkpoints ({', '.join(names)}), loaded={loaded or 'none'}",
+        url=url,
+        service=body.get("service"),
+        server_version=(body.get("versions") or {}).get("server") if isinstance(body.get("versions"), dict) else None,
+        models=summary,
+        tokenizer="unknown",
+        tokenizer_note="neither GET /models nor laya_capabilities exposes a tokenizer; "
+        "one would only appear if the backend ever publishes it",
+    )
+
+
+# Valid global/per-tool policy modes (src/policy/mode.ts). Anything else
+# falls back to observe -- the doctor reports the raw value, it never
+# normalizes it away.
+_POLICY_MODES = ("observe", "shadow", "enforce")
+
+# Numeric cut-point overrides (src/policy/thresholds.ts THRESHOLD_ENV_VARS).
+# Reported verbatim + parse-validity only; defaults live in TS and are NOT
+# duplicated here.
+_POLICY_NUMERIC_VARS = (
+    "LAYA_POLICY_SCREEN_BLOCK",
+    "LAYA_POLICY_SCREEN_REVIEW",
+    "LAYA_POLICY_SCREEN_SUBSTANCE_SKIP",
+    "LAYA_POLICY_CLAIM_VERIFIED",
+    "LAYA_POLICY_CLAIM_CONTRADICTED",
+    "LAYA_POLICY_REVIEW_AUTO",
+    "LAYA_POLICY_REVIEW_MIN",
+    "LAYA_POLICY_REQUIRE_SUPPORT",
+)
+
+
+def check_policy_effective() -> Dict[str, Any]:
+    """Effective LAYA_MODE*/LAYA_POLICY_* env (verbatim) + registry note."""
+    mode = os.environ.get("LAYA_MODE", "(unset; default observe)")
+    per_tool = {k: v for k, v in os.environ.items() if k.startswith("LAYA_MODE_")}
+    numeric = {k: os.environ.get(k, "(unset)") for k in _POLICY_NUMERIC_VARS}
+    secrets = os.environ.get("LAYA_POLICY_SECRET_TYPES", "(unset)")
+    revisions = {
+        "LAYA_MODEL_REVISION": os.environ.get("LAYA_MODEL_REVISION", "(unset; unpinned)"),
+        "GLINER_MODEL_REVISION": os.environ.get("GLINER_MODEL_REVISION", "(unset; unpinned)"),
+    }
+    invalid: List[str] = []
+    if "LAYA_MODE" in os.environ and os.environ["LAYA_MODE"] not in _POLICY_MODES:
+        invalid.append(f"LAYA_MODE={os.environ['LAYA_MODE']!r} (falls back to observe)")
+    for k in sorted(per_tool):
+        if per_tool[k] not in _POLICY_MODES:
+            invalid.append(f"{k}={per_tool[k]!r} (falls back to observe)")
+    for k in _POLICY_NUMERIC_VARS:
+        raw = os.environ.get(k)
+        if raw is not None:
+            try:
+                float(raw)
+            except ValueError:
+                invalid.append(f"{k}={raw!r} (unparseable; falls back to the v1 default)")
+    detail = {
+        "LAYA_MODE": mode,
+        "per_tool_modes": per_tool or "(none)",
+        "numeric_overrides": numeric,
+        "LAYA_POLICY_SECRET_TYPES": secrets,
+        "revision_pins": revisions,
+        "registry": "TS-only: src/policy/loader.ts (14 policies @1.0.0); "
+        "thresholds live there and are not duplicated here -- "
+        "see laya_capabilities / EVALUATION.md for the live view",
+    }
+    if invalid:
+        return _warn(
+            "policy-effective",
+            f"policy env has {len(invalid)} invalid entr{'y' if len(invalid) == 1 else 'ies'} (each falls back; nothing crashes): "
+            + "; ".join(invalid),
+            invalid=invalid,
+            **detail,
+        )
+    n_overrides = len(per_tool) + sum(1 for k in _POLICY_NUMERIC_VARS if k in os.environ)
+    return _ok(
+        "policy-effective",
+        f"policy env clean: LAYA_MODE={mode}, {n_overrides} override(s), 0 invalid (registry: TS src/policy/loader.ts)",
+        **detail,
+    )
+
+
+_MCP_PROTOCOL_VERSION = "2025-11-25"  # newest accepted by the bundled SDK 1.30.0
+
+
+def _mcp_tools_list(dist: Path, timeout_s: float) -> Tuple[Optional[List[str]], Optional[str]]:
+    """Speak MCP initialize + tools/list over stdio. Returns (names, error).
+
+    Raw newline-delimited JSON-RPC (stdlib only -- no MCP SDK in Python).
+    Any failure returns (None, reason); never raises past socket/subprocess
+    errors the caller already handles... in fact never raises at all.
+    """
+    import queue
+    import subprocess
+    import threading
+
+    try:
+        proc = subprocess.Popen(
+            ["node", str(dist)],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env={**os.environ},
+        )
+    except FileNotFoundError as exc:
+        return None, f"node not found: {exc!r}"
+    except Exception as exc:  # noqa: BLE001
+        return None, f"failed to spawn {dist}: {exc!r}"
+
+    lines: "queue.Queue[str]" = queue.Queue()
+
+    def _reader() -> None:
+        try:
+            assert proc.stdout is not None
+            for raw in proc.stdout:
+                lines.put(raw.decode(errors="ignore"))
+        except Exception:  # noqa: BLE001 -- reader thread must never kill the check
+            pass
+
+    reader = threading.Thread(target=_reader, daemon=True)
+    reader.start()
+    deadline = time.time() + timeout_s
+
+    def _send(obj: Dict[str, Any]) -> None:
+        assert proc.stdin is not None
+        proc.stdin.write((json.dumps(obj) + "\n").encode())
+        proc.stdin.flush()
+
+    def _wait_for(rid: int) -> Optional[Dict[str, Any]]:
+        while True:
+            remaining = deadline - time.time()
+            if remaining <= 0:
+                return None
+            try:
+                raw = lines.get(timeout=min(remaining, 5.0))
+            except queue.Empty:
+                continue
+            try:
+                msg = json.loads(raw)
+            except ValueError:
+                continue
+            if isinstance(msg, dict) and msg.get("id") == rid:
+                return msg
+
+    try:
+        _send(
+            {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": _MCP_PROTOCOL_VERSION,
+                    "capabilities": {},
+                    "clientInfo": {"name": "laya-doctor", "version": "0"},
+                },
+            }
+        )
+        init = _wait_for(1)
+        if init is None:
+            return None, f"no initialize response within {timeout_s:g}s"
+        if "error" in init:
+            return None, f"initialize rejected: {init['error']}"
+        _send({"jsonrpc": "2.0", "method": "notifications/initialized"})
+        _send({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}})
+        listed = _wait_for(2)
+        if listed is None:
+            return None, f"no tools/list response within {timeout_s:g}s"
+        if "error" in listed:
+            return None, f"tools/list rejected: {listed['error']}"
+        tools = ((listed.get("result") or {}).get("tools")) or []
+        names = [t.get("name", "?") for t in tools if isinstance(t, dict)]
+        return names, None
+    except Exception as exc:  # noqa: BLE001
+        return None, f"stdio conversation failed: {exc!r}"
+    finally:
+        try:
+            proc.kill()
+        except Exception:  # noqa: BLE001
+            pass
+        for stream in (proc.stdin, proc.stdout, proc.stderr):
+            try:
+                if stream is not None:
+                    stream.close()
+            except Exception:  # noqa: BLE001
+                pass
+
+
+def check_mcp_tools_list(timeout_s: float = 30.0) -> Dict[str, Any]:
+    """Boot the MCP server over stdio and run tools/list (real data)."""
+    dist = INSTALL_DIR / "dist" / "index.js"
+    if not dist.exists():
+        return _skip("mcp-tools-list", f"{dist} missing -- run npm run build")
+    names, error = _mcp_tools_list(dist, timeout_s)
+    if error is not None:
+        if error.startswith("node not found"):
+            return _fail("mcp-tools-list", error, dist=str(dist))
+        return _warn(
+            "mcp-tools-list",
+            f"{dist.name} spawned but tools/list did not complete: {error} "
+            "(see mcp-server-boot for the boot verdict)",
+            dist=str(dist),
+            error=error,
+        )
+    assert names is not None
+    if not names:
+        return _warn(
+            "mcp-tools-list",
+            f"{dist.name} booted but tools/list advertised 0 tools -- current source "
+            "(src/index.ts) always advertises at least laya_capabilities when the backend "
+            "is down, so this installed dist is likely stale; rebuild (npm run build) or reinstall",
+            dist=str(dist),
+            tools=names,
+        )
+    degraded = names == ["laya_capabilities"]
+    return _ok(
+        "mcp-tools-list",
+        f"stdio tools/list: {len(names)} tool(s) ({', '.join(names)})"
+        + (" -- backend not ready, only the meta tool is advertised" if degraded else ""),
+        dist=str(dist),
+        tools=names,
+        degraded_backend=degraded,
+    )
+
+
+def _repo_root() -> Path:
+    """Checkout root for the doctor.py on disk (evals/results live here)."""
+    return Path(__file__).resolve().parent.parent
+
+
+def check_benchmark(bench_timeout_s: float = 120.0) -> Dict[str, Any]:
+    """Live `node evals/bench.mjs --json` when feasible, else versioned results.
+
+    Live path needs node + dist + evals/bench.mjs and must finish within
+    bench_timeout_s. Anything else -- timeout, missing files, unparsable
+    output -- falls back to the last versioned evals/results/v1 run quoted
+    with provenance. No numbers are ever invented.
+    """
+    import subprocess
+
+    root = _repo_root()
+    bench_mjs = root / "evals" / "bench.mjs"
+    results_dir = root / "evals" / "results" / "v1"
+    if (root / "dist" / "index.js").exists() is False:
+        dist_note = "dist/index.js missing -- run npm run build before a live bench"
+    else:
+        dist_note = "dist/index.js present"
+    if bench_mjs.exists() and shutil.which("node") and (root / "dist" / "index.js").exists():
+        try:
+            proc = subprocess.run(
+                ["node", str(bench_mjs), "--json"],
+                cwd=str(root),
+                capture_output=True,
+                text=True,
+                timeout=bench_timeout_s,
+            )
+            rep = json.loads(proc.stdout)
+            prims = rep.get("primitives") or []
+            sweep = rep.get("rerank_sweep") or []
+            return _ok(
+                "benchmark",
+                f"live bench: {len(prims)} primitives + {len(sweep)} rerank rows "
+                "(stub ceiling -- harness plumbing, NOT backend quality)",
+                mode="live",
+                command="node evals/bench.mjs --json",
+                timeout_s=bench_timeout_s,
+                primitives=len(prims),
+                rerank_rows=len(sweep),
+                method=rep.get("method"),
+            )
+        except Exception as exc:  # noqa: BLE001 -- timeout/noise falls back to versioned
+            live_error = f"{exc!r}"
+    else:
+        live_error = f"live bench not attempted ({dist_note}; node={bool(shutil.which('node'))})"
+    # -- versioned fallback: quote evals/results/v1 with provenance ---------
+    manifest_p = results_dir / "manifest.json"
+    bench_p = results_dir / "bench.json"
+    try:
+        manifest = json.loads(manifest_p.read_text(encoding="utf-8"))
+        bench = json.loads(bench_p.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        return _skip(
+            "benchmark",
+            f"no live bench ({live_error}) and no versioned results at {results_dir}: {exc!r} "
+            "-- run node evals/bench.mjs --save",
+            live_error=live_error,
+            results_dir=str(results_dir),
+        )
+    prims = bench.get("primitives") or []
+    sweep = bench.get("rerank_sweep") or []
+    return _ok(
+        "benchmark",
+        f"versioned results {results_dir.name} (commit {manifest.get('commit_short')}, "
+        f"{manifest.get('date')}, model {manifest.get('model')}): "
+        f"{len(prims)} primitives + {len(sweep)} rerank rows "
+        "(stub ceiling -- harness plumbing, NOT backend quality)",
+        mode="versioned",
+        live_error=live_error,
+        manifest=str(manifest_p),
+        commit=manifest.get("commit"),
+        date=manifest.get("date"),
+        model=manifest.get("model"),
+        model_revision=manifest.get("model_revision"),
+        tokenizer=manifest.get("tokenizer"),
+        tokenizer_note=manifest.get("tokenizer_note"),
+        primitives=len(prims),
+        rerank_rows=len(sweep),
+        method=manifest.get("method"),
+    )
+
+
 def _default_opencode_cfg() -> Path:
     """Resolve the effective global opencode.json.
 
@@ -596,6 +986,27 @@ def _entry_disabled(entry: Dict[str, Any]) -> Tuple[bool, str]:
     return False, "(default)"
 
 
+def _redact_env(env: Any) -> Any:
+    """Redact secret-looking values from an MCP environment dict.
+
+    Doctor reports travel in --json output, CI logs and the GET /doctor
+    endpoint (localhost only, but still logged). Environment maps in
+    opencode.json may carry tokens/keys, so values whose key looks secret
+    are replaced with "[redacted]" -- names and non-secret values stay
+    verbatim for debuggability. Non-dict input passes through untouched.
+    """
+    if not isinstance(env, dict):
+        return env
+    redacted: Dict[str, Any] = {}
+    for k, v in env.items():
+        kl = str(k).lower()
+        if any(s in kl for s in ("token", "secret", "key", "password", "passwd", "auth", "bearer", "credential", "private")):
+            redacted[k] = "[redacted]"
+        else:
+            redacted[k] = v
+    return redacted
+
+
 def check_optional_agent_configs() -> List[Dict[str, Any]]:
     """Are the optional opencode.json / Claude / Codex MCP entries present and well-formed?"""
     out: List[Dict[str, Any]] = []
@@ -634,7 +1045,7 @@ def check_optional_agent_configs() -> List[Dict[str, Any]]:
                 "opencode-config",
                 f"{shape} registered in {cfg}",
                 command=mcp_laya.get("command"),
-                env=mcp_laya.get("environment", {}),
+                env=_redact_env(mcp_laya.get("environment", {})),
             )
         ]
     except Exception as exc:  # noqa: BLE001
@@ -650,6 +1061,12 @@ def run_doctor(
     include_live_calls: bool = True,
     gliner_host: str = "127.0.0.1",
     gliner_port: int = 8766,
+    include_models: bool = False,
+    include_policy: bool = False,
+    include_mcp: bool = False,
+    include_benchmark: bool = False,
+    mcp_timeout_s: float = 30.0,
+    bench_timeout_s: float = 120.0,
 ) -> Dict[str, Any]:
     """Run every check and return the structured report."""
     checks: List[Dict[str, Any]] = []
@@ -669,6 +1086,16 @@ def run_doctor(
         checks.append(check_gliner_live_spanish(gliner_host, gliner_port))
     checks.append(check_mcp_server_starts())
     checks.extend(check_optional_agent_configs())
+    # Fase-8-final T3 opt-in sections: real data only, never invented.
+    # Backend down / config absent yield honest warn/skip, never throws.
+    if include_models:
+        checks.append(check_models_inventory(laya_host, laya_port))
+    if include_policy:
+        checks.append(check_policy_effective())
+    if include_mcp:
+        checks.append(check_mcp_tools_list(timeout_s=mcp_timeout_s))
+    if include_benchmark:
+        checks.append(check_benchmark(bench_timeout_s=bench_timeout_s))
 
     summary = {
         "pass": sum(1 for c in checks if c["status"] == "pass"),
@@ -729,6 +1156,42 @@ def main() -> int:
         default="fail",
         help="exit non-zero when checks at this level or worse are present (default: fail)",
     )
+    parser.add_argument(
+        "--models",
+        action="store_true",
+        help="probe live GET /models inventory; when the backend is down, report "
+        "config+disk only (expected repos, HF cache paths, env pins) -- revisions are never invented",
+    )
+    parser.add_argument(
+        "--policy",
+        action="store_true",
+        help="report the effective LAYA_MODE / LAYA_MODE_<TOOL> / LAYA_POLICY_* env verbatim + validity; "
+        "the policy registry lives in TS (src/policy/loader.ts) and thresholds are not duplicated here",
+    )
+    parser.add_argument(
+        "--mcp",
+        action="store_true",
+        help="boot dist/index.js over stdio and run MCP initialize + tools/list (real tool names; "
+        "backend down honestly yields [laya_capabilities])",
+    )
+    parser.add_argument(
+        "--benchmark",
+        action="store_true",
+        help="run live `node evals/bench.mjs --json` when the environment allows (node + dist + timeout); "
+        "otherwise quote the last versioned evals/results/v1 run with provenance -- numbers never invented",
+    )
+    parser.add_argument(
+        "--mcp-timeout-s",
+        type=float,
+        default=30.0,
+        help="stdio tools/list budget in seconds (default: 30)",
+    )
+    parser.add_argument(
+        "--bench-timeout-s",
+        type=float,
+        default=120.0,
+        help="live bench budget in seconds before falling back to versioned results (default: 120)",
+    )
     args = parser.parse_args()
 
     report = run_doctor(
@@ -737,6 +1200,12 @@ def main() -> int:
         include_live_calls=not args.no_live,
         gliner_host=args.gliner_host,
         gliner_port=args.gliner_port,
+        include_models=args.models,
+        include_policy=args.policy,
+        include_mcp=args.mcp,
+        include_benchmark=args.benchmark,
+        mcp_timeout_s=args.mcp_timeout_s,
+        bench_timeout_s=args.bench_timeout_s,
     )
 
     if args.json:

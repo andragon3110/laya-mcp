@@ -6,7 +6,11 @@ shapes, the `tools/call` output convention, envelope versioning, and
 compatibility guarantees. Every claim below is verified against the
 shipped code and its contract batteries
 (`tests/fase5_t3_contract.mjs`, `tests/fase5_t4_envelope.mjs`,
-`tests/fase5_t5_capabilities.mjs`, `tests/fase5_t6_contract_gaps.mjs`).
+`tests/fase5_t5_capabilities.mjs`, `tests/fase5_t6_contract_gaps.mjs`)
+plus the Fase 6 additions (`tests/fase6_t3_trace_metrics.mjs`,
+`tests/fase6_t4_modes.mjs`, `tests/fase6_t5_security_discovery.mjs`,
+`tests/fase6_t6_gentle_integration.mjs`; full cross-layer contract in
+`GENTLE_INTEGRATION.md`).
 
 ## 1. MCP version
 
@@ -68,7 +72,7 @@ are listed where they exist. Primitives come from `TOOL_PRIMITIVES`
 | `laya_review` | `score` | required: `request`, `diff`; optional: `tests` | `rubric`, `decision`, `latency_ms`, `evidence`, `abstention` |
 | `laya_gate` | `score` | required: `request`, `diff`, `claims`; optional: `evidence`, `context`, `risk` | `review`, `claims`, `decision`, `context`, `risk`, `latency_ms`, `evidence`, `abstention` |
 | `laya_pii` | `spans` | required: `text`; optional: `extra_types`. Served only while the GLiNER sidecar is live-ready. | `pipeline`, `findings`, `counts`, `secrets_found`, `decision`, `latency_ms`, `recommendation`, `evidence`, `abstention` |
-| `laya_capabilities` | none (`null`) | optional: `timeout_ms` (integer, 100–30000, default 2000) | `models`, `backend`, `gliner`, `primitives`, `tools`, `policies`, `features`, `mode`, `schema_version`, `latency_ms` |
+| `laya_capabilities` | none (`null`) | optional: `timeout_ms` (integer, 100–30000, default 2000) | `models`, `backend`, `gliner`, `primitives`, `tools`, `policies`, `features`, `mode`, `schema_version`, `latency_ms` — plus OPTIONAL (never required) `modes`, `metrics` (Fase 6, §10) |
 
 Notes:
 
@@ -78,7 +82,20 @@ Notes:
   GLiNER sidecar state, primitives, currently servable tools (with a
   summarized per-tool contract), the full policy registry, real feature
   flags (`top_k`, `pruning`, `two_stage`, `structured`, `revision`),
-  and `mode: "observe"`.
+  `mode: "observe"`, plus the Fase 6 additions `modes` and `metrics`
+  (both OPTIONAL outputSchema keys, `src/tools/capabilities.ts:359-391`;
+  stored pre-Fase-6 outputs keep validating).
+- `modes` (`supported` from `SUPPORTED_MODES`, `effective` from live
+  `effectiveMode()`, `default` = `DEFAULT_MODE`, plus a semantics note)
+  reports the policy-decision modes `observe`/`shadow`/`enforce`
+  (`src/policy/mode.ts:52-66`). The legacy `mode: "observe"` field is
+  untouched: the MCP layer itself never acts, under every policy mode.
+- `metrics` embeds `getMetricsSnapshot()` (`src/metrics.ts:261-309`):
+  per-tool `requests_total`/`requests_failed`/`inference_latency_ms`
+  (`count` + `p50`/`p95`/`p99` over a bounded 256-sample window,
+  `LATENCY_WINDOW_MAX`, `src/metrics.ts:66`)/`policy_decisions`/
+  `abstentions`/`escalations`, per-model latency (`by_model`), and
+  probe `model_load` stats — aggregates only, never content.
 - `laya_capabilities` is **always advertised**, even when laya-server is
   down (explicit exemption in `src/index.ts:133-139`). A call while the
   backend is down fails with `isError` carrying the backend diagnosis
@@ -122,6 +139,14 @@ Notes:
   recomputed). Metadata per envelope:
   - `decision_id` — unique per call, `dec_<16 lowercase hex>`
     (8 random bytes; an id, never a content hash).
+  - `trace_id` / `span_id` (Fase 6, OPTIONAL keys) — inbound trace
+    correlation from the request `_meta` (validated, generated when
+    absent; `src/trace.ts`), threaded by `augmentEnvelope`
+    (`src/envelope.ts:236-242`). Live envelopes (via `index.ts`,
+    which always passes a context) always carry both; callers that
+    pass none get the envelope without the keys. Opaque ids only,
+    never content. Old readers ignore them; stored pre-Fase-6 outputs
+    still validate (minor-additive).
   - `timestamp` — ISO-8601 creation time.
   - `model` — judging backend label from `evidence.model` (`null` when
     no backend judged: `laya_pii`, `laya_capabilities`).
@@ -132,7 +157,22 @@ Notes:
     (`null` for `laya_capabilities`, which judges nothing).
   - `policy` / `policy_version` — top-level mirror of
     `decision.policy.{name, version}` (`null` without a decision).
+  - `effective_mode` (Fase 6, OPTIONAL key) — the policy-decision mode
+    this call ran under (`observe`/`shadow`/`enforce`, resolved per
+    call from `LAYA_MODE` / `LAYA_MODE_<TOOL>`, default `observe`;
+    `src/policy/mode.ts:82-92`, stamped by `augmentEnvelope`,
+    `src/envelope.ts:244-248,270`). Same minor-additive promise.
+  - `shadow` (Fase 6, handler-emitted, shadow mode only) —
+    `{ would_decide, under_policy }`: the same input evaluated under
+    the explicit candidate policy, without altering `decision`
+    (`src/policy/mode.ts:148-162`; declared OPTIONAL in every
+    judgment `outputSchema` via `shadowSchema()`, `src/tool.ts:81-99`).
+    Flows through the envelope untouched (spread preserves it).
   - `schema_version` — `"1.0.0"`.
+  - Twelve known additive envelope keys in total
+    (`envelopeMetadataProperties()`, `src/tool.ts:138-189` — eleven
+    pre-Fase-6-T4 keys plus `effective_mode`; asserted by
+    `tests/fase5_t6_contract_gaps.mjs:407-412`).
 - Degenerate path: if handler text is not a JSON object (never happens
   with the shipped handlers), the text returns intact with **no**
   `structuredContent`, plus a one-line stderr note; the call never
@@ -211,6 +251,8 @@ Notes:
   "policies": [{ "name": "screen", "version": "1.0.0" }],
   "features": { "top_k": { "supported": true }, "structured": { "text_compat": true } },
   "mode": "observe",
+  "modes": { "supported": ["observe", "shadow", "enforce"], "effective": "observe", "default": "observe" },
+  "metrics": { "requests_total": {}, "requests_failed": {} },
   "schema_version": "1.0.0",
   "latency_ms": 12,
   "decision_id": "dec_9f2c41ab77d03e10",
@@ -253,11 +295,12 @@ makes no judgment; `primitive` is `null` because it judges nothing.)
 
 ## 9. Breaking changes
 
-**None.** Fase 5 is additive-only (`minor` class per
-`SCHEMA_VERSION_POLICY`): new `outputSchema` announcements, new
-`structuredContent` alongside unchanged text, nine optional envelope
-keys, one new tool. Documented behaviour changes (not breakings —
-old text readers keep working):
+**None in Fase 5** (historic verdict, kept verbatim): Fase 5 is
+additive-only (`minor` class per `SCHEMA_VERSION_POLICY`): new
+`outputSchema` announcements, new `structuredContent` alongside
+unchanged text, nine optional envelope keys, one new tool.
+Documented behaviour changes (not breakings — old text readers keep
+working):
 
 1. `tools/list` with laya-server down returns `[laya_capabilities]`
    instead of `[]` (previously empty). `tests/test_tools_offline.sh`
@@ -269,3 +312,33 @@ old text readers keep working):
 4. Unknown/malformed tool arguments keep resolving to `isError` with
    builder vocabulary (unchanged semantics; now additionally covered by
    the T6 malformed-args battery for all 12 tools).
+
+## 10. Fase 6 additions (also `minor`, also non-breaking)
+
+Fase 6 adds the following, each optional/additive per
+`SCHEMA_VERSION_POLICY` (old readers ignore unknown keys; stored
+pre-Fase-6 outputs keep validating — asserted by the Fase 6
+batteries listed in the intro):
+
+1. **Trace correlation** (`trace_id` / `span_id`, Fase-6 T3): inbound
+   `_meta` ids threaded into every live envelope (§5). Absent input
+   yields generated ids on live calls, no keys on direct/test calls
+   without a context.
+2. **`effective_mode`** (Fase-6 T4): stamped on every live envelope
+   (§5); twelve known additive envelope keys total
+   (`tests/fase5_t6_contract_gaps.mjs:407-412`).
+3. **`shadow`** (Fase-6 T4): handler-emitted, shadow mode only (§5);
+   OPTIONAL in every judgment `outputSchema`.
+4. **`modes` + `metrics`** on the `laya_capabilities` report (§3):
+   OPTIONAL outputSchema keys (never in `required`), so stored
+   pre-Fase-6 capability reports keep validating
+   (`tests/fase5_t6_contract_gaps.mjs:380-399`).
+5. **Degradation identical in every mode**: backend down still yields
+   exactly `[laya_capabilities]` on `tools/list` and `isError`
+   judgment calls with a recovery hint, in `observe`, `shadow`, and
+   `enforce` alike
+   (`tests/fase6_t5_security_discovery.mjs`,
+   `GENTLE_INTEGRATION.md` §7).
+6. **Immutability**: no input path (args, `_meta`, text content) can
+   change policy/config/mode/thresholds/permissions
+   (`tests/fase6_t5_security_discovery.mjs`, 16 checks).
