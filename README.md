@@ -12,8 +12,9 @@
 
 <p align="center">
   <b>Give your coding agent judgment calls instead of vibes.</b><br>
-  Twelve MCP tools backed by local decision models — calibrated probabilities
-  your code can branch on, sort by, and gate with.
+  Twelve MCP tools backed by local decision models — deterministic
+  evidence-plus-policy judgments (uncalibrated signals, never probabilities;
+  see `EVALUATION.md` §6) your code can branch on, sort by, and gate with.
   <br><br>
   <a href="#quickstart">Quickstart</a> ·
   <a href="#tools">Tools</a> ·
@@ -225,8 +226,9 @@ flowchart LR
 ```
 
 When a backend is unreachable the MCP server degrades instead of
-failing: zero tools advertised if `laya-server` is down; regex fallback
-(with a note) and a clear error for `laya_pii` if the sidecar is down.
+failing: only `laya_capabilities` (discovery + diagnosis) is advertised if
+`laya-server` is down; regex fallback (with a note) and a clear error for
+`laya_pii` if the sidecar is down.
 Every call has a hard timeout, so the agent never hangs.
 
 ### GLiNER proposes, Laya disposes
