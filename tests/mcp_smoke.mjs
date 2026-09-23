@@ -60,7 +60,10 @@ try {
       arguments: { text: "Escribí a juan.perez@acme.com. Token: ghp_AbC123xYz." },
     });
     const body = JSON.parse(pii.content[0].text);
-    assert(body.action === "block", `laya_pii blocks on secret (got ${body.action})`);
+    // P1-T6: legacy `action: "block"` is now the engine decision DENY from
+    // pii@1.0.0 (same secret cut, shared table). Updated, not deleted.
+    assert(body.decision?.decision === "DENY", `laya_pii denies secrets (got ${body.decision?.decision})`);
+    assert.deepEqual(body.decision?.policy, { name: "pii", version: "1.0.0" }, "pii decision carries policy identity");
     const text = "Escribí a juan.perez@acme.com. Token: ghp_AbC123xYz.";
     assert(
       body.findings.every((f) => text.slice(f.start, f.end) === f.text),

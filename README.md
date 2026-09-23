@@ -252,6 +252,19 @@ on completion.** Context stays clean coming in, claims stay honest going
 out — and because it's all local, you can afford to run it on *every*
 diff and *every* fetched page, not just the important ones.
 
+### Screen-pass is not authority
+
+Laya is a **detector, never a security authority**. A `laya_screen`
+`ALLOW` (screen_pass) is evidence for the calling agent and its policy to
+consume — it grants no permission to include, render, or execute the
+screened text. Treat every screen output as `{signals, assessment,
+decision, evidence, abstention}`: when `decision` is `REVIEW`, `DENY`, or
+`ESCALATE` (or `abstention.abstained` is true), do not act on the content;
+when it is `ALLOW`, still apply your own policy before using it. The
+adversarial battery (`tests/t6_screen_pii_rest.mjs`) proves this at the
+output level: a screen `ALLOW` over injected content carries a
+detector-only note and no authorization field.
+
 ---
 
 ## Gentle-AI orchestrator policy (recommended)

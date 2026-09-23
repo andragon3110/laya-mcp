@@ -1,6 +1,8 @@
 import type { LayaClient } from "../client.js";
 import { rerankEvidence } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
+import { evaluate } from "../policy/engine.js";
+import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export interface RerankCandidate {
@@ -34,8 +36,12 @@ export function truncateRerankCandidates(candidates: RerankCandidate[]): RerankT
 export const rerankTool: ToolDefinition = {
   name: "laya_rerank",
   description:
-    "Score every candidate's relevance to a query and return them sorted. Each candidate gets its own probability, " +
+    "Score every candidate's relevance to a query and return them sorted. Each candidate gets its own raw, " +
+    "uncalibrated relevance_score, " +
     "so the whole ordering survives. Use for retrieval reranking, near-duplicate triage, or ordering a feed. " +
+    "The ordering is informational: the deterministic ALLOW/ESCALATE `decision` from the versioned rerank@1.0.0 " +
+    "policy authorizes USE of the ordering, and an ESCALATE decision is authoritative (do not trust the order " +
+    "when the decision escalates). " +
     "At most 64 candidates per call; each candidate text is truncated to 2,000 chars and the response sets " +
     "truncated:true (with truncated_ids) when any candidate was cut.",
   inputSchema: {
@@ -80,6 +86,17 @@ export const rerankTool: ToolDefinition = {
   },
 };
 
+/**
+ * P1-T6 (breaking): `laya_rerank` routes the ordering through the engine.
+ * Each ranked entry's legacy `relevance` number (a raw Router noul output)
+ * is now the honestly named `relevance_score` (null when the backend gave
+ * no answer for that candidate -- the legacy `?? 0` default, which sorted
+ * missing candidates as zeroes, is gone; missing scores sort last), and
+ * the output carries the ALLOW-or-ESCALATE `decision` from rerank@1.0.0.
+ * The sort itself is unchanged for firm signal sets; T3 abstention (empty
+ * or missing candidates) is now authoritative via the engine ESCALATE
+ * exit. No threshold literal lives here: v1 never cuts, it sorts.
+ */
 export async function handleRerank(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const candidates = Array.isArray(args.candidates) ? args.candidates : [];
   const { candidates: truncated, truncated: wasTruncated, truncatedIds } =
@@ -89,15 +106,23 @@ export async function handleRerank(client: LayaClient, args: Record<string, unkn
   const state = { ...args, candidates: truncated };
   const result = await runTool(client, state, rerankTool.buildQuestions(args), (raw) => {
     const a = raw.answers as Record<string, { noul: number }>;
-    const scored = candidates
-      .map((c: { id?: string }, i: number) => ({
-        rank: 0,
-        id: c.id,
-        relevance: a[`relevance_${i}_${c.id}`]?.noul ?? 0,
-      }))
-      // P1-T3: legacy decision, engine-owned from T5/T6 (sort order below).
-      .sort((a, b) => b.relevance - a.relevance)
-      .map((entry, idx) => ({ ...entry, rank: idx + 1 }));
+    const numOrNull = (v: unknown): number | null => (typeof v === "number" ? v : null);
+    const withScores = candidates.map((c: { id?: string }, i: number) => ({
+      id: c.id,
+      relevance_score: numOrNull(a[`relevance_${i}_${c.id}`]?.noul),
+    }));
+    // Firm scores sort descending; missing (null) scores sort last and keep
+    // input order among themselves (stable, no invented value).
+    const scored = withScores
+      .map((entry, i) => ({ ...entry, inputIndex: i }))
+      .sort((x, y) => {
+        if (x.relevance_score === null && y.relevance_score === null) return x.inputIndex - y.inputIndex;
+        if (x.relevance_score === null) return 1;
+        if (y.relevance_score === null) return -1;
+        if (y.relevance_score !== x.relevance_score) return (y.relevance_score as number) - (x.relevance_score as number);
+        return x.inputIndex - y.inputIndex;
+      })
+      .map((entry, idx) => ({ rank: idx + 1, id: entry.id, relevance_score: entry.relevance_score }));
     const { evidence, abstention } = rerankEvidence(raw, {
       items: candidates.map((c: { id?: string }, i: number) => {
         const key = `relevance_${i}_${c.id}`;
@@ -111,8 +136,21 @@ export async function handleRerank(client: LayaClient, args: Record<string, unkn
         };
       }),
     });
+    // P1-T6: decision owned by the engine (shared table resolved for uniformity;
+    // rerank@1.0.0 applies no numeric cut -- it authorizes use of the ordering).
+    const { thresholds } = getPolicy("rerank", "1.0.0");
+    const decision = evaluate(
+      {
+        evidence,
+        abstention,
+        context: { candidate_count: candidates.length, query_chars: String(args.query ?? "").length },
+        risk: "normal",
+        policy: { name: "rerank", version: "1.0.0" },
+      },
+      { thresholds },
+    );
     return JSON.stringify(
-      { ranked: scored, truncated: wasTruncated, truncated_ids: truncatedIds, latency_ms: raw.latencyMs, evidence, abstention },
+      { ranked: scored, truncated: wasTruncated, truncated_ids: truncatedIds, decision, latency_ms: raw.latencyMs, evidence, abstention },
       null,
       2,
     );

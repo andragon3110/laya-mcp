@@ -1,6 +1,8 @@
 import type { LayaClient } from "../client.js";
-import { decideEvidence } from "../evidence.js";
+import { decideEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount, inputTooLarge } from "../limits.js";
+import { evaluate } from "../policy/engine.js";
+import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const decideTool: ToolDefinition = {
@@ -9,7 +11,9 @@ export const decideTool: ToolDefinition = {
     "Pick one of 2-6 bounded options, with optional per-requirement checks evaluated independently in the same call. " +
     "Use when the choice space is small and the criteria are explicit. Fewer than 2 or more than 6 options, " +
     "or more than 32 requirements, are rejected with input_too_large. " +
-    "Returns the winner and a confidence probability.",
+    "Returns the winner with its raw, uncalibrated distribution and winner_probability (never a confidence) " +
+    "plus the deterministic ALLOW/ESCALATE `decision` from the versioned decide@1.0.0 policy. " +
+    "An ESCALATE decision is authoritative: do not act on the selection when the decision escalates.",
   inputSchema: {
     type: "object",
     properties: {
@@ -86,10 +90,22 @@ export const decideTool: ToolDefinition = {
   },
 };
 
+/**
+ * P1-T6 (breaking): `laya_decide` routes the pick through the engine. The
+ * legacy `confidence` dict (the raw choice distribution mislabelled as a
+ * confidence probability) is now `distribution` with the honest
+ * `winner_probability` top share (null when empty), and each requirement
+ * entry is now `{signal, supported}` (raw, uncalibrated support signal or
+ * null when missing; `supported` resolves from the shared requireSupport
+ * cut and is display-only -- the policy owns the cut). The output carries
+ * the ALLOW-or-ESCALATE `decision` from decide@1.0.0; T3 abstention (no
+ * selection, empty/flat distribution, missing or unsupported requirements)
+ * is now authoritative via the engine ESCALATE exit. No threshold literal
+ * remains in this handler.
+ */
 export async function handleDecide(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const result = await runTool(client, args, decideTool.buildQuestions(args), (raw) => {
     const a = raw.answers as Record<string, { choice?: string; probabilities?: Record<string, number>; noul?: number }>;
-    // P1-T3: legacy decision, engine-owned from T5/T6 (selected/requirements below).
     const candidates = Array.isArray(args.candidates) ? args.candidates : [];
     const requirementKeys = Object.keys(a).filter((k) => k.startsWith("requirement_"));
     const { evidence, abstention } = decideEvidence(raw, {
@@ -102,13 +118,31 @@ export async function handleDecide(client: LayaClient, args: Record<string, unkn
         missing: typeof a[k]?.noul !== "number",
       })),
     });
+    // P1-T6: decision and display cuts resolve from the shared table.
+    const { thresholds } = getPolicy("decide", "1.0.0");
+    const decision = evaluate(
+      {
+        evidence,
+        abstention,
+        context: { option_count: candidates.length, requirement_count: requirementKeys.length },
+        risk: "normal",
+        policy: { name: "decide", version: "1.0.0" },
+      },
+      { thresholds },
+    );
+    const distribution = (a.selected?.probabilities as Record<string, number> | undefined) ?? {};
+    const requirements: Record<string, { signal: number | null; supported: boolean | null }> = {};
+    for (const [k, v] of Object.entries(a).filter(([k]) => k.startsWith("requirement_"))) {
+      const signal = typeof (v as { noul?: unknown }).noul === "number" ? ((v as { noul: number }).noul) : null;
+      requirements[k] = { signal, supported: signal === null ? null : signal >= thresholds.requireSupport };
+    }
     return JSON.stringify(
       {
         selected: a.selected?.choice ?? null,
-        confidence: a.selected?.probabilities ?? {},
-        requirements: Object.fromEntries(
-          Object.entries(a).filter(([k]) => k.startsWith("requirement_")).map(([k, v]) => [k, v.noul]),
-        ),
+        distribution,
+        winner_probability: winnerOf(distribution),
+        requirements,
+        decision,
         latency_ms: raw.latencyMs,
         evidence,
         abstention,

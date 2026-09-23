@@ -3,6 +3,8 @@ import type { GlinerClient, GlinerSpan } from "../gliner.js";
 import type { ToolContext } from "../index.js";
 import { extractEvidence, winnerOf, type ExtractFieldEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
+import { evaluate } from "../policy/engine.js";
+import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const extractTool: ToolDefinition = {
@@ -13,6 +15,8 @@ export const extractTool: ToolDefinition = {
     "(default) GLiNER is used when its sidecar is reachable, otherwise regex. Laya always picks among " +
     "the candidates, and the returned value is always a verbatim substring of the document " +
     "(never model-generated). Entity mode additionally returns character offsets for grounding. " +
+    "Each field returns its raw, uncalibrated winner_probability (never a confidence) plus the deterministic " +
+    "ALLOW/ESCALATE `decision` from the versioned extract@1.0.0 policy; an ESCALATE decision is authoritative. " +
     "At most 20 candidates per field reach the judge; the response reports truncated:true and " +
     "dropped:N when more were found (no silent truncation). Document at most 20,000 chars, at most " +
     "64 fields per call (larger inputs are rejected with input_too_large).",
@@ -236,13 +240,16 @@ export async function handleExtract(
       const key = `extract_${i}_${f.id}`;
       const ans = a[key];
       const choice = ans?.choice ?? "none";
-      // P1-T3: legacy decision, engine-owned from T5/T6 (choice/value below).
-      // P1-T3 bugfix: Math.max(...[]) is -Infinity for an empty dict; emit the
-      // honest winner_probability null instead. Wire-identical: JSON already
-      // serialized -Infinity as null, so legacy consumers see no change.
+      // P1-T6: legacy decision, engine-owned (choice/value below). The
+      // legacy `confidence` number is now the honest `winner_probability`
+      // (null when the answer is missing or the dict came back empty).
+      // P1-T3 bugfix preserved: Math.max(...[]) is -Infinity for an empty
+      // dict; JSON already serialized -Infinity as null, so legacy
+      // consumers reading null see no change, while consumers reading 0
+      // for missing answers see the honest null (breaking, documented).
       const entry: Record<string, unknown> = {
         id: f.id,
-        confidence: ans ? (winnerOf(ans.probabilities ?? {}) ?? null) : 0,
+        winner_probability: ans ? (winnerOf(ans.probabilities ?? {}) ?? null) : null,
       };
       let candidateCount = 0;
       let invalidPattern = false;
@@ -269,7 +276,7 @@ export async function handleExtract(
         entry.start = s.start;
         entry.end = s.end;
         entry.entity_type = s.type;
-        entry.gliner_confidence = s.confidence;
+        entry.detector_score = s.confidence;
         span = { start: s.start, end: s.end };
         detectorScore = typeof s.confidence === "number" ? s.confidence : null;
         entityType = s.type;
@@ -326,6 +333,26 @@ export async function handleExtract(
       fields: fieldEvidence,
       source: useEntities && !fallbackNote ? "entities" : "regex",
     });
+    // P1-T6: decision owned by the engine. T3 abstention (zero-candidate /
+    // invalid-pattern fields) is now authoritative via the ESCALATE exit --
+    // consumers must not act on values when the decision escalates. No
+    // threshold literal lives here: v1 firmness is candidates-existed and
+    // pattern-parsed.
+    const { thresholds } = getPolicy("extract", "1.0.0");
+    const decision = evaluate(
+      {
+        evidence,
+        abstention,
+        context: {
+          field_count: fieldEvidence.length,
+          candidate_source: useEntities && !fallbackNote ? "entities" : "regex",
+        },
+        risk: "normal",
+        policy: { name: "extract", version: "1.0.0" },
+      },
+      { thresholds },
+    );
+    out.decision = decision;
     out.evidence = evidence;
     out.abstention = abstention;
     return JSON.stringify(out, null, 2);
