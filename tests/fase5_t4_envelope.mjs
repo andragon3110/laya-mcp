@@ -391,8 +391,8 @@ async function withServer(extraEnv, fn) {
     const deadline = Date.now() + 20000;
     for (;;) {
       const listed = await client.listTools();
-      if (listed.tools.length === 11) break;
-      assert.ok(Date.now() < deadline, `11 tools advertised (got ${listed.tools.length})`);
+      if (listed.tools.length === 12) break;
+      assert.ok(Date.now() < deadline, `12 tools advertised (got ${listed.tools.length})`);
       await new Promise((r) => setTimeout(r, 300));
     }
     await fn(client);

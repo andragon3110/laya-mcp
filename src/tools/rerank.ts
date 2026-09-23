@@ -3,7 +3,7 @@ import { rerankEvidence } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 import { overlapScore, tokenizeForFind } from "./find.js";
 
 export interface RerankCandidate {
@@ -84,6 +84,7 @@ export const rerankTool: ToolDefinition = {
   outputSchema: {
     type: "object",
     properties: {
+      ...envelopeMetadataProperties(),
       ranked: {
         type: "array",
         items: {

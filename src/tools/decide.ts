@@ -3,7 +3,7 @@ import { decideEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount, inputTooLarge } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { TOOL_TIMEOUT_MS, type ToolDefinition, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
+import { TOOL_TIMEOUT_MS, type ToolDefinition, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 type DecideAnswers = Record<string, { choice?: string; probabilities?: Record<string, number>; noul?: number }>;
 
@@ -148,6 +148,7 @@ export const decideTool: ToolDefinition = {
   outputSchema: {
     type: "object",
     properties: {
+      ...envelopeMetadataProperties(),
       selected: {
         type: ["string", "null"],
         description: "Winning option id; null when the pick abstained.",

@@ -3,7 +3,7 @@ import { screenEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const screenTool: ToolDefinition = {
   name: "laya_screen",
@@ -30,6 +30,7 @@ export const screenTool: ToolDefinition = {
   outputSchema: {
     type: "object",
     properties: {
+      ...envelopeMetadataProperties(),
       signals: {
         type: "object",
         description: "Three raw, uncalibrated Router signals (never probabilities).",

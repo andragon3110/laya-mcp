@@ -4,7 +4,7 @@ import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
 import type { RiskTier } from "../policy/types.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 const RISKS: readonly RiskTier[] = ["low", "normal", "high"];
 
@@ -65,6 +65,7 @@ export const gateTool: ToolDefinition = {
   outputSchema: {
     type: "object",
     properties: {
+      ...envelopeMetadataProperties(),
       review: {
         type: "object",
         properties: {

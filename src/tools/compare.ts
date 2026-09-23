@@ -3,7 +3,7 @@ import { compareEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const compareTool: ToolDefinition = {
   name: "laya_compare",
@@ -34,6 +34,7 @@ export const compareTool: ToolDefinition = {
     type: "object",
     description: "Per-aspect judgments are keyed by aspect name alongside `overall` (dynamic keys, same judgment shape).",
     properties: {
+      ...envelopeMetadataProperties(),
       overall: {
         type: "object",
         properties: {

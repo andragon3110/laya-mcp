@@ -5,7 +5,7 @@ import { extractEvidence, winnerOf, type ExtractFieldEvidence } from "../evidenc
 import { LIMITS, assertCount, assertLength, extractLimitsFromEnv } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const extractTool: ToolDefinition = {
   name: "laya_extract",
@@ -96,6 +96,7 @@ export const extractTool: ToolDefinition = {
   outputSchema: {
     type: "object",
     properties: {
+      ...envelopeMetadataProperties(),
       results: {
         type: "array",
         items: {

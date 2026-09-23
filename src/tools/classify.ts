@@ -3,7 +3,7 @@ import { classifyEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const classifyTool: ToolDefinition = {
   name: "laya_classify",
@@ -44,6 +44,7 @@ export const classifyTool: ToolDefinition = {
   outputSchema: {
     type: "object",
     properties: {
+      ...envelopeMetadataProperties(),
       classifications: {
         type: "array",
         items: {

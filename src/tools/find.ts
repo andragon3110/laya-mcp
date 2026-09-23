@@ -3,7 +3,7 @@ import { findEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const findTool: ToolDefinition = {
   name: "laya_find",
@@ -63,6 +63,7 @@ export const findTool: ToolDefinition = {
   outputSchema: {
     type: "object",
     properties: {
+      ...envelopeMetadataProperties(),
       winner: { type: "string", description: "Winning candidate id, or 'none'." },
       exists: { type: "boolean" },
       distribution: { type: "object" },

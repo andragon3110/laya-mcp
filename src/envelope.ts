@@ -36,7 +36,7 @@
  *                       for the 11 shipped tools).
  *   - `schema_version`: envelope contract version, constant "1.0.0"
  *                       (ENVELOPE_SCHEMA_VERSION). Versioning/compat policy
- *                       belongs to T5; T4 only stamps the constant.
+ *                       is T5's SCHEMA_VERSION_POLICY below (major = breaking, minor = additive).
  *   - `latency_ms`:     already emitted by every handler; conserved here
  *                       (never recomputed, never overwritten with a new key).
  *
@@ -63,6 +63,78 @@ import {
 
 /** Envelope contract version stamped on every augmented envelope (T4). */
 export const ENVELOPE_SCHEMA_VERSION = "1.0.0";
+
+/**
+ * Fase-5 T5: envelope-contract versioning policy (SCHEMA_VERSION_POLICY).
+ *
+ * The `schema_version` stamped on every envelope versions the WHOLE
+ * tools/call contract (envelope keys + outputSchemas + list behaviour),
+ * not just this file. Compat surface that is ALWAYS preserved:
+ * content[0] is a non-empty text block with the full JSON (protocol
+ * 2024-10-07 clients keep reading text), and structuredContent carries the
+ * SAME object (deep-equals JSON.parse of the text).
+ *
+ * MINOR bump (1.x.0) -- additive, old clients keep working:
+ * - a new OPTIONAL envelope/output key (old readers ignore unknown keys);
+ * - a new tool with its own input+output schemas (old lists are a subset);
+ * - a new policy version registered ALONGSIDE the old (loader keeps both);
+ * - a new optional input parameter (old callers omit it).
+ * T5 itself is a minor-class change: laya_capabilities is a new tool and
+ * the nine envelope keys only become OPTIONAL outputSchema properties.
+ *
+ * MAJOR bump (2.0.0) -- breaking, old clients may fail:
+ * - removing or emptying the text block (2024-10-07 clients go blind);
+ * - renaming an envelope/output field (old readers miss it);
+ * - adding a REQUIRED key or making an optional key required (stored old
+ *   outputs stop validating);
+ * - removing a property/tool/input or narrowing a type/enum (valid old
+ *   payloads become invalid);
+ * - newly rejecting a previously valid input (tightened inputs).
+ *
+ * classifyContractChange below encodes exactly this table so tests (and
+ * T7's MCP_CONTRACT.md) assert it instead of quoting prose.
+ */
+export interface ContractChange {
+  /** The text block is removed or allowed to be empty. */
+  removesTextBlock?: boolean;
+  /** An existing envelope/output field is renamed. */
+  renamesField?: boolean;
+  /** A new required key appears, or an optional key becomes required. */
+  addsRequired?: boolean;
+  /** An existing property/tool/input is removed, or a type/enum narrows. */
+  removesOrNarrows?: boolean;
+  /** A previously valid input is newly rejected. */
+  tightensInput?: boolean;
+  /** A new optional envelope/output key (old readers ignore unknown keys). */
+  addsOptionalKey?: boolean;
+  /** A new tool with its own input+output schemas (old lists are a subset). */
+  addsTool?: boolean;
+  /** A new policy version registered alongside the old one. */
+  addsPolicy?: boolean;
+  /** A new optional input parameter (old callers omit it). */
+  addsOptionalParam?: boolean;
+}
+
+/** "major" = schema_version major bump; "minor" = additive, compat kept. */
+export type ContractChangeKind = "major" | "minor";
+
+/**
+ * Classify a contract change per SCHEMA_VERSION_POLICY. Any single breaking
+ * flag forces "major" (even combined with additive flags); a change with
+ * only additive flags -- or no flags at all -- is "minor".
+ */
+export function classifyContractChange(change: ContractChange): ContractChangeKind {
+  if (
+    change.removesTextBlock === true ||
+    change.renamesField === true ||
+    change.addsRequired === true ||
+    change.removesOrNarrows === true ||
+    change.tightensInput === true
+  ) {
+    return "major";
+  }
+  return "minor";
+}
 
 /** Dominant signal kind per tool (display/contract metadata, no semantics). */
 export type DecisionPrimitive = "noul" | "choice" | "score" | "spans";

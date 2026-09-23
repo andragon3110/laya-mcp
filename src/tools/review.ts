@@ -3,7 +3,7 @@ import { reviewEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const reviewTool: ToolDefinition = {
   name: "laya_review",
@@ -28,6 +28,7 @@ export const reviewTool: ToolDefinition = {
   outputSchema: {
     type: "object",
     properties: {
+      ...envelopeMetadataProperties(),
       rubric: {
         type: "object",
         description: "Rubric EVIDENCE ONLY: 0-2 scores plus the raw safe_to_apply signal (never an authorization).",

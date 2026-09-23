@@ -92,6 +92,63 @@ export function abstentionSchema(): Record<string, unknown> {
 }
 
 /**
+ * Fase-5 T5: envelope-metadata property descriptors for outputSchemas.
+ *
+ * T4 stamps these keys on every `tools/call` success envelope (see
+ * envelope.ts: augmentEnvelope) but deliberately left the 11 outputSchemas
+ * untouched. T5 closes that gap: every judgment outputSchema spreads this
+ * fragment (plus laya_capabilities' own outputSchema) so the contract is
+ * self-describing. All nine keys are OPTIONAL -- never added to `required`:
+ * live envelopes always carry them, but stored pre-T5 outputs must keep
+ * validating. That is the minor-version compat promise (see
+ * SCHEMA_VERSION_POLICY in envelope.ts).
+ *
+ * `primitive` admits null for the observe tool (laya_capabilities judges
+ * nothing, so augmentEnvelope stamps primitive:null); `model` / `policy` /
+ * `policy_version` admit null for envelopes without a judgment (pii has no
+ * laya judgment; capabilities has no decision at all). Only type +
+ * description + enum keywords are used: the SDK client compiles schemas
+ * with Ajv and those are the keywords this repo's schemas already rely on
+ * (no `format` / `const`, whose validator support was never verified here).
+ */
+export function envelopeMetadataProperties(): Record<string, unknown> {
+  return {
+    decision_id: { type: "string", description: "Unique id per call (dec_<16 lowercase hex)." },
+    timestamp: { type: "string", description: "ISO-8601 creation time of the envelope." },
+    model: {
+      type: ["string", "null"],
+      description: "Judging backend label from evidence.model; null when no backend judged (pii, capabilities).",
+    },
+    model_revision: {
+      type: ["string", "null"],
+      description: "Operator pin or backend revision; honest null when unresolvable (never invented).",
+    },
+    revision_source: {
+      type: "string",
+      description:
+        "Where model_revision came from: env:LAYA_MODEL_REVISION | env:GLINER_MODEL_REVISION | backend | unpinned.",
+    },
+    primitive: {
+      type: ["string", "null"],
+      enum: ["noul", "choice", "score", "spans", null],
+      description: "Dominant signal kind; null for the observe tool (judges nothing).",
+    },
+    policy: {
+      type: ["string", "null"],
+      description: "Top-level mirror of decision.policy.name; null without a decision.",
+    },
+    policy_version: {
+      type: ["string", "null"],
+      description: "Top-level mirror of decision.policy.version; null without a decision.",
+    },
+    schema_version: {
+      type: "string",
+      description: 'Envelope contract version, currently "1.0.0" (ENVELOPE_SCHEMA_VERSION).',
+    },
+  };
+}
+
+/**
  * Run a Laya call and shape the MCP text response. The `present` callback
  * decides what the agent actually sees.
  *
