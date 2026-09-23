@@ -1,15 +1,38 @@
 import type { LayaClient } from "../client.js";
+import { gateEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
+import { evaluate } from "../policy/engine.js";
+import { getPolicy } from "../policy/loader.js";
+import type { RiskTier } from "../policy/types.js";
 import { type ToolDefinition, runTool } from "../tool.js";
+
+const RISKS: readonly RiskTier[] = ["low", "normal", "high"];
+
+function normalizeRisk(v: unknown): RiskTier {
+  if (v === undefined) return "normal";
+  if (typeof v === "string" && (RISKS as readonly string[]).includes(v)) return v as RiskTier;
+  throw new Error(`laya_gate: risk must be one of ${RISKS.join("|")} (got ${JSON.stringify(v)})`);
+}
+
+function normalizeContext(v: unknown): Record<string, unknown> {
+  if (v === undefined) return {};
+  if (typeof v === "object" && v !== null && !Array.isArray(v)) return { ...(v as Record<string, unknown>) };
+  throw new Error(`laya_gate: context must be an object when provided (got ${typeof v})`);
+}
 
 export const gateTool: ToolDefinition = {
   name: "laya_gate",
   description:
-    "Completion gate: same rubric as `laya_review` plus per-claim verification against evidence. " +
-    "Use this RIGHT BEFORE claiming a task done -- it checks both the diff and the truthfulness of any " +
-    "completion claims (e.g. 'tests pass'). Contradicted claims escalate. At most 61 claims per call " +
-    "(3 fixed rubric questions + claims fit the 64-question server budget); diff and evidence at most " +
-    "20,000 chars each (larger inputs are rejected with input_too_large).",
+    "Completion gate: correctness + spec_match + safe_to_apply signals plus one per-claim support " +
+    "signal, each claim verified against the supplied evidence. Returns EVIDENCE (rubric objects " +
+    "and per-claim {signal} objects with honest SUPPORTED/INSUFFICIENT_EVIDENCE/ABSTAIN labels) " +
+    "plus the deterministic ALLOW/REVIEW/ESCALATE `decision` from the versioned gate@1.0.0 policy " +
+    "(context + risk are forwarded to the engine; v1 policies ignore risk). This tool never " +
+    "executes actions and never applies diffs -- it only reports the policy decision. " +
+    "Deliberate rubric difference vs laya_review (see gate@1.0.0): test_gap/blast_radius are not " +
+    "asked here; coverage breadth lives in review, completion truthfulness lives here. " +
+    "At most 61 claims per call (3 fixed rubric questions + claims fit the 64-question server " +
+    "budget); diff and evidence at most 20,000 chars each (larger inputs are rejected with input_too_large).",
   inputSchema: {
     type: "object",
     properties: {
@@ -25,6 +48,15 @@ export const gateTool: ToolDefinition = {
         type: "string",
         maxLength: LIMITS.maxStateChars,
         description: "Evidence to verify the claims against (max 20,000 chars, e.g. test output).",
+      },
+      context: {
+        type: "object",
+        description: "Optional caller context forwarded to the policy engine (e.g. {ci: true}).",
+      },
+      risk: {
+        type: "string",
+        enum: ["low", "normal", "high"],
+        description: "Optional risk tier forwarded to the policy engine (default normal; v1 policies ignore it).",
       },
     },
     required: ["request", "diff", "claims"],
@@ -84,23 +116,69 @@ export const gateTool: ToolDefinition = {
   },
 };
 
+/**
+ * P1-T5 (breaking): `laya_gate` consumes review-evidence + policy + context
+ * + risk and returns the deterministic engine decision. The legacy `action`
+ * (auto/review/escalate), the `review: {safe_to_apply: <number>}` shorthand,
+ * and the per-claim `{probability, verdict: verified|unsupported|contradicted}`
+ * labels are gone: rubric entries are objects, per-claim output is
+ * `{claim, signal, verdict}` with the honest SUPPORTED/INSUFFICIENT_EVIDENCE/
+ * ABSTAIN vocabulary (a low support signal is absence of evidence, never a
+ * refutation -- CONTRADICTED needs positive refutation evidence no v1
+ * detector carries, so v1 never emits it; the engine reason codes keep
+ * their T4 names), and the decision is `{decision, reason_codes, policy}`
+ * from gate@1.0.0. No threshold literal remains in this handler.
+ */
 export async function handleGate(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const claims = Array.isArray(args.claims) ? args.claims : [];
   const result = await runTool(client, args, gateTool.buildQuestions(args), (raw) => {
-    const a = raw.answers as Record<string, { score: number; noul?: number }>;
-    const claimResults = claims.map((claim, i) => {
-      const prob = a[`claim_${i}`]?.noul ?? 0;
-      const verdict = prob >= 0.8 ? "verified" : prob >= 0.4 ? "unsupported" : "contradicted";
-      return { claim, probability: prob, verdict };
+    const a = raw.answers as Record<string, { score?: number; noul?: number }>;
+    const numOrNull = (v: unknown): number | null => (typeof v === "number" ? v : null);
+    const correctness = numOrNull(a.correctness?.score);
+    const spec_match = numOrNull(a.spec_match?.score);
+    const safe_to_apply = numOrNull(a.safe_to_apply?.noul);
+    // P1-T5: decision and display cuts resolve from the shared table; the
+    // handler never hardcodes 0.85/0.8/0.4. The display cut below uses the
+    // SUPPORT threshold only: anything present-but-below is insufficient
+    // evidence, never a contradiction (absence != refutation).
+    const { thresholds } = getPolicy("gate", "1.0.0");
+    const verdictFor = (signal: number | null): string =>
+      signal === null ? "ABSTAIN" : signal >= thresholds.claimVerified ? "SUPPORTED" : "INSUFFICIENT_EVIDENCE";
+    const claimEntries = claims.map((claim, i) => {
+      const signal = numOrNull(a[`claim_${i}`]?.noul);
+      return { claim: String(claim), signal, verdict: verdictFor(signal) };
     });
-    const contradicted = claimResults.filter((c) => c.verdict === "contradicted").length;
-    const action = contradicted > 0 ? "escalate" : (a.safe_to_apply?.noul ?? 0) > 0.85 ? "auto" : "review";
+    const { evidence, abstention } = gateEvidence(raw, {
+      correctness,
+      spec_match,
+      safe_to_apply,
+      claims: claimEntries,
+    });
+    const risk = normalizeRisk(args.risk);
+    const context = {
+      ...normalizeContext(args.context),
+      claim_count: claims.length,
+      diff_chars: String(args.diff ?? "").length,
+      evidence_chars: String(args.evidence ?? "").length,
+    };
+    const decision = evaluate(
+      { evidence, abstention, context, risk, policy: { name: "gate", version: "1.0.0" } },
+      { thresholds },
+    );
     return JSON.stringify(
       {
-        action,
-        review: { safe_to_apply: a.safe_to_apply?.noul },
-        claims: claimResults,
+        review: {
+          correctness: { score: correctness },
+          spec_match: { score: spec_match },
+          safe_to_apply: { signal: safe_to_apply },
+        },
+        claims: claimEntries,
+        decision,
+        context,
+        risk,
         latency_ms: raw.latencyMs,
+        evidence,
+        abstention,
       },
       null,
       2,

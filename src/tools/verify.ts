@@ -1,14 +1,21 @@
 import type { LayaClient } from "../client.js";
+import { verifyEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
+import { evaluate } from "../policy/engine.js";
+import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const verifyTool: ToolDefinition = {
   name: "laya_verify",
   description:
-    "Verify one or more claims against the supplied evidence. Each claim is judged independently " +
-    "(verified / contradicted / unsupported) with a calibrated probability. Use to fact-check PR descriptions, " +
-    "agent briefs, or any statement before relying on it. At most 64 claims per call (one question each) " +
-    "and evidence at most 20,000 chars (larger inputs are rejected with input_too_large).",
+    "Verify one or more claims against the supplied evidence. Each claim carries its raw, " +
+    "uncalibrated support {signal} plus an honest verdict: SUPPORTED (signal at/above the shared " +
+    "verified cut), INSUFFICIENT_EVIDENCE (present signal below the cut -- absence of evidence is " +
+    "never labelled a contradiction), or ABSTAIN (signal missing). CONTRADICTED is reserved for " +
+    "positive refutation evidence no v1 detector carries, so v1 never emits it. The aggregate " +
+    "ALLOW/REVIEW/DENY/ESCALATE decision comes from the versioned verify@1.0.0 policy. " +
+    "Empty claims yield a structured ABSTAIN (no zero summary). At most 64 claims per call " +
+    "(one question each) and evidence at most 20,000 chars (larger inputs are rejected with input_too_large).",
   inputSchema: {
     type: "object",
     properties: {
@@ -56,21 +63,54 @@ export const verifyTool: ToolDefinition = {
   },
 };
 
+/**
+ * P1-T5 (breaking): `laya_verify` verdicts are SUPPORTED / INSUFFICIENT_EVIDENCE /
+ * ABSTAIN (+ reserved CONTRADICTED, never emitted from a support signal alone).
+ * The legacy `{probability, verdict: verified|unsupported|contradicted}` labels are
+ * gone -- low signals are absence of evidence, never refutation -- and the empty
+ * case returns a structured ABSTAIN with the engine ESCALATE decision instead of
+ * a zero summary. The aggregate decision is `{decision, reason_codes, policy}`
+ * from verify@1.0.0. No threshold literal remains in this handler: the SUPPORT
+ * display cut resolves from the shared table; the engine owns every cut point.
+ */
 export async function handleVerify(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const claims = Array.isArray(args.claims) ? args.claims : [];
   const result = await runTool(client, args, verifyTool.buildQuestions(args), (raw) => {
-    const a = raw.answers as Record<string, { noul: number }>;
+    const a = raw.answers as Record<string, { noul?: number }>;
+    // P1-T5: decision and display cuts resolve from the shared table.
+    const { thresholds } = getPolicy("verify", "1.0.0");
+    const verdictFor = (signal: number | null): string =>
+      signal === null ? "ABSTAIN" : signal >= thresholds.claimVerified ? "SUPPORTED" : "INSUFFICIENT_EVIDENCE";
     const verdicts = claims.map((claim, i) => {
-      const prob = a[`claim_${i}`]?.noul ?? 0;
-      const verdict = prob >= 0.8 ? "verified" : prob >= 0.4 ? "unsupported" : "contradicted";
-      return { claim, probability: prob, verdict };
+      const answer = a[`claim_${i}`]?.noul;
+      const signal = typeof answer === "number" ? answer : null;
+      return { claim: String(claim), signal, verdict: verdictFor(signal) };
     });
+    const { evidence, abstention } = verifyEvidence(raw, {
+      claims: verdicts.map((v) => ({ claim: v.claim, signal: v.signal, verdict: v.verdict })),
+    });
+    const decision = evaluate(
+      {
+        evidence,
+        abstention,
+        context: { claim_count: claims.length, evidence_chars: String(args.evidence ?? "").length },
+        risk: "normal",
+        policy: { name: "verify", version: "1.0.0" },
+      },
+      { thresholds },
+    );
+    // P1-T5: empty claims abstain structurally -- no zero summary. The
+    // engine maps the abstained evidence to ESCALATE + abstained_evidence.
+    if (verdicts.length === 0) {
+      return JSON.stringify({ verdicts: [], decision, latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
+    }
     const summary = {
-      verified: verdicts.filter((v) => v.verdict === "verified").length,
-      unsupported: verdicts.filter((v) => v.verdict === "unsupported").length,
-      contradicted: verdicts.filter((v) => v.verdict === "contradicted").length,
+      supported: verdicts.filter((v) => v.verdict === "SUPPORTED").length,
+      insufficient_evidence: verdicts.filter((v) => v.verdict === "INSUFFICIENT_EVIDENCE").length,
+      contradicted: verdicts.filter((v) => v.verdict === "CONTRADICTED").length,
+      abstain: verdicts.filter((v) => v.verdict === "ABSTAIN").length,
     };
-    return JSON.stringify({ summary, verdicts, latency_ms: raw.latencyMs }, null, 2);
+    return JSON.stringify({ summary, verdicts, decision, latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
   });
   if (!result.ok) throw new Error(result.error);
   return result.content;

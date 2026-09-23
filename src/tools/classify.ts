@@ -1,12 +1,17 @@
 import type { LayaClient } from "../client.js";
+import { classifyEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
+import { evaluate } from "../policy/engine.js";
+import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const classifyTool: ToolDefinition = {
   name: "laya_classify",
   description:
     "Batch-classify items against a shared catalog of classes. One catalog is sent once and every item is " +
-    "scored in parallel. Includes an optional 'other' / 'manual_review' class to surface low-confidence cases. " +
+    "scored in parallel. Includes an optional 'other' / 'manual_review' class to surface weak-signal cases. " +
+    "Each item returns its raw, uncalibrated winner_probability (never a confidence) plus the deterministic " +
+    "ALLOW/ESCALATE `decision` from the versioned classify@1.0.0 policy. An ESCALATE decision is authoritative. " +
     "At most 64 items per call (one question per item, matching the server question budget); larger batches " +
     "are rejected with input_too_large.",
   inputSchema: {
@@ -63,19 +68,56 @@ export const classifyTool: ToolDefinition = {
   },
 };
 
+/**
+ * P1-T6 (breaking): `laya_classify` routes the labels through the engine.
+ * Each entry's legacy `confidence` number (Math.max over the raw choice
+ * dict, uncalibrated -- and 0 when the backend gave no answer) is now the
+ * honestly named `winner_probability` (null when the answer is missing or
+ * the dict came back empty; the P1-T3 -Infinity bugfix stays), and the
+ * output carries the ALLOW-or-ESCALATE `decision` from classify@1.0.0. T3
+ * abstention (missing answers, empty distributions) is now authoritative
+ * via the engine ESCALATE exit. No threshold literal lives here: v1 never
+ * cuts, firmness is signal presence.
+ */
 export async function handleClassify(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const items = Array.isArray(args.items) ? args.items : [];
   const result = await runTool(client, args, classifyTool.buildQuestions(args), (raw) => {
     const a = raw.answers as Record<string, { choice: string; probabilities: Record<string, number> }>;
     const classifications = items.map((item: { id?: string }, i: number) => {
       const ans = a[`class_${i}_${item.id}`];
+      // P1-T3 bugfix preserved: Math.max(...[]) is -Infinity for an empty
+      // dict; the honest winner_probability is null instead.
+      const winner = ans ? winnerOf(ans.probabilities ?? {}) : null;
       return {
         id: item.id,
         classification: ans?.choice ?? "other",
-        confidence: ans ? Math.max(...Object.values(ans.probabilities ?? {})) : 0,
+        winner_probability: ans ? winner : null,
       };
     });
-    return JSON.stringify({ classifications, latency_ms: raw.latencyMs }, null, 2);
+    const { evidence, abstention } = classifyEvidence(raw, {
+      items: items.map((item: { id?: string }, i: number) => {
+        const ans = a[`class_${i}_${item.id}`];
+        return {
+          id: String(item.id),
+          choice: ans?.choice ?? "other",
+          distribution: (ans?.probabilities as Record<string, number> | undefined) ?? null,
+          missing: ans == null,
+        };
+      }),
+    });
+    // P1-T6: decision owned by the engine.
+    const { thresholds } = getPolicy("classify", "1.0.0");
+    const decision = evaluate(
+      {
+        evidence,
+        abstention,
+        context: { item_count: items.length },
+        risk: "normal",
+        policy: { name: "classify", version: "1.0.0" },
+      },
+      { thresholds },
+    );
+    return JSON.stringify({ classifications, decision, latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
   });
   if (!result.ok) throw new Error(result.error);
   return result.content;

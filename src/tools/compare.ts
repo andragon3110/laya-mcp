@@ -1,12 +1,18 @@
 import type { LayaClient } from "../client.js";
+import { compareEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
+import { evaluate } from "../policy/engine.js";
+import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const compareTool: ToolDefinition = {
   name: "laya_compare",
   description:
     "Compare two passages overall and optionally per aspect. Returns relation (same_fact / contradicts / " +
-    "different_facts) with calibrated probability. Use for source reconciliation, changelog-vs-doc drift, " +
+    "different_facts) with the raw, uncalibrated distribution and winner_probability (never a calibrated " +
+    "probability) plus the deterministic ALLOW/ESCALATE `decision` from the versioned compare@1.0.0 policy. " +
+    "Every firm judgment set is reportable (the relation VALUE never gates); an ESCALATE decision is " +
+    "authoritative. Use for source reconciliation, changelog-vs-doc drift, " +
     "and summary-vs-source validation. Passages at most 20,000 chars each, at most 32 aspects per call " +
     "(larger inputs are rejected with input_too_large).",
   inputSchema: {
@@ -73,23 +79,69 @@ export const compareTool: ToolDefinition = {
   },
 };
 
+/**
+ * P1-T6 (breaking): `laya_compare` routes the relation judgments through
+ * the engine. Each judgment's legacy `confidence` dict (raw choice shares
+ * labelled as a calibrated probability) is now `distribution` with the
+ * honest `winner_probability` top share (null when empty), and the output
+ * carries the ALLOW-or-ESCALATE `decision` from compare@1.0.0. The
+ * relation VALUE never gates (same_fact, contradicts, and different_facts
+ * are all reportable); T3 abstention (missing overall/aspect answers) is
+ * now authoritative via the engine ESCALATE exit. No threshold literal
+ * lives here: v1 has no cut point.
+ */
 export async function handleCompare(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const aspects = Array.isArray(args.aspects) ? args.aspects : [];
   const result = await runTool(client, args, compareTool.buildQuestions(args), (raw) => {
     const a = raw.answers as Record<string, { choice: string; probabilities: Record<string, number> }>;
-    const out: Record<string, unknown> = {
+    const aspectInputs = aspects.map((aspect, i) => {
+      const key = `aspect_${i}_${String(aspect).replace(/\W/g, "_")}`;
+      return {
+        key,
+        label: String(aspect),
+        choice: typeof a[key]?.choice === "string" ? a[key].choice : null,
+        distribution: (a[key]?.probabilities as Record<string, number> | undefined) ?? null,
+        missing: a[key] == null,
+      };
+    });
+    const { evidence, abstention } = compareEvidence(raw, {
       overall: {
-        relation: a.overall?.choice,
-        confidence: a.overall?.probabilities ?? {},
+        choice: typeof a.overall?.choice === "string" ? a.overall.choice : null,
+        distribution: (a.overall?.probabilities as Record<string, number> | undefined) ?? null,
+        missing: a.overall == null,
       },
+      aspects: aspectInputs,
+    });
+    // P1-T6: decision owned by the engine.
+    const { thresholds } = getPolicy("compare", "1.0.0");
+    const decision = evaluate(
+      {
+        evidence,
+        abstention,
+        context: { aspect_count: aspects.length },
+        risk: "normal",
+        policy: { name: "compare", version: "1.0.0" },
+      },
+      { thresholds },
+    );
+    const judgmentOf = (choice: string | undefined, distribution: Record<string, number> | undefined) => ({
+      relation: choice,
+      distribution: distribution ?? {},
+      winner_probability: winnerOf(distribution ?? null),
+    });
+    const out: Record<string, unknown> = {
+      overall: judgmentOf(a.overall?.choice, a.overall?.probabilities),
+      decision,
       latency_ms: raw.latencyMs,
     };
     aspects.forEach((aspect, i) => {
       const key = `aspect_${i}_${String(aspect).replace(/\W/g, "_")}`;
       if (a[key]) {
-        out[aspect as string] = { relation: a[key].choice, confidence: a[key].probabilities };
+        out[aspect as string] = judgmentOf(a[key].choice, a[key].probabilities);
       }
     });
+    out.evidence = evidence;
+    out.abstention = abstention;
     return JSON.stringify(out, null, 2);
   });
   if (!result.ok) throw new Error(result.error);
