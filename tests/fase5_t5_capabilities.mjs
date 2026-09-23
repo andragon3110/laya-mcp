@@ -181,14 +181,19 @@ await check("capabilities outputSchema: required ⊆ properties, readonly, envel
 
 await check("fragment covers augmentEnvelope; observe tool gets honest nulls", () => {
   const frag = envelopeMetadataProperties();
-  assert.equal(Object.keys(frag).length, 9, "nine envelope keys");
+  // Fase-6 T4 intentional evolution (minor-additive): eleven T3 keys plus
+  // effective_mode. Still all OPTIONAL (required lists untouched), so
+  // stored pre-T4 outputs keep validating -- only this count moves.
+  assert.equal(Object.keys(frag).length, 12, "twelve envelope keys (eleven T3 + effective_mode T4)");
   const probe = { decision: { decision: "ALLOW", reason_codes: ["r"], policy: { name: "screen", version: "1.0.0" } }, latency_ms: 1, evidence: { model: "m", revision: null } };
   const savedLaya = process.env.LAYA_MODEL_REVISION;
   const savedGliner = process.env.GLINER_MODEL_REVISION;
   delete process.env.LAYA_MODEL_REVISION;
   delete process.env.GLINER_MODEL_REVISION;
   try {
-    const augmented = augmentEnvelope("laya_screen", probe);
+    // T3 trace context passed (index.ts always passes one live); without
+    // it the envelope carries no trace keys (back-compat, see T3 tests).
+    const augmented = augmentEnvelope("laya_screen", probe, { trace_id: "a".repeat(32), span_id: "b".repeat(16) });
     for (const k of Object.keys(frag)) assert.ok(k in augmented, `augmented carries '${k}'`);
     assert.equal(augmented.schema_version, "1.0.0");
     assert.equal(ENVELOPE_SCHEMA_VERSION, "1.0.0");

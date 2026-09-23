@@ -1,9 +1,9 @@
 import type { LayaClient } from "../client.js";
 import { classifyEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const classifyTool: ToolDefinition = {
   name: "laya_classify",
@@ -61,6 +61,7 @@ export const classifyTool: ToolDefinition = {
         },
       },
       decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      shadow: shadowSchema(),
       latency_ms: { type: "number" },
       evidence: evidenceSchema("Classify evidence bundle (per-item choice signals)."),
       abstention: abstentionSchema(),
@@ -134,7 +135,8 @@ export async function handleClassify(client: LayaClient, args: Record<string, un
     });
     // P1-T6: decision owned by the engine.
     const { thresholds } = getPolicy("classify", "1.0.0");
-    const decision = evaluate(
+    const { decision, shadow } = evaluateForTool(
+      "laya_classify",
       {
         evidence,
         abstention,
@@ -144,7 +146,7 @@ export async function handleClassify(client: LayaClient, args: Record<string, un
       },
       { thresholds },
     );
-    return JSON.stringify({ classifications, decision, latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
+    return JSON.stringify({ classifications, decision, ...(shadow ? { shadow } : {}), latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
   });
   if (!result.ok) throw new Error(result.error);
   return result.content;

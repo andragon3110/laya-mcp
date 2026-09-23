@@ -1,9 +1,9 @@
 import type { LayaClient } from "../client.js";
 import { findEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const findTool: ToolDefinition = {
   name: "laya_find",
@@ -72,6 +72,7 @@ export const findTool: ToolDefinition = {
         description: "Top raw share (never a confidence); null when the dict came back empty.",
       },
       decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      shadow: shadowSchema(),
       latency_ms: { type: "number" },
       evidence: evidenceSchema("Find evidence bundle (choice + distribution signals)."),
       abstention: abstentionSchema(),
@@ -306,7 +307,8 @@ export async function handleFind(client: LayaClient, args: Record<string, unknow
     // P1-T6: decision owned by the engine (shared table resolved for uniformity;
     // find@1.0.0 applies no numeric cut -- firmness is presence + uniqueness).
     const { thresholds } = getPolicy("find", "1.0.0");
-    const decision = evaluate(
+    const { decision, shadow } = evaluateForTool(
+      "laya_find",
       {
         evidence,
         abstention,
@@ -325,6 +327,7 @@ export async function handleFind(client: LayaClient, args: Record<string, unknow
         distribution: distribution ?? {},
         winner_probability: winnerOf(distribution ?? null),
         decision,
+        ...(shadow ? { shadow } : {}),
         latency_ms: raw.latencyMs,
         evidence,
         abstention,

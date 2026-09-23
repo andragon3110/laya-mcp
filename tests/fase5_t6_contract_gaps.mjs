@@ -388,6 +388,14 @@ const FIXTURES = [
       mode: "observe",
       schema_version: "1.0.0",
       latency_ms: 1,
+      // Fase-6 T3 handler-emitted key (like schema_version above): the live
+      // report embeds the in-process metrics snapshot. Type-valid baseline
+      // (outputSchema declares it optional); live assertions check presence.
+      metrics: {},
+      // Fase-6 T4 handler-emitted key (same treatment): the live report
+      // carries modes{supported, effective, default}. Full valid value
+      // (the modes schema requires those three); live assertions check it.
+      modes: { supported: ["observe", "shadow", "enforce"], effective: "observe", default: "observe" },
     },
     negatives: [
       ["mode write (observe-only enum)", (o) => ({ ...o, mode: "write" })],
@@ -397,7 +405,11 @@ const FIXTURES = [
 ];
 
 const ENVELOPE_KEYS = new Set(Object.keys(envelopeMetadataProperties()));
-assert.equal(ENVELOPE_KEYS.size, 9, "nine known additive envelope keys");
+// Fase-6 T4 intentional evolution (minor-additive): eleven T3 keys plus
+// effective_mode. The strip-back assertions below keep passing unchanged
+// because the new key is a known envelope key (stamped on every envelope,
+// optional in every schema).
+assert.equal(ENVELOPE_KEYS.size, 12, "twelve known additive envelope keys (eleven T3 + effective_mode T4)");
 
 function stripEnvelope(obj) {
   const out = { ...obj };

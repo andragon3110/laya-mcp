@@ -15,6 +15,11 @@
  *                       (8 random bytes via node:crypto). Randomness is the
  *                       uniqueness mechanism; collisions are negligible and
  *                       carry no semantics (an id, never a hash of content).
+ *   - `trace_id` / `span_id` (fase-6 T3, OPTIONAL keys): inbound trace
+ *                       correlation from the request `_meta` (validated,
+ *                       generated when absent -- see trace.ts). Stamped only
+ *                       when a trace context is passed (index.ts always
+ *                       passes one); opaque ids only, never content.
  *   - `timestamp`:      ISO-8601 creation time (new Date().toISOString()).
  *   - `model`:          judging backend label, taken from
  *                       `evidence.model` (the LayaClient already defaults a
@@ -34,6 +39,12 @@
  *                       `decision.policy.{name,version}` (null when the
  *                       envelope carries no decision, which never happens
  *                       for the 11 shipped tools).
+ *   - `effective_mode` (fase-6 T4, OPTIONAL key): the policy-decision
+ *                       mode this call ran under (observe/shadow/enforce,
+ *                       resolved per call from LAYA_MODE / LAYA_MODE_<TOOL>,
+ *                       default observe; explicit override wins in tests).
+ *                       Minor-additive like the trace keys: old readers
+ *                       ignore it, stored pre-T4 outputs still validate.
  *   - `schema_version`: envelope contract version, constant "1.0.0"
  *                       (ENVELOPE_SCHEMA_VERSION). Versioning/compat policy
  *                       is T5's SCHEMA_VERSION_POLICY below (major = breaking, minor = additive).
@@ -60,6 +71,9 @@ import {
   LAYA_MODEL_REVISION_ENV,
   readRevisionEnv,
 } from "./evidence.js";
+import { recordCall, recordEnvelope } from "./metrics.js";
+import { effectiveMode, type ToolMode } from "./policy/mode.js";
+import type { TraceContext } from "./trace.js";
 
 /** Envelope contract version stamped on every augmented envelope (T4). */
 export const ENVELOPE_SCHEMA_VERSION = "1.0.0";
@@ -218,10 +232,26 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
  * Augment a parsed handler envelope ADDITIVELY. Every pre-existing key is
  * preserved (spread first); only the documented metadata keys are set.
  * `latency_ms` is conserved, never recomputed.
+ *
+ * Fase-6 T3: `trace` threads the inbound trace context (OpenCode -> Gentle
+ * -> laya-mcp correlation, see trace.ts) as the OPTIONAL keys `trace_id` /
+ * `span_id` alongside `decision_id`. Optional is the minor-additive sense:
+ * old readers ignore them; stored pre-T3 outputs still validate. Callers
+ * that pass no trace (tests, direct callers) get the envelope without the
+ * keys -- index.ts always passes one (generated when the request carries
+ * none), so live envelopes always carry both.
+ *
+ * Fase-6 T4: `modeOverride` pins the stamped `effective_mode` (test path);
+ * when absent the mode resolves from the live env for this tool
+ * (effectiveMode, default observe -- see policy/mode.ts). Handler-emitted
+ * `shadow` reports (shadow mode only) flow through untouched: the spread
+ * preserves every pre-existing key.
  */
 export function augmentEnvelope(
   toolName: string,
   parsed: Record<string, unknown>,
+  trace?: TraceContext,
+  modeOverride?: ToolMode,
 ): Record<string, unknown> {
   const evidence = isPlainObject(parsed.evidence) ? parsed.evidence : null;
   const decision = isPlainObject(parsed.decision) ? parsed.decision : null;
@@ -235,7 +265,9 @@ export function augmentEnvelope(
   return {
     ...parsed,
     decision_id: newDecisionId(),
+    ...(trace !== undefined ? { trace_id: trace.trace_id, span_id: trace.span_id } : {}),
     timestamp: new Date().toISOString(),
+    effective_mode: modeOverride ?? effectiveMode(toolName),
     model: evidence !== null && (typeof evidence.model === "string" || evidence.model === null)
       ? (evidence.model as string | null)
       : null,
@@ -254,8 +286,17 @@ export function augmentEnvelope(
  * indented JSON, never empty) and `structuredContent` carries the SAME
  * object. On degenerate input (unparseable text or a non-object), the
  * text is returned intact with no structuredContent plus a stderr note.
+ *
+ * Fase-6 T3: central metrics hook. The success path records the served
+ * observation (model/decision/latency/abstention extracted from the
+ * augmented envelope via recordEnvelope); the degenerate path counts the
+ * request with an empty observation. Failures never break the result --
+ * recordEnvelope never throws. `trace` is threaded to augmentEnvelope
+ * (absent => envelope without trace keys; index.ts always passes one).
+ * Fase-6 T4: `modeOverride` threads the effective-mode stamp the same way
+ * (absent => resolved from the live env for this tool).
  */
-export function buildCallResult(toolName: string, text: string): CallToolResult {
+export function buildCallResult(toolName: string, text: string, trace?: TraceContext, modeOverride?: ToolMode): CallToolResult {
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);
@@ -264,6 +305,7 @@ export function buildCallResult(toolName: string, text: string): CallToolResult 
       `[laya-mcp] tools/call ${toolName}: handler text is not JSON; ` +
         `returning text without structuredContent`,
     );
+    recordCall({ tool: toolName });
     return { content: [{ type: "text" as const, text }] };
   }
   if (!isPlainObject(parsed)) {
@@ -271,9 +313,11 @@ export function buildCallResult(toolName: string, text: string): CallToolResult 
       `[laya-mcp] tools/call ${toolName}: handler envelope is not a JSON object; ` +
         `returning text without structuredContent`,
     );
+    recordCall({ tool: toolName });
     return { content: [{ type: "text" as const, text }] };
   }
-  const augmented = augmentEnvelope(toolName, parsed);
+  const augmented = augmentEnvelope(toolName, parsed, trace, modeOverride);
+  recordEnvelope(toolName, augmented);
   return {
     content: [{ type: "text" as const, text: JSON.stringify(augmented, null, 2) }],
     structuredContent: augmented,

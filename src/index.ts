@@ -35,6 +35,8 @@ import { LayaClient } from "./client.js";
 import { buildCallResult } from "./envelope.js";
 import { GlinerClient } from "./gliner.js";
 import { HealthWatch } from "./health.js";
+import { recordError } from "./metrics.js";
+import { extractTraceContext } from "./trace.js";
 import { screenTool, handleScreen } from "./tools/screen.js";
 import { verifyTool, handleVerify } from "./tools/verify.js";
 import { findTool, handleFind } from "./tools/find.js";
@@ -151,7 +153,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToolResult> => {
   const name = request.params.name;
   const handler = HANDLERS[name];
+  // Fase-6 T3: inbound trace correlation (OpenCode -> Gentle -> laya-mcp).
+  // `_meta` carries optional trace_id/span_id; absent/malformed ids are
+  // replaced with generated ones (extractTraceContext never throws, never
+  // logs content -- only opaque ids travel onward into the envelope).
+  const trace = extractTraceContext(request.params);
   if (!handler) {
+    // Unknown tool: a failed request (counts requests_total + failed).
+    // Only the tool name is recorded -- never arguments.
+    recordError(name);
     return {
       isError: true,
       content: [{ type: "text", text: `Unknown tool: ${name}` }],
@@ -166,9 +176,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToo
     // clients) and structuredContent carries the SAME object
     // (deep-equals JSON.parse of the text). Degenerate handler text still
     // returns intact with no structuredContent (see envelope.ts).
-    return buildCallResult(name, content);
+    // Fase-6 T3: the trace threads into the envelope (trace_id/span_id
+    // alongside decision_id) and the success path records the metrics
+    // observation inside buildCallResult.
+    return buildCallResult(name, content, trace);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+    // Failed request (backend unreachable etc.): counts total + failed.
+    // Only the tool name is recorded -- error text stays in the response.
+    recordError(name);
     return {
       isError: true,
       content: [

@@ -25,7 +25,20 @@
  *                  (laya_decide, see decide.ts), structured (T3/T4 contract),
  *                  revision (evidence.ts/envelope.ts vocabulary). Nothing is
  *                  invented; tests re-derive every entry from its source.
- *   - `mode`:     always "observe".
+ *   - `mode`:     always "observe" -- the MCP layer itself (read-only
+ *                  discovery + inference, never actions). This stays true
+ *                  under every policy mode below; it is NOT the
+ *                  policy-decision mode.
+ *   - `modes`:    fase-6 T4 policy-decision modes, from code truth:
+ *                  `supported` (SUPPORTED_MODES), `effective` (global
+ *                  LAYA_MODE resolution), `default`, plus a note spelling
+ *                  out observe/shadow/enforce and the per-tool overrides.
+ *                  OPTIONAL outputSchema key (stored pre-T4 outputs keep
+ *                  validating).
+ *   - `metrics`:    fase-6 T3 in-process snapshot (requests/latency
+ *                  p50-p99/decisions/abstentions/escalations per tool,
+ *                  per-model latency, probe load stats; aggregates only,
+ *                  exact shape in metrics.ts). OPTIONAL outputSchema key.
  *   - `schema_version`: ENVELOPE_SCHEMA_VERSION ("1.0.0").
  *   - `latency_ms`: wall-clock discovery cost (probes run in parallel).
  *
@@ -48,7 +61,9 @@
 import type { BackendModelInfo, LayaClient, ReadyResult } from "../client.js";
 import { ENVELOPE_SCHEMA_VERSION, TOOL_PRIMITIVES } from "../envelope.js";
 import type { ToolContext } from "../index.js";
+import { getMetricsSnapshot, recordProbe } from "../metrics.js";
 import { listPolicies } from "../policy/loader.js";
+import { DEFAULT_MODE, SUPPORTED_MODES, effectiveMode } from "../policy/mode.js";
 import {
   type ToolDefinition,
   READONLY_TOOL_ANNOTATIONS,
@@ -341,6 +356,39 @@ export const capabilitiesTool: ToolDefinition = {
         description:
           "Observe mode: the MCP layer only observes backend state and reports judgments; it never executes actions, applies changes, or mutates anything.",
       },
+      modes: {
+        type: "object",
+        description:
+          "Fase-6 T4 policy-decision modes (OPTIONAL -- never required so stored pre-T4 outputs keep " +
+          "validating): supported modes from code truth plus the effective global mode. The legacy `mode` " +
+          "field above is untouched: the MCP layer stays read-only under every policy mode.",
+        properties: {
+          supported: {
+            type: "array",
+            description: "Supported policy-decision modes (SUPPORTED_MODES).",
+            items: { type: "string" },
+          },
+          effective: {
+            type: "string",
+            description: "Effective global mode (LAYA_MODE resolution, default observe; per-tool LAYA_MODE_<TOOL> may differ per call -- see effective_mode on each envelope).",
+          },
+          default: {
+            type: "string",
+            description: "Default mode when unset or invalid (DEFAULT_MODE).",
+          },
+          note: { type: "string", description: "One-paragraph semantics + configuration pointers." },
+        },
+        required: ["supported", "effective", "default"],
+      },
+      metrics: {
+        type: "object",
+        description:
+          "In-process metrics snapshot (fase-6 T3, OPTIONAL -- never required so stored pre-T3 outputs keep " +
+          "validating): requests_total/failed, inference_latency_ms p50/p95/p99 over a bounded window, " +
+          "policy_decisions per tool/decision, abstentions, escalations, per-model latency, and probe " +
+          "model_load stats. Numeric/categorical aggregates only -- no argument content, no free text. " +
+          "Exact shape is documented in metrics.ts (getMetricsSnapshot).",
+      },
       schema_version: {
         type: "string",
         description: "Envelope contract version (ENVELOPE_SCHEMA_VERSION).",
@@ -382,7 +430,21 @@ export async function handleCapabilities(
 ): Promise<string> {
   const timeoutMs = validateTimeoutMs(args.timeout_ms);
   const started = Date.now();
-  const [laya, gliner] = await Promise.all([probeLaya(client, timeoutMs), probeGliner(ctx, timeoutMs)]);
+  // Fase-6 T3: the live probes below are the model_load signal -- each is
+  // timed individually (parallel wall-clock per probe) and recorded via
+  // recordProbe. No new sondas: these are the pre-existing discovery
+  // probes, only observed, never added to.
+  const timed = async <T>(p: Promise<T>): Promise<[T, number]> => {
+    const s = Date.now();
+    const v = await p;
+    return [v, Date.now() - s];
+  };
+  const [[laya, layaMs], [gliner, glinerMs]] = await Promise.all([
+    timed(probeLaya(client, timeoutMs)),
+    timed(probeGliner(ctx, timeoutMs)),
+  ]);
+  recordProbe("laya", laya.ok && laya.ready !== null, layaMs);
+  recordProbe("gliner", gliner.reachable, glinerMs);
   if (!laya.ok || laya.ready === null) {
     throw new Error(
       `laya_capabilities: laya-server unavailable (${laya.error ?? "unknown error"}); ` +
@@ -414,6 +476,26 @@ export async function handleCapabilities(
     policies: listPolicies(),
     features: buildFeatures(),
     mode: "observe" as const,
+    // Fase-6 T4: policy-decision modes from code truth (additive, OPTIONAL
+    // in outputSchema). `supported` is SUPPORTED_MODES verbatim;
+    // `effective` is the global LAYA_MODE resolution (per-tool overrides
+    // surface per call as `effective_mode` on each envelope); `mode`
+    // above stays "observe" -- the MCP layer itself never acts, under
+    // every policy mode.
+    modes: {
+      supported: [...SUPPORTED_MODES],
+      effective: effectiveMode(),
+      default: DEFAULT_MODE,
+      note: "observe (default): advisory decisions, recorded. shadow: base decision unchanged plus " +
+        "shadow{would_decide, under_policy} under an explicit candidate (LAYA_SHADOW_POLICY[_<TOOL>] as " +
+        "name@version). enforce: Gentle must honor the decision. Per-tool mode via LAYA_MODE_<TOOL> " +
+        "(e.g. LAYA_MODE_LAYA_SCREEN); invalid values fall back to observe.",
+    },
+    // Fase-6 T3: metrics snapshot embedded additively (no new tool -- this
+    // already-exempt discovery surface is the exposure point; one line of
+    // justification as required: a new tool would add list surface for a
+    // read that discovery already serves).
+    metrics: getMetricsSnapshot(),
     schema_version: ENVELOPE_SCHEMA_VERSION,
     latency_ms: Date.now() - started,
   };

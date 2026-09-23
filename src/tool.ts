@@ -78,6 +78,26 @@ export function decisionSchema(allowed: readonly string[]): Record<string, unkno
   };
 }
 
+/** Fase-6 T4: `shadow` property descriptor for outputSchemas (OPTIONAL). */
+export function shadowSchema(): Record<string, unknown> {
+  return {
+    type: "object",
+    description:
+      "Shadow evaluation (fase-6 T4, shadow mode only): the decision the candidate policy WOULD have " +
+      "made on the same input, without altering `decision`. Absent outside shadow mode.",
+    properties: {
+      would_decide: decisionSchema(["ALLOW", "REVIEW", "DENY", "ESCALATE"]),
+      under_policy: {
+        type: "object",
+        description: "Explicit candidate policy ref the shadow ran under (name@version).",
+        properties: { name: { type: "string" }, version: { type: "string" } },
+        required: ["name", "version"],
+      },
+    },
+    required: ["would_decide", "under_policy"],
+  };
+}
+
 /** Fase-5 T3: `evidence` property descriptor for outputSchemas. */
 export function evidenceSchema(description: string): Record<string, unknown> {
   return { type: "object", description };
@@ -98,10 +118,14 @@ export function abstentionSchema(): Record<string, unknown> {
  * envelope.ts: augmentEnvelope) but deliberately left the 11 outputSchemas
  * untouched. T5 closes that gap: every judgment outputSchema spreads this
  * fragment (plus laya_capabilities' own outputSchema) so the contract is
- * self-describing. All nine keys are OPTIONAL -- never added to `required`:
+ * self-describing. All keys are OPTIONAL -- never added to `required`:
  * live envelopes always carry them, but stored pre-T5 outputs must keep
  * validating. That is the minor-version compat promise (see
  * SCHEMA_VERSION_POLICY in envelope.ts).
+ *
+ * Fase-6 T4 adds `effective_mode` (observe/shadow/enforce, stamped on
+ * every live envelope; stored pre-T4 outputs still validate) alongside the
+ * two trace keys -- twelve optional keys total, same compat promise.
  *
  * `primitive` admits null for the observe tool (laya_capabilities judges
  * nothing, so augmentEnvelope stamps primitive:null); `model` / `policy` /
@@ -114,6 +138,14 @@ export function abstentionSchema(): Record<string, unknown> {
 export function envelopeMetadataProperties(): Record<string, unknown> {
   return {
     decision_id: { type: "string", description: "Unique id per call (dec_<16 lowercase hex)." },
+    trace_id: {
+      type: "string",
+      description: "Inbound trace correlation id from request _meta (validated, generated when absent); opaque id only, never content (fase-6 T3).",
+    },
+    span_id: {
+      type: "string",
+      description: "Inbound span id from request _meta (validated, generated when absent); opaque id only, never content (fase-6 T3).",
+    },
     timestamp: { type: "string", description: "ISO-8601 creation time of the envelope." },
     model: {
       type: ["string", "null"],
@@ -140,6 +172,14 @@ export function envelopeMetadataProperties(): Record<string, unknown> {
     policy_version: {
       type: ["string", "null"],
       description: "Top-level mirror of decision.policy.version; null without a decision.",
+    },
+    effective_mode: {
+      type: "string",
+      enum: ["observe", "shadow", "enforce"],
+      description:
+        "Effective policy-decision mode for this call (fase-6 T4): observe = advisory, shadow = base " +
+        "decision plus a shadow report, enforce = Gentle must honor the decision. Resolved per call " +
+        "from LAYA_MODE / LAYA_MODE_<TOOL> (default observe).",
     },
     schema_version: {
       type: "string",

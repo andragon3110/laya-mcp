@@ -1,9 +1,9 @@
 import type { LayaClient } from "../client.js";
 import { compareEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const compareTool: ToolDefinition = {
   name: "laya_compare",
@@ -49,6 +49,7 @@ export const compareTool: ToolDefinition = {
         required: ["distribution", "winner_probability"],
       },
       decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      shadow: shadowSchema(),
       latency_ms: { type: "number" },
       evidence: evidenceSchema("Compare evidence bundle (overall + per-aspect signals)."),
       abstention: abstentionSchema(),
@@ -140,7 +141,8 @@ export async function handleCompare(client: LayaClient, args: Record<string, unk
     });
     // P1-T6: decision owned by the engine.
     const { thresholds } = getPolicy("compare", "1.0.0");
-    const decision = evaluate(
+    const { decision, shadow } = evaluateForTool(
+      "laya_compare",
       {
         evidence,
         abstention,
@@ -168,6 +170,7 @@ export async function handleCompare(client: LayaClient, args: Record<string, unk
     });
     out.evidence = evidence;
     out.abstention = abstention;
+    if (shadow !== null) out.shadow = shadow;
     return JSON.stringify(out, null, 2);
   });
   if (!result.ok) throw new Error(result.error);

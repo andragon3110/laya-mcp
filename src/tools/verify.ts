@@ -1,9 +1,9 @@
 import type { LayaClient } from "../client.js";
 import { verifyEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const verifyTool: ToolDefinition = {
   name: "laya_verify",
@@ -66,6 +66,7 @@ export const verifyTool: ToolDefinition = {
         },
       },
       decision: decisionSchema(["ALLOW", "REVIEW", "DENY", "ESCALATE"]),
+      shadow: shadowSchema(),
       latency_ms: { type: "number" },
       evidence: evidenceSchema("Verify evidence bundle (per-claim signals + metadata)."),
       abstention: abstentionSchema(),
@@ -128,7 +129,8 @@ export async function handleVerify(client: LayaClient, args: Record<string, unkn
     const { evidence, abstention } = verifyEvidence(raw, {
       claims: verdicts.map((v) => ({ claim: v.claim, signal: v.signal, verdict: v.verdict })),
     });
-    const decision = evaluate(
+    const { decision, shadow } = evaluateForTool(
+      "laya_verify",
       {
         evidence,
         abstention,
@@ -141,7 +143,7 @@ export async function handleVerify(client: LayaClient, args: Record<string, unkn
     // P1-T5: empty claims abstain structurally -- no zero summary. The
     // engine maps the abstained evidence to ESCALATE + abstained_evidence.
     if (verdicts.length === 0) {
-      return JSON.stringify({ verdicts: [], decision, latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
+      return JSON.stringify({ verdicts: [], decision, ...(shadow ? { shadow } : {}), latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
     }
     const summary = {
       supported: verdicts.filter((v) => v.verdict === "SUPPORTED").length,
@@ -149,7 +151,7 @@ export async function handleVerify(client: LayaClient, args: Record<string, unkn
       contradicted: verdicts.filter((v) => v.verdict === "CONTRADICTED").length,
       abstain: verdicts.filter((v) => v.verdict === "ABSTAIN").length,
     };
-    return JSON.stringify({ summary, verdicts, decision, latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
+    return JSON.stringify({ summary, verdicts, decision, ...(shadow ? { shadow } : {}), latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
   });
   if (!result.ok) throw new Error(result.error);
   return result.content;

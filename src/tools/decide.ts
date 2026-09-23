@@ -1,9 +1,9 @@
 import type { LayaClient, PredictResult } from "../client.js";
 import { decideEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount, inputTooLarge } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { TOOL_TIMEOUT_MS, type ToolDefinition, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { TOOL_TIMEOUT_MS, type ToolDefinition, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
 type DecideAnswers = Record<string, { choice?: string; probabilities?: Record<string, number>; noul?: number }>;
 
@@ -163,6 +163,7 @@ export const decideTool: ToolDefinition = {
         description: "Per requirement key {signal, supported}; signal null and supported null when unevaluated.",
       },
       decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      shadow: shadowSchema(),
       latency_ms: { type: "number", description: "Sum of both stages when requirements are present." },
       evidence: evidenceSchema("Decide evidence bundle (selection + requirement signals)."),
       abstention: abstentionSchema(),
@@ -257,7 +258,8 @@ export async function handleDecide(client: LayaClient, args: Record<string, unkn
   });
   // P1-T6: decision and display cuts resolve from the shared table.
   const { thresholds } = getPolicy("decide", "1.0.0");
-  const decision = evaluate(
+  const { decision, shadow } = evaluateForTool(
+    "laya_decide",
     {
       evidence,
       abstention,
@@ -280,6 +282,7 @@ export async function handleDecide(client: LayaClient, args: Record<string, unkn
       winner_probability: winnerOf(outDistribution),
       requirements: outRequirements,
       decision,
+      ...(shadow ? { shadow } : {}),
       latency_ms: raw1.latencyMs + (raw2?.latencyMs ?? 0),
       evidence,
       abstention,
