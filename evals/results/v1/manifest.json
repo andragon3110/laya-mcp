@@ -1,0 +1,121 @@
+{
+  "generated": "fase-7 T5 reproducibility manifest (stub run; absolutes + method, no improvement claims)",
+  "date": "2026-09-23T13:03:27.874Z",
+  "commit": "e6c0b981cb621577ef4a720fc34f60b6801f3050",
+  "commit_short": "e6c0b98",
+  "model": "evals-bench-stub",
+  "model_note": "no real model involved; stub id only (T3/T4 canonicals use evals-oracle-stub, bench runs use evals-bench-stub)",
+  "model_revision": null,
+  "model_revision_note": "honest null: stubs resolve no pin (cf. capabilities revision_source unpinned; a hash is never invented)",
+  "tokenizer": "unknown",
+  "tokenizer_note": "explicit unknown: laya_capabilities exposes name/repo/loaded/revision/device/circuit per model, never a tokenizer",
+  "device": "unknown (stub run; no live backend)",
+  "device_note": "capabilities reports backend.device / models[].device probed LIVE; nothing was probed in this run",
+  "policy": [
+    {
+      "name": "classify",
+      "version": "1.0.0"
+    },
+    {
+      "name": "code-review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "compare",
+      "version": "1.0.0"
+    },
+    {
+      "name": "decide",
+      "version": "1.0.0"
+    },
+    {
+      "name": "extract",
+      "version": "1.0.0"
+    },
+    {
+      "name": "find",
+      "version": "1.0.0"
+    },
+    {
+      "name": "gate",
+      "version": "1.0.0"
+    },
+    {
+      "name": "normal",
+      "version": "1.0.0"
+    },
+    {
+      "name": "pii",
+      "version": "1.0.0"
+    },
+    {
+      "name": "rerank",
+      "version": "1.0.0"
+    },
+    {
+      "name": "review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "screen",
+      "version": "1.0.0"
+    },
+    {
+      "name": "security",
+      "version": "1.0.0"
+    },
+    {
+      "name": "verify",
+      "version": "1.0.0"
+    }
+  ],
+  "policy_note": "live registry truth (availability-independent); 14 entries",
+  "schema_version": "1.0.0",
+  "software": {
+    "node": "v24.18.0",
+    "platform": "win32",
+    "arch": "x64",
+    "package_version": "0.4.0"
+  },
+  "hardware": {
+    "arch": "x64",
+    "cpus": 16,
+    "cpu_model": "AMD Ryzen 7 5700X 8-Core Processor             ",
+    "totalmem_mb": 32646
+  },
+  "config": {
+    "reps": 15,
+    "e2eReps": 5,
+    "stubLatencyMs": 0,
+    "topK": 10,
+    "rerankNs": [
+      10,
+      50,
+      100,
+      500,
+      1000
+    ],
+    "seed": "none (deterministic construction, no RNG)"
+  },
+  "mode": {
+    "mcp": "observe",
+    "mcp_note": "the MCP layer only observes and reports judgments; it never acts, under every policy mode",
+    "policy": "observe (default)",
+    "policy_note": "effective global policy-decision mode resolution input (verbatim env or default)"
+  },
+  "method": "single process; stub-reported latency_ms kept separate from measured wall (wall = pipeline overhead; stubs report latency_ms as a field, never conflated; optional injected delay via delayMs, unused by default); memory = absolute heapUsed in MB (approx, whole process, single sample, no GC forcing); quantiles = nearest-rank p50/p95/p99 (src/metrics.ts definition); throughput = count/meanWall; rerank N>64 = pure selector + projected judge (64 transport cap); quality = MRR/nDCG vs construction-truth gold (stub ceiling, NOT backend quality); absolutes only, no baseline, no claims.",
+  "honesty": [
+    "absolutes only; no cross-machine comparison; no improvement claimed (no baseline exists)",
+    "stub ceiling: numbers measure harness + handler plumbing, never backend quality",
+    "thresholds untouched (CERO cambios en src/); wrong_confident taus remain reporting slices, never prod cutoffs"
+  ],
+  "links": {
+    "bench": {
+      "primitives": 10,
+      "rerank_rows": 5
+    },
+    "metrics": {
+      "suites": 10
+    }
+  }
+}
