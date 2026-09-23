@@ -319,6 +319,36 @@ surfaced by the MCP tools for audit. Override per call with `model`,
 
 ---
 
+## Backend probes, reload & limits
+
+Both servers (`laya-server :8765`, `gliner-server :8766`) expose the
+same k8s-style surface:
+
+| Endpoint | Semantics |
+|---|---|
+| `GET /live` | Liveness only. Always `200 {alive: true}` when the process is up; never touches models. Safe to poll aggressively. |
+| `GET /ready` | Readiness snapshot (never warms models). `200` when ready, else `503` with a structured body (`ready`, `reason`, `loaded`, `failed`, `device`, `versions`, `circuit`, `load_attempts`, `retry_after_seconds`) plus a `Retry-After` header. |
+| `GET /models` | Per-model inventory (`name`, `loaded`, `device`, `revision: null` + `revision_source: "unpinned"` — pins are not resolved offline). Always `200`, never loads anything. |
+| `POST /reload` | Operational, non-destructive: clears load failure-tracking and closes the circuit so the next use retries immediately. Never unloads a healthy backend. Always `200`. Use after fixing the cause (VRAM, HF reachability). |
+| `GET /health` | Legacy liveness + readiness (may lazy-load on first call, fail-fast inside the backoff window). Prefer `/live` + `/ready`. |
+
+Error contract:
+
+- **413 `input_too_large`** (`{code, field, limit, actual, hint}`, no
+  `Retry-After`): the payload is valid but too large — shrink it, don't
+  resend. Enforced on `/predict` (`LAYA_LIMITS_*`), `/extract_entities`
+  / `/classify` / `/pii_scan` (`GLINER_LIMITS_*`), and mirrored early in
+  the MCP tools (`laya_find` ≤ 250 candidates, `laya_rerank` ≤ 64
+  candidates truncated to 2,000 chars each, `laya_classify` ≤ 64 items,
+  `laya_verify` ≤ 64 claims, `laya_gate` ≤ 61 claims, `laya_decide` 2–6
+  options with ≤ 32 requirements).
+- **503 + `Retry-After`**: backend not ready (load backoff / open
+  circuit) or saturated (over `LAYA_MAX_INFLIGHT` / `GLINER_MAX_INFLIGHT`).
+  Wait the advertised seconds, then retry; for repeated load failures use
+  `POST /reload` after fixing the cause.
+
+---
+
 ## Diagnose with `doctor`
 
 One command tells you exactly which layer is broken, if any:
@@ -389,7 +419,11 @@ HTTP endpoints, or wrap via your own extension (see Pi docs).
 | `LAYA_AUTO_TASK_DETECTION` | `1` | Auto-route to `typed-decisions` on workflow match |
 | `LAYA_MAX_LOADED` | `3` | Max resident checkpoints (LRU eviction) |
 | `LAYA_TIMEOUT_MS` | `5000` | Per-call HTTP timeout, MCP → Python |
-| `LAYA_TOOL_TIMEOUT_MS` | `8000` | Per-tool MCP timeout |
+| `LAYA_TOOL_TIMEOUT_MS` | `8000` | Per-tool MCP timeout (enforced: calls slower than this fail instead of hanging) |
+| `LAYA_MAX_INFLIGHT` | `3` | Max concurrent inferences per server; overflow answers `503` + `Retry-After` instead of queueing |
+| `LAYA_LOAD_RETRY_BASE_S` / `LAYA_LOAD_RETRY_FACTOR` / `LAYA_LOAD_RETRY_CAP_S` / `LAYA_LOAD_RETRY_MAX` | `1.0` / `2.0` / `60.0` / `5` | Load backoff with jitter: first delay, exponential growth, per-delay ceiling, attempts before probes-only |
+| `LAYA_LOAD_CIRCUIT_THRESHOLD` / `LAYA_LOAD_CIRCUIT_COOLDOWN_S` / `LAYA_LOAD_ERROR_TTL_S` | `3` / `30.0` / `300.0` | Failures to open the circuit, open → half-open probe delay, cached-error expiry |
+| `LAYA_LIMITS_MAX_STATE_CHARS` / `LAYA_LIMITS_MAX_QUESTIONS` / `LAYA_LIMITS_MAX_BODY_CHARS` | `20000` / `64` / `100000` | Input size guards on `/predict`; over-limit answers `413 input_too_large` |
 | `LAYA_HEALTH_INTERVAL_MS` | `10000` | Watcher poll interval |
 | `LAYA_LOG_LEVEL` | `WARNING` | uvicorn log level |
 | `GLINER_URL` | `http://127.0.0.1:8766` | MCP → gliner-server |
@@ -397,6 +431,10 @@ HTTP endpoints, or wrap via your own extension (see Pi docs).
 | `GLINER_DEVICE` | `auto` | `auto` (cuda → mps → cpu) / `cpu` / `cuda` / `mps` |
 | `GLINER_MODEL` | `fastino/gliner2.5-multi-v1` | HuggingFace model id |
 | `GLINER_TIMEOUT_MS` | `10000` | Per-call HTTP timeout, MCP → GLiNER |
+| `GLINER_MAX_INFLIGHT` | `4` | Max concurrent inferences on the sidecar; overflow answers `503` + `Retry-After` instead of queueing |
+| `GLINER_LOAD_RETRY_BASE_S` / `GLINER_LOAD_RETRY_FACTOR` / `GLINER_LOAD_RETRY_CAP_S` / `GLINER_LOAD_RETRY_MAX` | `1.0` / `2.0` / `60.0` / `5` | Same backoff+jitter budget as Laya, for the sidecar loader |
+| `GLINER_LOAD_CIRCUIT_THRESHOLD` / `GLINER_LOAD_CIRCUIT_COOLDOWN_S` / `GLINER_LOAD_ERROR_TTL_S` | `3` / `30.0` / `300.0` | Same circuit-breaker budget as Laya, for the sidecar loader |
+| `GLINER_LIMITS_MAX_TEXT_CHARS` / `GLINER_LIMITS_MAX_LABELS` / `GLINER_LIMITS_MAX_TASKS` / `GLINER_LIMITS_MAX_EXTRA_TYPES` / `GLINER_LIMITS_MAX_BODY_CHARS` | `50000` / `64` / `32` / `32` / `100000` | Input size guards on `/extract_entities`, `/classify`, `/pii_scan`; over-limit answers `413 input_too_large` |
 
 ---
 
