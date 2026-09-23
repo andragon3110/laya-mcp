@@ -16,7 +16,8 @@ Resolver los pendientes de las Fases 1-8: commitear untracked (AUDIT.md, artifac
 - [x] T6 (delegated): backends live — DONE sin commit (venv TEMP CPU-only; :8765 3 checkpoints + :8766 gliner vivos; doctor live 16/0/0; smoke+gliner live OK; juicios live registrados; integration live 2/5 gate externo; 2 bugs tests: mcp_smoke race+deepEqual, smoke.py puerto 8766; limpieza total).
 - [x] T7 (delegated): fixes + stale + no-regresión — DONE (commit b99f8ed +93/-21; mcp_smoke race+deepEqual; smoke.py LAYA_PORT; test_health.sh; EVALUATION compare; todo verde offline).
 - [x] T7b (delegated): re-verificación live — DONE sin commit (mcp_smoke live ALL PASSED 12 tools; smoke.py :8767 OK; doctor live 16/0/0 EXIT=0; 3 fixes CONFIRMADOS; limpieza total verificada).
-- [ ] T8 (inline): readback + spot-check + reporte + pregunta push/PR/merge — IN PROGRESS.
+- [x] T8 (inline): readback + spot-check + reporte + pregunta push/PR/merge — DONE (árbol limpio e9ddf3c; todo verificado).
+- Cadena cierre: 1b72bad T2, 59108f3 T4, 51eee28 T5, b99f8ed T7, e9ddf3c T8 (+T3/T6 sin commit por diseño). Push/PR/merge: PREGUNTADO al usuario.
 - [ ] T6 (delegated): backends live (pip laya, boot, doctor/smoke/mcp_smoke live, registro honesto).
 - [ ] T7 (delegated): no-regresión + actualizar FINAL_REPORT limitaciones.
 - [ ] T8 (inline): readback + spot-check + reporte + pregunta push/PR/merge.
