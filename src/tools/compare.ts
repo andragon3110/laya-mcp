@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const compareTool: ToolDefinition = {
@@ -6,16 +7,18 @@ export const compareTool: ToolDefinition = {
   description:
     "Compare two passages overall and optionally per aspect. Returns relation (same_fact / contradicts / " +
     "different_facts) with calibrated probability. Use for source reconciliation, changelog-vs-doc drift, " +
-    "and summary-vs-source validation.",
+    "and summary-vs-source validation. Passages at most 20,000 chars each, at most 32 aspects per call " +
+    "(larger inputs are rejected with input_too_large).",
   inputSchema: {
     type: "object",
     properties: {
-      passage_a: { type: "string", description: "First passage." },
-      passage_b: { type: "string", description: "Second passage." },
+      passage_a: { type: "string", maxLength: LIMITS.maxStateChars, description: "First passage (max 20,000 chars)." },
+      passage_b: { type: "string", maxLength: LIMITS.maxStateChars, description: "Second passage (max 20,000 chars)." },
       aspects: {
         type: "array",
+        maxItems: LIMITS.maxCompareAspects,
         items: { type: "string" },
-        description: "Optional aspects to evaluate independently (e.g. price, date, scope).",
+        description: "Optional aspects to evaluate independently (max 32, e.g. price, date, scope).",
       },
     },
     required: ["passage_a", "passage_b"],
@@ -23,6 +26,24 @@ export const compareTool: ToolDefinition = {
   },
   buildQuestions: (args) => {
     const aspects = Array.isArray(args.aspects) ? args.aspects : [];
+    assertLength(
+      String(args.passage_a ?? ""),
+      LIMITS.maxStateChars,
+      "passage_a",
+      `passage_a exceeds ${LIMITS.maxStateChars} chars; compare per section instead`,
+    );
+    assertLength(
+      String(args.passage_b ?? ""),
+      LIMITS.maxStateChars,
+      "passage_b",
+      `passage_b exceeds ${LIMITS.maxStateChars} chars; compare per section instead`,
+    );
+    assertCount(
+      aspects.length,
+      LIMITS.maxCompareAspects,
+      "aspects",
+      `at most ${LIMITS.maxCompareAspects} aspects per call to stay within the ${LIMITS.maxQuestions}-question server budget`,
+    );
     const relationCriteria = {
       same_fact: "Both passages make the same assertion.",
       contradicts: "The two passages contradict each other.",

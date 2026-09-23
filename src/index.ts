@@ -15,8 +15,10 @@
  *     reachable. `laya_extract` uses GLiNER spans when available and falls
  *     back to regex otherwise (unless source=entities is forced).
  *   - The server is intentionally stateless: each call is independent.
- *   - Background watchers poll /health so tool availability flips
- *     automatically when either Python process comes up or goes down.
+ *   - Background watchers poll /live (liveness) + /ready (readiness) so
+ *     tool availability flips automatically when either Python process
+ *     comes up or goes down. CallTool never consults the watchers
+ *     (see src/health.ts) and fails fast on its own via client timeouts.
  */
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -41,6 +43,8 @@ import { reviewTool, handleReview } from "./tools/review.js";
 import { gateTool, handleGate } from "./tools/gate.js";
 import { piiTool, handlePii } from "./tools/pii.js";
 
+// T5: enforced per tool call in runTool (src/tool.ts); logged here at startup.
+// Per-tool budgets (if ever needed) belong to T6.
 const TOOL_TIMEOUT_MS = Number(process.env.LAYA_TOOL_TIMEOUT_MS ?? 8000);
 
 /** Shared per-request context handed to every tool handler. */

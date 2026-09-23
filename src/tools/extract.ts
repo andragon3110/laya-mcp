@@ -1,6 +1,7 @@
 import type { LayaClient } from "../client.js";
 import type { GlinerClient, GlinerSpan } from "../gliner.js";
 import type { ToolContext } from "../index.js";
+import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const extractTool: ToolDefinition = {
@@ -10,15 +11,19 @@ export const extractTool: ToolDefinition = {
     "pattern per field) or `entities` (GLiNER finds zero-shot spans, no pattern needed). With `auto` " +
     "(default) GLiNER is used when its sidecar is reachable, otherwise regex. Laya always picks among " +
     "the candidates, and the returned value is always a verbatim substring of the document " +
-    "(never model-generated). Entity mode additionally returns character offsets for grounding.",
+    "(never model-generated). Entity mode additionally returns character offsets for grounding. " +
+    "At most 20 candidates per field reach the judge; the response reports truncated:true and " +
+    "dropped:N when more were found (no silent truncation). Document at most 20,000 chars, at most " +
+    "64 fields per call (larger inputs are rejected with input_too_large).",
   inputSchema: {
     type: "object",
     properties: {
-      document: { type: "string", description: "Source document." },
+      document: { type: "string", maxLength: LIMITS.maxStateChars, description: "Source document (max 20,000 chars)." },
       fields: {
         type: "array",
+        maxItems: LIMITS.maxExtractFields,
         description:
-          "Fields to extract. Each needs `id` and `description`. Regex mode additionally needs " +
+          "Fields to extract (max 64). Each needs `id` and `description`. Regex mode additionally needs " +
           "`pattern` (ECMAScript regex, no flags). Entity mode optionally takes `entity_type` " +
           "(defaults to the field id).",
         items: {
@@ -60,18 +65,49 @@ interface FieldSpec {
 function regexCandidates(document: string, pattern: string): string[] {
   try {
     const re = new RegExp(pattern, "g");
-    return Array.from(document.matchAll(re), (m) => m[0]).slice(0, 20);
+    return Array.from(document.matchAll(re), (m) => m[0]);
   } catch {
     return [];
   }
 }
 
-function buildRegexQuestions(args: Record<string, unknown>): Record<string, unknown> {
-  const fields = Array.isArray(args.fields) ? args.fields : [];
+export interface ExtractTruncation {
+  truncated: boolean;
+  dropped: number;
+}
+
+function assertExtractBudget(args: Record<string, unknown>): { document: string; fields: FieldSpec[] } {
+  const document = String(args.document ?? "");
+  const fields = (Array.isArray(args.fields) ? args.fields : []) as FieldSpec[];
+  // The whole document rides along as Laya state on every path, so the
+  // server state cap applies here even for pure-regex calls (fail fast with
+  // the same vocabulary instead of a /predict 413 round trip).
+  assertLength(
+    document,
+    LIMITS.maxStateChars,
+    "document",
+    `laya_extract document exceeds ${LIMITS.maxStateChars} chars; shorten it or extract per section`,
+  );
+  assertCount(
+    fields.length,
+    LIMITS.maxExtractFields,
+    "fields",
+    `laya_extract accepts at most ${LIMITS.maxExtractFields} fields per call (one server question each); split into batches`,
+  );
+  return { document, fields };
+}
+
+export function buildRegexQuestionsWithInfo(
+  args: Record<string, unknown>,
+): { questions: Record<string, unknown> } & ExtractTruncation {
+  const { document, fields } = assertExtractBudget(args);
   const out: Record<string, unknown> = {};
+  let dropped = 0;
   fields.forEach((f: FieldSpec, i: number) => {
     if (!f || typeof f.id !== "string" || typeof f.pattern !== "string") return;
-    const candidates = regexCandidates(String(args.document ?? ""), f.pattern);
+    const all = regexCandidates(document, f.pattern);
+    if (all.length > LIMITS.maxExtractCandidates) dropped += all.length - LIMITS.maxExtractCandidates;
+    const candidates = all.slice(0, LIMITS.maxExtractCandidates);
     const criteria: Record<string, string> = {};
     candidates.forEach((c, idx) => {
       criteria[`m${idx}`] = c.slice(0, 240);
@@ -85,7 +121,11 @@ function buildRegexQuestions(args: Record<string, unknown>): Record<string, unkn
       criteria,
     };
   });
-  return out;
+  return { questions: out, truncated: dropped > 0, dropped };
+}
+
+function buildRegexQuestions(args: Record<string, unknown>): Record<string, unknown> {
+  return buildRegexQuestionsWithInfo(args).questions;
 }
 
 interface SpanChoice {
@@ -129,14 +169,14 @@ export async function handleExtract(
   args: Record<string, unknown>,
   ctx?: ToolContext,
 ): Promise<string> {
-  const fields = (Array.isArray(args.fields) ? args.fields : []) as FieldSpec[];
-  const document = String(args.document ?? "");
+  const { document, fields } = assertExtractBudget(args);
   const source = args.source === "regex" || args.source === "entities" ? args.source : "auto";
   const glinerReady = ctx?.glinerReady() ?? false;
 
   const useEntities = source === "entities" || (source === "auto" && glinerReady);
   let fallbackNote: string | undefined;
   let spanIndex: Record<string, Record<string, SpanChoice>> = {};
+  let truncation: ExtractTruncation = { truncated: false, dropped: 0 };
 
   let questions: Record<string, unknown>;
   if (useEntities && ctx) {
@@ -147,10 +187,19 @@ export async function handleExtract(
       const built = buildEntityQuestions(fields, spansByType);
       questions = built.questions;
       spanIndex = built.spanIndex;
+      let dropped = 0;
+      for (const f of fields) {
+        if (!f || typeof f.id !== "string") continue;
+        const spans = spansByType[f.entity_type ?? f.id] ?? spansByType[f.id] ?? [];
+        if (spans.length > LIMITS.maxExtractCandidates) dropped += spans.length - LIMITS.maxExtractCandidates;
+      }
+      truncation = { truncated: dropped > 0, dropped };
     } catch (err) {
       if (source === "entities") throw err;
       fallbackNote = `GLiNER unavailable (${err instanceof Error ? err.message : String(err)}); fell back to regex.`;
-      questions = buildRegexQuestions(args);
+      const built = buildRegexQuestionsWithInfo(args);
+      questions = built.questions;
+      truncation = { truncated: built.truncated, dropped: built.dropped };
     }
   } else {
     if (source === "entities") {
@@ -163,7 +212,9 @@ export async function handleExtract(
     if (source === "auto") {
       fallbackNote = "GLiNER sidecar unreachable at call time; using regex candidates.";
     }
-    questions = buildRegexQuestions(args);
+    const built = buildRegexQuestionsWithInfo(args);
+    questions = built.questions;
+    truncation = { truncated: built.truncated, dropped: built.dropped };
   }
 
   // The entities path asks Laya to choose among pre-labeled spans -- a
@@ -199,8 +250,11 @@ export async function handleExtract(
         entry.gliner_confidence = s.confidence;
       } else {
         // Regex path: the choice key (m{n}) is not the value; resolve it.
-        // Recompute candidates deterministically to map key -> substring.
-        const cands = f.pattern ? regexCandidates(document, f.pattern) : [];
+        // Recompute candidates deterministically to map key -> substring
+        // (same 20-cap the judge saw, so m{n} always lines up).
+        const cands = f.pattern
+          ? regexCandidates(document, f.pattern).slice(0, LIMITS.maxExtractCandidates)
+          : [];
         const m = /^m(\d+)$/.exec(choice);
         const idx = m ? Number(m[1]) : -1;
         entry.value = idx >= 0 && idx < cands.length ? cands[idx] : null;
@@ -211,6 +265,8 @@ export async function handleExtract(
     const out: Record<string, unknown> = {
       results,
       source: useEntities && !fallbackNote ? "entities" : "regex",
+      truncated: truncation.truncated,
+      dropped: truncation.dropped,
       latency_ms: raw.latencyMs,
     };
     if (fallbackNote) out.fallback = fallbackNote;

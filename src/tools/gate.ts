@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const gateTool: ToolDefinition = {
@@ -6,20 +7,24 @@ export const gateTool: ToolDefinition = {
   description:
     "Completion gate: same rubric as `laya_review` plus per-claim verification against evidence. " +
     "Use this RIGHT BEFORE claiming a task done -- it checks both the diff and the truthfulness of any " +
-    "completion claims (e.g. 'tests pass'). Contradicted claims escalate.",
+    "completion claims (e.g. 'tests pass'). Contradicted claims escalate. At most 61 claims per call " +
+    "(3 fixed rubric questions + claims fit the 64-question server budget); diff and evidence at most " +
+    "20,000 chars each (larger inputs are rejected with input_too_large).",
   inputSchema: {
     type: "object",
     properties: {
       request: { type: "string", description: "Original task." },
-      diff: { type: "string", description: "Proposed diff." },
+      diff: { type: "string", maxLength: LIMITS.maxStateChars, description: "Proposed diff (max 20,000 chars)." },
       claims: {
         type: "array",
+        maxItems: LIMITS.maxGateClaims,
         items: { type: "string" },
-        description: "Completion claims to verify (e.g. 'all tests pass').",
+        description: "Completion claims to verify (max 61, e.g. 'all tests pass').",
       },
       evidence: {
         type: "string",
-        description: "Evidence to verify the claims against (e.g. test output).",
+        maxLength: LIMITS.maxStateChars,
+        description: "Evidence to verify the claims against (max 20,000 chars, e.g. test output).",
       },
     },
     required: ["request", "diff", "claims"],
@@ -27,6 +32,24 @@ export const gateTool: ToolDefinition = {
   },
   buildQuestions: (args) => {
     const claims = Array.isArray(args.claims) ? args.claims : [];
+    assertCount(
+      claims.length,
+      LIMITS.maxGateClaims,
+      "claims",
+      `laya_gate accepts at most ${LIMITS.maxGateClaims} claims per call (3 fixed rubric questions + claims fit the ${LIMITS.maxQuestions}-question server budget)`,
+    );
+    assertLength(
+      String(args.diff ?? ""),
+      LIMITS.maxStateChars,
+      "diff",
+      `diff exceeds ${LIMITS.maxStateChars} chars; gate per file or per hunk instead`,
+    );
+    assertLength(
+      String(args.evidence ?? ""),
+      LIMITS.maxStateChars,
+      "evidence",
+      `evidence exceeds ${LIMITS.maxStateChars} chars; shorten it or gate per claim batch`,
+    );
     const out: Record<string, unknown> = {
       correctness: {
         type: "score",

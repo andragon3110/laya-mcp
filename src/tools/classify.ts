@@ -1,18 +1,22 @@
 import type { LayaClient } from "../client.js";
+import { LIMITS, assertCount } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const classifyTool: ToolDefinition = {
   name: "laya_classify",
   description:
     "Batch-classify items against a shared catalog of classes. One catalog is sent once and every item is " +
-    "scored in parallel. Includes an optional 'other' / 'manual_review' class to surface low-confidence cases.",
+    "scored in parallel. Includes an optional 'other' / 'manual_review' class to surface low-confidence cases. " +
+    "At most 64 items per call (one question per item, matching the server question budget); larger batches " +
+    "are rejected with input_too_large.",
   inputSchema: {
     type: "object",
     properties: {
       purpose: { type: "string", description: "Why you are classifying these items (helps the description)." },
       items: {
         type: "array",
-        description: "Items to classify. Each needs `id` and `text`.",
+        maxItems: LIMITS.maxClassifyItems,
+        description: "Items to classify (max 64). Each needs `id` and `text`.",
         items: {
           type: "object",
           properties: { id: { type: "string" }, text: { type: "string" } },
@@ -35,6 +39,12 @@ export const classifyTool: ToolDefinition = {
   buildQuestions: (args) => {
     const items = Array.isArray(args.items) ? args.items : [];
     const classes = Array.isArray(args.classes) ? args.classes : [];
+    assertCount(
+      items.length,
+      LIMITS.maxClassifyItems,
+      "items",
+      `laya_classify accepts at most ${LIMITS.maxClassifyItems} items per call (one server question each); split into batches`,
+    );
     const criteria: Record<string, string> = {};
     for (const c of classes) {
       if (c && typeof c.id === "string") criteria[c.id] = String(c.description ?? "").slice(0, 240);
