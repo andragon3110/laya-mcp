@@ -9,9 +9,9 @@ Resolver los pendientes de las Fases 1-8: commitear untracked (AUDIT.md, artifac
 
 ## Tasks
 - [x] T1 (inline): tracking + rama — DONE.
-- [ ] T2 (inline): commit untracked AUDIT.md/artifacts/odd — IN PROGRESS.
-- [ ] T3 (delegated): bash discovery + .sh + --check con fixture.
-- [ ] T4 (delegated): dataset laya_compare + wiring evals.
+- [x] T2 (inline): commit untracked — DONE (1b72bad docs: AUDIT.md + artifacts/ + odd/, 17 ficheros).
+- [x] T3 (delegated): bash + .sh + fixture — DONE sin commit (bash Git 5.2.37 funcional; test_tools_offline.sh exit 0 PASS; test_health.sh exit 0 no-op sin .venv; policy.sh matriz completa en fixture sintética TEMP; hallazgo: test_health.sh texto stale 0/10 → corrección T7).
+- [x] T4 (delegated): dataset laya_compare + wiring — DONE (W2: evals/suites/compare.mjs 8 casos + run/score; 88/88).
 - [ ] T5 (delegated): verificación pins == en venv temporal (aplicar solo si seguro).
 - [ ] T6 (delegated): backends live (pip laya, boot, doctor/smoke/mcp_smoke live, registro honesto).
 - [ ] T7 (delegated): no-regresión + actualizar FINAL_REPORT limitaciones.

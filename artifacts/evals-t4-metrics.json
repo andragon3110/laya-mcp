@@ -751,11 +751,87 @@
           }
         ]
       }
+    },
+    {
+      "suite": "compare",
+      "primitive": "laya_compare",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 2,
+        "abstention_rate": 0.2857142857142857
+      },
+      "decision": {
+        "n": 7,
+        "correct": 7,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "binary_allow_polarity": {
+        "n": 5,
+        "tp": 5,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "fpr": null,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 5,
+        "excluded": {
+          "threw": 0,
+          "abstained": 2,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 4,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
     }
-  ],
-  "compare": {
-    "primitive": "laya_compare",
-    "status": "sin suite en T3",
-    "note": "metrics.mjs covers compare (binary + winner_probability signal) for future suites; no T3 dataset exists."
-  }
+  ]
 }

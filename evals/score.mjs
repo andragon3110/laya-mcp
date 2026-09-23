@@ -1,5 +1,5 @@
 /**
- * Fase-7 T4 metrics runner: applies evals/metrics.mjs to the 10 T3 suites.
+ * Fase-7 T4 metrics runner: applies evals/metrics.mjs to the 11 T3 suites.
  *
  * SCOPE (T4 only): run every suite case against the REAL handler (from
  * dist/) with the same oracle-derived deterministic stub as evals/run.mjs,
@@ -13,7 +13,7 @@
  * backend quality. Nothing here transfers to the real backend.
  *
  * SIGNAL MAP for wrong_confident (one honest signal per primitive):
- *   classify/decide/find/extract -> winner_probability (top choice share)
+ *   classify/decide/find/extract/compare -> winner_probability (top choice share)
  *   verify/gate                  -> per-claim support signal (noul)
  *   screen                       -> injection signal (the safety-relevant noul;
  *                                   substance/relevance are audit-only)
@@ -47,6 +47,7 @@ import * as find from "./suites/find.mjs";
 import * as rerank from "./suites/rerank.mjs";
 import * as review from "./suites/review.mjs";
 import * as gate from "./suites/gate.mjs";
+import * as compare from "./suites/compare.mjs";
 import {
   WRONG_CONFIDENT_TAUS,
   abstentionStats,
@@ -57,7 +58,7 @@ import {
   wrongConfident,
 } from "./metrics.mjs";
 
-const SUITES = [classify, decide, verify, screen, pii, extract, find, rerank, review, gate];
+const SUITES = [classify, decide, verify, screen, pii, extract, find, rerank, review, gate, compare];
 
 /* Same oracle-stub deps as evals/run.mjs (canonical orchestration there). */
 const fakeClient = (answers, capture) => ({
@@ -158,6 +159,13 @@ function extractJudgments(suiteName, body, gold) {
         taskActual: body.winner,
         taskGold: gold.winner ?? null,
         judgments: [{ correct: gold.winner === undefined || body.winner === gold.winner, signal: body.winner_probability ?? null }],
+      };
+    case "compare":
+      return {
+        taskActual: body.overall.relation ?? null,
+        taskGold: gold.relation ?? null,
+        hasTask: "relation" in gold,
+        judgments: [{ correct: gold.relation === undefined || body.overall.relation === gold.relation, signal: body.overall.winner_probability ?? null }],
       };
     case "review":
       return {
@@ -260,7 +268,6 @@ const report = {
   suites: [],
 };
 for (const suite of selected) report.suites.push(await scoreSuite(suite));
-report.compare = { primitive: "laya_compare", status: "sin suite en T3", note: "metrics.mjs covers compare (binary + winner_probability signal) for future suites; no T3 dataset exists." };
 
 if (asJson) {
   console.log(JSON.stringify(report, null, 2));
