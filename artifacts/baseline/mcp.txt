@@ -1,0 +1,30 @@
+# baseline — MCP (estado git + cableado MCP verificado por lectura)
+# Timestamp (UTC): 2026-09-23T03:1XZ
+# Modificaciones: NINGUNA (solo `git status/log/branch`, lectura de src, y el equivalente nativo
+# del tools/list ya evidenciado en tests.txt sec.4).
+
+## 1) git status --short
+# Duracion: instantanea | Exit: 0
+?? odd/
+# Unico cambio: dir odd/ sin seguimiento (trabajo ODD en curso, fuera del alcance del baseline).
+
+## 2) git log --oneline -5
+# Duracion: instantanea | Exit: 0
+cb70301 Merge pull request #1 from andragon3110/opencode-v2-compat
+6a69638 docs: bash prerequisite and Windows git-bash note
+9d5d070 fix(windows): utf-8 everywhere, native snippet paths, venv layout
+8ca62e2 fix(install): first-try reliability and LF shell scripts
+166fd68 feat(opencode): migrate install and detection layer to OpenCode V2 config shape
+
+## 3) git branch --show-current
+# Duracion: instantanea | Exit: 0
+main
+
+## 4) Comportamiento MCP verificado (lectura src/index.ts:104-121 + ejecucion nativa)
+# - ListTools con laya-server caido -> {"result":{"tools":[]}} (exit 0, 0.23 s). CORRECTO por diseno.
+# - Con laya arriba: anuncia BASE_TOOLS (10) + laya_pii si gliner listo (11). NO verificable aqui
+#   (servidores caidos, sin modelos en este repo; checkpoints solo en HF cache de la instalacion
+#   separada C:\Users\Andragon\laya-mcp).
+# - CallTool a handler desconocido -> isError:true "Unknown tool: <name>" (solo lectura, no ejecutado
+#   mas alla del tools/list para no mutar estado).
+# - mcp-server-boot: PASS segun doctor (index.js arranca y responde stdio).

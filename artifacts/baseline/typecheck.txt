@@ -1,0 +1,10 @@
+# baseline — typecheck (tsc --noEmit)
+# Timestamp (UTC): 2026-09-23T03:0XZ (tras `npm install`, node_modules estaba ausente)
+# Modificaciones previas: SOLO creacion de artifacts/baseline/ + `npm install`. Sin tocar src/py/tests.
+# Comando exacto: `npm run typecheck`  (script package.json: "typecheck": "tsc --noEmit")
+# Duracion: 1.25 s | Exit: 0 | Resultado: OK
+# stdout/stderr completo:
+> laya-mcp@0.4.0 typecheck
+> tsc --noEmit
+# (sin errores ni warnings)
+# Entorno: node v24.18.0, npm 11.17.0, typescript@5.9.3 (resuelto por npm ls).
