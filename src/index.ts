@@ -2,7 +2,7 @@
 /**
  * laya-mcp server.
  *
- * Exposes 11 typed-decision tools (laya_screen, laya_verify, laya_find, etc.)
+ * Exposes 10 Laya judgment tools (laya_screen, laya_verify, laya_find, etc.)
  * backed by a local Laya instance reachable via HTTP at LAYA_URL, plus one
  * optional tool (laya_pii) backed by the GLiNER sidecar at GLINER_URL,
  * plus the always-advertised meta tool laya_capabilities (live discovery)

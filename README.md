@@ -31,18 +31,31 @@ to merge? — you are coercing a text generator into a decision machine,
 then parsing the answer back and hoping the format holds.
 
 `laya-mcp` skips that round-trip. It exposes **System One decision models**
-as MCP tools: state in, **typed answers with calibrated probabilities**
-out. No text generation, nothing to parse, nothing to hallucinate.
+as MCP tools: state in, **typed answers with deterministic policy
+decisions** out (raw backend signals plus an explicit decision —
+never a calibrated probability; see `EVALUATION.md` §6). No text
+generation, nothing to parse, nothing to hallucinate.
 
 - 🧠 **Laya** ([NandhaKishorM/laya](https://huggingface.co/convaiinnovations/laya),
-  Apache 2.0) — `choice` / `score` / `noul` answers in ~33 ms, trained
-  with RLCD so honest probabilities are the only way to maximize reward.
+  Apache 2.0) — `choice` / `score` / `noul` answers from a local
+  checkpoint, trained with RLCD so honest probabilities are the only
+  way to maximize reward. CPU-friendly (no GPU needed); per-call
+  latency depends on hardware — the doctor assumes ~200 ms/call on
+  CPU as a planning estimate (`py/doctor.py:227`), not a measurement.
+  No live latency figure is claimed here; the only timed numbers in
+  this repo are stub-plumbing absolutes (see `EVALUATION.md` §7).
 - 🔍 **GLiNER2.5** ([fastino/gliner2.5-multi-v1](https://huggingface.co/fastino/gliner2.5-multi-v1),
   Apache 2.0) — zero-shot span extraction with character offsets, PII and
   secrets included. Rule of the house: **GLiNER proposes, Laya disposes.**
-  Spans locate, calibrated probabilities gate.
-- 🌍 **Multilingual.** Spanish first-class: entity extraction, PII scan
-  and classification verified live in Spanish.
+  Spans locate, deterministic policy decisions gate (no output is a
+  calibrated probability — see `EVALUATION.md` §6).
+- 🌍 **Multilingual.** Spanish first-class by architecture: non-English
+  text routes to the mmBERT-based `multilingual` checkpoint
+  (`py/laya_server.py:58-62`), and the doctor ships a live Spanish
+  extraction smoke test for the GLiNER sidecar
+  (`py/doctor.py:388,484-520`). Broader "verified live" claims are
+  not made: no live judgment run is recorded in this repo
+  (see `GENTLE_INTEGRATION.md` §9, `EVALUATION.md` §8.3).
 - 💸 **$0, self-hosted, private.** No API keys, no per-token billing, no
   data egress. CPU-friendly.
 - 🔌 **Optional by design.** If the servers are down — or never
@@ -102,10 +115,14 @@ cd laya-mcp
 # ./install.sh --with-gliner # + span extraction & PII tool
 ```
 
-The installer is idempotent, touches only `$HOME/laya-mcp`, pre-downloads
-the models, and generates `start_laya.sh`, `start_gliner.sh`,
-`doctor.sh` and `uninstall.sh`. Your agent configuration is never
-modified without your say-so.
+The installer is idempotent, installs into `$INSTALL_DIR` (default
+`$HOME/laya-mcp`, overridable via `LAYA_MCP_HOME` — `install.sh:27`),
+pre-downloads the models into the HuggingFace cache, and generates
+`start_laya.sh`, `start_gliner.sh`, `doctor.sh` and `uninstall.sh`.
+Your agent configuration is never modified without your say-so.
+For a reproducible Node install use `npm ci` (the repo ships
+`package-lock.json`); `install.sh` itself runs `npm install`
+(`install.sh:116`, `py/requirements.txt:24-27`).
 
 ```bash
 $HOME/laya-mcp/start_laya.sh    # terminal 1 — :8765
@@ -308,6 +325,106 @@ test change this required was one `mcp_smoke.mjs` assert (`laya_pii`
 
 ---
 
+## Modes (observe / shadow / enforce)
+
+Every envelope stamps `effective_mode`; the decision itself never
+changes shape between modes — only who must honor it does
+(`src/policy/mode.ts:1-48`, `GENTLE_INTEGRATION.md` §3):
+
+- `observe` (default) — advisory evidence for the calling agent/policy.
+- `shadow` — base decision unchanged **plus** a top-level
+  `shadow: { would_decide, under_policy }` report: the same input
+  evaluated under an explicit candidate policy. Present only in
+  shadow mode with a resolvable candidate; never alters the flow.
+- `enforce` — the decision is authoritative; Gentle must honor it
+  (`ALLOW` / `REVIEW` / `DENY` / `ESCALATE`).
+
+Configure globally (`LAYA_MODE`), per tool (`LAYA_MODE_<TOOL>`,
+e.g. `LAYA_MODE_LAYA_SCREEN`), and — shadow only — with an explicit
+candidate (`LAYA_SHADOW_POLICY[_<TOOL>]` as `name@version`).
+Invalid modes fall back to `observe`; unresolvable shadow
+candidates report no shadow with the base decision intact.
+`laya_capabilities` reports `modes: { supported, effective, default }`
+from code truth; the legacy `mode: "observe"` field is untouched
+(the MCP layer itself never acts, under every policy mode).
+
+## Observability (trace + metrics)
+
+- **Trace:** pass `trace_id` / `span_id` on the MCP request `_meta`
+  object; they are threaded into the envelope as optional keys
+  alongside `decision_id` (`src/trace.ts`, `src/envelope.ts:236-242`).
+  Absent or malformed ids are replaced with fresh generated ones
+  (`trace_id`: 32 hex, `span_id`: 16 hex) — extraction never throws.
+  One `trace_id` correlates a whole workflow; each call keeps its own
+  `decision_id`. Trace context carries opaque ids only — argument
+  content never enters the trace path, and PII payloads are excluded
+  outright (hashing was rejected: a hash still enables confirmation
+  against known PII).
+- **Metrics:** in-process registry, no dependencies, no exporters
+  (`src/metrics.ts`). Per tool: `requests_total`, `requests_failed`,
+  `inference_latency_ms` (`count` + `p50`/`p95`/`p99`, nearest-rank),
+  `policy_decisions`, `abstentions`, `escalations`, per-model latency
+  (`by_model`); plus `model_load` probe stats for `laya`/`gliner`.
+  Latency series keep a **bounded window of 256 samples per series**
+  (`LATENCY_WINDOW_MAX`, `src/metrics.ts:66`) — counters are exact,
+  samples are ring-buffered. Aggregates only: never argument content,
+  never free text, never span payloads. Exposed as the optional
+  `metrics` field of the `laya_capabilities` report (no separate tool);
+  `resetMetrics()` exists for test isolation. Metrics are mode-blind.
+
+## Evaluation
+
+What `evals/` measures — and what it cannot — is defined in
+[`EVALUATION.md`](EVALUATION.md): 10 suites × 8 cases (80 golds) run
+against the real handlers with deterministic oracle stubs (no live
+backend, no models, no network). Scores confirm harness plumbing
+under the stub ceiling; nothing transfers to backend quality.
+Benchmarks are single-machine absolutes (`evals/results/v1/`,
+never overwritten). The paired ±Laya live comparison exists as a
+gated protocol only (`EVALUATION.md` §8, `evals/integration.mjs
+--mode live` refuses without its five live requirements).
+
+```bash
+node evals/run.mjs            # 80-case harness smoke
+node evals/score.mjs          # metrics report
+node evals/bench.mjs          # benchmark tables (absolutes)
+node evals/integration.mjs    # stub protocol run (4/4 vs oracle golds)
+```
+
+## Revisions & reproducibility
+
+`model_revision` is honest-or-null, never invented
+(`src/evidence.ts:110-155`, `src/envelope.ts:208-225`): operator pin
+via `LAYA_MODEL_REVISION` (Laya tools) / `GLINER_MODEL_REVISION`
+(`laya_pii`) wins, else the backend-supplied value, else `null` with
+`revision_source: "unpinned"`. `download_models.py --revision`
+(defaults to `$LAYA_MODEL_REVISION`) passes the pin through and
+records `unpinned` honestly when absent (`py/download_models.py:40-49`).
+The tokenizer is explicitly `unknown`: neither `GET /models` nor
+`laya_capabilities` exposes one (`py/doctor.py:612-614`). Python deps
+are range-pinned with a verified de-facto lock comment
+(`py/requirements.txt:14-27`); Node is lockfile-pinned
+(`package-lock.json`) — install reproducibly with `npm ci`.
+
+## Security (summary)
+
+- **Detector, never authority.** A screen `ALLOW` is evidence for the
+  calling agent/policy — it grants no permission (see
+  "Screen-pass is not authority" above; `GENTLE_INTEGRATION.md` §1).
+- **Thresholds are preserved cut points, not calibrated.**
+  All 14 policies are `1.0.0`; numeric cuts (e.g. `screenInjectionBlock`
+  0.75, `claimVerified` 0.8) keep pre-P1 behavior and must not be read
+  as probabilities (`P1_IMPLEMENTATION.md` §4).
+- **Immutability.** No input path (args, `_meta`, text content) can
+  change policy, config, mode, thresholds, or permissions — proven by
+  the 16-check battery `tests/fase6_t5_security_discovery.mjs`
+  (`GENTLE_INTEGRATION.md` §6).
+- **Fail-closed option.** `security@1.0.0` returns `DENY`/`REVIEW` only
+  (never `ALLOW`); abstained evidence always resolves to `ESCALATE`,
+  never to a forced verdict.
+
+---
+
 ## Gentle-AI orchestrator policy (recommended)
 
 `examples/gentle-orchestrator-policy.md` is a marker-delimited policy
@@ -325,9 +442,12 @@ as before.**
 Backs up `opencode.json` first, anchors on Gentle-AI's own
 `sdd-model-assignments` marker, refuses to guess if the anchor moved,
 and validates the JSON. Re-run after any `gentle-ai sync` or upgrade,
-since sync regenerates managed prompts. Verified live: the orchestrator
-calls `laya_screen` + `laya_pii` unprompted on pasted third-party text,
-rejects jailbreaks, and routes `laya_review` after writers.
+since sync regenerates managed prompts. Intended behavior (not yet
+verified live in this repo — see `GENTLE_INTEGRATION.md` §9 and
+`EVALUATION.md` §8.3 for the unmet live requirements): the
+orchestrator calls `laya_screen` + `laya_pii` unprompted on pasted
+third-party text, rejects jailbreaks, and routes `laya_review`
+after writers.
 
 Sub-agent patterns (`sdd-apply` → `laya_review`, issues → `laya_classify`,
 PII pre-screen, grounded extraction) live in
@@ -342,16 +462,18 @@ zero-shot entity spans, relations, PII/secrets, multi-label
 classification — no regex required. What changes when it's up:
 
 - `laya_extract` uses spans (with offsets) instead of patterns;
-- `laya_pii` appears as the 11th tool;
+- `laya_pii` appears as the 12th tool;
 - `doctor.sh` gains 4 GLiNER checks including a live Spanish smoke test.
 
 Sidecar down or never installed? `laya_pii` simply isn't advertised and
 `laya_extract` falls back to regex with a note. Nothing breaks, ever.
 
 > **VRAM note (6 GB cards):** the three Laya checkpoints fill a small
-> GPU on their own. Run the sidecar on CPU — it answers in ~90 ms there:
-> `export GLINER_DEVICE=cpu` (or `LAYA_DEVICE=cpu` if you prefer it the
-> other way around).
+> GPU on their own. Run the sidecar on CPU — no live latency is
+> measured for that shape in this repo, so no ms figure is claimed:
+> `export GLINER_DEVICE=cpu` (`py/gliner_server.py:44`; or
+> `LAYA_DEVICE=cpu` if you prefer it the other way around,
+> `py/laya_server.py:46`).
 
 ---
 
@@ -425,13 +547,29 @@ servers live, a real `/predict` call, a live Spanish extraction, MCP
 bundle boot, and the optional agent config entry. Run this first when
 something looks off — paste the output when asking for help.
 
+Opt-in deep checks (Fase 8; real data only, never invented —
+`py/doctor.py:559-577,1105-1173`):
+
+```bash
+$HOME/laya-mcp/doctor.sh --models     # live GET /models, or config+disk when down (revisions never invented)
+$HOME/laya-mcp/doctor.sh --policy     # effective LAYA_MODE*/LAYA_POLICY_* env verbatim + validity (registry stays TS-only)
+$HOME/laya-mcp/doctor.sh --mcp        # boot dist/index.js over stdio: initialize + tools/list (backend down honestly yields [laya_capabilities])
+$HOME/laya-mcp/doctor.sh --benchmark  # live `node evals/bench.mjs --json`, else the versioned evals/results/v1 run with provenance
+```
+
+> **Stale-`dist` note:** after pulling or editing `src/`, re-run
+> `npm ci && npm run build` before trusting `--mcp`. A `tools/list`
+> of 0 tools means the installed `dist/` predates the
+> always-advertise-`laya_capabilities` contract and is stale
+> (`py/doctor.py:843-851`).
+
 ## Test the install
 
 ```bash
 $HOME/laya-mcp/doctor.sh                                          # full diagnostic first
 $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke.py    # Laya end-to-end
 $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke_gliner.py  # GLiNER end-to-end (needs sidecar)
-cd $HOME/laya-mcp && npm run inspect                              # MCP inspector: 11 tools (12 with sidecar)
+cd $HOME/laya-mcp && npm run inspect                              # MCP inspector: 12 tools with sidecar (11 without; 1 with Laya down)
 cd $HOME/laya-mcp && .venv/bin/python tests/test_opencode_v2.py  # config-layer unit tests (no models needed)
 ```
 (On Windows git-bash the venv lives at `.venv/Scripts` instead of `.venv/bin`.)
@@ -494,6 +632,12 @@ HTTP endpoints, or wrap via your own extension (see Pi docs).
 | `GLINER_LOAD_RETRY_BASE_S` / `GLINER_LOAD_RETRY_FACTOR` / `GLINER_LOAD_RETRY_CAP_S` / `GLINER_LOAD_RETRY_MAX` | `1.0` / `2.0` / `60.0` / `5` | Same backoff+jitter budget as Laya, for the sidecar loader |
 | `GLINER_LOAD_CIRCUIT_THRESHOLD` / `GLINER_LOAD_CIRCUIT_COOLDOWN_S` / `GLINER_LOAD_ERROR_TTL_S` | `3` / `30.0` / `300.0` | Same circuit-breaker budget as Laya, for the sidecar loader |
 | `GLINER_LIMITS_MAX_TEXT_CHARS` / `GLINER_LIMITS_MAX_LABELS` / `GLINER_LIMITS_MAX_TASKS` / `GLINER_LIMITS_MAX_EXTRA_TYPES` / `GLINER_LIMITS_MAX_BODY_CHARS` | `50000` / `64` / `32` / `32` / `100000` | Input size guards on `/extract_entities`, `/classify`, `/pii_scan`; over-limit answers `413 input_too_large` |
+| `LAYA_MODEL_REVISION` / `GLINER_MODEL_REVISION` | *(unset; unpinned)* | Operator revision pins: reported verbatim as `model_revision`, else the backend value, else honest `null` (`src/evidence.ts:110-155`, `src/envelope.ts:208-225`) |
+| `LAYA_MODE` / `LAYA_MODE_<TOOL>` | `observe` | Policy-decision mode: `observe` (advisory) / `shadow` / `enforce`; per-tool wins over global; invalid falls back to `observe` (`src/policy/mode.ts:62-92`) |
+| `LAYA_SHADOW_POLICY` / `LAYA_SHADOW_POLICY_<TOOL>` | *(unset; no shadow)* | Shadow candidate as `name@version` (e.g. `review@1.0.0`); malformed/unknown yields no shadow, base decision intact (`src/policy/mode.ts:64-75,94-120`) |
+| `LAYA_POLICY_SCREEN_BLOCK` / `LAYA_POLICY_SCREEN_REVIEW` / `LAYA_POLICY_SCREEN_SUBSTANCE_SKIP` / `LAYA_POLICY_CLAIM_VERIFIED` / `LAYA_POLICY_CLAIM_CONTRADICTED` / `LAYA_POLICY_REVIEW_AUTO` / `LAYA_POLICY_REVIEW_MIN` / `LAYA_POLICY_REQUIRE_SUPPORT` / `LAYA_POLICY_SECRET_TYPES` | `0.75` / `0.25` / `0.4` / `0.8` / `0.4` / `0.85` / `0.5` / `0.8` / `"api_key,token_secreto,password"` | Numeric cut-point overrides (ops/tests only); preserved pre-P1 values, **not calibrated**; missing/non-finite falls back without throwing (`src/policy/thresholds.ts:33-45,81-89`, `P1_IMPLEMENTATION.md` §4) |
+| `LAYA_LIMITS_MAX_EXTRACT_CANDIDATES` | `20` | Candidate ceiling for `laya_extract` `top_k` / `max_candidates`; above-ceiling rejected as `input_too_large` (`src/limits.ts:103-111`, `src/tools/extract.ts:199-204`) |
+| `LAYA_STANDALONE_REPOS` | `0` | `1`/`true`: Router loads standalone HF repos instead of the bundled `convaiinnovations/laya` subfolders (`py/laya_server.py:50`) |
 
 ---
 
@@ -507,7 +651,9 @@ HTTP endpoints, or wrap via your own extension (see Pi docs).
   with recovery hints.
 - **Stateless**: every tool call is independent.
 - **Your setup is untouched**: install/uninstall only ever add or remove
-  `$HOME/laya-mcp` (plus one optional `mcp.servers.laya` key you merge yourself).
+  `$INSTALL_DIR` (default `$HOME/laya-mcp`, overridable via
+  `LAYA_MCP_HOME`) plus the HuggingFace model cache it downloads into —
+  plus one optional `mcp.servers.laya` key you merge yourself.
 
 ```bash
 $HOME/laya-mcp/uninstall.sh   # removes the dir + the opencode.json entry (timestamped backup)
