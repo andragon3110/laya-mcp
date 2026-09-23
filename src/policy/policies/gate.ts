@@ -19,6 +19,15 @@
  * WITHOUT contradicted claims REVIEWs (never escalates on safety alone —
  * the deliberate difference from review@1.0.0).
  *
+ * DELIBERATE RUBRIC DIFFERENCE vs review@1.0.0 (P1-T5, documented here
+ * instead of widened): gate consumes only the correctness/spec_match
+ * `score` signals plus safe_to_apply and the per-claim support signals.
+ * test_gap/blast_radius are NOT asked by laya_gate (the TS builder keeps
+ * 3 fixed rubric questions so 61 claims still fit the 64-question server
+ * budget): coverage breadth belongs to laya_review, completion
+ * truthfulness belongs here. The review-family `score` signals are
+ * audit-only in v1 — the DECISION reads safe_to_apply + claim signals.
+ *
  * Reason codes (exhaustive):
  *   - "gate_contradicted_escalate" (ESCALATE) any claim < contradicted cut
  *   - "gate_auto_allow"            (ALLOW)    no contradicted + safe > auto

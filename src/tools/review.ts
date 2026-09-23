@@ -1,14 +1,19 @@
 import type { LayaClient } from "../client.js";
 import { reviewEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
+import { evaluate } from "../policy/engine.js";
+import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
 export const reviewTool: ToolDefinition = {
   name: "laya_review",
   description:
-    "Score a proposed diff against the request before merging. Returns 0-2 scores for correctness, " +
-    "spec_match, test_gap, blast_radius, plus a safe_to_apply probability. Use this BEFORE declaring " +
-    "any coding task done -- it judges the diff against your stated request. " +
+    "Score a proposed diff against the request before merging. Returns rubric EVIDENCE ONLY " +
+    "(0-2 scores for correctness, spec_match, test_gap, blast_radius as {score} objects, plus a " +
+    "safe_to_apply {signal} object carrying the raw, uncalibrated safety signal -- never a " +
+    "probability and never an authorization). The ALLOW/REVIEW/ESCALATE decision comes from the " +
+    "versioned review@1.0.0 policy (code-review@1.0.0 is the same cut points under a workflow " +
+    "name) and is carried in `decision`. This tool never authorizes anything by itself. " +
     "Diff at most 20,000 chars (larger inputs are rejected with input_too_large).",
   inputSchema: {
     type: "object",
@@ -60,28 +65,55 @@ export const reviewTool: ToolDefinition = {
   },
 };
 
+/**
+ * P1-T5 (breaking): `laya_review` produces EVIDENCE ONLY plus the engine
+ * decision. The legacy `scores` flat numbers, the top-level `safe_to_apply`
+ * number, and the inline `action` (auto/review/escalate) are gone; the
+ * rubric now ships as objects ({score} / {signal}) and the decision as
+ * `{decision, reason_codes, policy}` from review@1.0.0. No threshold
+ * literal remains in this handler: cut points live in the shared policy
+ * table and the policy owns the mapping.
+ */
 export async function handleReview(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const result = await runTool(client, args, reviewTool.buildQuestions(args), (raw) => {
-    const a = raw.answers as Record<string, { score: number; confidence?: number; noul?: number }>;
+    const a = raw.answers as Record<string, { score?: number; noul?: number }>;
     const numOrNull = (v: unknown): number | null => (typeof v === "number" ? v : null);
+    const correctness = numOrNull(a.correctness?.score);
+    const spec_match = numOrNull(a.spec_match?.score);
+    const test_gap = numOrNull(a.test_gap?.score);
+    const blast_radius = numOrNull(a.blast_radius?.score);
+    const safe_to_apply = numOrNull(a.safe_to_apply?.noul);
     const { evidence, abstention } = reviewEvidence(raw, {
-      correctness: numOrNull(a.correctness?.score),
-      spec_match: numOrNull(a.spec_match?.score),
-      test_gap: numOrNull(a.test_gap?.score),
-      blast_radius: numOrNull(a.blast_radius?.score),
-      safe_to_apply: numOrNull(a.safe_to_apply?.noul),
+      correctness,
+      spec_match,
+      test_gap,
+      blast_radius,
+      safe_to_apply,
     });
+    // P1-T5: decision owned by the engine. Thresholds resolve here (shared
+    // table + documented env overrides); the handler never branches on a
+    // numeric cut point.
+    const { thresholds } = getPolicy("review", "1.0.0");
+    const decision = evaluate(
+      {
+        evidence,
+        abstention,
+        context: { diff_chars: String(args.diff ?? "").length },
+        risk: "normal",
+        policy: { name: "review", version: "1.0.0" },
+      },
+      { thresholds },
+    );
     return JSON.stringify(
       {
-        scores: {
-          correctness: a.correctness?.score,
-          spec_match: a.spec_match?.score,
-          test_gap: a.test_gap?.score,
-          blast_radius: a.blast_radius?.score,
+        rubric: {
+          correctness: { score: correctness },
+          spec_match: { score: spec_match },
+          test_gap: { score: test_gap },
+          blast_radius: { score: blast_radius },
+          safe_to_apply: { signal: safe_to_apply },
         },
-        safe_to_apply: a.safe_to_apply?.noul,
-        // P1-T3: legacy decision, engine-owned from T5/T6
-        action: (a.safe_to_apply?.noul ?? 0) > 0.85 ? "auto" : (a.safe_to_apply?.noul ?? 0) > 0.5 ? "review" : "escalate",
+        decision,
         latency_ms: raw.latencyMs,
         evidence,
         abstention,
