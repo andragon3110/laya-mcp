@@ -29,6 +29,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 import { LayaClient } from "./client.js";
+import { buildCallResult } from "./envelope.js";
 import { GlinerClient } from "./gliner.js";
 import { HealthWatch } from "./health.js";
 import { screenTool, handleScreen } from "./tools/screen.js";
@@ -146,7 +147,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToo
 
   try {
     const content = await handler(client, args, ctx);
-    return { content: [{ type: "text", text: content }] };
+    // Fase-5 T4: the text block stays (re-serialized WITH the additive
+    // decision metadata, still non-empty indented JSON for 2024-10-07
+    // clients) and structuredContent carries the SAME object
+    // (deep-equals JSON.parse of the text). Degenerate handler text still
+    // returns intact with no structuredContent (see envelope.ts).
+    return buildCallResult(name, content);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return {
