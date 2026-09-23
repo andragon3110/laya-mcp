@@ -245,5 +245,39 @@ class RunDoctorFlagsTest(unittest.TestCase):
             self.assertIn(flag, proc.stdout)
 
 
+class RedactionTest(unittest.TestCase):
+    def test_opencode_env_secrets_redacted(self):
+        # Secret-looking environment values must never appear verbatim in
+        # the doctor report (it travels in --json output and GET /doctor).
+        cfg = {
+            "mcp": {
+                "servers": {
+                    "laya": {
+                        "command": "node",
+                        "environment": {
+                            "LAYA_URL": "http://127.0.0.1:8765",
+                            "GH_TOKEN": "ghp_supersecret123",
+                            "API_KEY": "sk-live-abc",
+                        },
+                    }
+                }
+            }
+        }
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode="w") as tf:
+            json.dump(cfg, tf)
+            tmp = tf.name
+        self.addCleanup(os.unlink, tmp)
+        saved = os.environ.get("OPENCODE_JSON")
+        os.environ["OPENCODE_JSON"] = tmp
+        self.addCleanup(lambda: (os.environ.pop("OPENCODE_JSON", None), saved is not None and os.environ.__setitem__("OPENCODE_JSON", saved)))
+        out = doctor.check_optional_agent_configs()
+        self.assertEqual(len(out), 1)
+        blob = json.dumps(out[0])
+        self.assertNotIn("ghp_supersecret123", blob)
+        self.assertNotIn("sk-live-abc", blob)
+        self.assertIn("[redacted]", blob)
+        self.assertEqual(out[0]["detail"]["env"]["LAYA_URL"], "http://127.0.0.1:8765")
+
+
 if __name__ == "__main__":
     unittest.main()

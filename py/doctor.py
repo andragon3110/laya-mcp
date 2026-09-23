@@ -986,6 +986,27 @@ def _entry_disabled(entry: Dict[str, Any]) -> Tuple[bool, str]:
     return False, "(default)"
 
 
+def _redact_env(env: Any) -> Any:
+    """Redact secret-looking values from an MCP environment dict.
+
+    Doctor reports travel in --json output, CI logs and the GET /doctor
+    endpoint (localhost only, but still logged). Environment maps in
+    opencode.json may carry tokens/keys, so values whose key looks secret
+    are replaced with "[redacted]" -- names and non-secret values stay
+    verbatim for debuggability. Non-dict input passes through untouched.
+    """
+    if not isinstance(env, dict):
+        return env
+    redacted: Dict[str, Any] = {}
+    for k, v in env.items():
+        kl = str(k).lower()
+        if any(s in kl for s in ("token", "secret", "key", "password", "passwd", "auth", "bearer", "credential", "private")):
+            redacted[k] = "[redacted]"
+        else:
+            redacted[k] = v
+    return redacted
+
+
 def check_optional_agent_configs() -> List[Dict[str, Any]]:
     """Are the optional opencode.json / Claude / Codex MCP entries present and well-formed?"""
     out: List[Dict[str, Any]] = []
@@ -1024,7 +1045,7 @@ def check_optional_agent_configs() -> List[Dict[str, Any]]:
                 "opencode-config",
                 f"{shape} registered in {cfg}",
                 command=mcp_laya.get("command"),
-                env=mcp_laya.get("environment", {}),
+                env=_redact_env(mcp_laya.get("environment", {})),
             )
         ]
     except Exception as exc:  # noqa: BLE001
