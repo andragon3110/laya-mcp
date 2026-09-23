@@ -265,6 +265,29 @@ adversarial battery (`tests/t6_screen_pii_rest.mjs`) proves this at the
 output level: a screen `ALLOW` over injected content carries a
 detector-only note and no authorization field.
 
+### Policy + evidence outputs (P1)
+
+Every tool returns **evidence plus a deterministic policy decision** —
+no `confidence`/`probability` labels on uncalibrated signals, no inline
+Model → Action:
+
+- `evidence` — explicit signals (`signal_strength`, `relevance_score`,
+  `distribution` + `winner_probability`, `detector_score`, rubric `score`)
+  with `source`/`candidate`/`span`/`detector`/`model`/`revision`, per tool.
+- `decision` — `{decision: ALLOW | REVIEW | DENY | ESCALATE, reason_codes[],
+  policy: {name, version}}` from a versioned policy (all `1.0.0`);
+  thresholds are preserved pre-P1 cut points, documented as **not
+  calibrated** (see `P1_IMPLEMENTATION.md` §4).
+- `abstention` — first-class `{abstained, reason}`; abstained evidence
+  always resolves to `ESCALATE`, never to a forced verdict or a block.
+  Verify verdicts are `SUPPORTED` / `INSUFFICIENT_EVIDENCE` / `ABSTAIN`.
+
+Breaking renames per tool (old → new) and the full policy/threshold
+reference live in `P1_IMPLEMENTATION.md` (§8, §4). The decision vocabulary
+replaces the legacy `action`/`probabilities`/`confidence` fields; the only
+test change this required was one `mcp_smoke.mjs` assert (`laya_pii`
+`action: "block"` → `decision: "DENY"` + policy identity, same secret cut).
+
 ---
 
 ## Gentle-AI orchestrator policy (recommended)
