@@ -1,9 +1,9 @@
 import type { LayaClient } from "../client.js";
 import { rerankEvidence } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 import { overlapScore, tokenizeForFind } from "./find.js";
 
 export interface RerankCandidate {
@@ -103,6 +103,7 @@ export const rerankTool: ToolDefinition = {
       truncated: { type: "boolean" },
       truncated_ids: { type: "array", items: { type: "string" } },
       decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      shadow: shadowSchema(),
       latency_ms: { type: "number" },
       evidence: evidenceSchema("Rerank evidence bundle (per-candidate relevance signals)."),
       abstention: abstentionSchema(),
@@ -368,7 +369,8 @@ export async function handleRerank(client: LayaClient, args: Record<string, unkn
     // P1-T6: decision owned by the engine (shared table resolved for uniformity;
     // rerank@1.0.0 applies no numeric cut -- it authorizes use of the ordering).
     const { thresholds } = getPolicy("rerank", "1.0.0");
-    const decision = evaluate(
+    const { decision, shadow } = evaluateForTool(
+      "laya_rerank",
       {
         evidence,
         abstention,
@@ -386,6 +388,7 @@ export async function handleRerank(client: LayaClient, args: Record<string, unkn
         truncated: wasTruncated,
         truncated_ids: truncatedIds,
         decision,
+        ...(shadow ? { shadow } : {}),
         latency_ms: raw.latencyMs,
         evidence,
         abstention,

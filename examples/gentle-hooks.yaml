@@ -1,0 +1,62 @@
+# Gentle-side declarative hook table for laya-mcp (fase-6 T4).
+#
+# This file is CONFIGURATION DOCUMENTATION for the Gentle orchestrator side.
+# It is never read by laya-mcp itself: this repo does not orchestrate Gentle
+# and no code here forces calls. Gentle wires these hooks by editing its own
+# skill files (see examples/gentle-hooks.md and examples/gentle-ai-integration.md).
+#
+# Standing rules for every hook below:
+#   - OPTIONAL and off by default: if no `laya_*` tool is present in the
+#     host tool list, the hook is a no-op (never wait, require, or mention).
+#   - NEVER on every request: each hook fires only at its lifecycle point.
+#   - Default mode is `observe` (advisory, non-intrusive). `shadow` and
+#     `enforce` are opt-in per hook via the tool's effective mode
+#     (LAYA_MODE / LAYA_MODE_<TOOL> on the laya-mcp server side).
+#   - Mode semantics: observe = decision is advisory evidence; shadow = base
+#     decision unchanged plus shadow{would_decide, under_policy} under the
+#     candidate policy; enforce = Gentle MUST honor the decision.
+version: "1.0.0"
+defaults:
+  mode: observe
+  on_missing_tools: ignore
+hooks:
+  - id: external_content.pre_context
+    when: BEFORE fetched, pasted, or third-party text enters agent context
+    calls:
+      - tool: laya_screen
+        args: { text: "<external text>", purpose: "<stated purpose>" }
+        mode: observe
+        on_decision:
+          DENY: refuse the text
+          REVIEW: escalate before inlining
+          ESCALATE: escalate before inlining
+      - tool: laya_pii
+        args: { text: "<external text>" }
+        mode: observe
+        needs: --with-gliner
+        on_decision:
+          DENY: redact the reported spans first
+          REVIEW: confirm each finding may enter context
+  - id: implementation.post_write
+    when: AFTER every delegated code-writing agent finishes, BEFORE the work is declared done
+    calls:
+      - tool: laya_review
+        args: { request: "<original task>", diff: "<unified diff>", tests: "<test output>" }
+        mode: observe
+        on_decision:
+          ESCALATE: hand to a human instead of closing the task
+  - id: completion.pre_complete
+    when: WHEN any worker claims completion ("tests pass", "done")
+    calls:
+      - tool: laya_gate
+        args: { claims: "<completion claims>", diff: "<unified diff>", evidence: "<test output>" }
+        mode: observe
+        on_decision:
+          ESCALATE: never accept completion on a contradicted or unsupported claim
+  - id: retrieval.candidate_selection
+    when: WHEN picking or ranking candidates (documents, files, notes) by meaning
+    calls:
+      - tool: laya_find
+        args: { query: "<query>", candidates: [{ id: "<id>", text: "<body>" }] }
+        mode: observe
+        note: find always returns a winner; check its existence verdict first

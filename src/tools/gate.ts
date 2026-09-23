@@ -1,10 +1,10 @@
 import type { LayaClient } from "../client.js";
 import { gateEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
 import type { RiskTier } from "../policy/types.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
 const RISKS: readonly RiskTier[] = ["low", "normal", "high"];
 
@@ -104,6 +104,7 @@ export const gateTool: ToolDefinition = {
         },
       },
       decision: decisionSchema(["ALLOW", "REVIEW", "ESCALATE"]),
+      shadow: shadowSchema(),
       context: { type: "object" },
       risk: { type: "string", enum: ["low", "normal", "high"] },
       latency_ms: { type: "number" },
@@ -212,7 +213,8 @@ export async function handleGate(client: LayaClient, args: Record<string, unknow
       diff_chars: String(args.diff ?? "").length,
       evidence_chars: String(args.evidence ?? "").length,
     };
-    const decision = evaluate(
+    const { decision, shadow } = evaluateForTool(
+      "laya_gate",
       { evidence, abstention, context, risk, policy: { name: "gate", version: "1.0.0" } },
       { thresholds },
     );
@@ -225,6 +227,7 @@ export async function handleGate(client: LayaClient, args: Record<string, unknow
         },
         claims: claimEntries,
         decision,
+        ...(shadow ? { shadow } : {}),
         context,
         risk,
         latency_ms: raw.latencyMs,

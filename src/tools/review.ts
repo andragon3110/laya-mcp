@@ -1,9 +1,9 @@
 import type { LayaClient } from "../client.js";
 import { reviewEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const reviewTool: ToolDefinition = {
   name: "laya_review",
@@ -62,6 +62,7 @@ export const reviewTool: ToolDefinition = {
         required: ["correctness", "spec_match", "test_gap", "blast_radius", "safe_to_apply"],
       },
       decision: decisionSchema(["ALLOW", "REVIEW", "ESCALATE"]),
+      shadow: shadowSchema(),
       latency_ms: { type: "number" },
       evidence: evidenceSchema("Review evidence bundle (rubric + safety signals)."),
       abstention: abstentionSchema(),
@@ -138,7 +139,8 @@ export async function handleReview(client: LayaClient, args: Record<string, unkn
     // table + documented env overrides); the handler never branches on a
     // numeric cut point.
     const { thresholds } = getPolicy("review", "1.0.0");
-    const decision = evaluate(
+    const { decision, shadow } = evaluateForTool(
+      "laya_review",
       {
         evidence,
         abstention,
@@ -158,6 +160,7 @@ export async function handleReview(client: LayaClient, args: Record<string, unkn
           safe_to_apply: { signal: safe_to_apply },
         },
         decision,
+        ...(shadow ? { shadow } : {}),
         latency_ms: raw.latencyMs,
         evidence,
         abstention,

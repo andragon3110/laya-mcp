@@ -181,10 +181,10 @@ await check("capabilities outputSchema: required ⊆ properties, readonly, envel
 
 await check("fragment covers augmentEnvelope; observe tool gets honest nulls", () => {
   const frag = envelopeMetadataProperties();
-  // Fase-6 T3 intentional evolution (minor-additive): nine T5 keys plus
-  // trace_id/span_id. Still all OPTIONAL (required lists untouched), so
-  // stored pre-T3 outputs keep validating -- only this count moves.
-  assert.equal(Object.keys(frag).length, 11, "eleven envelope keys (nine T5 + trace_id/span_id T3)");
+  // Fase-6 T4 intentional evolution (minor-additive): eleven T3 keys plus
+  // effective_mode. Still all OPTIONAL (required lists untouched), so
+  // stored pre-T4 outputs keep validating -- only this count moves.
+  assert.equal(Object.keys(frag).length, 12, "twelve envelope keys (eleven T3 + effective_mode T4)");
   const probe = { decision: { decision: "ALLOW", reason_codes: ["r"], policy: { name: "screen", version: "1.0.0" } }, latency_ms: 1, evidence: { model: "m", revision: null } };
   const savedLaya = process.env.LAYA_MODEL_REVISION;
   const savedGliner = process.env.GLINER_MODEL_REVISION;

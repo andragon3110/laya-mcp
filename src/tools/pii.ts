@@ -2,9 +2,9 @@ import type { LayaClient } from "../client.js";
 import type { ToolContext } from "../index.js";
 import { piiEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { type ToolDefinition, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const piiTool: ToolDefinition = {
   name: "laya_pii",
@@ -90,6 +90,7 @@ export const piiTool: ToolDefinition = {
       counts: { type: "object" },
       secrets_found: { type: "integer" },
       decision: decisionSchema(["ALLOW", "REVIEW", "DENY", "ESCALATE"]),
+      shadow: shadowSchema(),
       latency_ms: { type: "number" },
       recommendation: { type: "string" },
       evidence: evidenceSchema("PII evidence bundle (candidate spans + weak-type report)."),
@@ -239,7 +240,8 @@ export async function handlePii(
     })),
     weakTypes: findings.filter((f) => !secretSet.has(f.type)).map((f) => f.type),
   });
-  const decision = evaluate(
+  const { decision, shadow } = evaluateForTool(
+    "laya_pii",
     {
       evidence,
       abstention,
@@ -276,6 +278,7 @@ export async function handlePii(
       counts,
       secrets_found: secrets.length,
       decision,
+      ...(shadow ? { shadow } : {}),
       latency_ms: latencyMs,
       recommendation:
         decision.decision === "DENY"

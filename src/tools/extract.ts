@@ -3,9 +3,9 @@ import type { GlinerClient, GlinerSpan } from "../gliner.js";
 import type { ToolContext } from "../index.js";
 import { extractEvidence, winnerOf, type ExtractFieldEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength, extractLimitsFromEnv } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const extractTool: ToolDefinition = {
   name: "laya_extract",
@@ -123,6 +123,7 @@ export const extractTool: ToolDefinition = {
       fallback: { type: "string" },
       routing: { type: "object" },
       decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      shadow: shadowSchema(),
       latency_ms: { type: "number" },
       evidence: evidenceSchema("Extract evidence bundle (per-field choice signals)."),
       abstention: abstentionSchema(),
@@ -532,7 +533,8 @@ export async function handleExtract(
     // threshold literal lives here: v1 firmness is candidates-existed and
     // pattern-parsed.
     const { thresholds } = getPolicy("extract", "1.0.0");
-    const decision = evaluate(
+    const { decision, shadow } = evaluateForTool(
+      "laya_extract",
       {
         evidence,
         abstention,
@@ -546,6 +548,7 @@ export async function handleExtract(
       { thresholds },
     );
     out.decision = decision;
+    if (shadow !== null) out.shadow = shadow;
     out.evidence = evidence;
     out.abstention = abstention;
     return JSON.stringify(out, null, 2);

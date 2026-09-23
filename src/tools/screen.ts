@@ -1,9 +1,9 @@
 import type { LayaClient } from "../client.js";
 import { screenEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
-import { evaluate } from "../policy/engine.js";
+import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const screenTool: ToolDefinition = {
   name: "laya_screen",
@@ -67,6 +67,7 @@ export const screenTool: ToolDefinition = {
         enum: ["malicious-instruction", "ambiguous", "irrelevant", "valid"],
       },
       decision: decisionSchema(["ALLOW", "REVIEW", "DENY", "ESCALATE"]),
+      shadow: shadowSchema(),
       latency_ms: { type: "number" },
       evidence: evidenceSchema("Screen evidence bundle (signals + metadata)."),
       abstention: abstentionSchema(),
@@ -154,7 +155,8 @@ export async function handleScreen(client: LayaClient, args: Record<string, unkn
     // handler never hardcodes 0.75/0.25/0.4. Strict >/ < edge semantics are
     // preserved (0.75 -> REVIEW, 0.25 -> substance branch, 0.4 -> valid).
     const { thresholds } = getPolicy("screen", "1.0.0");
-    const decision = evaluate(
+    const { decision, shadow } = evaluateForTool(
+      "laya_screen",
       {
         evidence,
         abstention,
@@ -198,6 +200,7 @@ export async function handleScreen(client: LayaClient, args: Record<string, unkn
         },
         assessment,
         decision,
+        ...(shadow ? { shadow } : {}),
         latency_ms: raw.latencyMs,
         evidence,
         abstention,

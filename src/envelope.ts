@@ -39,6 +39,12 @@
  *                       `decision.policy.{name,version}` (null when the
  *                       envelope carries no decision, which never happens
  *                       for the 11 shipped tools).
+ *   - `effective_mode` (fase-6 T4, OPTIONAL key): the policy-decision
+ *                       mode this call ran under (observe/shadow/enforce,
+ *                       resolved per call from LAYA_MODE / LAYA_MODE_<TOOL>,
+ *                       default observe; explicit override wins in tests).
+ *                       Minor-additive like the trace keys: old readers
+ *                       ignore it, stored pre-T4 outputs still validate.
  *   - `schema_version`: envelope contract version, constant "1.0.0"
  *                       (ENVELOPE_SCHEMA_VERSION). Versioning/compat policy
  *                       is T5's SCHEMA_VERSION_POLICY below (major = breaking, minor = additive).
@@ -66,6 +72,7 @@ import {
   readRevisionEnv,
 } from "./evidence.js";
 import { recordCall, recordEnvelope } from "./metrics.js";
+import { effectiveMode, type ToolMode } from "./policy/mode.js";
 import type { TraceContext } from "./trace.js";
 
 /** Envelope contract version stamped on every augmented envelope (T4). */
@@ -233,11 +240,18 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
  * that pass no trace (tests, direct callers) get the envelope without the
  * keys -- index.ts always passes one (generated when the request carries
  * none), so live envelopes always carry both.
+ *
+ * Fase-6 T4: `modeOverride` pins the stamped `effective_mode` (test path);
+ * when absent the mode resolves from the live env for this tool
+ * (effectiveMode, default observe -- see policy/mode.ts). Handler-emitted
+ * `shadow` reports (shadow mode only) flow through untouched: the spread
+ * preserves every pre-existing key.
  */
 export function augmentEnvelope(
   toolName: string,
   parsed: Record<string, unknown>,
   trace?: TraceContext,
+  modeOverride?: ToolMode,
 ): Record<string, unknown> {
   const evidence = isPlainObject(parsed.evidence) ? parsed.evidence : null;
   const decision = isPlainObject(parsed.decision) ? parsed.decision : null;
@@ -253,6 +267,7 @@ export function augmentEnvelope(
     decision_id: newDecisionId(),
     ...(trace !== undefined ? { trace_id: trace.trace_id, span_id: trace.span_id } : {}),
     timestamp: new Date().toISOString(),
+    effective_mode: modeOverride ?? effectiveMode(toolName),
     model: evidence !== null && (typeof evidence.model === "string" || evidence.model === null)
       ? (evidence.model as string | null)
       : null,
@@ -278,8 +293,10 @@ export function augmentEnvelope(
  * request with an empty observation. Failures never break the result --
  * recordEnvelope never throws. `trace` is threaded to augmentEnvelope
  * (absent => envelope without trace keys; index.ts always passes one).
+ * Fase-6 T4: `modeOverride` threads the effective-mode stamp the same way
+ * (absent => resolved from the live env for this tool).
  */
-export function buildCallResult(toolName: string, text: string, trace?: TraceContext): CallToolResult {
+export function buildCallResult(toolName: string, text: string, trace?: TraceContext, modeOverride?: ToolMode): CallToolResult {
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);
@@ -299,7 +316,7 @@ export function buildCallResult(toolName: string, text: string, trace?: TraceCon
     recordCall({ tool: toolName });
     return { content: [{ type: "text" as const, text }] };
   }
-  const augmented = augmentEnvelope(toolName, parsed, trace);
+  const augmented = augmentEnvelope(toolName, parsed, trace, modeOverride);
   recordEnvelope(toolName, augmented);
   return {
     content: [{ type: "text" as const, text: JSON.stringify(augmented, null, 2) }],
