@@ -5,7 +5,8 @@
  * `extractEvidence` (evidence.ts), keyed by `metadata.field_id`:
  * `candidate` = winning key ("none" when the judge picked none),
  * `distribution` = raw shares (uncalibrated),
- * `metadata.candidate_count` = candidates the judge saw (20-cap),
+ * `metadata.candidate_count` = candidates the judge saw (post-filter /
+ * post-cap shown count, default cap 20),
  * `metadata.invalid_pattern` set for unparseable regexes,
  * `metadata.status` = legacy extracted/not_found (informational only).
  * Entity-mode signals additionally carry `span` + `detector_score`.
@@ -15,6 +16,15 @@
  * existed and the pattern parsed. A firm "none" (judge saw candidates and
  * rejected them) is still a firm answer -> ALLOW; only zero-candidate /
  * invalid-pattern fields escalate.
+ *
+ * Fase-4 T3 note (no version bump): min_gliner_score filtering composes
+ * with the existing firmness notion instead of changing it -- a fully
+ * filtered field reports candidate_count 0 and surfaces as ESCALATE (engine
+ * abstained_evidence rule; extract_no_candidates stays as the policy-level
+ * reason for the same condition), exactly like a zero-proposal field. The
+ * top_k/max_candidates caps only change HOW MANY candidates the judge saw,
+ * never the firm/zero distinction, so thresholds and semantics are
+ * unchanged and extract stays 1.0.0.
  *
  * Reason codes (exhaustive):
  *   - "extract_values_allow"  (ALLOW)    every field firm (extracted or
