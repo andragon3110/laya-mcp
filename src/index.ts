@@ -2,15 +2,18 @@
 /**
  * laya-mcp server.
  *
- * Exposes 10 typed-decision tools (laya_screen, laya_verify, laya_find, etc.)
+ * Exposes 11 typed-decision tools (laya_screen, laya_verify, laya_find, etc.)
  * backed by a local Laya instance reachable via HTTP at LAYA_URL, plus one
- * optional tool (laya_pii) backed by the GLiNER sidecar at GLINER_URL
- * (11 tools total with the sidecar up, 10 without it).
+ * optional tool (laya_pii) backed by the GLiNER sidecar at GLINER_URL,
+ * plus the always-advertised meta tool laya_capabilities (live discovery)
+ * (12 tools total with the sidecar up, 11 without it; 1 when Laya is down).
  *
  * Behaviour contract:
- *   - If the laya-server (Python) is NOT reachable, `tools/list` returns []
- *     and every `tools/call` returns `{isError: true, ...}` -- the MCP host
- *     sees zero tools and the user-facing agent never crashes.
+ *   - If the laya-server (Python) is NOT reachable, `tools/list` advertises
+ *     ONLY laya_capabilities (fase-5 T5 exemption, so hosts can tell
+ *     MCP-alive/backend-down apart from MCP-dead) and every other
+ *     `tools/call` returns `{isError: true, ...}` -- a capabilities call
+ *     then also fails isError, carrying the backend diagnosis.
  *   - `laya_pii` is advertised only while the gliner-server sidecar is
  *     reachable. `laya_extract` uses GLiNER spans when available and falls
  *     back to regex otherwise (unless source=entities is forced).
@@ -29,6 +32,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 import { LayaClient } from "./client.js";
+import { buildCallResult } from "./envelope.js";
 import { GlinerClient } from "./gliner.js";
 import { HealthWatch } from "./health.js";
 import { screenTool, handleScreen } from "./tools/screen.js";
@@ -42,6 +46,7 @@ import { extractTool, handleExtract } from "./tools/extract.js";
 import { reviewTool, handleReview } from "./tools/review.js";
 import { gateTool, handleGate } from "./tools/gate.js";
 import { piiTool, handlePii } from "./tools/pii.js";
+import { capabilitiesTool, handleCapabilities } from "./tools/capabilities.js";
 
 // T5: enforced per tool call in runTool (src/tool.ts); logged here at startup.
 // Per-tool budgets (if ever needed) belong to T6.
@@ -81,6 +86,7 @@ const HANDLERS: Record<
   laya_review: handleReview,
   laya_gate: handleGate,
   laya_pii: handlePii,
+  laya_capabilities: handleCapabilities,
 };
 
 const client = new LayaClient();
@@ -100,27 +106,45 @@ const ctx: ToolContext = {
   glinerReady: () => glinerHealth.current().ready === true,
 };
 
+/** tools/list wire entry: name + description + both schemas + annotations. */
+function toListEntry(t: { name: string; description: string; inputSchema: Record<string, unknown>; outputSchema: Record<string, unknown>; annotations?: Record<string, unknown> }): Record<string, unknown> {
+  return {
+    name: t.name,
+    description: t.description,
+    inputSchema: t.inputSchema,
+    // Fase-5 T3: publish the typed output contract + annotations. The
+    // SDK server does NOT validate arguments against inputSchema or
+    // results against outputSchema (verified in
+    // node_modules/@modelcontextprotocol/sdk/dist/esm/server/index.js:
+    // only the tools/call request/result envelope is validated); real
+    // input rejection lives in each tool's buildQuestions
+    // (input_too_large), and outputSchema is an announcement for clients.
+    outputSchema: t.outputSchema,
+    annotations: t.annotations,
+  };
+}
+
 const server = new Server(
   { name: "laya-mcp", version: "0.4.0" },
   { capabilities: { tools: {} } },
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => {
-  // Only advertise tools when Laya is reachable. This keeps the agent from
-  // attempting calls that would just fail.
+  // Fase-5 T5: laya_capabilities is exempt from the readiness gate. Only
+  // judgment tools need a reachable backend; the meta tool exists precisely
+  // to report that nothing else is servable (its call then fails isError
+  // with the backend diagnosis). This keeps the agent from attempting
+  // judgment calls that would just fail, without hiding the server itself.
   if (!health.current().ready) {
-    return { tools: [] };
+    return { tools: [toListEntry(capabilitiesTool)] };
   }
   const tools = [...BASE_TOOLS];
   if (ctx.glinerReady()) {
     tools.push(piiTool);
   }
+  tools.push(capabilitiesTool);
   return {
-    tools: tools.map((t) => ({
-      name: t.name,
-      description: t.description,
-      inputSchema: t.inputSchema,
-    })),
+    tools: tools.map((t) => toListEntry(t)),
   };
 });
 
@@ -137,7 +161,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToo
 
   try {
     const content = await handler(client, args, ctx);
-    return { content: [{ type: "text", text: content }] };
+    // Fase-5 T4: the text block stays (re-serialized WITH the additive
+    // decision metadata, still non-empty indented JSON for 2024-10-07
+    // clients) and structuredContent carries the SAME object
+    // (deep-equals JSON.parse of the text). Degenerate handler text still
+    // returns intact with no structuredContent (see envelope.ts).
+    return buildCallResult(name, content);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return {

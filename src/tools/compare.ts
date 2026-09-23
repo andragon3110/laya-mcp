@@ -3,7 +3,7 @@ import { compareEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const compareTool: ToolDefinition = {
   name: "laya_compare",
@@ -30,6 +30,32 @@ export const compareTool: ToolDefinition = {
     required: ["passage_a", "passage_b"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    description: "Per-aspect judgments are keyed by aspect name alongside `overall` (dynamic keys, same judgment shape).",
+    properties: {
+      ...envelopeMetadataProperties(),
+      overall: {
+        type: "object",
+        properties: {
+          relation: {
+            type: "string",
+            enum: ["same_fact", "contradicts", "different_facts"],
+            description: "Absent when the backend gave no answer for the judgment.",
+          },
+          distribution: { type: "object" },
+          winner_probability: { type: ["number", "null"] },
+        },
+        required: ["distribution", "winner_probability"],
+      },
+      decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      latency_ms: { type: "number" },
+      evidence: evidenceSchema("Compare evidence bundle (overall + per-aspect signals)."),
+      abstention: abstentionSchema(),
+    },
+    required: ["overall", "decision", "latency_ms", "evidence", "abstention"],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: (args) => {
     const aspects = Array.isArray(args.aspects) ? args.aspects : [];
     assertLength(

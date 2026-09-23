@@ -3,7 +3,7 @@ import { verifyEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const verifyTool: ToolDefinition = {
   name: "laya_verify",
@@ -34,6 +34,45 @@ export const verifyTool: ToolDefinition = {
     required: ["claims", "evidence"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    properties: {
+      ...envelopeMetadataProperties(),
+      summary: {
+        type: "object",
+        description: "Aggregate counts. Absent when claims is empty (structured ABSTAIN).",
+        properties: {
+          supported: { type: "integer" },
+          insufficient_evidence: { type: "integer" },
+          contradicted: { type: "integer" },
+          abstain: { type: "integer" },
+        },
+        required: ["supported", "insufficient_evidence", "contradicted", "abstain"],
+      },
+      verdicts: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            claim: { type: "string" },
+            signal: { type: ["number", "null"] },
+            verdict: {
+              type: "string",
+              enum: ["SUPPORTED", "INSUFFICIENT_EVIDENCE", "ABSTAIN", "CONTRADICTED"],
+              description: "CONTRADICTED is reserved for positive refutation evidence; v1 never emits it.",
+            },
+          },
+          required: ["claim", "signal", "verdict"],
+        },
+      },
+      decision: decisionSchema(["ALLOW", "REVIEW", "DENY", "ESCALATE"]),
+      latency_ms: { type: "number" },
+      evidence: evidenceSchema("Verify evidence bundle (per-claim signals + metadata)."),
+      abstention: abstentionSchema(),
+    },
+    required: ["verdicts", "decision", "latency_ms", "evidence", "abstention"],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: (args) => {
     const claims = Array.isArray(args.claims) ? args.claims : [];
     assertCount(

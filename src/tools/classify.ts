@@ -3,7 +3,7 @@ import { classifyEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const classifyTool: ToolDefinition = {
   name: "laya_classify",
@@ -41,6 +41,33 @@ export const classifyTool: ToolDefinition = {
     required: ["purpose", "items", "classes"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    properties: {
+      ...envelopeMetadataProperties(),
+      classifications: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            classification: { type: "string" },
+            winner_probability: {
+              type: ["number", "null"],
+              description: "Top raw share (never a confidence); null when the answer is missing or the dict came back empty.",
+            },
+          },
+          required: ["classification", "winner_probability"],
+        },
+      },
+      decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      latency_ms: { type: "number" },
+      evidence: evidenceSchema("Classify evidence bundle (per-item choice signals)."),
+      abstention: abstentionSchema(),
+    },
+    required: ["classifications", "decision", "latency_ms", "evidence", "abstention"],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: (args) => {
     const items = Array.isArray(args.items) ? args.items : [];
     const classes = Array.isArray(args.classes) ? args.classes : [];

@@ -74,6 +74,12 @@ export interface Evidence {
   signals: Signal[];
   model: string | null;
   revision: string | null;
+  /**
+   * Fase-5 T4: where `revision` came from -- `env:LAYA_MODEL_REVISION` /
+   * `env:GLINER_MODEL_REVISION` when operator-pinned, `backend` when the
+   * backend supplied it, `unpinned` for the honest null.
+   */
+  revision_source: string;
   /** Primary detector for this bundle, e.g. "router", "regex", "gliner". */
   detector: string | null;
   metadata?: Record<string, unknown>;
@@ -98,11 +104,63 @@ export function revisionFromRaw(raw: Pick<PredictResult, "routing">): string | n
   return typeof rev === "string" || typeof rev === "number" ? String(rev) : null;
 }
 
+/**
+ * Fase-5 T4: operator-pinned model revisions (documented env config).
+ *
+ *   - LAYA_MODEL_REVISION:   pin reported for every Laya-judged tool
+ *                            (the 10 laya_* tools; extract included --
+ *                            its judgment call is always Laya).
+ *   - GLINER_MODEL_REVISION: pin reported for GLINER-judged output
+ *                            (laya_pii evidence + span signals).
+ *
+ * Read dynamically per call (never cached at import) so operators and
+ * tests can set/unset them without a reload. A missing, non-string, empty
+ * or whitespace-only value counts as UNSET: the honest null (+ `unpinned`
+ * source) is reported. The pinned value itself is passed through verbatim
+ * (an operator claim, never a synthesized hash); backend values likewise.
+ */
+export const LAYA_MODEL_REVISION_ENV = "LAYA_MODEL_REVISION";
+export const GLINER_MODEL_REVISION_ENV = "GLINER_MODEL_REVISION";
+
+/** Trimmed env value, or null when unset/blank (honest-null path). */
+export function readRevisionEnv(name: string): string | null {
+  const v = process.env[name];
+  if (typeof v !== "string") return null;
+  const trimmed = v.trim();
+  return trimmed === "" ? null : trimmed;
+}
+
+/**
+ * Laya-side revision for signals/evidence: env pin wins, else the backend
+ * routing revision, else null. Never invents a hash.
+ */
+export function resolveLayaRevision(raw: Pick<PredictResult, "model" | "routing">): string | null {
+  return readRevisionEnv(LAYA_MODEL_REVISION_ENV) ?? revisionFromRaw(raw);
+}
+
+/** Where resolveLayaRevision's value came from (mirrors /models vocabulary). */
+export function layaRevisionSource(raw: Pick<PredictResult, "model" | "routing">): string {
+  if (readRevisionEnv(LAYA_MODEL_REVISION_ENV) !== null) return `env:${LAYA_MODEL_REVISION_ENV}`;
+  return revisionFromRaw(raw) !== null ? "backend" : "unpinned";
+}
+
+/** GLiNER-side revision for span signals/pii evidence (env pin or null). */
+export function resolveGlinerRevision(): string | null {
+  return readRevisionEnv(GLINER_MODEL_REVISION_ENV);
+}
+
+/** Where resolveGlinerRevision's value came from. */
+export function glinerRevisionSource(): string {
+  return readRevisionEnv(GLINER_MODEL_REVISION_ENV) !== null
+    ? `env:${GLINER_MODEL_REVISION_ENV}`
+    : "unpinned";
+}
+
 function baseSignal(
   raw: Pick<PredictResult, "model" | "routing">,
   init: Omit<Signal, "model" | "revision">,
 ): Signal {
-  return { ...init, model: raw?.model ?? null, revision: revisionFromRaw(raw) };
+  return { ...init, model: raw?.model ?? null, revision: resolveLayaRevision(raw) };
 }
 
 /** Raw Router noul signal (uncalibrated). */
@@ -196,7 +254,8 @@ export function spanSignal(
     span: { start, end },
     detector: `gliner:${entityType}`,
     model: null,
-    revision: null,
+    // Fase-5 T4: operator pin when set, else null (never invented).
+    revision: resolveGlinerRevision(),
     metadata: { entity_type: entityType, ...(extra?.weak_type !== undefined ? { weak_type: extra.weak_type } : {}), ...(extra?.metadata ?? {}) },
   };
 }
@@ -218,7 +277,8 @@ export function makeEvidence(
   return {
     signals,
     model: raw?.model ?? null,
-    revision: revisionFromRaw(raw),
+    revision: resolveLayaRevision(raw),
+    revision_source: layaRevisionSource(raw),
     detector,
     ...(metadata ? { metadata } : {}),
   };
@@ -512,7 +572,9 @@ export function piiEvidence(input: {
     evidence: {
       signals,
       model: null,
-      revision: null,
+      // Fase-5 T4: operator pin when set, else the honest null.
+      revision: resolveGlinerRevision(),
+      revision_source: glinerRevisionSource(),
       detector: "gliner",
       metadata: { weak_types: input.weakTypes },
     },

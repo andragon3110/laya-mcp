@@ -3,7 +3,7 @@ import { rerankEvidence } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 import { overlapScore, tokenizeForFind } from "./find.js";
 
 export interface RerankCandidate {
@@ -70,6 +70,7 @@ export const rerankTool: ToolDefinition = {
       top_k: {
         type: "integer",
         minimum: 1,
+        maximum: LIMITS.maxRerankCandidates,
         description:
           "Max candidates sent to the judge (default 64 = legacy behaviour: no pruning). " +
           "When below the pool size the pool is ranked by query token-overlap (ties keep input order, " +
@@ -80,6 +81,55 @@ export const rerankTool: ToolDefinition = {
     required: ["query", "candidates"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    properties: {
+      ...envelopeMetadataProperties(),
+      ranked: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            rank: { type: "integer" },
+            id: { type: "string" },
+            relevance_score: {
+              type: ["number", "null"],
+              description: "Raw, uncalibrated Router noul output; null when the backend gave no answer (sorts last).",
+            },
+          },
+          required: ["rank", "relevance_score"],
+        },
+      },
+      truncated: { type: "boolean" },
+      truncated_ids: { type: "array", items: { type: "string" } },
+      decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      latency_ms: { type: "number" },
+      evidence: evidenceSchema("Rerank evidence bundle (per-candidate relevance signals)."),
+      abstention: abstentionSchema(),
+      pruned: { type: "boolean" },
+      pruning: {
+        type: "object",
+        properties: {
+          kept: { type: "integer" },
+          dropped: { type: "integer" },
+          method: { type: "string" },
+        },
+        required: ["kept", "dropped", "method"],
+      },
+    },
+    required: [
+      "ranked",
+      "truncated",
+      "truncated_ids",
+      "decision",
+      "latency_ms",
+      "evidence",
+      "abstention",
+      "pruned",
+      "pruning",
+    ],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: (args) => buildRerankQuestionsWithInfo(args).questions,
 };
 

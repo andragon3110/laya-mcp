@@ -3,7 +3,7 @@ import { decideEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount, inputTooLarge } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { TOOL_TIMEOUT_MS, type ToolDefinition } from "../tool.js";
+import { TOOL_TIMEOUT_MS, type ToolDefinition, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 type DecideAnswers = Record<string, { choice?: string; probabilities?: Record<string, number>; noul?: number }>;
 
@@ -145,6 +145,40 @@ export const decideTool: ToolDefinition = {
     required: ["decision", "candidates"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    properties: {
+      ...envelopeMetadataProperties(),
+      selected: {
+        type: ["string", "null"],
+        description: "Winning option id; null when the pick abstained.",
+      },
+      distribution: { type: "object" },
+      winner_probability: {
+        type: ["number", "null"],
+        description: "Top raw share (never a confidence); null when empty.",
+      },
+      requirements: {
+        type: "object",
+        description: "Per requirement key {signal, supported}; signal null and supported null when unevaluated.",
+      },
+      decision: decisionSchema(["ALLOW", "ESCALATE"]),
+      latency_ms: { type: "number", description: "Sum of both stages when requirements are present." },
+      evidence: evidenceSchema("Decide evidence bundle (selection + requirement signals)."),
+      abstention: abstentionSchema(),
+    },
+    required: [
+      "selected",
+      "distribution",
+      "winner_probability",
+      "requirements",
+      "decision",
+      "latency_ms",
+      "evidence",
+      "abstention",
+    ],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: buildSelectionQuestions,
 };
 

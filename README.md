@@ -12,7 +12,7 @@
 
 <p align="center">
   <b>Give your coding agent judgment calls instead of vibes.</b><br>
-  Eleven MCP tools backed by local decision models — calibrated probabilities
+  Twelve MCP tools backed by local decision models — calibrated probabilities
   your code can branch on, sort by, and gate with.
   <br><br>
   <a href="#quickstart">Quickstart</a> ·
@@ -46,7 +46,9 @@ out. No text generation, nothing to parse, nothing to hallucinate.
 - 💸 **$0, self-hosted, private.** No API keys, no per-token billing, no
   data egress. CPU-friendly.
 - 🔌 **Optional by design.** If the servers are down — or never
-  installed — your agent works exactly as before. Zero tools advertised,
+  installed — your agent works exactly as before. Only the
+  `laya_capabilities` discovery tool stays advertised (so hosts can
+  tell MCP-alive/backend-down apart from MCP-dead),
   zero crashes, zero slowdowns.
 
 The tool shapes follow
@@ -143,7 +145,7 @@ when that env var is set) and restart the session:
 > `opencode mcp list` (expect `✓ laya connected`).
 
 Ask your agent: *"do you see the `laya_*` tools? list them."* You should
-get all eleven back.
+get all twelve back.
 
 ---
 
@@ -162,9 +164,19 @@ get all eleven back.
 | `laya_extract` | Field values as verbatim substrings — via your regex **or** GLiNER spans (`source: auto`, the default). Entity mode returns `[start:end]` offsets and forces the fine-tuned judge. Optional `top_k`/`max_candidates`/`min_gliner_score` narrow the per-field candidates (defaults = legacy first-20); the response reports `truncated` + `dropped`. | Laya `choice` over matches/spans |
 | `laya_review` | Diff scored 0–2 on correctness, spec match, test gap, blast radius + `safe_to_apply`. Call it before declaring any task done. | Laya `score` + `noul` |
 | `laya_gate` | Completion gate: `laya_review` plus every "tests pass"-style claim verified against evidence. Contradicted claims escalate. | combined |
+| `laya_capabilities` | Live capability discovery: backend model inventory, readiness, GLiNER sidecar state, servable tools, policy registry, feature flags. Always advertised, even when the backend is down. | observe (no judgment) |
 
 Every response carries `latency_ms`, and Laya answers include the
 `routing` block (which checkpoint served the call and why) for audit.
+
+Every `tools/call` success returns the same JSON object twice: once as
+the non-empty text block (old clients keep reading text) and once as
+`structuredContent`, with additive decision metadata (`decision_id`,
+`timestamp`, `model`/`model_revision` + `revision_source`,
+`primitive`, top-level `policy`/`policy_version`, `schema_version
+"1.0.0"`). Every tool publishes `inputSchema` + `outputSchema` with
+read-only annotations. Full contract, versioning policy, and
+compatibility notes: `MCP_CONTRACT.md`.
 
 ---
 
@@ -419,7 +431,7 @@ something looks off — paste the output when asking for help.
 $HOME/laya-mcp/doctor.sh                                          # full diagnostic first
 $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke.py    # Laya end-to-end
 $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke_gliner.py  # GLiNER end-to-end (needs sidecar)
-cd $HOME/laya-mcp && npm run inspect                              # MCP inspector: 10 tools (11 with sidecar)
+cd $HOME/laya-mcp && npm run inspect                              # MCP inspector: 11 tools (12 with sidecar)
 cd $HOME/laya-mcp && .venv/bin/python tests/test_opencode_v2.py  # config-layer unit tests (no models needed)
 ```
 (On Windows git-bash the venv lives at `.venv/Scripts` instead of `.venv/bin`.)

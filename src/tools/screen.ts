@@ -3,7 +3,7 @@ import { screenEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
 import { evaluate } from "../policy/engine.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, runTool } from "../tool.js";
+import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, envelopeMetadataProperties } from "../tool.js";
 
 export const screenTool: ToolDefinition = {
   name: "laya_screen",
@@ -27,6 +27,54 @@ export const screenTool: ToolDefinition = {
     required: ["text", "purpose"],
     additionalProperties: false,
   },
+  outputSchema: {
+    type: "object",
+    properties: {
+      ...envelopeMetadataProperties(),
+      signals: {
+        type: "object",
+        description: "Three raw, uncalibrated Router signals (never probabilities).",
+        properties: {
+          injection: {
+            type: "object",
+            properties: {
+              signal: { type: ["number", "null"] },
+              finding: { type: "string" },
+            },
+            required: ["signal", "finding"],
+          },
+          substance: {
+            type: "object",
+            properties: {
+              signal: { type: ["number", "null"] },
+              finding: { type: "string" },
+            },
+            required: ["signal", "finding"],
+          },
+          relevance: {
+            type: "object",
+            properties: {
+              signal: { type: ["number", "null"] },
+              finding: { type: "string" },
+            },
+            required: ["signal", "finding"],
+          },
+        },
+        required: ["injection", "substance", "relevance"],
+      },
+      assessment: {
+        type: "string",
+        enum: ["malicious-instruction", "ambiguous", "irrelevant", "valid"],
+      },
+      decision: decisionSchema(["ALLOW", "REVIEW", "DENY", "ESCALATE"]),
+      latency_ms: { type: "number" },
+      evidence: evidenceSchema("Screen evidence bundle (signals + metadata)."),
+      abstention: abstentionSchema(),
+      authority_note: { type: "string" },
+    },
+    required: ["signals", "assessment", "decision", "latency_ms", "evidence", "abstention", "authority_note"],
+  },
+  annotations: READONLY_TOOL_ANNOTATIONS,
   buildQuestions: (args) => {
     assertLength(
       String(args.text ?? ""),
