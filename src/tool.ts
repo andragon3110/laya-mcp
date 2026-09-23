@@ -98,10 +98,14 @@ export function abstentionSchema(): Record<string, unknown> {
  * envelope.ts: augmentEnvelope) but deliberately left the 11 outputSchemas
  * untouched. T5 closes that gap: every judgment outputSchema spreads this
  * fragment (plus laya_capabilities' own outputSchema) so the contract is
- * self-describing. All nine keys are OPTIONAL -- never added to `required`:
+ * self-describing. All keys are OPTIONAL -- never added to `required`:
  * live envelopes always carry them, but stored pre-T5 outputs must keep
  * validating. That is the minor-version compat promise (see
  * SCHEMA_VERSION_POLICY in envelope.ts).
+ *
+ * Fase-6 T3 adds the two trace keys (trace_id/span_id, stamped only when a
+ * trace context is passed -- index.ts always passes one): eleven optional
+ * keys total, same compat promise (stored pre-T3 outputs still validate).
  *
  * `primitive` admits null for the observe tool (laya_capabilities judges
  * nothing, so augmentEnvelope stamps primitive:null); `model` / `policy` /
@@ -114,6 +118,14 @@ export function abstentionSchema(): Record<string, unknown> {
 export function envelopeMetadataProperties(): Record<string, unknown> {
   return {
     decision_id: { type: "string", description: "Unique id per call (dec_<16 lowercase hex)." },
+    trace_id: {
+      type: "string",
+      description: "Inbound trace correlation id from request _meta (validated, generated when absent); opaque id only, never content (fase-6 T3).",
+    },
+    span_id: {
+      type: "string",
+      description: "Inbound span id from request _meta (validated, generated when absent); opaque id only, never content (fase-6 T3).",
+    },
     timestamp: { type: "string", description: "ISO-8601 creation time of the envelope." },
     model: {
       type: ["string", "null"],

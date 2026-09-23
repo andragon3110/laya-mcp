@@ -26,6 +26,10 @@
  *                  revision (evidence.ts/envelope.ts vocabulary). Nothing is
  *                  invented; tests re-derive every entry from its source.
  *   - `mode`:     always "observe".
+ *   - `metrics`:    fase-6 T3 in-process snapshot (requests/latency
+ *                  p50-p99/decisions/abstentions/escalations per tool,
+ *                  per-model latency, probe load stats; aggregates only,
+ *                  exact shape in metrics.ts). OPTIONAL outputSchema key.
  *   - `schema_version`: ENVELOPE_SCHEMA_VERSION ("1.0.0").
  *   - `latency_ms`: wall-clock discovery cost (probes run in parallel).
  *
@@ -48,6 +52,7 @@
 import type { BackendModelInfo, LayaClient, ReadyResult } from "../client.js";
 import { ENVELOPE_SCHEMA_VERSION, TOOL_PRIMITIVES } from "../envelope.js";
 import type { ToolContext } from "../index.js";
+import { getMetricsSnapshot, recordProbe } from "../metrics.js";
 import { listPolicies } from "../policy/loader.js";
 import {
   type ToolDefinition,
@@ -341,6 +346,15 @@ export const capabilitiesTool: ToolDefinition = {
         description:
           "Observe mode: the MCP layer only observes backend state and reports judgments; it never executes actions, applies changes, or mutates anything.",
       },
+      metrics: {
+        type: "object",
+        description:
+          "In-process metrics snapshot (fase-6 T3, OPTIONAL -- never required so stored pre-T3 outputs keep " +
+          "validating): requests_total/failed, inference_latency_ms p50/p95/p99 over a bounded window, " +
+          "policy_decisions per tool/decision, abstentions, escalations, per-model latency, and probe " +
+          "model_load stats. Numeric/categorical aggregates only -- no argument content, no free text. " +
+          "Exact shape is documented in metrics.ts (getMetricsSnapshot).",
+      },
       schema_version: {
         type: "string",
         description: "Envelope contract version (ENVELOPE_SCHEMA_VERSION).",
@@ -382,7 +396,21 @@ export async function handleCapabilities(
 ): Promise<string> {
   const timeoutMs = validateTimeoutMs(args.timeout_ms);
   const started = Date.now();
-  const [laya, gliner] = await Promise.all([probeLaya(client, timeoutMs), probeGliner(ctx, timeoutMs)]);
+  // Fase-6 T3: the live probes below are the model_load signal -- each is
+  // timed individually (parallel wall-clock per probe) and recorded via
+  // recordProbe. No new sondas: these are the pre-existing discovery
+  // probes, only observed, never added to.
+  const timed = async <T>(p: Promise<T>): Promise<[T, number]> => {
+    const s = Date.now();
+    const v = await p;
+    return [v, Date.now() - s];
+  };
+  const [[laya, layaMs], [gliner, glinerMs]] = await Promise.all([
+    timed(probeLaya(client, timeoutMs)),
+    timed(probeGliner(ctx, timeoutMs)),
+  ]);
+  recordProbe("laya", laya.ok && laya.ready !== null, layaMs);
+  recordProbe("gliner", gliner.reachable, glinerMs);
   if (!laya.ok || laya.ready === null) {
     throw new Error(
       `laya_capabilities: laya-server unavailable (${laya.error ?? "unknown error"}); ` +
@@ -414,6 +442,11 @@ export async function handleCapabilities(
     policies: listPolicies(),
     features: buildFeatures(),
     mode: "observe" as const,
+    // Fase-6 T3: metrics snapshot embedded additively (no new tool -- this
+    // already-exempt discovery surface is the exposure point; one line of
+    // justification as required: a new tool would add list surface for a
+    // read that discovery already serves).
+    metrics: getMetricsSnapshot(),
     schema_version: ENVELOPE_SCHEMA_VERSION,
     latency_ms: Date.now() - started,
   };

@@ -388,6 +388,10 @@ const FIXTURES = [
       mode: "observe",
       schema_version: "1.0.0",
       latency_ms: 1,
+      // Fase-6 T3 handler-emitted key (like schema_version above): the live
+      // report embeds the in-process metrics snapshot. Type-valid baseline
+      // (outputSchema declares it optional); live assertions check presence.
+      metrics: {},
     },
     negatives: [
       ["mode write (observe-only enum)", (o) => ({ ...o, mode: "write" })],
@@ -397,7 +401,10 @@ const FIXTURES = [
 ];
 
 const ENVELOPE_KEYS = new Set(Object.keys(envelopeMetadataProperties()));
-assert.equal(ENVELOPE_KEYS.size, 9, "nine known additive envelope keys");
+// Fase-6 T3 intentional evolution (minor-additive): nine T5 keys plus
+// trace_id/span_id. The strip-back assertions below keep passing unchanged
+// because untraced buildCallResult calls stamp no trace keys (back-compat).
+assert.equal(ENVELOPE_KEYS.size, 11, "eleven known additive envelope keys (nine T5 + trace_id/span_id T3)");
 
 function stripEnvelope(obj) {
   const out = { ...obj };
