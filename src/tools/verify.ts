@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { verifyEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
@@ -62,6 +63,7 @@ export async function handleVerify(client: LayaClient, args: Record<string, unkn
     const a = raw.answers as Record<string, { noul: number }>;
     const verdicts = claims.map((claim, i) => {
       const prob = a[`claim_${i}`]?.noul ?? 0;
+      // P1-T3: legacy decision, engine-owned from T5/T6
       const verdict = prob >= 0.8 ? "verified" : prob >= 0.4 ? "unsupported" : "contradicted";
       return { claim, probability: prob, verdict };
     });
@@ -70,7 +72,17 @@ export async function handleVerify(client: LayaClient, args: Record<string, unkn
       unsupported: verdicts.filter((v) => v.verdict === "unsupported").length,
       contradicted: verdicts.filter((v) => v.verdict === "contradicted").length,
     };
-    return JSON.stringify({ summary, verdicts, latency_ms: raw.latencyMs }, null, 2);
+    const { evidence, abstention } = verifyEvidence(
+      raw,
+      {
+        claims: verdicts.map((v, i) => ({
+          claim: String(v.claim),
+          signal: typeof a[`claim_${i}`]?.noul === "number" ? (a[`claim_${i}`].noul as number) : null,
+          verdict: v.verdict,
+        })),
+      },
+    );
+    return JSON.stringify({ summary, verdicts, latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
   });
   if (!result.ok) throw new Error(result.error);
   return result.content;

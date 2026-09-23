@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { gateEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
@@ -90,17 +91,32 @@ export async function handleGate(client: LayaClient, args: Record<string, unknow
     const a = raw.answers as Record<string, { score: number; noul?: number }>;
     const claimResults = claims.map((claim, i) => {
       const prob = a[`claim_${i}`]?.noul ?? 0;
+      // P1-T3: legacy decision, engine-owned from T5/T6
       const verdict = prob >= 0.8 ? "verified" : prob >= 0.4 ? "unsupported" : "contradicted";
       return { claim, probability: prob, verdict };
     });
     const contradicted = claimResults.filter((c) => c.verdict === "contradicted").length;
+    // P1-T3: legacy decision, engine-owned from T5/T6
     const action = contradicted > 0 ? "escalate" : (a.safe_to_apply?.noul ?? 0) > 0.85 ? "auto" : "review";
+    const numOrNull = (v: unknown): number | null => (typeof v === "number" ? v : null);
+    const { evidence, abstention } = gateEvidence(raw, {
+      correctness: numOrNull(a.correctness?.score),
+      spec_match: numOrNull(a.spec_match?.score),
+      safe_to_apply: numOrNull(a.safe_to_apply?.noul),
+      claims: claimResults.map((c, i) => ({
+        claim: String(c.claim),
+        signal: numOrNull(a[`claim_${i}`]?.noul),
+        verdict: c.verdict,
+      })),
+    });
     return JSON.stringify(
       {
         action,
         review: { safe_to_apply: a.safe_to_apply?.noul },
         claims: claimResults,
         latency_ms: raw.latencyMs,
+        evidence,
+        abstention,
       },
       null,
       2,

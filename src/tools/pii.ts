@@ -1,5 +1,6 @@
 import type { LayaClient } from "../client.js";
 import type { ToolContext } from "../index.js";
+import { piiEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import type { ToolDefinition } from "../tool.js";
 
@@ -66,8 +67,21 @@ export async function handlePii(
   const extra = Array.isArray(args.extra_types) ? (args.extra_types as string[]) : [];
   const { findings, counts, latencyMs } = await ctx.gliner.piiScan(text, extra);
   const secrets = findings.filter((f) => SECRET_TYPES.has(f.type));
+  // P1-T3: legacy decision, engine-owned from T5/T6
   const action =
     secrets.length > 0 ? "block" : findings.length > 0 ? "review" : "pass";
+  // P1-T3: weak-type findings are only marked in evidence; action above is unchanged.
+  const { evidence, abstention } = piiEvidence({
+    findings: findings.map((f) => ({
+      text: f.text,
+      start: f.start,
+      end: f.end,
+      type: f.type,
+      detectorScore: typeof f.confidence === "number" ? f.confidence : null,
+      weak_type: !SECRET_TYPES.has(f.type),
+    })),
+    weakTypes: findings.filter((f) => !SECRET_TYPES.has(f.type)).map((f) => f.type),
+  });
   return JSON.stringify(
     {
       action,
@@ -81,6 +95,8 @@ export async function handlePii(
           : action === "review"
             ? "PII detected. Review whether each finding may enter context."
             : "No PII or secrets detected.",
+        evidence,
+        abstention,
     },
     null,
     2,

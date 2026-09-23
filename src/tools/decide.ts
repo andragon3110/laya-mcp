@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { decideEvidence } from "../evidence.js";
 import { LIMITS, assertCount, inputTooLarge } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
@@ -88,6 +89,19 @@ export const decideTool: ToolDefinition = {
 export async function handleDecide(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const result = await runTool(client, args, decideTool.buildQuestions(args), (raw) => {
     const a = raw.answers as Record<string, { choice?: string; probabilities?: Record<string, number>; noul?: number }>;
+    // P1-T3: legacy decision, engine-owned from T5/T6 (selected/requirements below).
+    const candidates = Array.isArray(args.candidates) ? args.candidates : [];
+    const requirementKeys = Object.keys(a).filter((k) => k.startsWith("requirement_"));
+    const { evidence, abstention } = decideEvidence(raw, {
+      selected: typeof a.selected?.choice === "string" ? a.selected.choice : null,
+      distribution: (a.selected?.probabilities as Record<string, number> | undefined) ?? null,
+      optionCount: candidates.length,
+      requirements: requirementKeys.map((k) => ({
+        key: k,
+        signal: typeof a[k]?.noul === "number" ? (a[k].noul as number) : null,
+        missing: typeof a[k]?.noul !== "number",
+      })),
+    });
     return JSON.stringify(
       {
         selected: a.selected?.choice ?? null,
@@ -96,6 +110,8 @@ export async function handleDecide(client: LayaClient, args: Record<string, unkn
           Object.entries(a).filter(([k]) => k.startsWith("requirement_")).map(([k, v]) => [k, v.noul]),
         ),
         latency_ms: raw.latencyMs,
+        evidence,
+        abstention,
       },
       null,
       2,

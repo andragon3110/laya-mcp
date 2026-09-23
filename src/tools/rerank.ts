@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { rerankEvidence } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
@@ -94,10 +95,24 @@ export async function handleRerank(client: LayaClient, args: Record<string, unkn
         id: c.id,
         relevance: a[`relevance_${i}_${c.id}`]?.noul ?? 0,
       }))
+      // P1-T3: legacy decision, engine-owned from T5/T6 (sort order below).
       .sort((a, b) => b.relevance - a.relevance)
       .map((entry, idx) => ({ ...entry, rank: idx + 1 }));
+    const { evidence, abstention } = rerankEvidence(raw, {
+      items: candidates.map((c: { id?: string }, i: number) => {
+        const key = `relevance_${i}_${c.id}`;
+        const v = a[key]?.noul;
+        return {
+          id: String(c.id),
+          question: key,
+          relevance: typeof v === "number" ? v : null,
+          rank: scored.find((s) => s.id === c.id)?.rank ?? 0,
+          missing: typeof v !== "number",
+        };
+      }),
+    });
     return JSON.stringify(
-      { ranked: scored, truncated: wasTruncated, truncated_ids: truncatedIds, latency_ms: raw.latencyMs },
+      { ranked: scored, truncated: wasTruncated, truncated_ids: truncatedIds, latency_ms: raw.latencyMs, evidence, abstention },
       null,
       2,
     );

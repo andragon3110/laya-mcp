@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { classifyEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
@@ -69,13 +70,29 @@ export async function handleClassify(client: LayaClient, args: Record<string, un
     const a = raw.answers as Record<string, { choice: string; probabilities: Record<string, number> }>;
     const classifications = items.map((item: { id?: string }, i: number) => {
       const ans = a[`class_${i}_${item.id}`];
+      // P1-T3: legacy decision, engine-owned from T5/T6 (classification below).
+      // P1-T3 bugfix: Math.max(...[]) is -Infinity for an empty dict; emit the
+      // honest winner_probability null instead. Wire-identical: JSON already
+      // serialized -Infinity as null, so legacy consumers see no change.
+      const winner = ans ? winnerOf(ans.probabilities ?? {}) : null;
       return {
         id: item.id,
         classification: ans?.choice ?? "other",
-        confidence: ans ? Math.max(...Object.values(ans.probabilities ?? {})) : 0,
+        confidence: ans ? (winner ?? null) : 0,
       };
     });
-    return JSON.stringify({ classifications, latency_ms: raw.latencyMs }, null, 2);
+    const { evidence, abstention } = classifyEvidence(raw, {
+      items: items.map((item: { id?: string }, i: number) => {
+        const ans = a[`class_${i}_${item.id}`];
+        return {
+          id: String(item.id),
+          choice: ans?.choice ?? "other",
+          distribution: (ans?.probabilities as Record<string, number> | undefined) ?? null,
+          missing: ans == null,
+        };
+      }),
+    });
+    return JSON.stringify({ classifications, latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
   });
   if (!result.ok) throw new Error(result.error);
   return result.content;

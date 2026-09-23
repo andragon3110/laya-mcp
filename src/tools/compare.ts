@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { compareEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
@@ -77,6 +78,25 @@ export async function handleCompare(client: LayaClient, args: Record<string, unk
   const aspects = Array.isArray(args.aspects) ? args.aspects : [];
   const result = await runTool(client, args, compareTool.buildQuestions(args), (raw) => {
     const a = raw.answers as Record<string, { choice: string; probabilities: Record<string, number> }>;
+    // P1-T3: legacy decision, engine-owned from T5/T6 (relation below).
+    const aspectInputs = aspects.map((aspect, i) => {
+      const key = `aspect_${i}_${String(aspect).replace(/\W/g, "_")}`;
+      return {
+        key,
+        label: String(aspect),
+        choice: typeof a[key]?.choice === "string" ? a[key].choice : null,
+        distribution: (a[key]?.probabilities as Record<string, number> | undefined) ?? null,
+        missing: a[key] == null,
+      };
+    });
+    const { evidence, abstention } = compareEvidence(raw, {
+      overall: {
+        choice: typeof a.overall?.choice === "string" ? a.overall.choice : null,
+        distribution: (a.overall?.probabilities as Record<string, number> | undefined) ?? null,
+        missing: a.overall == null,
+      },
+      aspects: aspectInputs,
+    });
     const out: Record<string, unknown> = {
       overall: {
         relation: a.overall?.choice,
@@ -90,6 +110,8 @@ export async function handleCompare(client: LayaClient, args: Record<string, unk
         out[aspect as string] = { relation: a[key].choice, confidence: a[key].probabilities };
       }
     });
+    out.evidence = evidence;
+    out.abstention = abstention;
     return JSON.stringify(out, null, 2);
   });
   if (!result.ok) throw new Error(result.error);

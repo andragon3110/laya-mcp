@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { findEvidence } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
@@ -58,8 +59,15 @@ export async function handleFind(client: LayaClient, args: Record<string, unknow
     const a = raw.answers as Record<string, { choice: string; probabilities: Record<string, number> }>;
     const choice = a.exists?.choice ?? "none";
     const probs = a.exists?.probabilities ?? {};
+    // P1-T3: legacy decision, engine-owned from T5/T6 (winner/choice above).
+    const candidates = Array.isArray(args.candidates) ? args.candidates : [];
+    const { evidence, abstention } = findEvidence(raw, {
+      choice: typeof a.exists?.choice === "string" ? a.exists.choice : null,
+      distribution: (a.exists?.probabilities as Record<string, number> | undefined) ?? null,
+      candidateCount: candidates.length,
+    });
     return JSON.stringify(
-      { winner: choice, exists: choice !== "none", probabilities: probs, latency_ms: raw.latencyMs },
+      { winner: choice, exists: choice !== "none", probabilities: probs, latency_ms: raw.latencyMs, evidence, abstention },
       null,
       2,
     );

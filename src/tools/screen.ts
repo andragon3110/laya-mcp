@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { screenEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool, passthrough } from "../tool.js";
 
@@ -66,7 +67,20 @@ export async function handleScreen(client: LayaClient, args: Record<string, unkn
     const injection = a.is_injection?.noul ?? 0;
     const substance = a.has_substance?.noul ?? 0;
     const relevance = a.is_relevant?.noul ?? 0;
+    // P1-T3: legacy decision, engine-owned from T5/T6
     const action = injection > 0.75 ? "block" : injection > 0.25 ? "review" : substance < 0.4 ? "skip" : "pass";
+    const numOrNull = (v: unknown): number | null => (typeof v === "number" ? v : null);
+    const missing = [
+      ...(typeof a.is_injection?.noul !== "number" ? ["is_injection"] : []),
+      ...(typeof a.has_substance?.noul !== "number" ? ["has_substance"] : []),
+      ...(typeof a.is_relevant?.noul !== "number" ? ["is_relevant"] : []),
+    ];
+    const { evidence, abstention } = screenEvidence(raw, {
+      injection: numOrNull(a.is_injection?.noul),
+      substance: numOrNull(a.has_substance?.noul),
+      relevance: numOrNull(a.is_relevant?.noul),
+      missing,
+    });
     return JSON.stringify(
       {
         action,
@@ -81,6 +95,8 @@ export async function handleScreen(client: LayaClient, args: Record<string, unkn
               : action === "review"
                 ? "Escalate to a human or larger model before using."
                 : "Safe to include.",
+        evidence,
+        abstention,
       },
       null,
       2,

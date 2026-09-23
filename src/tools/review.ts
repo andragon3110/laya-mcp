@@ -1,4 +1,5 @@
 import type { LayaClient } from "../client.js";
+import { reviewEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
 import { type ToolDefinition, runTool } from "../tool.js";
 
@@ -62,6 +63,14 @@ export const reviewTool: ToolDefinition = {
 export async function handleReview(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const result = await runTool(client, args, reviewTool.buildQuestions(args), (raw) => {
     const a = raw.answers as Record<string, { score: number; confidence?: number; noul?: number }>;
+    const numOrNull = (v: unknown): number | null => (typeof v === "number" ? v : null);
+    const { evidence, abstention } = reviewEvidence(raw, {
+      correctness: numOrNull(a.correctness?.score),
+      spec_match: numOrNull(a.spec_match?.score),
+      test_gap: numOrNull(a.test_gap?.score),
+      blast_radius: numOrNull(a.blast_radius?.score),
+      safe_to_apply: numOrNull(a.safe_to_apply?.noul),
+    });
     return JSON.stringify(
       {
         scores: {
@@ -71,8 +80,11 @@ export async function handleReview(client: LayaClient, args: Record<string, unkn
           blast_radius: a.blast_radius?.score,
         },
         safe_to_apply: a.safe_to_apply?.noul,
+        // P1-T3: legacy decision, engine-owned from T5/T6
         action: (a.safe_to_apply?.noul ?? 0) > 0.85 ? "auto" : (a.safe_to_apply?.noul ?? 0) > 0.5 ? "review" : "escalate",
         latency_ms: raw.latencyMs,
+        evidence,
+        abstention,
       },
       null,
       2,
