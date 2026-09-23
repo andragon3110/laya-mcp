@@ -23,9 +23,9 @@ export interface HealthResult {
 }
 
 /**
- * T3: typed views over the new k8s-style probes (GET /live, /ready, /models).
- * The background HealthWatch still polls /health (warming) in T3 and migrates
- * to /live + /ready in T4, so no caller uses these yet.
+ * T4: typed views over the k8s-style probes (GET /live, /ready, /models).
+ * The background HealthWatch polls /live (liveness) + /ready (readiness)
+ * since T4; /health remains only as a legacy warming endpoint.
  */
 export interface LiveResult {
   alive: boolean;
@@ -48,6 +48,8 @@ export interface ReadyResult {
   device?: string;
   versions?: Record<string, string>;
   uptimeSeconds?: number;
+  /** Load circuit-breaker state (T4): "closed" | "open" | "half-open". */
+  circuit?: string;
 }
 
 export interface BackendModelInfo {
@@ -58,6 +60,8 @@ export interface BackendModelInfo {
   revision: string | null;
   revision_source?: string;
   device?: string;
+  /** Load circuit-breaker state (T4): "closed" | "open" | "half-open". */
+  circuit?: string;
 }
 
 export class BackendUnavailableError extends Error {
@@ -199,6 +203,7 @@ export class LayaClient {
       device: typeof body.device === "string" ? body.device : undefined,
       versions: (body.versions as Record<string, string>) ?? undefined,
       uptimeSeconds: typeof body.uptime_seconds === "number" ? body.uptime_seconds : undefined,
+      circuit: typeof body.circuit === "string" ? body.circuit : undefined,
     };
   }
 
