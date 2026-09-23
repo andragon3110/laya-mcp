@@ -38,6 +38,16 @@ def main() -> int:
         help="Download all three official Laya checkpoints (English, multilingual, typed-decisions).",
     )
     parser.add_argument(
+        "--revision",
+        default=os.getenv("LAYA_MODEL_REVISION"),
+        help="HF revision pin (commit hash, tag or branch) passed to "
+        "snapshot_download for every repo. Default: $LAYA_MODEL_REVISION. "
+        "When absent the download is unpinned (recorded honestly; the "
+        "backend reports revision null + revision_source unpinned, never "
+        "an invented hash). Pin resolution needs the network: without it "
+        "an explicit bad pin fails loudly instead of guessing.",
+    )
+    parser.add_argument(
         "--gliner",
         action="store_true",
         help="Also download the GLiNER2.5 multilingual checkpoint (fastino/gliner2.5-multi-v1, ~594 MB).",
@@ -76,9 +86,14 @@ def main() -> int:
             snapshot_download(
                 repo_id=repo_id,
                 allow_patterns=patterns,
+                revision=args.revision,
                 tqdm_class=None,
             )
-            print(f"[download] {repo_id}: ok")
+            # Receipt: record the pin actually used (explicit or honest
+            # unpinned). The backend independently reports revision null +
+            # revision_source "unpinned" unless the operator pins
+            # LAYA_MODEL_REVISION / GLINER_MODEL_REVISION.
+            print(f"[download] {repo_id}: ok revision={args.revision or 'unpinned'}")
         except Exception as exc:  # noqa: BLE001
             print(f"[download] {repo_id}: FAILED -- {exc!r}", file=sys.stderr)
             return 1

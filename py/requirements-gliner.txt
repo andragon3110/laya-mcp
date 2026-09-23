@@ -8,3 +8,11 @@
 # mDeBERTa tokenizer (ImportError without it -- verified 2026-09-20).
 gliner2[local]>=2.0.0,<3.0.0
 protobuf>=4.0
+
+# -- fase-8-final T3: de facto lock (NOT == pins -- see note below) --------
+# Exact versions installed and verified 2026-09-23 (Windows, Python 3.11.9):
+#   protobuf==6.33.6  (gliner2 itself: NOT installed here -- opt-in only)
+# Same no-pin rationale as py/requirements.txt: `==` was not verified
+# against a clean-room install, so reproduce via
+#   pip install -r py/requirements-gliner.txt && pip freeze
+# and pin only after testing a fresh venv.
