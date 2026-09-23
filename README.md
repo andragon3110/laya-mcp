@@ -155,7 +155,7 @@ get all eleven back.
 | `laya_pii` | PII + secrets scan (email, phone, API keys, tokens, passwords, names) with character offsets. Needs the GLiNER sidecar. | GLiNER spans |
 | `laya_verify` | Claim-by-claim fact check against supplied evidence. | Laya `noul` per claim |
 | `laya_find` | Best candidate id for a query (or `none`), up to 250 candidates, no embeddings. | Laya `choice` |
-| `laya_rerank` | Score + sort every candidate by relevance. | Laya `noul` per candidate |
+| `laya_rerank` | Score + sort candidates by relevance (raw score = order-only within one call, NOT a probability; optional `top_k` pre-filter). | Laya `noul` per candidate |
 | `laya_classify` | Batch-label items against your catalog. Auto-apply at confidence ≥ 0.85. | Laya `choice` per item |
 | `laya_decide` | Bounded choice (2–6 options) with per-requirement checks and `ask_user` escape hatches. | Laya `choice` + `noul` |
 | `laya_compare` | How two passages relate (`same_fact` / `contradicts` / `different_facts`), overall + per aspect. | Laya `choice` per aspect |
@@ -281,6 +281,12 @@ Model → Action:
 - `abstention` — first-class `{abstained, reason}`; abstained evidence
   always resolves to `ESCALATE`, never to a forced verdict or a block.
   Verify verdicts are `SUPPORTED` / `INSUFFICIENT_EVIDENCE` / `ABSTAIN`.
+- `relevance_score` (`laya_rerank`) is rank-only: higher means more
+  relevant **within that one call** — it is not a probability (0.9 is not
+  90%), does not transfer across calls or checkpoints, and no cutoff on
+  it is meaningful. With `top_k` set, a deterministic token-overlap
+  pre-filter picks the shortlist, but the final order is always the
+  judge's; act only on the `decision`, never on the number.
 
 Breaking renames per tool (old → new) and the full policy/threshold
 reference live in `P1_IMPLEMENTATION.md` (§8, §4). The decision vocabulary
@@ -375,7 +381,9 @@ Error contract:
   resend. Enforced on `/predict` (`LAYA_LIMITS_*`), `/extract_entities`
   / `/classify` / `/pii_scan` (`GLINER_LIMITS_*`), and mirrored early in
   the MCP tools (`laya_find` ≤ 250 candidates, `laya_rerank` ≤ 64
-  candidates truncated to 2,000 chars each, `laya_classify` ≤ 64 items,
+  candidates truncated to 2,000 chars each — optional `top_k` narrows the
+  judged shortlist deterministically without moving the ceiling,
+  `laya_classify` ≤ 64 items,
   `laya_verify` ≤ 64 claims, `laya_gate` ≤ 61 claims, `laya_decide` 2–6
   options with ≤ 32 requirements).
 - **503 + `Retry-After`**: backend not ready (load backoff / open
