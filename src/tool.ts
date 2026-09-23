@@ -34,7 +34,14 @@ export const passthrough: QuestionBuilder = (args) => {
 /**
  * Run a Laya call and shape the MCP text response. The `present` callback
  * decides what the agent actually sees.
+ *
+ * T5: LAYA_TOOL_TIMEOUT_MS (default 8000) is enforced here as the timeout
+ * for every tool call -- previously it was only logged at startup in
+ * index.ts. An explicit per-call opts.timeoutMs still wins; direct
+ * LayaClient.predict callers keep the transport default (LAYA_TIMEOUT_MS).
  */
+export const TOOL_TIMEOUT_MS = Number(process.env.LAYA_TOOL_TIMEOUT_MS ?? 8000);
+
 export async function runTool(
   client: LayaClient,
   args: Record<string, unknown>,
@@ -43,7 +50,7 @@ export async function runTool(
   opts?: PredictOpts,
 ): Promise<ToolResult> {
   try {
-    const result = await client.predict(args, questions, undefined, opts);
+    const result = await client.predict(args, questions, opts?.timeoutMs ?? TOOL_TIMEOUT_MS, opts);
     return { ok: true, content: present(result) };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

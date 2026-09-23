@@ -23,6 +23,7 @@ import math
 import os
 import random
 import sys
+import threading
 import time
 from typing import Any, Dict, List, Optional, Union
 
@@ -140,6 +141,25 @@ def _retry_after_header(seconds: float) -> Dict[str, str]:
     return {"Retry-After": str(max(1, math.ceil(seconds)))}
 
 
+class _InflightSaturated(RuntimeError):
+    """Inference bound hit: fail fast instead of queueing (never enqueues).
+
+    Carries `retry_after_seconds` so the endpoint answers 503 + Retry-After.
+    """
+
+    def __init__(self, message: str, retry_after_seconds: float = 1.0) -> None:
+        super().__init__(message)
+        self.retry_after_seconds = max(0.0, retry_after_seconds)
+
+
+def _max_inflight(env_name: str, default: int) -> int:
+    """Inference concurrency bound from env (validated >= 1)."""
+    try:
+        return max(1, int(os.getenv(env_name, str(default))))
+    except ValueError:
+        return default
+
+
 class _ExtractorHolder:
     """Lazy GLiNER loader so the HTTP server boots even when weights are missing.
 
@@ -160,6 +180,23 @@ class _ExtractorHolder:
         self._consecutive_failures = 0
         self._device: str | None = None
         self._loaded_at: float | None = None
+        # T5 concurrency guards. Justification per guard (no global locks):
+        # - _load_mutex (threading.Lock, per holder): serializes concurrent
+        #   SYNC constructions (threads / legacy sync paths) so N threads
+        #   with an unloaded model cause ONE AutoExtractor call; the rest
+        #   wait on the mutex and see the loaded model. Only held during load.
+        # - _load_lock (asyncio.Lock, per holder, lazy): serializes
+        #   concurrent ASYNC load dispatches in the event loop so N requests
+        #   dispatch ONE to_thread construction; the rest await the same
+        #   result. Only guards the load phase, never inference.
+        # - _inflight (asyncio.Semaphore, per holder, lazy): bounds
+        #   concurrent inference workers (see _inflight_sem for the
+        #   throughput/VRAM trade-off). Saturation answers 503 + Retry-After
+        #   immediately instead of queueing unboundedly.
+        self._load_mutex = threading.Lock()
+        self._load_lock: asyncio.Lock | None = None
+        self._inflight: asyncio.Semaphore | None = None
+        self._inflight_limit = 0
 
     # -- circuit breaker (T4) -------------------------------------------
     def circuit_state(self, now: float | None = None) -> str:
@@ -274,14 +311,72 @@ class _ExtractorHolder:
     def _ensure(self) -> Any:
         if self._model is not None:
             return self._model
-        self._check_retry_allowed(time.time())
+        # Single-flight (sync side): concurrent threads collapse onto one
+        # construction; the double-check after acquiring avoids a second
+        # build when a waiter finds the model already loaded.
+        with self._load_mutex:
+            if self._model is not None:
+                return self._model
+            self._check_retry_allowed(time.time())
+            try:
+                self._do_load()
+            except Exception as exc:  # noqa: BLE001
+                self._record_failure(exc, time.time())
+                raise
+            self._record_success(time.time())
+            return self._model
+
+    def _async_load_lock(self) -> asyncio.Lock:
+        # Lazily created in the running loop: asyncio primitives must not be
+        # shared across loops, and this server runs a single loop.
+        if self._load_lock is None:
+            self._load_lock = asyncio.Lock()
+        return self._load_lock
+
+    async def ensure_async(self) -> Any:
+        """Single-flight async load: N concurrent requests -> ONE blocking
+        construction in a worker thread; the rest await the same result.
+        Funnels through the sync _ensure (and its mutex), so a sync load
+        racing an async one still builds only once."""
+        if self._model is not None:
+            return self._model
+        async with self._async_load_lock():
+            if self._model is not None:
+                return self._model
+            return await asyncio.to_thread(self._ensure)
+
+    def _inflight_sem(self) -> "tuple[asyncio.Semaphore, int]":
+        """Inference semaphore, sized from GLINER_MAX_INFLIGHT.
+
+        Trade-off (documented, T5): each inflight inference holds a worker
+        thread + transient memory for a span-extraction forward pass of a
+        287M model. Default 4: extraction is lighter than a Laya Router
+        pass, so a small amount of overlap is safe; raise only with
+        measured headroom. Saturation is backpressure, not a bug.
+        """
+        limit = _max_inflight("GLINER_MAX_INFLIGHT", 4)
+        if self._inflight is None or self._inflight_limit != limit:
+            self._inflight = asyncio.Semaphore(limit)
+            self._inflight_limit = limit
+        return self._inflight, limit
+
+    async def run_bounded(self, func: Any, *args: Any, **kwargs: Any) -> Any:
+        """Run blocking inference in a worker thread under the inflight
+        bound. Raises _InflightSaturated immediately when saturated -- never
+        queues. The locked() check + acquire() below are atomic within one
+        event-loop task (no await between them), so no hidden queue forms."""
+        sem, limit = self._inflight_sem()
+        if sem.locked():
+            raise _InflightSaturated(
+                f"gliner-server saturated ({limit} inflight, limit {limit}): "
+                "retry shortly",
+                1.0,
+            )
+        await sem.acquire()
         try:
-            self._do_load()
-        except Exception as exc:  # noqa: BLE001
-            self._record_failure(exc, time.time())
-            raise
-        self._record_success(time.time())
-        return self._model
+            return await asyncio.to_thread(func, *args, **kwargs)
+        finally:
+            sem.release()
 
     def health(self) -> Dict[str, Any]:
         if self._model is None:
@@ -500,8 +595,10 @@ async def extract_entities(req: ExtractRequest) -> Dict[str, Any]:
     """Zero-shot entity spans with character offsets. No regex required."""
     start = time.perf_counter()
     try:
-        model = await asyncio.to_thread(holder._ensure)
-        result = await asyncio.to_thread(
+        # Single-flight load, then bound inference (503 + Retry-After when
+        # saturated, never an unbounded queue).
+        model = await holder.ensure_async()
+        result = await holder.run_bounded(
             model.extract_entities,
             req.text,
             req.labels,
@@ -515,6 +612,17 @@ async def extract_entities(req: ExtractRequest) -> Dict[str, Any]:
             detail=str(exc),
             headers=_retry_after_header(exc.retry_after_seconds),
         ) from exc
+    except _InflightSaturated as exc:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": str(exc),
+                "code": "inflight_saturated",
+                "retry_after_seconds": exc.retry_after_seconds,
+                "limit": holder._inflight_limit,
+            },
+            headers=_retry_after_header(exc.retry_after_seconds),
+        )
     except RuntimeError as exc:
         raise HTTPException(
             status_code=503,
@@ -534,14 +642,25 @@ async def classify(req: ClassifyRequest) -> Dict[str, Any]:
     """Zero-shot text classification. Tasks map is passed straight through."""
     start = time.perf_counter()
     try:
-        model = await asyncio.to_thread(holder._ensure)
-        result = await asyncio.to_thread(model.classify_text, req.text, req.tasks)
+        model = await holder.ensure_async()
+        result = await holder.run_bounded(model.classify_text, req.text, req.tasks)
     except _LoadNotReady as exc:
         raise HTTPException(
             status_code=503,
             detail=str(exc),
             headers=_retry_after_header(exc.retry_after_seconds),
         ) from exc
+    except _InflightSaturated as exc:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": str(exc),
+                "code": "inflight_saturated",
+                "retry_after_seconds": exc.retry_after_seconds,
+                "limit": holder._inflight_limit,
+            },
+            headers=_retry_after_header(exc.retry_after_seconds),
+        )
     except RuntimeError as exc:
         raise HTTPException(
             status_code=503,
@@ -564,8 +683,8 @@ async def pii_scan(req: PiiRequest) -> Dict[str, Any]:
     for extra in req.extra_types or []:
         labels.setdefault(extra, extra.replace("_", " "))
     try:
-        model = await asyncio.to_thread(holder._ensure)
-        result = await asyncio.to_thread(
+        model = await holder.ensure_async()
+        result = await holder.run_bounded(
             model.extract_entities,
             req.text,
             labels,
@@ -578,6 +697,17 @@ async def pii_scan(req: PiiRequest) -> Dict[str, Any]:
             detail=str(exc),
             headers=_retry_after_header(exc.retry_after_seconds),
         ) from exc
+    except _InflightSaturated as exc:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": str(exc),
+                "code": "inflight_saturated",
+                "retry_after_seconds": exc.retry_after_seconds,
+                "limit": holder._inflight_limit,
+            },
+            headers=_retry_after_header(exc.retry_after_seconds),
+        )
     except RuntimeError as exc:
         raise HTTPException(
             status_code=503,

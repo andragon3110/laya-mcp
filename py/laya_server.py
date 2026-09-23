@@ -23,6 +23,7 @@ import math
 import os
 import random
 import sys
+import threading
 import time
 from typing import Any, Dict
 
@@ -135,6 +136,25 @@ def _retry_after_header(seconds: float) -> Dict[str, str]:
     return {"Retry-After": str(max(1, math.ceil(seconds)))}
 
 
+class _InflightSaturated(RuntimeError):
+    """Inference bound hit: fail fast instead of queueing (never enqueues).
+
+    Carries `retry_after_seconds` so the endpoint answers 503 + Retry-After.
+    """
+
+    def __init__(self, message: str, retry_after_seconds: float = 1.0) -> None:
+        super().__init__(message)
+        self.retry_after_seconds = max(0.0, retry_after_seconds)
+
+
+def _max_inflight(env_name: str, default: int) -> int:
+    """Inference concurrency bound from env (validated >= 1)."""
+    try:
+        return max(1, int(os.getenv(env_name, str(default))))
+    except ValueError:
+        return default
+
+
 class _RouterHolder:
     """Lazy Router loader so the HTTP server boots even when Laya is missing.
 
@@ -154,6 +174,23 @@ class _RouterHolder:
         self._load_attempts = 0
         self._consecutive_failures = 0
         self._loaded_at: float | None = None
+        # T5 concurrency guards. Justification per guard (no global locks):
+        # - _load_mutex (threading.Lock, per holder): serializes concurrent
+        #   SYNC constructions (threads / legacy sync paths) so N threads
+        #   with an unloaded model cause ONE Router() call; the rest wait on
+        #   the mutex and see the loaded router. Only held during load.
+        # - _load_lock (asyncio.Lock, per holder, lazy): serializes
+        #   concurrent ASYNC load dispatches in the event loop so N requests
+        #   dispatch ONE to_thread construction; the rest await the same
+        #   result. Only guards the load phase, never inference.
+        # - _inflight (asyncio.Semaphore, per holder, lazy): bounds
+        #   concurrent inference workers to protect VRAM (see _inflight_sem
+        #   for the throughput/VRAM trade-off). Saturation answers 503 +
+        #   Retry-After immediately instead of queueing unboundedly.
+        self._load_mutex = threading.Lock()
+        self._load_lock: asyncio.Lock | None = None
+        self._inflight: asyncio.Semaphore | None = None
+        self._inflight_limit = 0
 
     # -- circuit breaker (T4) -------------------------------------------
     def circuit_state(self, now: float | None = None) -> str:
@@ -284,14 +321,72 @@ class _RouterHolder:
     def _ensure(self) -> Any:
         if self._router is not None:
             return self._router
-        self._check_retry_allowed(time.time())
+        # Single-flight (sync side): concurrent threads collapse onto one
+        # construction; the double-check after acquiring avoids a second
+        # build when a waiter finds the router already loaded.
+        with self._load_mutex:
+            if self._router is not None:
+                return self._router
+            self._check_retry_allowed(time.time())
+            try:
+                self._do_load()
+            except Exception as exc:  # noqa: BLE001
+                self._record_failure(exc, time.time())
+                raise
+            self._record_success(time.time())
+            return self._router
+
+    def _async_load_lock(self) -> asyncio.Lock:
+        # Lazily created in the running loop: asyncio primitives must not be
+        # shared across loops, and this server runs a single loop.
+        if self._load_lock is None:
+            self._load_lock = asyncio.Lock()
+        return self._load_lock
+
+    async def ensure_async(self) -> Any:
+        """Single-flight async load: N concurrent requests -> ONE blocking
+        construction in a worker thread; the rest await the same result.
+        Funnels through the sync _ensure (and its mutex), so a sync load
+        racing an async one still builds only once."""
+        if self._router is not None:
+            return self._router
+        async with self._async_load_lock():
+            if self._router is not None:
+                return self._router
+            return await asyncio.to_thread(self._ensure)
+
+    def _inflight_sem(self) -> "tuple[asyncio.Semaphore, int]":
+        """Inference semaphore, sized from LAYA_MAX_INFLIGHT.
+
+        Trade-off (documented, T5): each inflight inference holds a worker
+        thread + transient VRAM for a Router forward pass. Default = number
+        of checkpoints (3): one slot per checkpoint avoids VRAM
+        oversubscription on a cold box. Raise only with measured VRAM
+        headroom; saturation is a backpressure signal, not a bug.
+        """
+        limit = _max_inflight("LAYA_MAX_INFLIGHT", len(LAYA_CHECKPOINTS))
+        if self._inflight is None or self._inflight_limit != limit:
+            self._inflight = asyncio.Semaphore(limit)
+            self._inflight_limit = limit
+        return self._inflight, limit
+
+    async def run_bounded(self, func: Any, *args: Any, **kwargs: Any) -> Any:
+        """Run blocking inference in a worker thread under the inflight
+        bound. Raises _InflightSaturated immediately when saturated -- never
+        queues. The locked() check + acquire() below are atomic within one
+        event-loop task (no await between them), so no hidden queue forms."""
+        sem, limit = self._inflight_sem()
+        if sem.locked():
+            raise _InflightSaturated(
+                f"laya-server saturated ({limit} inflight, limit {limit}): "
+                "retry shortly",
+                1.0,
+            )
+        await sem.acquire()
         try:
-            self._do_load()
-        except Exception as exc:  # noqa: BLE001
-            self._record_failure(exc, time.time())
-            raise
-        self._record_success(time.time())
-        return self._router
+            return await asyncio.to_thread(func, *args, **kwargs)
+        finally:
+            sem.release()
 
     def predict(self, state: Any, questions: Dict[str, Any], **kwargs: Any) -> Dict[str, Any]:
         # kwargs passes Router routing overrides straight through:
@@ -561,11 +656,13 @@ async def predict(req: PredictRequest) -> PredictResponse:
             kwargs["task"] = req.task
         if req.lang is not None:
             kwargs["lang"] = req.lang
-        result = await asyncio.to_thread(
-            lambda: router.predict(req.state, req.questions, **kwargs)
-            if kwargs
-            else router.predict(req.state, req.questions)
-        )
+        # Single-flight load (one construction for N concurrent requests),
+        # then bound inference (503 + Retry-After when saturated, no queue).
+        router_obj = await router.ensure_async()
+        if kwargs:
+            result = await router.run_bounded(router_obj.predict, req.state, req.questions, **kwargs)
+        else:
+            result = await router.run_bounded(router_obj.predict, req.state, req.questions)
     except _LoadNotReady as exc:
         # Backoff/circuit fail-fast: 503 with Retry-After, no retry loop.
         raise HTTPException(
@@ -573,6 +670,17 @@ async def predict(req: PredictRequest) -> PredictResponse:
             detail=str(exc),
             headers=_retry_after_header(exc.retry_after_seconds),
         ) from exc
+    except _InflightSaturated as exc:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": str(exc),
+                "code": "inflight_saturated",
+                "retry_after_seconds": exc.retry_after_seconds,
+                "limit": router._inflight_limit,
+            },
+            headers=_retry_after_header(exc.retry_after_seconds),
+        )
     except RuntimeError as exc:
         raise HTTPException(
             status_code=503,
