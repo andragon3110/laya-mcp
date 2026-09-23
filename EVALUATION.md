@@ -28,10 +28,10 @@ claim about the real backend or about agent quality.
 
 | Path | Role |
 |---|---|
-| `evals/run.mjs` | Common harness: loads the 10 suites, runs every case against the real handler with the oracle stub, checks the output against the case gold. Exit 0 when all golds match. |
-| `evals/suites/*.mjs` | 10 datasets with golds plus thin per-primitive adapters (`invoke` + `check`): `classify`, `decide`, `verify`, `screen`, `pii`, `extract`, `find`, `rerank`, `review`, `gate`. |
+| `evals/run.mjs` | Common harness: loads the 11 suites, runs every case against the real handler with the oracle stub, checks the output against the case gold. Exit 0 when all golds match. |
+| `evals/suites/*.mjs` | 11 datasets with golds plus thin per-primitive adapters (`invoke` + `check`): `classify`, `decide`, `verify`, `screen`, `pii`, `extract`, `find`, `rerank`, `review`, `gate`, plus `compare` (cierre-pendientes T4). |
 | `evals/metrics.mjs` | Shared pure metric functions (binary, decision accuracy, abstention, ranking, score agreement, wrong_confident). No I/O, no thresholds. |
-| `evals/score.mjs` | T4 runner: applies `metrics.mjs` to the 10 suites; prints the metrics table; optionally saves to `--out` (default `artifacts/`, untracked). |
+| `evals/score.mjs` | T4 runner: applies `metrics.mjs` to the 11 suites; prints the metrics table; optionally saves to `--out` (default `artifacts/`, untracked). |
 | `evals/calibration.md` | Calibration verdict: no output is a probability; Brier/ECE do not apply; forbidden conclusions. |
 | `evals/bench.mjs` | T5 benchmarks: primitive latency/throughput/memory, rerank scale sweep, model-load shape. Absolutes only. |
 | `evals/manifest.mjs` | T5 reproducibility manifest plus the never-overwrite versioned saver for `evals/results/vN/`. |
@@ -43,7 +43,7 @@ claim about the real backend or about agent quality.
 
 ## 3. Datasets
 
-10 suites x 8 cases = 80 cases. Every suite covers the six honest
+11 suites x 8 cases = 88 cases. Every suite covers the six honest
 classes: normal, ambiguous, difficult, adversarial, negative, abstention.
 One negative case per suite is a fail-fast limit test (`input_too_large`
 throw), counted in `abstention.errors`, never in quality denominators.
@@ -60,11 +60,12 @@ throw), counted in `abstention.errors`, never in quality denominators.
 | `rerank` | `laya_rerank` | 2 | 1 | 1 | 1 | 2 (1) | 1 | 8 |
 | `review` | `laya_review` | 1 | 1 | 1 | 1 | 3 (1) | 1 | 8 |
 | `gate` | `laya_gate` | 1 | 1 | 1 | 1 | 3 (1) | 1 | 8 |
-| **Total** | | **13** | **10** | **10** | **11** | **23 (10)** | **13** | **80** |
+| `compare` | `laya_compare` | 1 | 1 | 1 | 1 | 2 (1) | 2 | 8 |
+| **Total** | | **14** | **11** | **11** | **12** | **25 (11)** | **15** | **88** |
 
 Each suite file documents its own `stubModel` (which backend signal each
 oracle answer emulates) and `stubLimits` (what the stub cannot prove).
-The harness smoke state is 80/80 golds matching (`node evals/run.mjs`).
+The harness smoke state is 88/88 golds matching (`node evals/run.mjs`).
 
 ## 4. Metrics by primitive
 
@@ -77,7 +78,7 @@ abstention rate + wrong_confident; rubric-score agreement is defined in
 
 | Primitive(s) | Valid here | Not applicable (with reason) |
 |---|---|---|
-| `classify`, `decide`, `verify`, `screen`, `pii`, `extract`, `find` (+`compare`, future) | accuracy, P/R/F1 on ALLOW polarity, FPR/FNR, `abstention_rate`, `wrong_confident_rate` on the primitive signal | Brier/ECE (no calibrated probabilities exist) |
+| `classify`, `decide`, `verify`, `screen`, `pii`, `extract`, `find`, `compare` | accuracy, P/R/F1 on ALLOW polarity, FPR/FNR, `abstention_rate`, `wrong_confident_rate` on the primitive signal | Brier/ECE (no calibrated probabilities exist) |
 | `review`, `gate` | decision accuracy, task accuracy, `abstention_rate`, `wrong_confident_rate` on the safe / per-claim signal | Brier/ECE (same reason); rubric-score agreement on T3 golds (golds hold decisions, not score oracles) |
 | `rerank` | MRR/nDCG/MAP/top-k over ranked orders | accuracy over scores, any threshold, `wrong_confident_rate`, cross-call score comparison (`relevance_score` is within-call only by contract) |
 
@@ -96,7 +97,7 @@ harness conserves oracle golds end to end. They are not backend quality.
 ## 5. wrong_confident_rate
 
 One honest signal per primitive (see `evals/score.mjs`): `winner_probability`
-for classify/decide/find/extract; per-claim support signal for
+for classify/decide/find/extract/compare; per-claim support signal for
 verify/gate; injection signal for screen; `safe_to_apply` signal for
 review; max `detector_score` for pii (null when zero findings, excluded).
 Rerank: no aplica (within-call scores, no correctness value per score).
@@ -113,6 +114,7 @@ Rerank: no aplica (within-call scores, no correctness value per score).
 | `rerank` | — | — | no aplica | no aplica | no aplica | no aplica |
 | `review` | `safe_to_apply` | 4 | 0.000 | 0.000 | 0.000 | 0.000 |
 | `gate` | per-claim support | 6 | 0.000 | 0.000 | 0.000 | 0.000 |
+| `compare` | `winner_probability` | 5 | 0.000 | 0.000 | 0.000 | 0.000 |
 
 Stub ceiling: 0.000 at every tau is the expected oracle-stub outcome
 (signals are assigned together with the golds, so confident-and-wrong
@@ -203,6 +205,13 @@ N > 64 is selector-only plus projected judge; quality is MRR/nDCG
 against the construction-truth gold. No baseline exists, so no
 improvement is claimed and none can be derived from these tables.
 
+Bench freeze note (cierre-pendientes T7): the bench covers the 10 T5
+primitives only. `laya_compare` has a T3 dataset plus run/score wiring
+(88/88) but no bench row -- deliberately, not by omission: the T5 bench
+froze with the versioned `v1` run, and adding an 11th row would
+invalidate that record without a re-record. See the COMPARE NOTE in
+`evals/bench.mjs`.
+
 ## 8. Integration
 
 ### 8.1 Protocol (comparable +/-Laya)
@@ -258,7 +267,7 @@ work.
 
 ## 9. Reproducibility
 
-- `node evals/run.mjs [--json] [suite]` — 80-case harness smoke.
+- `node evals/run.mjs [--json] [suite]` — 88-case harness smoke.
 - `node evals/score.mjs [--json] [--out <path>]` — T4 metrics report.
 - `node evals/bench.mjs [--json]` — T5 benchmark tables (absolutes).
 - `node evals/manifest.mjs [--json]` — manifest for the current tree.
@@ -286,8 +295,10 @@ work.
    recorded run, not hardware claims.
 5. No live comparison: OpenCode, the Gentle orchestrator session, and
    models are absent here, so the paired +/-Laya table is future work.
-6. `laya_compare` has metric definitions in `metrics.mjs` but no T3
-   dataset, and is reported as such, not silently dropped.
+6. `laya_compare` has a T3 dataset (`evals/suites/compare.mjs`, 8 cases)
+   with run/score wiring (88/88 with the other 10 suites), but no T5
+   bench row -- by version-freeze, documented in `evals/bench.mjs`
+   (COMPARE NOTE) and section 7.4, not silently dropped.
 
 ## 11. Per-run record (what each `evals/results/vN/` answers)
 

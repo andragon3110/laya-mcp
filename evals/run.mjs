@@ -21,7 +21,7 @@
  * adapters (invoke + check); all orchestration lives here.
  *
  * Run from the repo root:  node evals/run.mjs [suite] [--json]
- *   suite  optional suite name filter (e.g. `verify`); default runs all 10.
+ *   suite  optional suite name filter (e.g. `verify`); default runs all 11.
  *   --json print a machine-readable summary instead of the per-case log.
  * Exit 0 when every gold matches, 1 otherwise.
  */
