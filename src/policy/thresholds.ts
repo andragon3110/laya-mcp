@@ -51,7 +51,16 @@ export interface PolicyThresholds {
   screenSubstanceSkip: number;
   /** Shared verify+gate cut: signal >= this is a verified claim. */
   claimVerified: number;
-  /** Shared verify+gate cut: signal < this is a contradicted claim. */
+  /**
+   * Legacy verify+gate low-support cut (v1 0.4, `<` contradicted).
+   *
+   * fut-b-semantica T3: verify@1.0.0 and gate@1.0.0 NO LONGER consult this
+   * field -- inferring contradiction from low support labelled absence of
+   * evidence a refutation. CONTRADICTED now needs a firm refutation probe
+   * (refute >= claimVerified) plus weak support. The field stays in the
+   * table (defaults, LAYA_POLICY_CLAIM_CONTRADICTED override, and the
+   * v1-defaults battery) for compat; no value changed (NOT calibrated).
+   */
   claimContradicted: number;
   /** Shared review+gate+code-review cut: safe_to_apply > this is auto/allow. */
   reviewAuto: number;

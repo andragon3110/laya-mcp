@@ -105,8 +105,9 @@ await check("all 11 handlers wire handler->evidence->engine with versioned polic
     }), { request: "r", diff: "d" })],
     ["gate", handleGate(fakeClient({
       correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.9 }, claim_0: { noul: 0.9 },
+      refute_0: { noul: 0.1 },
     }), { request: "r", diff: "d", claims: ["tests pass"], evidence: "log" })],
-    ["verify", handleVerify(fakeClient({ claim_0: { noul: 0.95 } }), { claims: ["sky is blue"], evidence: "log" })],
+    ["verify", handleVerify(fakeClient({ claim_0: { noul: 0.95 }, refute_0: { noul: 0.1 } }), { claims: ["sky is blue"], evidence: "log" })],
     ["screen", handleScreen(
       fakeClient({ is_injection: { noul: 0.1 }, has_substance: { noul: 0.9 }, is_relevant: { noul: 0.9 } }),
       { text: "hello world", purpose: "test" },
@@ -156,8 +157,18 @@ await check("all 11 handlers wire handler->evidence->engine with versioned polic
 
 // ------------------------------------------------------------------ semantic ---
 const verifyArgs = (claims) => ({ claims, evidence: "log" });
-const verifyAnswers = (signals) =>
-  Object.fromEntries(signals.map((v, i) => [`claim_${i}`, v === null ? {} : { noul: v }]));
+// T3: every support stub gets a weak refutation answer by default (no
+// denial); refutation cases pin their own refute_N answers inline.
+const verifyAnswers = (signals, refutes = []) =>
+  Object.fromEntries(
+    signals.flatMap((v, i) => {
+      const r = i < refutes.length ? refutes[i] : 0.1;
+      return [
+        [`claim_${i}`, v === null ? {} : { noul: v }],
+        [`refute_${i}`, r === null ? {} : { noul: r }],
+      ];
+    }),
+  );
 
 await check("semantic: signal exactly 0.80 -> SUPPORTED + ALLOW (verified edge)", async () => {
   const body = JSON.parse(await handleVerify(fakeClient(verifyAnswers([0.8])), verifyArgs(["edge claim"])));
@@ -167,12 +178,12 @@ await check("semantic: signal exactly 0.80 -> SUPPORTED + ALLOW (verified edge)"
   assert.deepEqual(body.decision.reason_codes, ["verify_all_verified"]);
 });
 
-await check("semantic: signal exactly 0.40 -> INSUFFICIENT_EVIDENCE + abstained ESCALATE (mid-band floor)", async () => {
+await check("semantic: signal exactly 0.40 -> INSUFFICIENT_EVIDENCE + REVIEW (T3: mid band reachable, no abstention)", async () => {
   const body = JSON.parse(await handleVerify(fakeClient(verifyAnswers([0.4])), verifyArgs(["floor claim"])));
   assert.equal(body.verdicts[0].verdict, "INSUFFICIENT_EVIDENCE");
-  assert.equal(body.abstention.abstained, true);
-  assert.equal(body.decision.decision, "ESCALATE");
-  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+  assert.equal(body.abstention.abstained, false);
+  assert.equal(body.decision.decision, "REVIEW");
+  assert.deepEqual(body.decision.reason_codes, ["verify_unsupported_review"]);
 });
 
 await check("semantic: mutually-contradictory claims both high -> both SUPPORTED + ALLOW (v1 has no cross-claim check)", async () => {
@@ -298,17 +309,25 @@ await check("flat: classify empty distribution via handler -> null winner + ESCA
 });
 
 // ------------------------------------------------------------------- risk ---
-const gateAnswers = ({ correctness = 2, spec_match = 2, safe = 0.9, claims = [] } = {}) => ({
+const gateAnswers = ({ correctness = 2, spec_match = 2, safe = 0.9, claims = [], refutes = [] } = {}) => ({
   correctness: { score: correctness },
   spec_match: { score: spec_match },
   ...(safe === null ? {} : { safe_to_apply: { noul: safe } }),
   ...Object.fromEntries(claims.map((v, i) => [`claim_${i}`, v === null ? {} : { noul: v }])),
+  // T3: weak refutation answers by default (no denial).
+  ...Object.fromEntries(
+    claims.map((_, i) => {
+      const r = i < refutes.length ? refutes[i] : 0.1;
+      return [`refute_${i}`, r === null ? {} : { noul: r }];
+    }),
+  ),
 });
 const gateArgs = (claims, extra = {}) => ({ request: "r", diff: "d", claims, evidence: "log", ...extra });
 
 await check("risk: gate missing-signal evidence + risk high still ESCALATEs missing (risk never rescues)", async () => {
-  // gateEvidence abstains only on safe_to_apply bands (not on missing
-  // claims), so the engine exits via gate_missing_signal -- pinned in t5.
+  // gateEvidence abstains only on a missing safe_to_apply signal (T3: band
+  // abstention is gone; not on missing claims either), so the engine exits
+  // via gate_missing_signal -- pinned in t5.
   // The point here: risk:high changes neither the code nor the outcome.
   const body = JSON.parse(
     await handleGate(fakeClient(gateAnswers({ safe: 0.9, claims: [null] })), gateArgs(["a"], { risk: "high" })),

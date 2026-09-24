@@ -7,8 +7,8 @@
  * returns canned answers. Every assertion runs the real handler + the real
  * engine.evaluate underneath it.
  *
- * Covered: supported / insufficient / abstention / reserved-contradicted
- * honesty (absence of evidence is never labelled a contradiction),
+ * Covered: supported / insufficient / positive-refutation CONTRADICTED /
+ * abstention / band reachability (T3: REVIEW/DENY via handlers) /
  * structured ABSTAIN on empty claims (no zero summary), context+risk
  * wiring on gate, invalid-risk rejection, legacy-vocabulary absence,
  * and double-call determinism.
@@ -32,14 +32,31 @@ const reviewAnswers = ({ correctness = 2, spec_match = 2, test_gap = 0, blast_ra
   ...(safe === null ? {} : { safe_to_apply: { noul: safe } }),
 });
 
-const gateAnswers = ({ correctness = 2, spec_match = 2, safe = 0.9, claims = [] } = {}) => ({
+const gateAnswers = ({ correctness = 2, spec_match = 2, safe = 0.9, claims = [], refutes = [] } = {}) => ({
   correctness: { score: correctness },
   spec_match: { score: spec_match },
   ...(safe === null ? {} : { safe_to_apply: { noul: safe } }),
   ...Object.fromEntries(claims.map((v, i) => [`claim_${i}`, v === null ? {} : { noul: v }])),
+  // fut-b-semantica T3: every claim also gets a refutation answer. Default
+  // is weak (no denial); cases about refutation pin explicit firm values.
+  ...Object.fromEntries(
+    claims.map((_, i) => {
+      const r = i < refutes.length ? refutes[i] : 0.1;
+      return [`refute_${i}`, r === null ? {} : { noul: r }];
+    }),
+  ),
 });
 
-const verifyAnswers = (signals) => Object.fromEntries(signals.map((v, i) => [`claim_${i}`, v === null ? {} : { noul: v }]));
+const verifyAnswers = (signals, refutes = []) =>
+  Object.fromEntries(
+    signals.flatMap((v, i) => {
+      const r = i < refutes.length ? refutes[i] : 0.1;
+      return [
+        [`claim_${i}`, v === null ? {} : { noul: v }],
+        [`refute_${i}`, r === null ? {} : { noul: r }],
+      ];
+    }),
+  );
 
 let passed = 0;
 function check(name, fn) {
@@ -78,11 +95,14 @@ await check("review low safe 0.2 -> ESCALATE review_escalate (no abstention)", a
   assert.deepEqual(body.decision.reason_codes, ["review_escalate"]);
 });
 
-await check("review mid-band safe 0.7 -> abstained -> ESCALATE abstained_evidence", async () => {
+await check("review mid-band safe 0.7 -> REVIEW needs_review, no abstention (T3 band reachable)", async () => {
   const body = JSON.parse(await handleReview(fakeClient(reviewAnswers({ safe: 0.7 })), { request: "r", diff: "d" }));
-  assert.equal(body.abstention.abstained, true);
-  assert.equal(body.decision.decision, "ESCALATE");
-  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+  // T3 breaking: mid-band safety is firm REVIEW evidence, not ambiguity --
+  // the policy REVIEW band is reachable via the handler (was ESCALATE via
+  // abstained_evidence before T3 removed band abstention).
+  assert.equal(body.abstention.abstained, false);
+  assert.equal(body.decision.decision, "REVIEW");
+  assert.deepEqual(body.decision.reason_codes, ["review_needs_review"]);
 });
 
 await check("review missing safe signal -> null signal + ESCALATE", async () => {
@@ -117,16 +137,19 @@ await check("gate clean high -> ALLOW + SUPPORTED claim, context+risk echoed", a
   noLegacyKeys(body, "gate");
 });
 
-await check("gate contradicted claim dominates: ESCALATE engine-side, INSUFFICIENT display-side", async () => {
+await check("gate positively-refuted claim dominates: ESCALATE engine-side, CONTRADICTED display-side", async () => {
   const body = JSON.parse(
-    await handleGate(fakeClient(gateAnswers({ safe: 0.95, claims: [0.9, 0.2] })), gateArgs(["a", "b"])),
+    await handleGate(
+      fakeClient(gateAnswers({ safe: 0.95, claims: [0.9, 0.2], refutes: [0.1, 0.9] })),
+      gateArgs(["a", "b"]),
+    ),
   );
   assert.equal(body.decision.decision, "ESCALATE");
   assert.deepEqual(body.decision.reason_codes, ["gate_contradicted_escalate"]);
-  // Honesty split: the engine keeps its T4 cut name, but the per-claim label
-  // refuses to assert refutation from a support signal alone.
-  assert.equal(body.claims[1].verdict, "INSUFFICIENT_EVIDENCE");
-  assert.ok(!body.claims.some((c) => c.verdict === "CONTRADICTED"), "v1 never emits CONTRADICTED from signals");
+  // T3 honesty: CONTRADICTED comes from the firm refutation probe (0.9)
+  // paired with weak support (0.2) -- never from the low support alone
+  // (claim "a": firm support + weak refutation stays SUPPORTED).
+  assert.deepEqual(body.claims.map((c) => c.verdict), ["SUPPORTED", "CONTRADICTED"]);
 });
 
 await check("gate low safety alone REVIEWs; unsupported-only allows with high safe", async () => {
@@ -193,26 +216,26 @@ await check("verify supported -> SUPPORTED + ALLOW", async () => {
   assert.ok(!("probability" in body.verdicts[0]), "per-claim probability must be gone");
 });
 
-await check("verify mid signal -> INSUFFICIENT_EVIDENCE + abstained ESCALATE (T3 band preserved)", async () => {
+await check("verify mid signal -> INSUFFICIENT_EVIDENCE + REVIEW (T3 band reachable, no abstention)", async () => {
   const body = JSON.parse(await handleVerify(fakeClient(verifyAnswers([0.6])), verifyArgs(["a"])));
   assert.equal(body.verdicts[0].verdict, "INSUFFICIENT_EVIDENCE");
-  // T3 evidence abstains on the mid band, so the global rule wins over the
-  // engine REVIEW band (covered with cleared abstention in policy_engine.mjs).
-  assert.equal(body.abstention.abstained, true);
-  assert.equal(body.decision.decision, "ESCALATE");
-  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+  // T3 breaking: mid-band support flows to the policy REVIEW band (was
+  // ESCALATE via abstained_evidence before T3 removed band abstention).
+  assert.equal(body.abstention.abstained, false);
+  assert.equal(body.decision.decision, "REVIEW");
+  assert.deepEqual(body.decision.reason_codes, ["verify_unsupported_review"]);
 });
 
-await check("verify low signal is absence, not refutation (abstained ESCALATE; DENY band in engine battery)", async () => {
+await check("verify low signal is absence, not refutation (INSUFFICIENT + REVIEW; DENY needs a probe)", async () => {
   const body = JSON.parse(await handleVerify(fakeClient(verifyAnswers([0.1])), verifyArgs(["a"])));
   assert.equal(body.verdicts[0].verdict, "INSUFFICIENT_EVIDENCE");
-  assert.ok(!body.verdicts.some((v) => v.verdict === "CONTRADICTED"), "thresholds never emit CONTRADICTED");
-  // T3 evidence abstains on the low band, so the global rule wins; the
-  // engine DENY band (verify_contradicted_deny) is covered with cleared
-  // abstention in policy_engine.mjs.
-  assert.equal(body.abstention.abstained, true);
-  assert.equal(body.decision.decision, "ESCALATE");
-  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+  assert.ok(!body.verdicts.some((v) => v.verdict === "CONTRADICTED"), "weak support never labels a contradiction");
+  // T3 breaking: low support without firm refutation REVIEWs as
+  // unsupported (was ESCALATE via abstained_evidence; the engine DENY band
+  // now needs the refute probe -- covered in t3_refute_bands.mjs).
+  assert.equal(body.abstention.abstained, false);
+  assert.equal(body.decision.decision, "REVIEW");
+  assert.deepEqual(body.decision.reason_codes, ["verify_unsupported_review"]);
 });
 
 await check("verify null signal -> ABSTAIN claim + ESCALATE", async () => {
@@ -233,6 +256,9 @@ await check("verify empty claims -> structured ABSTAIN, no zero summary", async 
 await check("verify mixed summary uses honest keys; legacy verdict strings absent", async () => {
   const body = JSON.parse(await handleVerify(fakeClient(verifyAnswers([0.95, 0.6])), verifyArgs(["a", "b"])));
   assert.deepEqual(body.summary, { supported: 1, insufficient_evidence: 1, contradicted: 0, abstain: 0 });
+  // T3: the weak claim reaches REVIEW (no band abstention).
+  assert.equal(body.decision.decision, "REVIEW");
+  assert.deepEqual(body.decision.reason_codes, ["verify_unsupported_review"]);
   const words = body.verdicts.map((v) => v.verdict);
   for (const legacy of ["verified", "unsupported", "contradicted"]) {
     assert.ok(!words.includes(legacy), `legacy verdict ${legacy} must be gone`);

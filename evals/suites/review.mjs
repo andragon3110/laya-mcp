@@ -9,11 +9,11 @@
  * safe_to_apply drives the decision.
  *
  * STUB LIMITS (honesty): the stub is NOT the model. Rubric scores and safety
- * signals are oracle-assigned: no code-review quality claim transfers. v1
- * pins: mid-band safety (0.50, 0.85] abstains so the policy REVIEW path is
- * unreachable via the handler (only ALLOW/ESCALATE surface); edges are
- * strict > (0.85 -> REVIEW band edge, 0.50 -> escalate edge); missing safety
- * abstains; the tool never authorizes anything.
+ * signals are oracle-assigned: no code-review quality claim transfers. Pins:
+ * mid-band safety (0.50, 0.85] is firm REVIEW evidence (reachable via the
+ * handler since T3 -- no band abstention); edges are strict > (0.85 ->
+ * REVIEW band edge, 0.50 -> escalate edge); missing safety abstains; the
+ * tool never authorizes anything.
  */
 import assert from "node:assert";
 import { handleReview } from "../../dist/tools/review.js";
@@ -25,7 +25,7 @@ export const stubModel =
   "0.86, mid-band for gappy diffs, low for broken diffs, {} for silence.";
 export const stubLimits =
   "Scores and safety are oracle-assigned: no review-quality claim transfers; " +
-  "REVIEW is unreachable via the handler because mid-band safety abstains.";
+  "mid-band safety REVIEWs via the handler (firm evidence, not ambiguity).";
 
 export const cases = [
   {
@@ -65,7 +65,7 @@ export const cases = [
         blast_radius: { score: 1 }, safe_to_apply: { noul: 0.7 },
       },
     },
-    gold: { decision: "ESCALATE", abstained: true, why: "mid-band safety abstains; neither firm auto nor firm escalate." },
+    gold: { decision: "REVIEW", abstained: false, why: "mid-band safety is firm REVIEW evidence; neither auto nor escalate." },
   },
   {
     id: "review-adversarial-01",
@@ -78,7 +78,7 @@ export const cases = [
         blast_radius: { score: 2 }, safe_to_apply: { noul: 0.6 },
       },
     },
-    gold: { decision: "ESCALATE", abstained: true, why: "surface correctness cannot rescue an untested blast radius." },
+    gold: { decision: "REVIEW", abstained: false, why: "hedged safety REVIEWs; surface correctness never auto-allows an untested blast radius." },
   },
   {
     id: "review-negative-01",

@@ -228,12 +228,20 @@ await check("pii risk invalido se rechaza con vocabulario", async () => {
 });
 
 // ------------------------------------------------------------- risk gates ---
-function gateEv(safe, claimValues, risk) {
+function gateEv(safe, claimValues, risk, refutes = []) {
   const { evidence } = E.gateEvidence(RAW, {
     correctness: 2,
     spec_match: 2,
     safe_to_apply: safe,
-    claims: claimValues.map((signal, i) => ({ claim: `c${i}`, signal, verdict: "legacy" })),
+    // T3: refute entries are optional -- absent means legacy support-only
+    // evidence (contradicted unreachable: absence != refutation); explicit
+    // values (incl. null) emit refute_N signals.
+    claims: claimValues.map((signal, i) => ({
+      claim: `c${i}`,
+      signal,
+      verdict: "legacy",
+      ...(i < refutes.length ? { refute: refutes[i] } : {}),
+    })),
   });
   // Abstencion limpiada a proposito: el T2 mueve bandas, no la regla global
   // (la precedencia se pinea aparte abajo).
@@ -256,8 +264,10 @@ await check("risk mueve gate: safe 0.83 ALLOW solo en low", () => {
 });
 
 await check("gate fixed points: contradicted/missing no se mueven con risk", () => {
-  assert.deepEqual(gateEv(0.95, [0.2], "high").reason_codes, ["gate_contradicted_escalate"]);
-  assert.deepEqual(gateEv(0.95, [0.2], "low").reason_codes, ["gate_contradicted_escalate"]);
+  // T3: contradicted necesita refutacion positiva (probe firme + soporte
+  // debil); el soporte bajo solo ya no contradice (absence != refutation).
+  assert.deepEqual(gateEv(0.95, [0.2], "high", [0.9]).reason_codes, ["gate_contradicted_escalate"]);
+  assert.deepEqual(gateEv(0.95, [0.2], "low", [0.9]).reason_codes, ["gate_contradicted_escalate"]);
   assert.deepEqual(gateEv(0.95, [null], "high").reason_codes, ["gate_missing_signal"]);
   assert.deepEqual(gateEv(0.2, [0.9], "low").reason_codes, ["gate_review"]);
 });
@@ -321,7 +331,10 @@ await check("pii fixed points: secreto DENY y clean ALLOW en todo risk", () => {
 });
 
 await check("risk nunca rescata abstencion: ESCALATE abstained en gate/screen/pii con high", () => {
-  const g = E.gateEvidence(RAW, { correctness: 2, spec_match: 2, safe_to_apply: 0.7, claims: [] });
+  // T3: el caso gate usa una senal REALMENTE ausente (safe null). La banda
+  // media (safe 0.7) ya no abstiene desde T3 -- es evidencia REVIEW firme,
+  // no ambiguedad -- asi que no serviria para pinear la precedencia global.
+  const g = E.gateEvidence(RAW, { correctness: 2, spec_match: 2, safe_to_apply: null, claims: [] });
   assert.equal(g.abstention.abstained, true);
   assert.deepEqual(
     evaluate({ evidence: g.evidence, abstention: g.abstention, risk: "high", policy: { name: "gate", version: "1.0.0" } }, { thresholds: T1 }).reason_codes,

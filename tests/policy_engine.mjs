@@ -75,34 +75,58 @@ check("screen abstention wins over block-level signal", () => {
 });
 
 // ---------------------------------------------------------------- verify ---
-function verifyEv(values) {
-  const signals = values.map((v, i) =>
-    E.noulSignal(RAW, `claim_${i}`, v, { candidate: `claim ${i}`, metadata: { verdict: "legacy" } }),
-  );
+// T3: support signals pair with refutation signals by index. Default refute
+// is weak (no denial); pass explicit firm values for refutation cases, or
+// build legacy support-only evidence inline (no refute_N signal) for the
+// degraded path (DENY unreachable there -- absence != refutation).
+function verifyEv(values, refutes = []) {
+  const signals = values.flatMap((v, i) => {
+    const out = [
+      E.noulSignal(RAW, `claim_${i}`, v, { candidate: `claim ${i}`, metadata: { verdict: "legacy" } }),
+    ];
+    const r = i < refutes.length ? refutes[i] : 0.1;
+    if (r !== undefined) {
+      out.push(
+        E.noulSignal(RAW, `refute_${i}`, r, {
+          candidate: `claim ${i}`,
+          metadata: { refutation: true, verdict: "legacy" },
+        }),
+      );
+    }
+    return out;
+  });
   return E.makeEvidence(RAW, signals, "router");
 }
 check("verify 0.8 edge -> ALLOW; 0.79 -> REVIEW", () => {
   assert.deepEqual(ev("verify", verifyEv([0.8]), noAbs()).reason_codes, ["verify_all_verified"]);
   assert.deepEqual(ev("verify", verifyEv([0.79]), noAbs()).reason_codes, ["verify_unsupported_review"]);
 });
-check("verify 0.4 edge -> REVIEW unsupported; 0.39 -> DENY", () => {
+check("verify 0.4 edge -> REVIEW; 0.39 alone REVIEWs (DENY needs the refute probe)", () => {
   assert.deepEqual(ev("verify", verifyEv([0.4]), noAbs()).reason_codes, ["verify_unsupported_review"]);
-  const d = ev("verify", verifyEv([0.39]), noAbs());
+  // T3 breaking: low support without firm refutation is absence, not
+  // refutation -- REVIEW, not DENY (claimContradicted no longer consulted).
+  assert.deepEqual(ev("verify", verifyEv([0.39]), noAbs()).reason_codes, ["verify_unsupported_review"]);
+  const d = ev("verify", verifyEv([0.39], [0.9]), noAbs());
   assert.equal(d.decision, "DENY");
   assert.deepEqual(d.reason_codes, ["verify_contradicted_deny"]);
 });
-check("verify mixed verified+unsupported -> REVIEW; with contradicted -> DENY", () => {
+check("verify mixed verified+unsupported -> REVIEW; with firm refutation -> DENY", () => {
   assert.equal(ev("verify", verifyEv([0.95, 0.5]), noAbs()).decision, "REVIEW");
-  assert.equal(ev("verify", verifyEv([0.95, 0.5, 0.1]), noAbs()).decision, "DENY");
+  assert.equal(ev("verify", verifyEv([0.95, 0.5, 0.1], [0.1, 0.1, 0.9]), noAbs()).decision, "DENY");
 });
 check("verify empty -> ESCALATE no_claims; null signal -> ESCALATE missing", () => {
   assert.deepEqual(ev("verify", E.makeEvidence(RAW, [], "router"), noAbs()).reason_codes, ["verify_no_claims"]);
   assert.deepEqual(ev("verify", verifyEv([null]), noAbs()).reason_codes, ["verify_missing_signal"]);
 });
-check("verify real low-signal abstention -> ESCALATE", () => {
-  const { evidence, abstention } = E.verifyEvidence(RAW, { claims: [{ claim: "c", signal: 0.2, verdict: "contradicted" }] });
-  assert.equal(abstention.abstained, true);
-  assert.deepEqual(ev("verify", evidence, abstention).reason_codes, ["abstained_evidence"]);
+check("verify band signals no longer abstain; real missing still does (T3 precedence)", () => {
+  const { evidence, abstention } = E.verifyEvidence(RAW, {
+    claims: [{ claim: "c", signal: 0.2, verdict: "x", refute: 0.1 }],
+  });
+  assert.equal(abstention.abstained, false, "T3: low band is policy business, not abstention");
+  assert.deepEqual(ev("verify", evidence, abstention).reason_codes, ["verify_unsupported_review"]);
+  const miss = E.verifyEvidence(RAW, { claims: [{ claim: "c", signal: null, verdict: "x", refute: 0.1 }] });
+  assert.equal(miss.abstention.abstained, true);
+  assert.deepEqual(ev("verify", miss.evidence, miss.abstention).reason_codes, ["abstained_evidence"]);
 });
 
 // ----------------------------------------------------------------- review ---
@@ -124,23 +148,33 @@ check("review null safe -> ESCALATE missing", () => {
   const { evidence } = reviewEv(null);
   assert.deepEqual(ev("review", evidence, noAbs()).reason_codes, ["review_missing_signal"]);
 });
-check("review real mid-band abstention -> ESCALATE (precedence)", () => {
+check("review mid-band no longer abstains; missing safety still does (T3 precedence)", () => {
   const { evidence, abstention } = reviewEv(0.7);
-  assert.equal(abstention.abstained, true);
-  assert.deepEqual(ev("review", evidence, abstention).reason_codes, ["abstained_evidence"]);
+  assert.equal(abstention.abstained, false, "T3: mid band is REVIEW evidence, not ambiguity");
+  assert.deepEqual(ev("review", evidence, abstention).reason_codes, ["review_needs_review"]);
+  const miss = reviewEv(null);
+  assert.equal(miss.abstention.abstained, true);
+  assert.deepEqual(ev("review", miss.evidence, miss.abstention).reason_codes, ["abstained_evidence"]);
 });
 
 // ------------------------------------------------------------------- gate ---
-function gateEv(safe, claimValues) {
+// T3: same refutation-pairing convention as verifyEv (default weak refute;
+// explicit firm values for refutation cases).
+function gateEv(safe, claimValues, refutes = []) {
   return E.gateEvidence(RAW, {
     correctness: 2,
     spec_match: 2,
     safe_to_apply: safe,
-    claims: claimValues.map((signal, i) => ({ claim: `c${i}`, signal, verdict: "legacy" })),
+    claims: claimValues.map((signal, i) => ({
+      claim: `c${i}`,
+      signal,
+      verdict: "legacy",
+      refute: i < refutes.length ? refutes[i] : 0.1,
+    })),
   });
 }
-check("gate contradicted claim dominates high safety -> ESCALATE", () => {
-  const { evidence, abstention } = gateEv(0.95, [0.9, 0.2]);
+check("gate positively-refuted claim dominates high safety -> ESCALATE", () => {
+  const { evidence, abstention } = gateEv(0.95, [0.9, 0.2], [0.1, 0.9]);
   const d = ev("gate", evidence, abstention);
   assert.equal(d.decision, "ESCALATE");
   assert.deepEqual(d.reason_codes, ["gate_contradicted_escalate"]);
@@ -423,15 +457,20 @@ check("v1 defaults equal the preserved pre-P1 literals", () => {
     secretTypes: ["api_key", "token_secreto", "password"],
   });
 });
-check("one shared claim table drives verify AND gate (no duplicated 0.8/0.4)", () => {
+check("one shared claim table drives verify AND gate (incl. the refutation cut, no duplicated 0.8)", () => {
   const customHi = resolveThresholds({ LAYA_POLICY_CLAIM_VERIFIED: "0.9" });
   assert.equal(customHi.claimVerified, 0.9);
   assert.equal(ev("verify", verifyEv([0.85]), noAbs(), undefined, customHi).decision, "REVIEW");
   assert.equal(ev("verify", verifyEv([0.85]), noAbs(), undefined, T1).decision, "ALLOW");
-  const customLo = resolveThresholds({ LAYA_POLICY_CLAIM_CONTRADICTED: "0.9" });
-  const g = gateEv(0.95, [0.85]);
-  assert.deepEqual(ev("gate", g.evidence, noAbs(), undefined, customLo).reason_codes, ["gate_contradicted_escalate"]);
-  assert.deepEqual(ev("gate", g.evidence, noAbs(), undefined, T1).reason_codes, ["gate_auto_allow"]);
+  // T3: the SAME shared cut is the firm-refutation cut -- support 0.75 +
+  // refute 0.85 denies under T1 (firm denial at 0.8) but only REVIEWs under
+  // customHi (0.85 is weak refutation at a 0.9 cut).
+  const denied = verifyEv([0.75], [0.85]);
+  assert.deepEqual(ev("verify", denied, noAbs(), undefined, T1).reason_codes, ["verify_contradicted_deny"]);
+  assert.deepEqual(ev("verify", denied, noAbs(), undefined, customHi).reason_codes, ["verify_unsupported_review"]);
+  const g = gateEv(0.95, [0.75], [0.85]);
+  assert.deepEqual(ev("gate", g.evidence, noAbs(), undefined, T1).reason_codes, ["gate_contradicted_escalate"]);
+  assert.deepEqual(ev("gate", g.evidence, noAbs(), undefined, customHi).reason_codes, ["gate_auto_allow"]);
 });
 check("env override moves screen block cut; invalid env falls back", () => {
   const custom = resolveThresholds({ LAYA_POLICY_SCREEN_BLOCK: "0.5" });
