@@ -8,7 +8,19 @@
   <img src="https://img.shields.io/badge/python-3.10%2B-yellow" alt="python 3.10+">
   <img src="https://img.shields.io/badge/node-20%2B-brightgreen" alt="node 20+">
   <img src="https://img.shields.io/badge/AI-local%20%7C%20%240%20%7C%20multilingual-purple" alt="local, free, multilingual">
+  <img src="https://img.shields.io/badge/status-paused-lightgrey" alt="status paused">
 </p>
+
+> ⏸️ **PAUSED — This project is on hold.**
+>
+> laya-mcp had a good idea (local, typed judgment calls for coding agents), but the underlying models are not at the required level yet. After 8 build phases plus 4 independent live-measurement spikes (GPU), we found:
+>
+> - Model signals are **uncalibrated and often non-discriminative** — no prompt, fusion, routing, or post-hoc fix moved judgments with cutoffs held fixed (formal bound proven, not just observed).
+> - Accuracy **below usable level** on key primitives (gate, screen, classify) measured live.
+> - Upstream weight updates were **README-only** (byte-identical weights); SDK churn changed nothing measurable.
+> - No open alternative beat the baseline: Needle (overconfident), mDeBERTa (worse or vacuous), bge-reranker (exact tie, zero diversity), fresh Laya weights/SDK (no diffs).
+>
+> Evidence: `EVALUATION.md`, `FINAL_REPORT.md`, `evals/results/`. Paused until a genuinely better local decision model appears — the architecture built here (Perception → Evidence → Policy → Decision, fully tested) is ready to resume on top of it.
 
 <p align="center">
   <b>Give your coding agent judgment calls instead of vibes.</b><br>
