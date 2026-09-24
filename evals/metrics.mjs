@@ -11,8 +11,13 @@
  *   probability, nothing here is a confidence, and no output of this module
  *   may be used as a production threshold (wrong_confident taus are
  *   reporting slices only).
- * - Brier score and ECE are NOT computed anywhere: they require calibrated
- *   probabilities and we have none. Documented, never calculated.
+ * - Brier score and ECE are live-miscalibration DIAGNOSTICS only
+ *   (brierScore()/ece() below): they quantify how far a raw primitive
+ *   signal is from behaving like a probability, over (signal, outcome)
+ *   pairs measured against a LIVE backend (see evals/live-cal.mjs). They
+ *   never promote a signal to a probability, never justify a production
+ *   threshold, and are meaningless over oracle-stub signals (which match
+ *   by construction).
  * - Zero denominators yield null (honest absence), never 0, 1, or NaN.
  * - Null signals, abstained cases, and input_too_large throws are EXCLUDED
  *   from denominators by the caller; each function documents its own
@@ -136,6 +141,67 @@ export function scoreAgreement(pairs) {
   const exact = pairs.filter((p) => p.actual === p.predicted).length;
   const mae = pairs.reduce((s, p) => s + Math.abs(p.actual - p.predicted), 0) / pairs.length;
   return { n: pairs.length, exact_match_rate: exact / pairs.length, mae };
+}
+
+/**
+ * Brier score over live (signal, outcome) pairs. Diagnostic only: measures
+ * how far the raw primitive signal is from behaving like a probability.
+ * @param pairs Array<{ signal: number, correct: boolean }>.
+ *   Callers MUST exclude null-signal/abstained/threw judgments before
+ *   calling (same denominator as wrongConfident). Outcome is 1 when the
+ *   judgment was correct, 0 otherwise.
+ * @returns { n, brier } (brier is null when n is 0; 0 = perfect).
+ */
+export function brierScore(pairs) {
+  if (pairs.length === 0) return { n: 0, brier: null };
+  const sum = pairs.reduce((a, p) => a + (p.signal - (p.correct ? 1 : 0)) ** 2, 0);
+  return { n: pairs.length, brier: sum / pairs.length };
+}
+
+/**
+ * Expected Calibration Error over live (signal, outcome) pairs, equal-width
+ * bins over [0,1]. Diagnostic only (same honesty rule as brierScore).
+ * @param pairs Array<{ signal: number, correct: boolean }> (nulls excluded
+ *   by the caller).
+ * @param bins bin count (default 10 per the calibration task).
+ * @returns { n, bins, ece, binsDetail } where ece = SUM_bins
+ *   |accuracy - confidence| * (n_bin / n). Signals outside [0,1] (never
+ *   expected from noul/probability signals) clamp into the edge bins and
+ *   are counted in `clamped` rather than dropped. Empty input yields
+ *   ece null (honest absence).
+ */
+export function ece(pairs, bins = 10) {
+  const detail = Array.from({ length: bins }, (_, i) => ({
+    bin: i,
+    lo: i / bins,
+    hi: (i + 1) / bins,
+    n: 0,
+    accuracy: null,
+    confidence: null,
+  }));
+  if (pairs.length === 0) return { n: 0, bins, ece: null, clamped: 0, binsDetail: detail };
+  let clamped = 0;
+  const sums = detail.map(() => ({ correct: 0, signal: 0 }));
+  for (const p of pairs) {
+    let idx = Math.floor(p.signal * bins);
+    if (p.signal < 0 || p.signal > 1) {
+      clamped++;
+      idx = Math.min(bins - 1, Math.max(0, idx));
+    } else {
+      idx = Math.min(bins - 1, Math.max(0, idx));
+    }
+    detail[idx].n++;
+    sums[idx].correct += p.correct ? 1 : 0;
+    sums[idx].signal += p.signal;
+  }
+  let weighted = 0;
+  for (let i = 0; i < bins; i++) {
+    if (detail[i].n === 0) continue;
+    detail[i].accuracy = sums[i].correct / detail[i].n;
+    detail[i].confidence = sums[i].signal / detail[i].n;
+    weighted += Math.abs(detail[i].accuracy - detail[i].confidence) * (detail[i].n / pairs.length);
+  }
+  return { n: pairs.length, bins, ece: weighted, clamped, binsDetail: detail };
 }
 
 /**

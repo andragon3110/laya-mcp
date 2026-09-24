@@ -37,6 +37,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import * as classify from "./suites/classify.mjs";
 import * as decide from "./suites/decide.mjs";
 import * as verify from "./suites/verify.mjs";
@@ -97,7 +98,7 @@ const goldVerdicts = (gold) =>
  * (limit throws never reach here); explicit null golds (extract null
  * value, decide null selection) ARE tasks and must be counted.
  */
-function extractJudgments(suiteName, body, gold) {
+export function extractJudgments(suiteName, body, gold) {
   switch (suiteName) {
     case "classify": {
       const pred = body.classifications.map((c) => c.classification);
@@ -241,6 +242,10 @@ async function scoreSuite(suite) {
   return out;
 }
 
+/* CLI entry: guarded so `import { extractJudgments } from "./score.mjs"`
+ * (evals/live-cal.mjs) does not execute the stub run. Same pattern as
+ * evals/manifest.mjs. Direct runs behave byte-identically. */
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
 const args = process.argv.slice(2);
 const asJson = args.includes("--json");
 const rest = [];
@@ -290,4 +295,5 @@ if (outIdx !== -1 || !asJson) {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, JSON.stringify(report, null, 2));
   console.log(`\nsaved: ${outPath} (untracked; versioned evals/results/ is T5)`);
+}
 }
