@@ -1,0 +1,36 @@
+{
+  "venv": "%TEMP%/laya-cal-0924 (temporal, deleted at T2 end)",
+  "pinsNote": "requirements == pins EXCEPT laya: 0.3.8 yanked from PyPI 2026-09-24, resolved laya==0.3.12 within the <0.4.0 ceiling; torch 2.14.0+cu130 added for GPU attempt; requirements files NOT modified",
+  "pipFreeze": {
+    "laya": "0.3.12",
+    "torch": "2.14.0+cu130",
+    "fastapi": "0.141.1",
+    "uvicorn": "0.53.0",
+    "pydantic": "2.13.5",
+    "huggingface_hub": "0.36.2",
+    "gliner2": "2.0.0",
+    "protobuf": "7.36.2",
+    "psutil": "7.2.2",
+    "transformers": "4.57.6",
+    "tokenizers": "0.22.2"
+  },
+  "torchCuda": true,
+  "gpu": "NVIDIA GeForce RTX 5060 Ti 16GB, driver 591.74",
+  "ports": {
+    "laya": 8765,
+    "gliner": 8766
+  },
+  "coldStarts": {
+    "method": "Router loads LAZY: spawn alone never loads (633s uptime, load_attempts 0); measured warming-call to /ready ready=true",
+    "layaS": 90,
+    "layaDetail": "GET /health trigger; 3/3 ckpts in 90s; nvidia-smi: server PID GPU compute app, 5748 MiB VRAM",
+    "glinerS": 15,
+    "glinerDetail": "POST /pii_scan trigger; fastino/gliner2.5-multi-v1 ready ~15s; /ready device=cuda verbatim"
+  },
+  "devices": {
+    "layaReady": "auto (setting echo; CUDA evidenced by nvidia-smi VRAM residency + torch.cuda True)",
+    "glinerReady": "cuda (verbatim /ready + /models)"
+  },
+  "layaSdk": "0.3.12",
+  "revisions": "null both servers (revision_source unpinned)"
+}
