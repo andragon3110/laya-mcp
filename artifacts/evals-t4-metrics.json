@@ -179,8 +179,8 @@
         "total": 8,
         "errors": 1,
         "scored": 7,
-        "abstained": 4,
-        "abstention_rate": 0.5714285714285714
+        "abstained": 2,
+        "abstention_rate": 0.2857142857142857
       },
       "decision": {
         "n": 7,
@@ -193,16 +193,16 @@
         "accuracy": 1
       },
       "binary_allow_polarity": {
-        "n": 3,
+        "n": 5,
         "tp": 3,
-        "tn": 0,
+        "tn": 2,
         "fp": 0,
         "fn": 0,
         "accuracy": 1,
         "precision": 1,
         "recall": 1,
         "f1": 1,
-        "fpr": null,
+        "fpr": 0,
         "fnr": 0
       },
       "wrong_confident": {
@@ -213,10 +213,10 @@
           0.9,
           0.95
         ],
-        "scored": 4,
+        "scored": 6,
         "excluded": {
           "threw": 0,
-          "abstained": 3,
+          "abstained": 1,
           "null_signal": 0
         },
         "slices": [
@@ -617,8 +617,8 @@
         "total": 8,
         "errors": 1,
         "scored": 7,
-        "abstained": 3,
-        "abstention_rate": 0.42857142857142855
+        "abstained": 1,
+        "abstention_rate": 0.14285714285714285
       },
       "decision": {
         "n": 7,
@@ -642,16 +642,16 @@
           0.9,
           0.95
         ],
-        "scored": 4,
+        "scored": 6,
         "excluded": {
           "threw": 0,
-          "abstained": 3,
+          "abstained": 1,
           "null_signal": 0
         },
         "slices": [
           {
             "tau": 0.7,
-            "confident": 2,
+            "confident": 3,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
@@ -689,8 +689,8 @@
         "total": 8,
         "errors": 1,
         "scored": 7,
-        "abstained": 1,
-        "abstention_rate": 0.14285714285714285
+        "abstained": 0,
+        "abstention_rate": 0
       },
       "decision": {
         "n": 7,
@@ -714,30 +714,30 @@
           0.9,
           0.95
         ],
-        "scored": 6,
+        "scored": 7,
         "excluded": {
           "threw": 0,
-          "abstained": 1,
+          "abstained": 0,
           "null_signal": 1
         },
         "slices": [
           {
             "tau": 0.7,
-            "confident": 5,
+            "confident": 6,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
           },
           {
             "tau": 0.8,
-            "confident": 5,
+            "confident": 6,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
           },
           {
             "tau": 0.9,
-            "confident": 4,
+            "confident": 5,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0

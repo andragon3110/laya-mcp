@@ -106,20 +106,23 @@ Rerank: no aplica (within-call scores, no correctness value per score).
 |---|---|---|---|---|---|---|
 | `classify` | `winner_probability` | 7 | 0.000 | 0.000 | 0.000 | 0.000 |
 | `decide` | `winner_probability` | 4 | 0.000 | 0.000 | 0.000 | 0.000 |
-| `verify` | per-claim support | 4 | 0.000 | 0.000 | 0.000 | 0.000 |
+| `verify` | per-claim support | 6 | 0.000 | 0.000 | 0.000 | 0.000 |
 | `screen` | injection signal | 6 | 0.000 | 0.000 | 0.000 | 0.000 |
 | `pii` | max `detector_score` | 2 | 0.000 | 0.000 | 0.000 | 0.000 |
 | `extract` | `winner_probability` | 4 | 0.000 | 0.000 | 0.000 | 0.000 |
 | `find` | `winner_probability` | 3 | 0.000 | 0.000 | 0.000 | 0.000 |
 | `rerank` | — | — | no aplica | no aplica | no aplica | no aplica |
-| `review` | `safe_to_apply` | 4 | 0.000 | 0.000 | 0.000 | 0.000 |
-| `gate` | per-claim support | 6 | 0.000 | 0.000 | 0.000 | 0.000 |
+| `review` | `safe_to_apply` | 6 | 0.000 | 0.000 | 0.000 | 0.000 |
+| `gate` | per-claim support | 7 | 0.000 | 0.000 | 0.000 | 0.000 |
 | `compare` | `winner_probability` | 5 | 0.000 | 0.000 | 0.000 | 0.000 |
 
 Stub ceiling: 0.000 at every tau is the expected oracle-stub outcome
 (signals are assigned together with the golds, so confident-and-wrong
 cannot occur). It validates the slicing pipeline (counts, exclusions,
-joint vs conditional rates), not backend safety. The conditional rate
+joint vs conditional rates), not backend safety. Scored counts for
+verify/review/gate rose in fut-b-semantica T3 (4->6, 4->6, 6->7):
+mid/low-band signals that used to abstain are now scored judgments
+(no band abstention); rates stay 0.000. The conditional rate
 `P(wrong | signal >= tau)` is reported alongside and is null wherever no
 judgment reaches the slice. Full per-tau confident counts and exclusion
 breakdowns are in `evals/results/v1/metrics.json`.
@@ -285,8 +288,10 @@ work.
    calibration, tie rates, evasion robustness, or review/gate judgment
    quality. The suites pin known honest limitations instead (detector
    blind-spot miss in screen, no instruction-hierarchy defense in
-   classify, no cross-claim check in gate, REVIEW unreachable via the
-   review handler mid-band, authority notes denying any authorization).
+   classify, no cross-claim check in gate, the tool never authorizes
+   anything — mid-band safety REVIEWs via the handler since
+   fut-b-semantica T3, no band abstention — authority notes denying any
+   authorization).
 2. No calibrated probabilities: Brier/ECE absent by verdict, not by
    omission.
 3. Rerank transport cap: pools above 64 cannot run the judge end to end;

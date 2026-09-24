@@ -308,10 +308,16 @@ Model → Action:
 - `decision` — `{decision: ALLOW | REVIEW | DENY | ESCALATE, reason_codes[],
   policy: {name, version}}` from a versioned policy (all `1.0.0`);
   thresholds are preserved pre-P1 cut points, documented as **not
-  calibrated** (see `P1_IMPLEMENTATION.md` §4).
+  calibrated** (see `P1_IMPLEMENTATION.md` §4). The optional `risk` tier
+  (`laya_gate` / `laya_screen` / `laya_pii`) moves bands by an equally
+  uncalibrated ±0.05 step; `normal`/unset keeps the v1 cuts
+  byte-identical.
 - `abstention` — first-class `{abstained, reason}`; abstained evidence
   always resolves to `ESCALATE`, never to a forced verdict or a block.
-  Verify verdicts are `SUPPORTED` / `INSUFFICIENT_EVIDENCE` / `ABSTAIN`.
+  Verify verdicts are `SUPPORTED` / `INSUFFICIENT_EVIDENCE` / `ABSTAIN`,
+  plus `CONTRADICTED` on positive refutation only (firm denial from the
+  dedicated refutation probe plus weak support — never a low support
+  signal alone).
 - `relevance_score` (`laya_rerank`) is rank-only: higher means more
   relevant **within that one call** — it is not a probability (0.9 is not
   90%), does not transfer across calls or checkpoints, and no cutoff on
@@ -377,7 +383,7 @@ from code truth; the legacy `mode: "observe"` field is untouched
 ## Evaluation
 
 What `evals/` measures — and what it cannot — is defined in
-[`EVALUATION.md`](EVALUATION.md): 10 suites × 8 cases (80 golds) run
+[`EVALUATION.md`](EVALUATION.md): 11 suites × 8 cases (88 golds) run
 against the real handlers with deterministic oracle stubs (no live
 backend, no models, no network). Scores confirm harness plumbing
 under the stub ceiling; nothing transfers to backend quality.
@@ -387,7 +393,7 @@ gated protocol only (`EVALUATION.md` §8, `evals/integration.mjs
 --mode live` refuses without its five live requirements).
 
 ```bash
-node evals/run.mjs            # 80-case harness smoke
+node evals/run.mjs            # 88-case harness smoke
 node evals/score.mjs          # metrics report
 node evals/bench.mjs          # benchmark tables (absolutes)
 node evals/integration.mjs    # stub protocol run (4/4 vs oracle golds)
