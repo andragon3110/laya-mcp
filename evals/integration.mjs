@@ -103,7 +103,7 @@ export const INTEGRATION_TASKS = [
       },
       gate: {
         correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.95 },
-        claim_0: { noul: 0.9 },
+        claim_0: { noul: 0.9 }, refute_0: { noul: 0.1 },
       },
     },
     gold: {
@@ -147,7 +147,7 @@ export const INTEGRATION_TASKS = [
   },
   {
     id: "INT-03",
-    title: "untested-change-escalate",
+    title: "untested-change-review",
     chain: ["screen", "classify", "review", "gate"],
     haltOn: null,
     inputs: {
@@ -172,14 +172,16 @@ export const INTEGRATION_TASKS = [
       },
       gate: {
         correctness: { score: 1 }, spec_match: { score: 1 }, safe_to_apply: { noul: 0.7 },
-        claim_0: { noul: 0.9 },
+        claim_0: { noul: 0.9 }, refute_0: { noul: 0.1 },
       },
     },
     gold: {
       screen: { decision: "ALLOW", assessment: "valid" },
       classify: { decision: "ALLOW", classification: "bug" },
-      review: { decision: "ESCALATE" },
-      gate: { decision: "ESCALATE" },
+      // T3: mid-band safety is firm REVIEW evidence (no band abstention),
+      // so the untested change REVIEWs at both hooks instead of escalating.
+      review: { decision: "REVIEW" },
+      gate: { decision: "REVIEW" },
     },
   },
   {
@@ -215,7 +217,7 @@ export const INTEGRATION_TASKS = [
       },
       gate: {
         correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.9 },
-        claim_0: { noul: 0.95 }, claim_1: { noul: 0.92 },
+        claim_0: { noul: 0.95 }, claim_1: { noul: 0.92 }, refute_0: { noul: 0.1 }, refute_1: { noul: 0.1 },
       },
     },
     gold: {

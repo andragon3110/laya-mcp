@@ -23,16 +23,19 @@ function normalizeContext(v: unknown): Record<string, unknown> {
 export const gateTool: ToolDefinition = {
   name: "laya_gate",
   description:
-    "Completion gate: correctness + spec_match + safe_to_apply signals plus one per-claim support " +
-    "signal, each claim verified against the supplied evidence. Returns EVIDENCE (rubric objects " +
-    "and per-claim {signal} objects with honest SUPPORTED/INSUFFICIENT_EVIDENCE/ABSTAIN labels) " +
+    "Completion gate: correctness + spec_match + safe_to_apply signals plus per-claim support " +
+    "AND refutation signals, each claim verified against the supplied evidence (support: does the " +
+    "evidence state the claim? refutation: does the evidence DENY it? -- positive refutation only, " +
+    "never absence). Returns EVIDENCE (rubric objects " +
+    "and per-claim {signal} objects with honest SUPPORTED/CONTRADICTED/INSUFFICIENT_EVIDENCE/ABSTAIN labels; " +
+    "CONTRADICTED needs firm denial plus weak support, never a low support signal alone) " +
     "plus the deterministic ALLOW/REVIEW/ESCALATE `decision` from the versioned gate@1.0.0 policy " +
-    "(context + risk are forwarded to the engine; v1 policies ignore risk). This tool never " +
+    "(context + risk are forwarded to the engine; risk tightens/relaxes the auto band per gate@1.0.0). This tool never " +
     "executes actions and never applies diffs -- it only reports the policy decision. " +
     "Deliberate rubric difference vs laya_review (see gate@1.0.0): test_gap/blast_radius are not " +
     "asked here; coverage breadth lives in review, completion truthfulness lives here. " +
-    "At most 61 claims per call (3 fixed rubric questions + claims fit the 64-question server " +
-    "budget); diff and evidence at most 20,000 chars each (larger inputs are rejected with input_too_large).",
+    "At most 30 claims per call (3 fixed rubric questions + two questions per claim -- support + " +
+    "refutation -- fit the 64-question server budget); diff and evidence at most 20,000 chars each (larger inputs are rejected with input_too_large).",
   inputSchema: {
     type: "object",
     properties: {
@@ -42,7 +45,7 @@ export const gateTool: ToolDefinition = {
         type: "array",
         maxItems: LIMITS.maxGateClaims,
         items: { type: "string" },
-        description: "Completion claims to verify (max 61, e.g. 'all tests pass').",
+        description: "Completion claims to verify (max 30, e.g. 'all tests pass'). Two judgments per claim: support + refutation.",
       },
       evidence: {
         type: "string",
@@ -56,7 +59,7 @@ export const gateTool: ToolDefinition = {
       risk: {
         type: "string",
         enum: ["low", "normal", "high"],
-        description: "Optional risk tier forwarded to the policy engine (default normal; v1 policies ignore it).",
+        description: "Optional risk tier forwarded to the policy engine (default normal; tightens/relaxes the gate auto band).",
       },
     },
     required: ["request", "diff", "claims"],
@@ -97,7 +100,7 @@ export const gateTool: ToolDefinition = {
             verdict: {
               type: "string",
               enum: ["SUPPORTED", "INSUFFICIENT_EVIDENCE", "ABSTAIN", "CONTRADICTED"],
-              description: "CONTRADICTED is reserved for positive refutation evidence; v1 never emits it.",
+              description: "CONTRADICTED needs positive refutation (firm denial + weak support); low support alone is INSUFFICIENT_EVIDENCE, never a contradiction.",
             },
           },
           required: ["claim", "signal", "verdict"],
@@ -120,7 +123,7 @@ export const gateTool: ToolDefinition = {
       claims.length,
       LIMITS.maxGateClaims,
       "claims",
-      `laya_gate accepts at most ${LIMITS.maxGateClaims} claims per call (3 fixed rubric questions + claims fit the ${LIMITS.maxQuestions}-question server budget)`,
+      `laya_gate accepts at most ${LIMITS.maxGateClaims} claims per call (3 fixed rubric questions + two questions per claim -- support + refutation -- fit the ${LIMITS.maxQuestions}-question server budget)`,
     );
     assertLength(
       String(args.diff ?? ""),
@@ -155,12 +158,23 @@ export const gateTool: ToolDefinition = {
       },
     };
     claims.forEach((claim, i) => {
+      // fut-b-semantica T3: two independent probes per claim (support +
+      // refutation), same contract as laya_verify. Low support is absence
+      // of evidence, never refutation.
       out[`claim_${i}`] = {
         type: "noul",
         instructions: `Is this completion claim supported by the supplied evidence? Claim: '${claim}'`,
         criteria: {
           true: "Claim is directly supported by the evidence.",
-          false: "Claim is contradicted or unsupported.",
+          false: "Claim is not supported by the evidence (absence of support is not refutation).",
+        },
+      };
+      out[`refute_${i}`] = {
+        type: "noul",
+        instructions: `Is this completion claim DENIED by the supplied evidence? Claim: '${claim}'`,
+        criteria: {
+          true: "Evidence directly states or implies the negation of the claim (positive refutation).",
+          false: "Evidence does not deny the claim (silence or absence is not denial).",
         },
       };
     });
@@ -176,10 +190,26 @@ export const gateTool: ToolDefinition = {
  * labels are gone: rubric entries are objects, per-claim output is
  * `{claim, signal, verdict}` with the honest SUPPORTED/INSUFFICIENT_EVIDENCE/
  * ABSTAIN vocabulary (a low support signal is absence of evidence, never a
- * refutation -- CONTRADICTED needs positive refutation evidence no v1
- * detector carries, so v1 never emits it; the engine reason codes keep
- * their T4 names), and the decision is `{decision, reason_codes, policy}`
- * from gate@1.0.0. No threshold literal remains in this handler.
+ * refutation -- CONTRADICTED needs positive refutation evidence, emitted
+ * since fut-b-semantica T3 via the dedicated refutation probe; the engine
+ * reason codes keep their T4 names), and the decision is
+ * `{decision, reason_codes, policy}` from gate@1.0.0. No threshold literal
+ * remains in this handler.
+ *
+ * fut-b-semantica T3 (breaking, extends the above):
+ *   - Per-claim CONTRADICTED is now EMITTED via the dedicated `refute_<i>`
+ *     probe: firm denial (>= shared claimVerified cut) + weak support (<
+ *     cut). Verdict rule mirrors laya_verify (either probe missing ->
+ *     ABSTAIN; firm denial + weak support -> CONTRADICTED; both firm ->
+ *     INSUFFICIENT_EVIDENCE as conflicting evidence; firm support without
+ *     firm denial -> SUPPORTED; else INSUFFICIENT_EVIDENCE).
+ *   - Two server questions per claim, so the cap drops 61 -> 30 claims
+ *     (3 rubric + 2x30 = 63 <= 64-question server budget).
+ *   - Band abstention is gone from gateEvidence: a present mid-band
+ *     safe_to_apply flows to gate_review (REVIEW reachable via the
+ *     handler) instead of short-circuiting to abstained_evidence ESCALATE.
+ *     Missing safe_to_apply still abstains; null claim/refutation answers
+ *     stay policy-owned (gate_missing_signal -> ESCALATE).
  */
 export async function handleGate(client: LayaClient, args: Record<string, unknown>): Promise<string> {
   const claims = Array.isArray(args.claims) ? args.claims : [];
@@ -190,21 +220,33 @@ export async function handleGate(client: LayaClient, args: Record<string, unknow
     const spec_match = numOrNull(a.spec_match?.score);
     const safe_to_apply = numOrNull(a.safe_to_apply?.noul);
     // P1-T5: decision and display cuts resolve from the shared table; the
-    // handler never hardcodes 0.85/0.8/0.4. The display cut below uses the
-    // SUPPORT threshold only: anything present-but-below is insufficient
-    // evidence, never a contradiction (absence != refutation).
+    // handler never hardcodes 0.85/0.8/0.4. Display pairs support with the
+    // T3 refutation probe (absence != refutation -- see verdictFor).
     const { thresholds } = getPolicy("gate", "1.0.0");
-    const verdictFor = (signal: number | null): string =>
-      signal === null ? "ABSTAIN" : signal >= thresholds.claimVerified ? "SUPPORTED" : "INSUFFICIENT_EVIDENCE";
+    // fut-b-semantica T3: display verdict pairs the support probe with the
+    // dedicated refutation probe (same rule as laya_verify) -- CONTRADICTED
+    // needs firm denial + weak support, never a low support signal alone.
+    const verdictFor = (support: number | null, refute: number | null): string => {
+      if (support === null || refute === null) return "ABSTAIN";
+      if (refute >= thresholds.claimVerified && support < thresholds.claimVerified) return "CONTRADICTED";
+      if (support >= thresholds.claimVerified && refute < thresholds.claimVerified) return "SUPPORTED";
+      return "INSUFFICIENT_EVIDENCE";
+    };
     const claimEntries = claims.map((claim, i) => {
-      const signal = numOrNull(a[`claim_${i}`]?.noul);
-      return { claim: String(claim), signal, verdict: verdictFor(signal) };
+      const support = numOrNull(a[`claim_${i}`]?.noul);
+      const refute = numOrNull(a[`refute_${i}`]?.noul);
+      return { claim: String(claim), signal: support, verdict: verdictFor(support, refute) };
     });
     const { evidence, abstention } = gateEvidence(raw, {
       correctness,
       spec_match,
       safe_to_apply,
-      claims: claimEntries,
+      claims: claimEntries.map((c, i) => ({
+        claim: c.claim,
+        signal: c.signal,
+        verdict: c.verdict,
+        refute: numOrNull(a[`refute_${i}`]?.noul),
+      })),
     });
     const risk = normalizeRisk(args.risk);
     const context = {

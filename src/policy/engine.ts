@@ -14,11 +14,23 @@
  *   3. Otherwise delegate to the policy definition with the resolved
  *      shared thresholds.
  *
- * v1 `context`/`risk` handling: accepted and forwarded, but policies
- * ignore them EXCEPT where documented (find@1.0.0 reads
- * `context.candidateCount` for the 1/N weak-winner baseline). No v1 policy
- * branches on `risk`: risk-tiered strictness is reserved for future
- * calibration, never invented here.
+ * fut-b-semantica T3 (BREAKING precedence change, implemented in
+ * evidence.ts, documented here because the engine owns the rule): the
+ * global rule is UNCHANGED -- real abstention still precedes every band --
+ * but what COUNTS as abstention narrowed. Band-position abstention is gone
+ * (verify/gate claim bands, review/gate mid-band safe_to_apply): a present
+ * signal in a REVIEW/DENY zone is firm evidence for that band, not
+ * ambiguity, so REVIEW/DENY are reachable via the handlers. Evidence
+ * abstains ONLY on missing/degraded input (null signals, empty claims).
+ * Missing -> ESCALATE is preserved at both levels (global rule + the
+ * policies' missing-signal exits).
+ *
+ * v1 `context`/`risk` handling: accepted and forwarded. `context` never
+ * moves a cut (except find@1.0.0 reading `context.candidateCount` for the
+ * 1/N weak-winner baseline). `risk` moves cuts ONLY where the policy
+ * documents it (gate/screen numeric bands via thresholds.RISK_CUT_DELTA,
+ * pii non-secret branch); every other v1 policy ignores it. Neither
+ * `context` nor `risk` ever rescues abstention (rule above).
  */
 import { getPolicy } from "./loader.js";
 import type { PolicyThresholds } from "./thresholds.js";

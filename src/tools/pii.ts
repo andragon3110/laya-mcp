@@ -1,19 +1,32 @@
-import type { LayaClient } from "../client.js";
+import { BackendUnavailableError, type LayaClient } from "../client.js";
+import type { GlinerSpan } from "../gliner.js";
 import type { ToolContext } from "../index.js";
 import { piiEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
-import { type ToolDefinition, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
+import type { RiskTier } from "../policy/types.js";
+import { type ToolDefinition, READONLY_TOOL_ANNOTATIONS, TOOL_TIMEOUT_MS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
+
+const RISKS: readonly RiskTier[] = ["low", "normal", "high"];
+
+function normalizeRisk(v: unknown): RiskTier {
+  if (v === undefined) return "normal";
+  if (typeof v === "string" && (RISKS as readonly string[]).includes(v)) return v as RiskTier;
+  throw new Error(`laya_pii: risk must be one of ${RISKS.join("|")} (got ${JSON.stringify(v)})`);
+}
 
 export const piiTool: ToolDefinition = {
   name: "laya_pii",
   description:
     "Scan text for PII and secrets (emails, phone numbers, API keys, tokens, passwords, person names) " +
-    "using the GLiNER sidecar. Returns pipeline EVIDENCE (candidate spans with entity_type + span offsets + " +
-    "detector_score, plus a null laya_signal: v1 applies no Laya risk cut -- the count-based policy is " +
-    "preserved) plus the deterministic ALLOW/REVIEW/DENY/ESCALATE `decision` from the versioned pii@1.0.0 " +
-    "policy. GLiNER proposes, Laya disposes -- every finding is a candidate, never a confirmed label. " +
+    "using the GLiNER sidecar, then ask Laya to judge every candidate span (one noul confirmation " +
+    "per span: is this span really {entity-type}?). Returns pipeline EVIDENCE (candidate spans with " +
+    "entity_type + span offsets + detector_score, plus the per-finding Laya `laya_signal`) plus the " +
+    "deterministic ALLOW/REVIEW/DENY/ESCALATE `decision` from the versioned pii@1.0.0 policy " +
+    "(count-based over GLiNER candidate spans; the optional risk tier moves the non-secret branch). " +
+    "GLiNER proposes, Laya judges each span, the Policy decides -- every finding stays a candidate, " +
+    "never a confirmed label. " +
     "Requires the gliner-server sidecar " +
     "(install.sh --with-gliner); fails clearly when it is down. " +
     "Text at most 50,000 chars, at most 32 extra types per call (larger inputs are rejected with input_too_large).",
@@ -26,6 +39,11 @@ export const piiTool: ToolDefinition = {
         maxItems: LIMITS.maxExtraTypes,
         items: { type: "string" },
         description: "Extra zero-shot entity types to look for alongside the PII set (max 32).",
+      },
+      risk: {
+        type: "string",
+        enum: ["low", "normal", "high"],
+        description: "Optional risk tier forwarded to the policy engine (default normal; moves the non-secret branch).",
       },
     },
     required: ["text"],
@@ -66,7 +84,13 @@ export const piiTool: ToolDefinition = {
               required: ["start", "end"],
             },
             detector_score: { type: ["number", "null"] },
-            laya_signal: { type: "null", description: "Null in v1: no Laya risk cut is applied." },
+            laya_signal: {
+              type: ["number", "null"],
+              description:
+                "Laya judge noul per span (raw, uncalibrated): high supports the span, low doubts it, " +
+                "null abstains (judge unreachable or span unjudged -- see pipeline.laya_note). " +
+                "Informational only: the policy still decides from GLiNER candidate counts.",
+            },
             category: {
               type: "string",
               enum: ["secret", "credential", "pii", "identifier", "unknown"],
@@ -190,24 +214,121 @@ export function piiCategoryFor(entityType: string, secretTypes: Set<string>): st
 }
 
 /**
- * P1-T6 (breaking): `laya_pii` reports the GLiNER -> candidate-spans ->
- * Laya-risk -> Policy pipeline explicitly plus the engine decision. The
- * legacy `action` (block/review/pass) is gone -- the decision is
- * `{decision, reason_codes, policy}` from pii@1.0.0 over the shared
- * secret-type table (no local SECRET_TYPES literal; env overrides apply).
- * Each finding now carries `entity_type` + `span` + `detector_score`
- * (renamed from the sidecar `confidence`, uncalibrated) + `laya_signal`
- * (null in v1: no Laya risk judge runs -- the count-based policy is
- * preserved, so the null is explicit instead of hidden) + `category`
- * (secret/credential/pii/identifier/unknown; false-positive reserved, v1
- * never emits it) + `finding_status: "candidate"`. The sidecar-verbatim
- * `type` alias is kept so span round-trip consumers keep working. Secret
- * membership still decides DENY; any non-secret finding still REVIEWs at
- * the policy level, while all-weak-type scans still abstain to ESCALATE
- * via the global rule (ambiguous detector judgment, preserved from T3).
+ * T2 Laya-judge over GLiNER candidate spans. Returns one `laya_signal` per
+ * finding (raw noul, uncalibrated; null = the judge abstained on that span)
+ * plus the batch `judged` flag (true iff every finding carries a signal --
+ * vacuously true with zero findings, when no Laya call is made at all), an
+ * honest `note`, and the judge `latencyMs` (0 when uncalled).
+ *
+ * Failure contract: only a BackendUnavailableError (unreachable / timeout /
+ * /predict HTTP error / invalid payload) degrades to all-null + judged:false
+ * + the backend reason in the note. Any other throw (programming error, GLiNER
+ * failure upstream) propagates -- a broken judge call must never masquerade
+ * as a backend outage, and a backend outage must never fail the scan.
+ */
+export interface PiiJudgeResult {
+  signals: Array<number | null>;
+  judged: boolean;
+  note: string;
+  latencyMs: number;
+}
+
+export function piiJudgeQuestions(
+  findings: GlinerSpan[],
+): { questions: Record<string, unknown>; judgedCount: number } {
+  const judgedCount = Math.min(findings.length, LIMITS.maxQuestions);
+  const questions: Record<string, unknown> = {};
+  for (let i = 0; i < judgedCount; i++) {
+    const f = findings[i];
+    questions[`pii_judge_${i}`] = {
+      type: "noul",
+      instructions:
+        `Is this detected span really '${f.type}'? Span text: '${f.text}' ` +
+        `(chars ${f.start}-${f.end}). Judge the span only, not the surrounding text.`,
+      criteria: {
+        true: `The span really is ${f.type}.`,
+        false: `The span is not ${f.type} (false positive or wrong entity type).`,
+      },
+    };
+  }
+  return { questions, judgedCount };
+}
+
+export async function judgePiiSpans(
+  client: LayaClient,
+  text: string,
+  findings: GlinerSpan[],
+): Promise<PiiJudgeResult> {
+  if (findings.length === 0) {
+    return {
+      signals: [],
+      judged: true,
+      note: "no GLiNER spans to judge; Laya judge not called (vacuous cover).",
+      latencyMs: 0,
+    };
+  }
+  const { questions, judgedCount } = piiJudgeQuestions(findings);
+  const truncated = findings.length - judgedCount;
+  try {
+    const raw = await client.predict({ text }, questions, TOOL_TIMEOUT_MS);
+    const signals: Array<number | null> = findings.map((_, i) => {
+      if (i >= judgedCount) return null;
+      const ans = (raw.answers ?? {})[`pii_judge_${i}`] as { noul?: unknown } | undefined;
+      return typeof ans?.noul === "number" ? ans.noul : null;
+    });
+    const answered = signals.filter((s) => typeof s === "number").length;
+    const judged = answered === findings.length;
+    const parts = [
+      `Laya judged ${answered}/${findings.length} GLiNER span(s) in one additional /predict call (noul per span); ` +
+        `laya_signal carries the raw signal per finding (high supports, low doubts, null abstains).`,
+    ];
+    if (truncated > 0) {
+      parts.push(
+        `${truncated} span(s) beyond the ${LIMITS.maxQuestions}-question budget were not sent and carry null.`,
+      );
+    }
+    if (!judged && truncated === 0) {
+      parts.push("Unjudged spans carry null: the backend gave no noul answer for their question.");
+    }
+    return { signals, judged, note: parts.join(" "), latencyMs: Number(raw.latencyMs ?? 0) };
+  } catch (err) {
+    if (err instanceof BackendUnavailableError) {
+      const reason = err instanceof Error ? err.message : String(err);
+      return {
+        signals: findings.map(() => null),
+        judged: false,
+        note:
+          `Laya judge unavailable (${reason}); every laya_signal is null ` +
+          `(GLiNER-only degrade, no signal invented). No span text is echoed here.`,
+        latencyMs: 0,
+      };
+    }
+    throw err;
+  }
+}
+
+/**
+ * fut-b-semantica T2: `laya_pii` runs GLiNER -> Laya-judge -> Policy.
+ * GLiNER proposes candidate spans; Laya judges EACH span with one `noul`
+ * confirmation question per span in an ADDITIONAL /predict call (it cannot
+ * share a call with anything: the spans are only known after GLiNER
+ * answers); the pii@1.0.0 policy decides from GLiNER candidate counts, with
+ * the optional `risk` tier moving only the non-secret branch. Authority is
+ * unchanged: the judge signal (high = supports, low = doubts, null =
+ * abstains) is informational per finding -- `finding_status` stays
+ * "candidate" and the decision still comes from the engine. A judge failure
+ * (backend unreachable/timeout/http/invalid) degrades to explicit nulls
+ * with an honest note -- it never fails the scan (the GLiNER evidence
+ * survives) and never invents signals.
+ *
+ * `laya_judged` is true iff every finding carries a non-null `laya_signal`
+ * (vacuously true when GLiNER reports zero spans: nothing to judge, no Laya
+ * call is made). At most LIMITS.maxQuestions spans are judged per call (one
+ * question per span fits the 64-question server budget); extras keep null
+ * with the truncation named in the note.
  */
 export async function handlePii(
-  _client: LayaClient,
+  client: LayaClient,
   args: Record<string, unknown>,
   ctx?: ToolContext,
 ): Promise<string> {
@@ -221,6 +342,7 @@ export async function handlePii(
   // Early size check with the shared vocabulary (the sidecar 413s as the
   // authority; this just fails before the HTTP round trip).
   piiTool.buildQuestions(args);
+  const risk = normalizeRisk(args.risk);
   const text = String(args.text ?? "");
   const extra = Array.isArray(args.extra_types) ? (args.extra_types as string[]) : [];
   const { findings, counts, latencyMs } = await ctx.gliner.piiScan(text, extra);
@@ -240,18 +362,23 @@ export async function handlePii(
     })),
     weakTypes: findings.filter((f) => !secretSet.has(f.type)).map((f) => f.type),
   });
+  // T2 judge: one noul confirmation per GLiNER span ("is this span really
+  // {entity-type}?"). Evidence/abstention above stay GLiNER-only (the judge
+  // informs the reviewer, never the policy input); the decision below still
+  // counts GLiNER candidates.
+  const judged = await judgePiiSpans(client, text, findings);
   const { decision, shadow } = evaluateForTool(
     "laya_pii",
     {
       evidence,
       abstention,
       context: { finding_count: findings.length, secret_count: secrets.length },
-      risk: "normal",
+      risk,
       policy: { name: "pii", version: "1.0.0" },
     },
     { thresholds },
   );
-  const enriched = findings.map((f) => ({
+  const enriched = findings.map((f, i) => ({
     text: f.text,
     start: f.start,
     end: f.end,
@@ -259,7 +386,7 @@ export async function handlePii(
     entity_type: f.type,
     span: { start: f.start, end: f.end },
     detector_score: typeof f.confidence === "number" ? f.confidence : null,
-    laya_signal: null,
+    laya_signal: judged.signals[i] ?? null,
     category: piiCategoryFor(f.type, secretSet),
     finding_status: "candidate",
   }));
@@ -268,10 +395,8 @@ export async function handlePii(
       pipeline: {
         stages: ["gliner", "laya_risk", "policy"],
         gliner_spans: findings.length,
-        laya_judged: false,
-        laya_note:
-          "v1 applies no Laya risk cut: laya_signal is null for every finding and the " +
-          "pii@1.0.0 count-based policy decides from GLiNER candidate spans alone (preserved behavior).",
+        laya_judged: judged.judged,
+        laya_note: judged.note,
         policy: { name: "pii", version: "1.0.0" },
       },
       findings: enriched,
@@ -279,7 +404,7 @@ export async function handlePii(
       secrets_found: secrets.length,
       decision,
       ...(shadow ? { shadow } : {}),
-      latency_ms: latencyMs,
+      latency_ms: latencyMs + judged.latencyMs,
       recommendation:
         decision.decision === "DENY"
           ? "Secrets detected. Redact before the text enters any model context or leaves the machine."

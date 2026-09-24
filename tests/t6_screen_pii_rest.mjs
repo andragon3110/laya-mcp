@@ -45,6 +45,20 @@ const fakePiiCtx = (findings) => ({
   },
 });
 
+// fut-b-semantica T2: the Laya judge confirms every span (firm noul), so
+// handler outputs carry real laya_signal + laya_judged:true. Clean scans
+// still take no client at all (vacuous cover, no Laya call).
+const fakeJudgeClient = (noul = 0.9) => ({
+  predict: async (_state, questions) => ({
+    answers: Object.fromEntries(Object.keys(questions).map((qid) => [qid, { noul }])),
+    confidence: {},
+    routing: {},
+    model: "t6-judge",
+    latencyMs: 3,
+    usage: {},
+  }),
+});
+
 let passed = 0;
 function check(name, fn) {
   return Promise.resolve()
@@ -162,9 +176,9 @@ const span = (type, text = `x-${type}`, confidence = 0.9) => ({
 });
 
 await check("pii secret -> DENY + pipeline + enriched finding", async () => {
-  const body = JSON.parse(await handlePii({}, { text: "key sk-123" }, fakePiiCtx([span("api_key", "sk-123")])));
+  const body = JSON.parse(await handlePii(fakeJudgeClient(), { text: "key sk-123" }, fakePiiCtx([span("api_key", "sk-123")])));
   assert.deepEqual(body.pipeline.stages, ["gliner", "laya_risk", "policy"]);
-  assert.equal(body.pipeline.laya_judged, false);
+  assert.equal(body.pipeline.laya_judged, true);
   assert.deepEqual(body.pipeline.policy, { name: "pii", version: "1.0.0" });
   assert.equal(body.findings.length, 1);
   const f = body.findings[0];
@@ -172,7 +186,7 @@ await check("pii secret -> DENY + pipeline + enriched finding", async () => {
   assert.equal(f.type, "api_key");
   assert.deepEqual(f.span, { start: 0, end: 6 });
   assert.equal(f.detector_score, 0.9);
-  assert.equal(f.laya_signal, null);
+  assert.equal(f.laya_signal, 0.9);
   assert.equal(f.category, "secret");
   assert.equal(f.finding_status, "candidate");
   assert.equal(body.secrets_found, 1);
@@ -191,12 +205,14 @@ await check("pii clean -> ALLOW", async () => {
 
 await check("pii weak-only (email) -> ESCALATE abstained (ambiguous detector judgment)", async () => {
   const body = JSON.parse(
-    await handlePii({}, { text: "a@b.c" }, fakePiiCtx([span("email", "a@b.c")])),
+    await handlePii(fakeJudgeClient(), { text: "a@b.c" }, fakePiiCtx([span("email", "a@b.c")])),
   );
   assert.equal(body.abstention.abstained, true);
   assert.equal(body.decision.decision, "ESCALATE");
   assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
   assert.equal(body.findings[0].category, "pii");
+  assert.equal(body.findings[0].laya_signal, 0.9, "judge informs even when policy abstains");
+  assert.equal(body.pipeline.laya_judged, true);
 });
 
 await check("pii categories distinguish credential/identifier/unknown (false-positive reserved)", async () => {
@@ -208,7 +224,7 @@ await check("pii categories distinguish credential/identifier/unknown (false-pos
   assert.equal(piiCategoryFor("starship_class", secrets), "unknown");
   const body = JSON.parse(
     await handlePii(
-      {},
+      fakeJudgeClient(),
       { text: "t" },
       fakePiiCtx([span("private_key", "k"), span("passport", "p"), span("starship_class", "s")]),
     ),
@@ -222,7 +238,7 @@ await check("pii categories distinguish credential/identifier/unknown (false-pos
 });
 
 await check("pii double call is byte-identical (determinism)", async () => {
-  const mk = () => handlePii({}, { text: "key sk-123" }, fakePiiCtx([span("api_key", "sk-123")]));
+  const mk = () => handlePii(fakeJudgeClient(), { text: "key sk-123" }, fakePiiCtx([span("api_key", "sk-123")]));
   assert.equal(await mk(), await mk());
 });
 
