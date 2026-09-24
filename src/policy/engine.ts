@@ -14,11 +14,12 @@
  *   3. Otherwise delegate to the policy definition with the resolved
  *      shared thresholds.
  *
- * v1 `context`/`risk` handling: accepted and forwarded, but policies
- * ignore them EXCEPT where documented (find@1.0.0 reads
- * `context.candidateCount` for the 1/N weak-winner baseline). No v1 policy
- * branches on `risk`: risk-tiered strictness is reserved for future
- * calibration, never invented here.
+ * v1 `context`/`risk` handling: accepted and forwarded. `context` never
+ * moves a cut (except find@1.0.0 reading `context.candidateCount` for the
+ * 1/N weak-winner baseline). `risk` moves cuts ONLY where the policy
+ * documents it (gate/screen numeric bands via thresholds.RISK_CUT_DELTA,
+ * pii non-secret branch); every other v1 policy ignores it. Neither
+ * `context` nor `risk` ever rescues abstention (rule above).
  */
 import { getPolicy } from "./loader.js";
 import type { PolicyThresholds } from "./thresholds.js";

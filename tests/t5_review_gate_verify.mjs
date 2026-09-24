@@ -150,16 +150,22 @@ await check("gate missing claim signal -> ABSTAIN claim + ESCALATE missing", asy
   assert.deepEqual(body.decision.reason_codes, ["gate_missing_signal"]);
 });
 
-await check("gate caller context+risk forwarded without moving v1 cuts", async () => {
-  const body = JSON.parse(
+await check("gate caller context+risk forwarded; risk high tightens the auto band (T2)", async () => {
+  const hi = JSON.parse(
     await handleGate(
       fakeClient(gateAnswers({ safe: 0.9, claims: [0.9] })),
       gateArgs(["a"], { context: { ci: true }, risk: "high" }),
     ),
   );
-  assert.equal(body.risk, "high");
-  assert.equal(body.context.ci, true);
-  assert.equal(body.decision.decision, "ALLOW");
+  assert.equal(hi.risk, "high");
+  assert.equal(hi.context.ci, true);
+  // safe 0.9 clears normal (0.85) but not high (0.90): the band moved.
+  assert.equal(hi.decision.decision, "REVIEW");
+  assert.deepEqual(hi.decision.reason_codes, ["gate_review"]);
+  const normal = JSON.parse(
+    await handleGate(fakeClient(gateAnswers({ safe: 0.9, claims: [0.9] })), gateArgs(["a"])),
+  );
+  assert.equal(normal.decision.decision, "ALLOW");
 });
 
 await check("gate invalid risk rejected", async () => {

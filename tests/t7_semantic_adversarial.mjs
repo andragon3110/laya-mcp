@@ -16,10 +16,9 @@
  *     plain "hello" clean and "a@b.c" weak-only; no obfuscated input exists.
  *   - flat distributions via HANDLER (find tie, decide 1/N flat, classify
  *     empty dict): policy_engine.mjs covers them at engine level only.
- *   - risk invariance + abstention-dominance: policy_engine.mjs asserts
- *     risk does not move the screen cut once; t5 asserts gate risk:high
- *     ALLOWs once. No test pairs low/high on identical evidence, and no
- *     test combines risk:high with abstained evidence.
+ *   - risk bands + abstention-dominance (fut-b-semantica T2): gate/screen/pii
+ *     move documented bands with risk (low/normal/high); the engine global
+ *     abstain rule still wins over risk:high on abstained evidence.
  *   - env overrides via HANDLER (screen block cut, pii secret set):
  *     policy_engine.mjs covers pure resolveThresholds only; no test proves
  *     a handler picks the override up end to end.
@@ -73,6 +72,18 @@ const span = (type, text = `x-${type}`, confidence = 0.9) => ({
   end: text.length,
   type,
   confidence,
+});
+
+// fut-b-semantica T2: the judge confirms every span it is asked about.
+const fakeJudgeClient = (noul = 0.9) => ({
+  predict: async (_state, questions) => ({
+    answers: Object.fromEntries(Object.keys(questions).map((qid) => [qid, { noul }])),
+    confidence: {},
+    routing: {},
+    model: "t7-judge",
+    latencyMs: 3,
+    usage: {},
+  }),
 });
 
 let passed = 0;
@@ -231,15 +242,16 @@ await check("adversarial: spaced-out secret missed by GLiNER stub -> ALLOW with 
   assert.equal(body.decision.decision, "ALLOW");
   assert.deepEqual(body.evidence.signals, []);
   assert.equal(body.abstention.abstained, false);
-  assert.equal(body.pipeline.laya_judged, false);
+  assert.equal(body.pipeline.laya_judged, true, "T2: vacuous cover, no Laya call on zero spans");
 });
 
 await check("adversarial: '[at]/[dot]'-obfuscated email hit -> ESCALATE abstained (ambiguous detector judgment)", async () => {
   const body = JSON.parse(
-    await handlePii({}, { text: "reach me at a [at] b [dot] c" }, fakePiiCtx([span("email", "a [at] b [dot] c")])),
+    await handlePii(fakeJudgeClient(), { text: "reach me at a [at] b [dot] c" }, fakePiiCtx([span("email", "a [at] b [dot] c")])),
   );
   assert.equal(body.findings[0].category, "pii");
   assert.equal(body.findings[0].finding_status, "candidate");
+  assert.equal(body.findings[0].laya_signal, 0.9, "T2: judge informs even when policy abstains");
   assert.equal(body.abstention.abstained, true);
   assert.equal(body.decision.decision, "ESCALATE");
   assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
@@ -311,13 +323,16 @@ await check("risk: gate missing-signal evidence + risk high still ESCALATEs miss
   assert.deepEqual(normal.decision, body.decision);
 });
 
-await check("risk: gate low vs high on identical firm evidence -> identical ALLOW (v1 ignores risk)", async () => {
+await check("risk: gate low vs high on identical firm evidence -> high tightens (T2 bands)", async () => {
+  // safe 0.9 clears normal (0.85) and low (0.80) but not high (0.90).
   const mk = (risk) =>
     handleGate(fakeClient(gateAnswers({ safe: 0.9, claims: [0.9] })), gateArgs(["a"], { risk }));
   const low = JSON.parse(await mk("low"));
   const high = JSON.parse(await mk("high"));
   assert.equal(low.decision.decision, "ALLOW");
-  assert.deepEqual(low.decision, high.decision);
+  assert.deepEqual(low.decision.reason_codes, ["gate_auto_allow"]);
+  assert.equal(high.decision.decision, "REVIEW");
+  assert.deepEqual(high.decision.reason_codes, ["gate_review"]);
   assert.equal(high.risk, "high");
 });
 
@@ -369,14 +384,14 @@ await check("policy override: LAYA_POLICY_SECRET_TYPES moves the pii handler cut
     // Default table: passport is not a secret -> weak-only scan abstains.
     delete process.env.LAYA_POLICY_SECRET_TYPES;
     const before = JSON.parse(
-      await handlePii({}, { text: "passport X123" }, fakePiiCtx([span("passport", "X123")])),
+      await handlePii(fakeJudgeClient(), { text: "passport X123" }, fakePiiCtx([span("passport", "X123")])),
     );
     assert.equal(before.abstention.abstained, true);
     assert.deepEqual(before.decision.reason_codes, ["abstained_evidence"]);
     // Operator override adds passport to the secret set -> DENY.
     process.env.LAYA_POLICY_SECRET_TYPES = "api_key,token_secreto,password,passport";
     const after = JSON.parse(
-      await handlePii({}, { text: "passport X123" }, fakePiiCtx([span("passport", "X123")])),
+      await handlePii(fakeJudgeClient(), { text: "passport X123" }, fakePiiCtx([span("passport", "X123")])),
     );
     assert.equal(after.abstention.abstained, false);
     assert.equal(after.decision.decision, "DENY");

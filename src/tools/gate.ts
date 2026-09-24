@@ -27,7 +27,7 @@ export const gateTool: ToolDefinition = {
     "signal, each claim verified against the supplied evidence. Returns EVIDENCE (rubric objects " +
     "and per-claim {signal} objects with honest SUPPORTED/INSUFFICIENT_EVIDENCE/ABSTAIN labels) " +
     "plus the deterministic ALLOW/REVIEW/ESCALATE `decision` from the versioned gate@1.0.0 policy " +
-    "(context + risk are forwarded to the engine; v1 policies ignore risk). This tool never " +
+    "(context + risk are forwarded to the engine; risk tightens/relaxes the auto band per gate@1.0.0). This tool never " +
     "executes actions and never applies diffs -- it only reports the policy decision. " +
     "Deliberate rubric difference vs laya_review (see gate@1.0.0): test_gap/blast_radius are not " +
     "asked here; coverage breadth lives in review, completion truthfulness lives here. " +
@@ -56,7 +56,7 @@ export const gateTool: ToolDefinition = {
       risk: {
         type: "string",
         enum: ["low", "normal", "high"],
-        description: "Optional risk tier forwarded to the policy engine (default normal; v1 policies ignore it).",
+        description: "Optional risk tier forwarded to the policy engine (default normal; tightens/relaxes the gate auto band).",
       },
     },
     required: ["request", "diff", "claims"],

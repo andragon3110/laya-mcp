@@ -34,7 +34,9 @@ export interface PolicyRef {
   version: string;
 }
 
-/** coarse risk tier, reserved for future calibration. v1 policies ignore it (see engine.ts). */
+/** coarse risk tier. Read ONLY where a policy documents it (gate, screen,
+ * pii since fut-b-semantica T2 -- see thresholds.RISK_CUT_DELTA); every
+ * other v1 policy ignores it (forwarded, never branched). */
 export type RiskTier = "low" | "normal" | "high";
 
 /** Caller context (tool args summary, candidate counts, ...). v1 reads it only where documented. */

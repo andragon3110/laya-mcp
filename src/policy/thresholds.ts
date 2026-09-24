@@ -76,6 +76,30 @@ export const THRESHOLDS_V1: PolicyThresholds = {
   secretTypes: ["api_key", "token_secreto", "password"],
 };
 
+/**
+ * fut-b-semantica T2: risk strictness delta (NOT calibrated -- same honesty
+ * as the v1 table above: a documented step, not a measured cut).
+ *
+ * Semantics (per-policy documentation owns the exact application):
+ *   - risk "high" tightens bands by +DELTA (harder to ALLOW, easier to
+ *     DENY/REVIEW/ESCALATE-adjacent outcomes);
+ *   - risk "low" relaxes bands by -DELTA;
+ *   - risk "normal" (default) applies zero delta: byte-identical v1 cuts.
+ *
+ * Fixed points (never moved by risk, in any policy): the global abstention
+ * rule (engine.ts), missing-signal escalations, and confirmed-harm exits
+ * (e.g. contradicted-claim escalation, secret DENY, clean ALLOW). Risk moves
+ * leniency bands only, never safety floors.
+ */
+export const RISK_CUT_DELTA = 0.05;
+
+/** Pure resolver: signed cut adjustment for a risk tier (0 when unset/unknown). */
+export function riskCutDelta(risk: string | undefined): number {
+  if (risk === "high") return RISK_CUT_DELTA;
+  if (risk === "low") return -RISK_CUT_DELTA;
+  return 0;
+}
+
 /** Env var names for each override (single source; loader/tests reuse). */
 export const THRESHOLD_ENV_VARS = {
   screenInjectionBlock: "LAYA_POLICY_SCREEN_BLOCK",

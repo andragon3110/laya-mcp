@@ -37,9 +37,15 @@
  *                                            signal null/absent
  *   - "abstained_evidence"         (ESCALATE) global rule in engine.ts.
  * v1 never returns DENY (gate refuses authority; worst case is ESCALATE).
+ *
+ * Risk (fut-b-semantica T2): `risk` moves ONLY the auto cut by the shared
+ * RISK_CUT_DELTA (thresholds.ts): high 0.90 / normal 0.85 / low 0.80 with
+ * default thresholds. No version bump: risk "normal"/unset is byte-identical
+ * to the pre-T2 cuts, and reason codes are unchanged.
  */
 import type { Signal } from "../../evidence.js";
 import type { PolicyThresholds } from "../thresholds.js";
+import { riskCutDelta } from "../thresholds.js";
 import type { PolicyDecision, PolicyDefinition, PolicyEvalContext } from "../types.js";
 
 export const gatePolicy: PolicyDefinition = {
@@ -67,7 +73,15 @@ export const gatePolicy: PolicyDefinition = {
         return { decision: "ESCALATE", reason_codes: ["gate_contradicted_escalate"], policy };
       }
     }
-    if (safe > t.reviewAuto) return { decision: "ALLOW", reason_codes: ["gate_auto_allow"], policy };
+    // fut-b-semantica T2 (risk-effective, no bump: risk "normal"/unset keeps
+    // the v1 0.85 cut byte-identical): risk tightens/relaxes ONLY the auto
+    // band (high: 0.90, low: 0.80 with default thresholds). The contradicted
+    // and missing-signal exits above are safety floors -- risk never rescues
+    // them, and the shared 0.8/0.4 claim cuts stay fixed (verify's table).
+    // Reason codes are unchanged: the cut moved, not the contract.
+    if (safe > t.reviewAuto + riskCutDelta(ctx.risk)) {
+      return { decision: "ALLOW", reason_codes: ["gate_auto_allow"], policy };
+    }
     return { decision: "REVIEW", reason_codes: ["gate_review"], policy };
   },
 };

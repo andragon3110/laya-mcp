@@ -3,7 +3,16 @@ import { screenEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
 import { getPolicy } from "../policy/loader.js";
+import type { RiskTier } from "../policy/types.js";
 import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
+
+const RISKS: readonly RiskTier[] = ["low", "normal", "high"];
+
+function normalizeRisk(v: unknown): RiskTier {
+  if (v === undefined) return "normal";
+  if (typeof v === "string" && (RISKS as readonly string[]).includes(v)) return v as RiskTier;
+  throw new Error(`laya_screen: risk must be one of ${RISKS.join("|")} (got ${JSON.stringify(v)})`);
+}
 
 export const screenTool: ToolDefinition = {
   name: "laya_screen",
@@ -11,7 +20,8 @@ export const screenTool: ToolDefinition = {
     "Screen text for prompt injection, jailbreaks, and substance before it enters the agent's context. " +
     "Returns EVIDENCE (three separate {signal} objects for injection, substance, and relevance carrying raw, " +
     "uncalibrated Router outputs -- never probabilities and never an authorization) plus the deterministic " +
-    "ALLOW/REVIEW/DENY/ESCALATE `decision` from the versioned screen@1.0.0 policy (shared 0.75/0.25/0.4 cuts). " +
+    "ALLOW/REVIEW/DENY/ESCALATE `decision` from the versioned screen@1.0.0 policy (shared 0.75/0.25/0.4 cuts, " +
+    "tightened/relaxed by the optional risk tier). " +
     "Laya is a detector, never a security authority: an ALLOW (screen_pass) is evidence for the agent/policy " +
     "to consume, not permission to include. " +
     "Text at most 20,000 chars (larger inputs are rejected with input_too_large).",
@@ -22,6 +32,11 @@ export const screenTool: ToolDefinition = {
       purpose: {
         type: "string",
         description: "Stated purpose for processing this text. Helps judge relevance.",
+      },
+      risk: {
+        type: "string",
+        enum: ["low", "normal", "high"],
+        description: "Optional risk tier forwarded to the policy engine (default normal; tightens/relaxes the injection bands).",
       },
     },
     required: ["text", "purpose"],
@@ -155,13 +170,14 @@ export async function handleScreen(client: LayaClient, args: Record<string, unkn
     // handler never hardcodes 0.75/0.25/0.4. Strict >/ < edge semantics are
     // preserved (0.75 -> REVIEW, 0.25 -> substance branch, 0.4 -> valid).
     const { thresholds } = getPolicy("screen", "1.0.0");
+    const risk = normalizeRisk(args.risk);
     const { decision, shadow } = evaluateForTool(
       "laya_screen",
       {
         evidence,
         abstention,
         context: { text_chars: String(args.text ?? "").length },
-        risk: "normal",
+        risk,
         policy: { name: "screen", version: "1.0.0" },
       },
       { thresholds },

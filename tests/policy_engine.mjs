@@ -395,11 +395,18 @@ check("double evaluation is byte-identical (determinism)", () => {
     assert.deepEqual(evaluate(c, { thresholds: T1 }), JSON.parse(JSON.stringify(evaluate(c, { thresholds: T1 }))));
   }
 });
-check("context/risk do not move v1 cuts (except documented find baseline)", () => {
+check("context never moves cuts; risk moves only gate/screen/pii bands (T2)", () => {
   const { evidence, abstention } = screenEv(0.6, 0.9);
   const a = evaluate({ evidence, abstention, policy: { name: "screen", version: "1.0.0" } }, { thresholds: T1 });
-  const b = evaluate({ evidence, abstention, context: { note: "x" }, risk: "high", policy: { name: "screen", version: "1.0.0" } }, { thresholds: T1 });
-  assert.deepEqual(a, b);
+  const b = evaluate({ evidence, abstention, context: { note: "x" }, policy: { name: "screen", version: "1.0.0" } }, { thresholds: T1 });
+  assert.deepEqual(a, b, "context inert");
+  // 0.6 clears every screen review band (0.20/0.25/0.30): risk must not move it.
+  const hi = evaluate({ evidence, abstention, context: { note: "x" }, risk: "high", policy: { name: "screen", version: "1.0.0" } }, { thresholds: T1 });
+  assert.deepEqual(hi, a, "risk high keeps REVIEW far from the moved bands");
+  // Documented movement lives in the T2 battery (gate 0.87/0.83, screen
+  // 0.72/0.22, pii non-secret branch); normal/unset stays byte-identical.
+  const n = evaluate({ evidence, abstention, risk: "normal", policy: { name: "screen", version: "1.0.0" } }, { thresholds: T1 });
+  assert.deepEqual(n, a, "risk normal == unset (no bump justification)");
 });
 
 // ------------------------------------------- shared table + env overrides ---
