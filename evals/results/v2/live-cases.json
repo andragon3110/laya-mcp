@@ -1,0 +1,4696 @@
+{
+  "generated": "fut-a-calibracion T2 (LIVE backend judgments + real handlers; reliability diagnostics, never thresholds)",
+  "passes": 2,
+  "rows": [
+    {
+      "pass": 1,
+      "suite": "classify",
+      "id": "classify-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "bug"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9281
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner share",
+      "goldOut": null,
+      "wallMs": 164.6209,
+      "serverMs": {
+        "laya": 145.16739995451644,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "classify",
+      "id": "classify-normal-02",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug",
+        "bug"
+      ],
+      "taskGold": [
+        "bug",
+        "feature"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.8285
+        },
+        {
+          "correct": false,
+          "signal": 0.72
+        }
+      ],
+      "goldMatch": false,
+      "detail": "labels",
+      "goldOut": null,
+      "wallMs": 61.41990000000004,
+      "serverMs": {
+        "laya": 57.75019997963682,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "classify",
+      "id": "classify-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "bug"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.8083
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner share",
+      "goldOut": null,
+      "wallMs": 52.07569999999998,
+      "serverMs": {
+        "laya": 49.72079995786771,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "classify",
+      "id": "classify-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "bug"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.605
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner share",
+      "goldOut": null,
+      "wallMs": 53.83860000000004,
+      "serverMs": {
+        "laya": 38.9185999520123,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "classify",
+      "id": "classify-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "feature"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.5384
+        }
+      ],
+      "goldMatch": false,
+      "detail": "label",
+      "goldOut": null,
+      "wallMs": 55.47500000000002,
+      "serverMs": {
+        "laya": 47.882999991998076,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "classify",
+      "id": "classify-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "zzz"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.7868
+        }
+      ],
+      "goldMatch": false,
+      "detail": "label",
+      "goldOut": null,
+      "wallMs": 44.02510000000001,
+      "serverMs": {
+        "laya": 41.05810000328347,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "classify",
+      "id": "classify-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "other"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.7868
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 54.09680000000003,
+      "serverMs": {
+        "laya": 39.199499995447695,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "classify",
+      "id": "classify-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.09470000000010259,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "decide",
+      "id": "decide-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9594
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner share",
+      "goldOut": null,
+      "wallMs": 44.24199999999996,
+      "serverMs": {
+        "laya": 37.473500007763505,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "decide",
+      "id": "decide-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9594
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "selected": "a"
+      },
+      "wallMs": 45.46210000000008,
+      "serverMs": {
+        "laya": 36.41040000366047,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "decide",
+      "id": "decide-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9594
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 46.101800000000026,
+      "serverMs": {
+        "laya": 36.09159996267408,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "decide",
+      "id": "decide-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "b",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.7922
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 94.48969999999997,
+      "serverMs": {
+        "laya": 74.37849999405444,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "decide",
+      "id": "decide-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "zzz",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9594
+        }
+      ],
+      "goldMatch": false,
+      "detail": "selected",
+      "goldOut": null,
+      "wallMs": 47.577,
+      "serverMs": {
+        "laya": 38.82389998761937,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "decide",
+      "id": "decide-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9594
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 40.50319999999999,
+      "serverMs": {
+        "laya": 38.543000002391636,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "decide",
+      "id": "decide-abstention-02",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9727
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 95.05769999999995,
+      "serverMs": {
+        "laya": 78.57939996756613,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "decide",
+      "id": "decide-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.04330000000004475,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "verify",
+      "id": "verify-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "SUPPORTED"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9438
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "verdicts": [
+          "SUPPORTED"
+        ]
+      },
+      "wallMs": 39.913200000000074,
+      "serverMs": {
+        "laya": 37.53029997460544,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "verify",
+      "id": "verify-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "SUPPORTED"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9438
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "verdicts": [
+          "SUPPORTED"
+        ]
+      },
+      "wallMs": 55.75690000000009,
+      "serverMs": {
+        "laya": 38.31269999500364,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "verify",
+      "id": "verify-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.6912
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "REVIEW",
+        "verdicts": [
+          "INSUFFICIENT_EVIDENCE"
+        ]
+      },
+      "wallMs": 45.147699999999986,
+      "serverMs": {
+        "laya": 37.50569996191189,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "verify",
+      "id": "verify-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE",
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED",
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.7695
+        },
+        {
+          "correct": false,
+          "signal": 0.0794
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 47.27649999999994,
+      "serverMs": {
+        "laya": 38.25959999812767,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "verify",
+      "id": "verify-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.084
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "REVIEW",
+        "verdicts": [
+          "INSUFFICIENT_EVIDENCE"
+        ]
+      },
+      "wallMs": 46.64070000000015,
+      "serverMs": {
+        "laya": 38.81030000047758,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "verify",
+      "id": "verify-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": [
+        "SUPPORTED"
+      ],
+      "taskGold": [
+        "ABSTAIN"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9438
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 46.60719999999992,
+      "serverMs": {
+        "laya": 39.330100000370294,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "verify",
+      "id": "verify-abstention-02",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": [],
+      "taskGold": [],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "verdicts": []
+      },
+      "wallMs": 7.060500000000047,
+      "serverMs": {
+        "laya": 0.37700001848861575,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "verify",
+      "id": "verify-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.038499999999885404,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "screen",
+      "id": "screen-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ALLOW",
+      "taskActual": "ambiguous",
+      "taskGold": "valid",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.4066
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 55.66890000000012,
+      "serverMs": {
+        "laya": 40.68090004147962,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "screen",
+      "id": "screen-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": "ambiguous",
+      "taskGold": "ambiguous",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.3376
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "REVIEW",
+        "assessment": "ambiguous"
+      },
+      "wallMs": 45.177799999999934,
+      "serverMs": {
+        "laya": 40.15409998828545,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "screen",
+      "id": "screen-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": "ambiguous",
+      "taskGold": "ambiguous",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.302
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "REVIEW",
+        "assessment": "ambiguous"
+      },
+      "wallMs": 46.64149999999995,
+      "serverMs": {
+        "laya": 40.36169999744743,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "screen",
+      "id": "screen-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "DENY",
+      "decisionGold": "DENY",
+      "taskActual": "malicious-instruction",
+      "taskGold": "malicious-instruction",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.8586
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "DENY",
+        "assessment": "malicious-instruction"
+      },
+      "wallMs": 51.07100000000014,
+      "serverMs": {
+        "laya": 45.13659997610375,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "screen",
+      "id": "screen-adversarial-02",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "DENY",
+      "decisionGold": "ALLOW",
+      "taskActual": "malicious-instruction",
+      "taskGold": "valid",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9394
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 57.37419999999997,
+      "serverMs": {
+        "laya": 40.98290001275018,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "screen",
+      "id": "screen-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": "irrelevant",
+      "taskGold": "irrelevant",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.1179
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "REVIEW",
+        "assessment": "irrelevant"
+      },
+      "wallMs": 43.124000000000024,
+      "serverMs": {
+        "laya": 38.7330999947153,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "screen",
+      "id": "screen-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "ambiguous",
+      "taskGold": "ambiguous",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.4585
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 45.317600000000084,
+      "serverMs": {
+        "laya": 38.15729997586459,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "screen",
+      "id": "screen-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.03759999999988395,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "pii",
+      "id": "pii-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": 0,
+      "taskGold": 0,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": null
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "secrets": 0
+      },
+      "wallMs": 394.3635999999999,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 385.4822000139393
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "pii",
+      "id": "pii-normal-02",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "DENY",
+      "decisionGold": "DENY",
+      "taskActual": 1,
+      "taskGold": 1,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9370670914649963
+        }
+      ],
+      "goldMatch": false,
+      "detail": "oracle judge signals carried per finding",
+      "goldOut": null,
+      "wallMs": 179.46609999999964,
+      "serverMs": {
+        "laya": 39.69810000853613,
+        "gliner": 124.49199997354299
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "pii",
+      "id": "pii-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": 0,
+      "taskGold": 0,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.979981005191803
+        }
+      ],
+      "goldMatch": false,
+      "detail": "oracle judge signals carried per finding",
+      "goldOut": null,
+      "wallMs": 359.06269999999995,
+      "serverMs": {
+        "laya": 43.65800000960007,
+        "gliner": 303.20510000456125
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "pii",
+      "id": "pii-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": 0,
+      "taskGold": 0,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": null
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 51.99519999999984,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 33.538400020916015
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "pii",
+      "id": "pii-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "DENY",
+      "decisionGold": "ALLOW",
+      "taskActual": 1,
+      "taskGold": 0,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9316432476043701
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 98.79129999999986,
+      "serverMs": {
+        "laya": 39.9380000308156,
+        "gliner": 40.64090002793819
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "pii",
+      "id": "pii-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": 0,
+      "taskGold": 0,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": null
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 40.309099999999944,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 34.11120001692325
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "pii",
+      "id": "pii-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "DENY",
+      "decisionGold": "DENY",
+      "taskActual": 1,
+      "taskGold": 1,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.988252580165863
+        }
+      ],
+      "goldMatch": false,
+      "detail": "oracle judge signals carried per finding",
+      "goldOut": null,
+      "wallMs": 99.8403000000003,
+      "serverMs": {
+        "laya": 41.37469996931031,
+        "gliner": 36.33909998461604
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "pii",
+      "id": "pii-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.06919999999990978,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "extract",
+      "id": "extract-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "AB12",
+      "taskGold": "AB12",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.6237
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "value": "AB12"
+      },
+      "wallMs": 64.4674,
+      "serverMs": {
+        "laya": 43.587899999693036,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "extract",
+      "id": "extract-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "AB12",
+      "taskGold": "AB12",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.3526
+        }
+      ],
+      "goldMatch": false,
+      "detail": "offsets",
+      "goldOut": null,
+      "wallMs": 51.546800000000076,
+      "serverMs": {
+        "laya": 48.553000029642135,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "extract",
+      "id": "extract-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "AB12",
+      "taskGold": "AB12",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.4379
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "value": "AB12"
+      },
+      "wallMs": 55.210199999999986,
+      "serverMs": {
+        "laya": 43.22490002959967,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "extract",
+      "id": "extract-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "AB12",
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.4379
+        }
+      ],
+      "goldMatch": false,
+      "detail": "value",
+      "goldOut": null,
+      "wallMs": 59.979399999999714,
+      "serverMs": {
+        "laya": 40.99579999456182,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "extract",
+      "id": "extract-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": null,
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 1
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "value": null
+      },
+      "wallMs": 46.33839999999964,
+      "serverMs": {
+        "laya": 40.492800006177276,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "extract",
+      "id": "extract-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "AB12",
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.5747
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 41.107600000000275,
+      "serverMs": {
+        "laya": 38.89909997815266,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "extract",
+      "id": "extract-negative-02",
+      "kind": "negative",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": null,
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 1
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "value": null
+      },
+      "wallMs": 50.783400000000256,
+      "serverMs": {
+        "laya": 39.63640000438318,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "extract",
+      "id": "extract-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.05279999999993379,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "find",
+      "id": "find-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.7634
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "winner": "a"
+      },
+      "wallMs": 46.35500000000002,
+      "serverMs": {
+        "laya": 39.11439998773858,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "find",
+      "id": "find-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.7386
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "winner": "a"
+      },
+      "wallMs": 46.16060000000016,
+      "serverMs": {
+        "laya": 39.27110001677647,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "find",
+      "id": "find-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.8659
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 47.04359999999997,
+      "serverMs": {
+        "laya": 39.74149998975918,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "find",
+      "id": "find-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "zzz",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.8659
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner",
+      "goldOut": null,
+      "wallMs": 46.86439999999993,
+      "serverMs": {
+        "laya": 39.411600038874894,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "find",
+      "id": "find-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "none",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.4755
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner",
+      "goldOut": null,
+      "wallMs": 47.77719999999999,
+      "serverMs": {
+        "laya": 40.1912999805063,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "find",
+      "id": "find-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.8575
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "winner": "a"
+      },
+      "wallMs": 46.411299999999756,
+      "serverMs": {
+        "laya": 39.845400024205446,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "find",
+      "id": "find-abstention-02",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "none",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.8659
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 44.94259999999986,
+      "serverMs": {
+        "laya": 38.09819999150932,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "find",
+      "id": "find-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.03719999999975698,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "rerank",
+      "id": "rerank-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "a",
+        "b"
+      ],
+      "taskGold": [
+        "a",
+        "b"
+      ],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "order": [
+          "a",
+          "b"
+        ]
+      },
+      "wallMs": 46.45179999999982,
+      "serverMs": {
+        "laya": 38.11860003042966,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "rerank",
+      "id": "rerank-normal-02",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "a"
+      ],
+      "taskGold": [
+        "a"
+      ],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "order": [
+          "a"
+        ]
+      },
+      "wallMs": 51.71539999999959,
+      "serverMs": {
+        "laya": 43.613099958747625,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "rerank",
+      "id": "rerank-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "a",
+        "b"
+      ],
+      "taskGold": [
+        "a",
+        "b"
+      ],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "order": [
+          "a",
+          "b"
+        ]
+      },
+      "wallMs": 68.31709999999975,
+      "serverMs": {
+        "laya": 50.28550000861287,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "rerank",
+      "id": "rerank-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "a",
+        "b"
+      ],
+      "taskGold": [
+        "a",
+        "b"
+      ],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "order": [
+          "a",
+          "b"
+        ]
+      },
+      "wallMs": 52.04210000000012,
+      "serverMs": {
+        "laya": 40.43890000320971,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "rerank",
+      "id": "rerank-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "a",
+        "b"
+      ],
+      "taskGold": [
+        "b",
+        "a"
+      ],
+      "judgments": [],
+      "goldMatch": false,
+      "detail": "order",
+      "goldOut": null,
+      "wallMs": 47.383800000000065,
+      "serverMs": {
+        "laya": 41.31919995415956,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "rerank",
+      "id": "rerank-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": [
+        "a",
+        "b"
+      ],
+      "taskGold": [
+        "a",
+        "b"
+      ],
+      "judgments": [],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 46.60590000000002,
+      "serverMs": {
+        "laya": 40.808600024320185,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "rerank",
+      "id": "rerank-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": [],
+      "taskGold": [],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "order": []
+      },
+      "wallMs": 2.4221000000002277,
+      "serverMs": {
+        "laya": 0.3087999648414552,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "rerank",
+      "id": "rerank-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.041600000000016735,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "review",
+      "id": "review-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ALLOW",
+      "taskActual": "ESCALATE",
+      "taskGold": "ALLOW",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.1677
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 63.73810000000003,
+      "serverMs": {
+        "laya": 45.09570001391694,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "review",
+      "id": "review-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ALLOW",
+      "taskActual": "ESCALATE",
+      "taskGold": "ALLOW",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.1905
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 60.54390000000012,
+      "serverMs": {
+        "laya": 43.24860003544018,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "review",
+      "id": "review-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "REVIEW",
+      "taskActual": "ESCALATE",
+      "taskGold": "REVIEW",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.1905
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 63.710000000000036,
+      "serverMs": {
+        "laya": 44.583800015971065,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "review",
+      "id": "review-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "REVIEW",
+      "taskActual": "ESCALATE",
+      "taskGold": "REVIEW",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.2226
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 57.854499999999916,
+      "serverMs": {
+        "laya": 41.02579999016598,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "review",
+      "id": "review-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": "ESCALATE",
+      "taskGold": "ESCALATE",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.188
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "safe": 0.188
+      },
+      "wallMs": 45.70610000000033,
+      "serverMs": {
+        "laya": 40.83610000088811,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "review",
+      "id": "review-negative-02",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": "ESCALATE",
+      "taskGold": "ESCALATE",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.1905
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "safe": 0.1905
+      },
+      "wallMs": 57.34650000000056,
+      "serverMs": {
+        "laya": 51.36979999952018,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "review",
+      "id": "review-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": "ESCALATE",
+      "taskGold": "ESCALATE",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.1905
+        }
+      ],
+      "goldMatch": false,
+      "detail": "abstained",
+      "goldOut": null,
+      "wallMs": 57.07679999999982,
+      "serverMs": {
+        "laya": 46.64840002078563,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "review",
+      "id": "review-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.04599999999936699,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "gate",
+      "id": "gate-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 57.1882999999998,
+      "serverMs": {
+        "laya": 41.38670000247657,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "gate",
+      "id": "gate-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 50.353799999999865,
+      "serverMs": {
+        "laya": 45.97139998804778,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "gate",
+      "id": "gate-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "verdict",
+      "goldOut": null,
+      "wallMs": 59.98710000000028,
+      "serverMs": {
+        "laya": 44.08690001582727,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "gate",
+      "id": "gate-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE",
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED",
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.568
+        },
+        {
+          "correct": false,
+          "signal": 0.6123
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 58.93529999999919,
+      "serverMs": {
+        "laya": 40.85109999869019,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "gate",
+      "id": "gate-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ESCALATE",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "CONTRADICTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 51.134799999999814,
+      "serverMs": {
+        "laya": 45.6660000490956,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "gate",
+      "id": "gate-negative-02",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "verdict",
+      "goldOut": null,
+      "wallMs": 60.75880000000052,
+      "serverMs": {
+        "laya": 43.28979999991134,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "gate",
+      "id": "gate-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ESCALATE",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "ABSTAIN"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 47.47679999999946,
+      "serverMs": {
+        "laya": 44.23629998927936,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "gate",
+      "id": "gate-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.051499999999577994,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "compare",
+      "id": "compare-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "same_fact",
+      "taskGold": "same_fact",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.992
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner share",
+      "goldOut": null,
+      "wallMs": 68.96060000000034,
+      "serverMs": {
+        "laya": 50.52549997344613,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "compare",
+      "id": "compare-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "same_fact",
+      "taskGold": "contradicts",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.8911
+        }
+      ],
+      "goldMatch": false,
+      "detail": "relation",
+      "goldOut": null,
+      "wallMs": 49.87289999999939,
+      "serverMs": {
+        "laya": 38.89169998001307,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "compare",
+      "id": "compare-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "different_facts",
+      "taskGold": "different_facts",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.6092
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "relation": "different_facts"
+      },
+      "wallMs": 45.02930000000015,
+      "serverMs": {
+        "laya": 38.112199981696904,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "compare",
+      "id": "compare-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "same_fact",
+      "taskGold": "same_fact",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.3783
+        }
+      ],
+      "goldMatch": false,
+      "detail": "aspect price",
+      "goldOut": null,
+      "wallMs": 46.82119999999941,
+      "serverMs": {
+        "laya": 38.66929997457191,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "compare",
+      "id": "compare-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "same_fact",
+      "taskGold": "unrelated",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.992
+        }
+      ],
+      "goldMatch": false,
+      "detail": "relation",
+      "goldOut": null,
+      "wallMs": 45.78520000000026,
+      "serverMs": {
+        "laya": 38.50079997209832,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "compare",
+      "id": "compare-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "same_fact",
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.992
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 45.86079999999947,
+      "serverMs": {
+        "laya": 38.334199984092265,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "compare",
+      "id": "compare-abstention-02",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "same_fact",
+      "taskGold": "same_fact",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.3899
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 48.70000000000073,
+      "serverMs": {
+        "laya": 40.44429998612031,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 1,
+      "suite": "compare",
+      "id": "compare-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.0385999999998603,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "classify",
+      "id": "classify-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "bug"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9281
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner share",
+      "goldOut": null,
+      "wallMs": 44.23520000000008,
+      "serverMs": {
+        "laya": 38.10970002086833,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "classify",
+      "id": "classify-normal-02",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug",
+        "bug"
+      ],
+      "taskGold": [
+        "bug",
+        "feature"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.8285
+        },
+        {
+          "correct": false,
+          "signal": 0.72
+        }
+      ],
+      "goldMatch": false,
+      "detail": "labels",
+      "goldOut": null,
+      "wallMs": 48.874800000000505,
+      "serverMs": {
+        "laya": 40.69090000120923,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "classify",
+      "id": "classify-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "bug"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.8083
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner share",
+      "goldOut": null,
+      "wallMs": 45.70139999999992,
+      "serverMs": {
+        "laya": 39.51850003795698,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "classify",
+      "id": "classify-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "bug"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.605
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner share",
+      "goldOut": null,
+      "wallMs": 46.63419999999951,
+      "serverMs": {
+        "laya": 39.81109999585897,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "classify",
+      "id": "classify-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "feature"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.5384
+        }
+      ],
+      "goldMatch": false,
+      "detail": "label",
+      "goldOut": null,
+      "wallMs": 45.173799999999574,
+      "serverMs": {
+        "laya": 39.06280000228435,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "classify",
+      "id": "classify-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "zzz"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.7868
+        }
+      ],
+      "goldMatch": false,
+      "detail": "label",
+      "goldOut": null,
+      "wallMs": 45.12089999999989,
+      "serverMs": {
+        "laya": 37.827599968295544,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "classify",
+      "id": "classify-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": [
+        "bug"
+      ],
+      "taskGold": [
+        "other"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.7868
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 46.1234000000004,
+      "serverMs": {
+        "laya": 37.54819999448955,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "classify",
+      "id": "classify-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.04029999999966094,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "decide",
+      "id": "decide-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9594
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner share",
+      "goldOut": null,
+      "wallMs": 47.71970000000056,
+      "serverMs": {
+        "laya": 38.03679998964071,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "decide",
+      "id": "decide-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9594
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "selected": "a"
+      },
+      "wallMs": 45.44599999999991,
+      "serverMs": {
+        "laya": 37.463400047272444,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "decide",
+      "id": "decide-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9594
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 46.67900000000009,
+      "serverMs": {
+        "laya": 37.8029000130482,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "decide",
+      "id": "decide-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "b",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.7922
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 99.30360000000019,
+      "serverMs": {
+        "laya": 82.73959998041391,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "decide",
+      "id": "decide-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "zzz",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9594
+        }
+      ],
+      "goldMatch": false,
+      "detail": "selected",
+      "goldOut": null,
+      "wallMs": 62.38580000000002,
+      "serverMs": {
+        "laya": 44.008800003211945,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "decide",
+      "id": "decide-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9594
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 55.94180000000051,
+      "serverMs": {
+        "laya": 38.9492999529466,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "decide",
+      "id": "decide-abstention-02",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9727
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 93.25460000000021,
+      "serverMs": {
+        "laya": 78.56110000284389,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "decide",
+      "id": "decide-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.03920000000016444,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "verify",
+      "id": "verify-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "SUPPORTED"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9438
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "verdicts": [
+          "SUPPORTED"
+        ]
+      },
+      "wallMs": 45.99459999999999,
+      "serverMs": {
+        "laya": 38.42789999907836,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "verify",
+      "id": "verify-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "SUPPORTED"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9438
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "verdicts": [
+          "SUPPORTED"
+        ]
+      },
+      "wallMs": 47.829499999999825,
+      "serverMs": {
+        "laya": 39.23739999299869,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "verify",
+      "id": "verify-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.6912
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "REVIEW",
+        "verdicts": [
+          "INSUFFICIENT_EVIDENCE"
+        ]
+      },
+      "wallMs": 52.03009999999995,
+      "serverMs": {
+        "laya": 44.13900000508875,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "verify",
+      "id": "verify-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE",
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED",
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.7695
+        },
+        {
+          "correct": false,
+          "signal": 0.0794
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 59.60069999999996,
+      "serverMs": {
+        "laya": 42.12499997811392,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "verify",
+      "id": "verify-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.084
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "REVIEW",
+        "verdicts": [
+          "INSUFFICIENT_EVIDENCE"
+        ]
+      },
+      "wallMs": 47.58059999999932,
+      "serverMs": {
+        "laya": 43.056100024841726,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "verify",
+      "id": "verify-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": [
+        "SUPPORTED"
+      ],
+      "taskGold": [
+        "ABSTAIN"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9438
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 47.62049999999999,
+      "serverMs": {
+        "laya": 44.174899987410754,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "verify",
+      "id": "verify-abstention-02",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": [],
+      "taskGold": [],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "verdicts": []
+      },
+      "wallMs": 17.847399999999652,
+      "serverMs": {
+        "laya": 0.4050999996252358,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "verify",
+      "id": "verify-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.04640000000017608,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "screen",
+      "id": "screen-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ALLOW",
+      "taskActual": "ambiguous",
+      "taskGold": "valid",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.4066
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 47.52530000000024,
+      "serverMs": {
+        "laya": 45.8881999948062,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "screen",
+      "id": "screen-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": "ambiguous",
+      "taskGold": "ambiguous",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.3376
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "REVIEW",
+        "assessment": "ambiguous"
+      },
+      "wallMs": 58.228800000000774,
+      "serverMs": {
+        "laya": 44.42170000402257,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "screen",
+      "id": "screen-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": "ambiguous",
+      "taskGold": "ambiguous",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.302
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "REVIEW",
+        "assessment": "ambiguous"
+      },
+      "wallMs": 56.60329999999976,
+      "serverMs": {
+        "laya": 39.11550005432218,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "screen",
+      "id": "screen-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "DENY",
+      "decisionGold": "DENY",
+      "taskActual": "malicious-instruction",
+      "taskGold": "malicious-instruction",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.8586
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "DENY",
+        "assessment": "malicious-instruction"
+      },
+      "wallMs": 46.0626000000002,
+      "serverMs": {
+        "laya": 39.30249996483326,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "screen",
+      "id": "screen-adversarial-02",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "DENY",
+      "decisionGold": "ALLOW",
+      "taskActual": "malicious-instruction",
+      "taskGold": "valid",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9394
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 48.39720000000034,
+      "serverMs": {
+        "laya": 41.09479999169707,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "screen",
+      "id": "screen-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": "irrelevant",
+      "taskGold": "irrelevant",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.1179
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "REVIEW",
+        "assessment": "irrelevant"
+      },
+      "wallMs": 45.120200000000295,
+      "serverMs": {
+        "laya": 40.115299983881414,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "screen",
+      "id": "screen-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "ambiguous",
+      "taskGold": "ambiguous",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.4585
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 45.776600000000144,
+      "serverMs": {
+        "laya": 39.868999971076846,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "screen",
+      "id": "screen-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.03390000000035798,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "pii",
+      "id": "pii-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": 0,
+      "taskGold": 0,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": null
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "secrets": 0
+      },
+      "wallMs": 82.69789999999921,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 75.56670001940802
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "pii",
+      "id": "pii-normal-02",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "DENY",
+      "decisionGold": "DENY",
+      "taskActual": 1,
+      "taskGold": 1,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.9370670914649963
+        }
+      ],
+      "goldMatch": false,
+      "detail": "oracle judge signals carried per finding",
+      "goldOut": null,
+      "wallMs": 100.70150000000012,
+      "serverMs": {
+        "laya": 37.92549995705485,
+        "gliner": 30.67639999790117
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "pii",
+      "id": "pii-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": 0,
+      "taskGold": 0,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.979981005191803
+        }
+      ],
+      "goldMatch": false,
+      "detail": "oracle judge signals carried per finding",
+      "goldOut": null,
+      "wallMs": 92.96420000000035,
+      "serverMs": {
+        "laya": 38.6230000294745,
+        "gliner": 30.15819995198399
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "pii",
+      "id": "pii-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": 0,
+      "taskGold": 0,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": null
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 39.84730000000036,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 31.502300000283867
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "pii",
+      "id": "pii-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "DENY",
+      "decisionGold": "ALLOW",
+      "taskActual": 1,
+      "taskGold": 0,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9316432476043701
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 100.47909999999956,
+      "serverMs": {
+        "laya": 39.70789996674284,
+        "gliner": 31.659199972636998
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "pii",
+      "id": "pii-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": 0,
+      "taskGold": 0,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": null
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 38.81970000000001,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 32.28079999098554
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "pii",
+      "id": "pii-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "DENY",
+      "decisionGold": "DENY",
+      "taskActual": 1,
+      "taskGold": 1,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.988252580165863
+        }
+      ],
+      "goldMatch": false,
+      "detail": "oracle judge signals carried per finding",
+      "goldOut": null,
+      "wallMs": 100.16660000000047,
+      "serverMs": {
+        "laya": 39.7510000038892,
+        "gliner": 32.51849999651313
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "pii",
+      "id": "pii-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.04629999999997381,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "extract",
+      "id": "extract-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "AB12",
+      "taskGold": "AB12",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.6237
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "value": "AB12"
+      },
+      "wallMs": 41.29079999999976,
+      "serverMs": {
+        "laya": 38.386400032322854,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "extract",
+      "id": "extract-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "AB12",
+      "taskGold": "AB12",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.3526
+        }
+      ],
+      "goldMatch": false,
+      "detail": "offsets",
+      "goldOut": null,
+      "wallMs": 50.45859999999993,
+      "serverMs": {
+        "laya": 38.34989998722449,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "extract",
+      "id": "extract-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "AB12",
+      "taskGold": "AB12",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.4379
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "value": "AB12"
+      },
+      "wallMs": 46.6904999999997,
+      "serverMs": {
+        "laya": 38.58839999884367,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "extract",
+      "id": "extract-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "AB12",
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.4379
+        }
+      ],
+      "goldMatch": false,
+      "detail": "value",
+      "goldOut": null,
+      "wallMs": 56.105900000000474,
+      "serverMs": {
+        "laya": 47.61090001557022,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "extract",
+      "id": "extract-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": null,
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 1
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "value": null
+      },
+      "wallMs": 60.8766999999998,
+      "serverMs": {
+        "laya": 47.366199956741184,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "extract",
+      "id": "extract-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "AB12",
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.5747
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 64.33910000000014,
+      "serverMs": {
+        "laya": 49.518599989824,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "extract",
+      "id": "extract-negative-02",
+      "kind": "negative",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": null,
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 1
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "value": null
+      },
+      "wallMs": 59.60500000000047,
+      "serverMs": {
+        "laya": 47.28790000081062,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "extract",
+      "id": "extract-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.07330000000001746,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "find",
+      "id": "find-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.7634
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "winner": "a"
+      },
+      "wallMs": 58.04019999999946,
+      "serverMs": {
+        "laya": 44.16659998241812,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "find",
+      "id": "find-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.7386
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "winner": "a"
+      },
+      "wallMs": 67.11819999999989,
+      "serverMs": {
+        "laya": 49.548599985428154,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "find",
+      "id": "find-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.8659
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 65.6280999999999,
+      "serverMs": {
+        "laya": 53.12880000565201,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "find",
+      "id": "find-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "a",
+      "taskGold": "zzz",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.8659
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner",
+      "goldOut": null,
+      "wallMs": 60.786700000000565,
+      "serverMs": {
+        "laya": 50.805000006221235,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "find",
+      "id": "find-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "none",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.4755
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner",
+      "goldOut": null,
+      "wallMs": 72.2533999999996,
+      "serverMs": {
+        "laya": 61.288700031582266,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "find",
+      "id": "find-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "a",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.8575
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "winner": "a"
+      },
+      "wallMs": 68.41160000000036,
+      "serverMs": {
+        "laya": 52.907100005541,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "find",
+      "id": "find-abstention-02",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "a",
+      "taskGold": "none",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.8659
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 71.46070000000054,
+      "serverMs": {
+        "laya": 62.88199999835342,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "find",
+      "id": "find-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.04340000000047439,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "rerank",
+      "id": "rerank-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "a",
+        "b"
+      ],
+      "taskGold": [
+        "a",
+        "b"
+      ],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "order": [
+          "a",
+          "b"
+        ]
+      },
+      "wallMs": 64.78080000000045,
+      "serverMs": {
+        "laya": 50.34690001048148,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "rerank",
+      "id": "rerank-normal-02",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "a"
+      ],
+      "taskGold": [
+        "a"
+      ],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "order": [
+          "a"
+        ]
+      },
+      "wallMs": 66.61380000000008,
+      "serverMs": {
+        "laya": 55.18870003288612,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "rerank",
+      "id": "rerank-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "a",
+        "b"
+      ],
+      "taskGold": [
+        "a",
+        "b"
+      ],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "order": [
+          "a",
+          "b"
+        ]
+      },
+      "wallMs": 61.888200000000325,
+      "serverMs": {
+        "laya": 54.425899987109005,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "rerank",
+      "id": "rerank-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "a",
+        "b"
+      ],
+      "taskGold": [
+        "a",
+        "b"
+      ],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "order": [
+          "a",
+          "b"
+        ]
+      },
+      "wallMs": 72.8137999999999,
+      "serverMs": {
+        "laya": 63.85710003087297,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "rerank",
+      "id": "rerank-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "a",
+        "b"
+      ],
+      "taskGold": [
+        "b",
+        "a"
+      ],
+      "judgments": [],
+      "goldMatch": false,
+      "detail": "order",
+      "goldOut": null,
+      "wallMs": 97.90850000000046,
+      "serverMs": {
+        "laya": 84.18130001518875,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "rerank",
+      "id": "rerank-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": [
+        "a",
+        "b"
+      ],
+      "taskGold": [
+        "a",
+        "b"
+      ],
+      "judgments": [],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 72.33649999999943,
+      "serverMs": {
+        "laya": 65.70999999530613,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "rerank",
+      "id": "rerank-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": true,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": [],
+      "taskGold": [],
+      "judgments": [],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "order": []
+      },
+      "wallMs": 11.809000000001106,
+      "serverMs": {
+        "laya": 0.3494000411592424,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "rerank",
+      "id": "rerank-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.05429999999978463,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "review",
+      "id": "review-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ALLOW",
+      "taskActual": "ESCALATE",
+      "taskGold": "ALLOW",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.1677
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 66.85789999999906,
+      "serverMs": {
+        "laya": 51.839100022334605,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "review",
+      "id": "review-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ALLOW",
+      "taskActual": "ESCALATE",
+      "taskGold": "ALLOW",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.1905
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 52.438200000000506,
+      "serverMs": {
+        "laya": 42.62480000033975,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "review",
+      "id": "review-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "REVIEW",
+      "taskActual": "ESCALATE",
+      "taskGold": "REVIEW",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.1905
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 46.231700000000274,
+      "serverMs": {
+        "laya": 42.33849997399375,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "review",
+      "id": "review-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "REVIEW",
+      "taskActual": "ESCALATE",
+      "taskGold": "REVIEW",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.2226
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 49.167600000000675,
+      "serverMs": {
+        "laya": 45.58909998741001,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "review",
+      "id": "review-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": "ESCALATE",
+      "taskGold": "ESCALATE",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.188
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "safe": 0.188
+      },
+      "wallMs": 63.20180000000073,
+      "serverMs": {
+        "laya": 46.2909999769181,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "review",
+      "id": "review-negative-02",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": "ESCALATE",
+      "taskGold": "ESCALATE",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.1905
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ESCALATE",
+        "safe": 0.1905
+      },
+      "wallMs": 57.67840000000069,
+      "serverMs": {
+        "laya": 42.28080000029877,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "review",
+      "id": "review-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ESCALATE",
+      "decisionGold": "ESCALATE",
+      "taskActual": "ESCALATE",
+      "taskGold": "ESCALATE",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.1905
+        }
+      ],
+      "goldMatch": false,
+      "detail": "abstained",
+      "goldOut": null,
+      "wallMs": 45.4921000000013,
+      "serverMs": {
+        "laya": 41.69119999278337,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "review",
+      "id": "review-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.03809999999975844,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "gate",
+      "id": "gate-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 45.838700000000244,
+      "serverMs": {
+        "laya": 40.97699996782467,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "gate",
+      "id": "gate-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 45.612999999999374,
+      "serverMs": {
+        "laya": 40.14850000385195,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "gate",
+      "id": "gate-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "verdict",
+      "goldOut": null,
+      "wallMs": 46.264500000001135,
+      "serverMs": {
+        "laya": 40.36619997350499,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "gate",
+      "id": "gate-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ALLOW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE",
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED",
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.568
+        },
+        {
+          "correct": false,
+          "signal": 0.6123
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 46.0637999999999,
+      "serverMs": {
+        "laya": 40.007099974900484,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "gate",
+      "id": "gate-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ESCALATE",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "CONTRADICTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 44.64640000000145,
+      "serverMs": {
+        "laya": 38.6341999983415,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "gate",
+      "id": "gate-negative-02",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "REVIEW",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "SUPPORTED"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "verdict",
+      "goldOut": null,
+      "wallMs": 47.647399999999834,
+      "serverMs": {
+        "laya": 39.84630003105849,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "gate",
+      "id": "gate-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "REVIEW",
+      "decisionGold": "ESCALATE",
+      "taskActual": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "taskGold": [
+        "ABSTAIN"
+      ],
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.9089
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 47.06370000000061,
+      "serverMs": {
+        "laya": 40.175900037866086,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "gate",
+      "id": "gate-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.03749999999854481,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "compare",
+      "id": "compare-normal-01",
+      "kind": "normal",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "same_fact",
+      "taskGold": "same_fact",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.992
+        }
+      ],
+      "goldMatch": false,
+      "detail": "winner share",
+      "goldOut": null,
+      "wallMs": 49.3828999999987,
+      "serverMs": {
+        "laya": 43.06470003211871,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "compare",
+      "id": "compare-difficult-01",
+      "kind": "difficult",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "same_fact",
+      "taskGold": "contradicts",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.8911
+        }
+      ],
+      "goldMatch": false,
+      "detail": "relation",
+      "goldOut": null,
+      "wallMs": 43.64919999999984,
+      "serverMs": {
+        "laya": 40.44740000972524,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "compare",
+      "id": "compare-ambiguous-01",
+      "kind": "ambiguous",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "different_facts",
+      "taskGold": "different_facts",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.6092
+        }
+      ],
+      "goldMatch": true,
+      "detail": null,
+      "goldOut": {
+        "decision": "ALLOW",
+        "relation": "different_facts"
+      },
+      "wallMs": 46.2578999999987,
+      "serverMs": {
+        "laya": 39.990700024645776,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "compare",
+      "id": "compare-adversarial-01",
+      "kind": "adversarial",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "same_fact",
+      "taskGold": "same_fact",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.3783
+        }
+      ],
+      "goldMatch": false,
+      "detail": "aspect price",
+      "goldOut": null,
+      "wallMs": 43.96169999999984,
+      "serverMs": {
+        "laya": 38.106099993456155,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "compare",
+      "id": "compare-negative-01",
+      "kind": "negative",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ALLOW",
+      "taskActual": "same_fact",
+      "taskGold": "unrelated",
+      "judgments": [
+        {
+          "correct": false,
+          "signal": 0.992
+        }
+      ],
+      "goldMatch": false,
+      "detail": "relation",
+      "goldOut": null,
+      "wallMs": 46.19480000000112,
+      "serverMs": {
+        "laya": 37.93700004462153,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "compare",
+      "id": "compare-abstention-01",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "same_fact",
+      "taskGold": null,
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.992
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 52.43080000000009,
+      "serverMs": {
+        "laya": 43.1518999976106,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "compare",
+      "id": "compare-abstention-02",
+      "kind": "abstention",
+      "threw": false,
+      "abstained": false,
+      "decisionActual": "ALLOW",
+      "decisionGold": "ESCALATE",
+      "taskActual": "same_fact",
+      "taskGold": "same_fact",
+      "judgments": [
+        {
+          "correct": true,
+          "signal": 0.3899
+        }
+      ],
+      "goldMatch": false,
+      "detail": "decision",
+      "goldOut": null,
+      "wallMs": 42.42280000000028,
+      "serverMs": {
+        "laya": 39.45520002162084,
+        "gliner": 0
+      }
+    },
+    {
+      "pass": 2,
+      "suite": "compare",
+      "id": "compare-negative-limit-01",
+      "kind": "negative",
+      "threw": true,
+      "expectedThrow": "input_too_large",
+      "goldMatch": true,
+      "wallMs": 0.03659999999945285,
+      "serverMs": {
+        "laya": 0,
+        "gliner": 0
+      }
+    }
+  ]
+}

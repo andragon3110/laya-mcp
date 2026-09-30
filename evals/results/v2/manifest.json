@@ -1,0 +1,220 @@
+{
+  "generated": "fut-a-calibracion T2 LIVE reproducibility manifest (real backend judgments; absolutes + method, no improvement claims)",
+  "date": "2026-09-24T04:19:02.221Z",
+  "commit": "0f72f35107ace205be48c5c1264cf3580611a87b",
+  "commit_short": "0f72f35",
+  "model": "live Router checkpoints (convaiinnovations/laya, convaiinnovations/laya-multilingual, convaiinnovations/laya-typed-decisions) + live GLiNER sidecar (fastino/gliner2.5-multi-v1)",
+  "model_note": "live backends probed via /models; no stub id involved",
+  "model_revision": null,
+  "model_revision_note": "honest null: the servers report revision_source unpinned (pins not resolvable offline); a hash is never invented",
+  "tokenizer": "unknown",
+  "tokenizer_note": "explicit unknown: laya_capabilities exposes name/repo/loaded/revision/device/circuit per model, never a tokenizer",
+  "device": "laya-server=auto gliner-server=cuda",
+  "device_note": "probed LIVE via /ready on both backends at run start (never asserted, never defaulted)",
+  "policy": [
+    {
+      "name": "classify",
+      "version": "1.0.0"
+    },
+    {
+      "name": "code-review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "compare",
+      "version": "1.0.0"
+    },
+    {
+      "name": "decide",
+      "version": "1.0.0"
+    },
+    {
+      "name": "extract",
+      "version": "1.0.0"
+    },
+    {
+      "name": "find",
+      "version": "1.0.0"
+    },
+    {
+      "name": "gate",
+      "version": "1.0.0"
+    },
+    {
+      "name": "normal",
+      "version": "1.0.0"
+    },
+    {
+      "name": "pii",
+      "version": "1.0.0"
+    },
+    {
+      "name": "rerank",
+      "version": "1.0.0"
+    },
+    {
+      "name": "review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "screen",
+      "version": "1.0.0"
+    },
+    {
+      "name": "security",
+      "version": "1.0.0"
+    },
+    {
+      "name": "verify",
+      "version": "1.0.0"
+    }
+  ],
+  "policy_note": "live registry truth (availability-independent); 14 entries",
+  "schema_version": "1.0.0",
+  "software": {
+    "node": "v24.18.0",
+    "platform": "win32",
+    "arch": "x64",
+    "package_version": "0.4.0"
+  },
+  "hardware": {
+    "arch": "x64",
+    "cpus": 16,
+    "cpu_model": "AMD Ryzen 7 5700X 8-Core Processor             ",
+    "totalmem_mb": 32646
+  },
+  "config": {
+    "passes": 2,
+    "layaUrl": "http://127.0.0.1:8765",
+    "glinerUrl": "http://127.0.0.1:8766",
+    "seed": "none (live backend; Router judgments are deterministic, latencies vary)"
+  },
+  "mode": {
+    "mcp": "observe",
+    "mcp_note": "the MCP layer only observes and reports judgments; it never acts, under every policy mode",
+    "policy": "observe (default)",
+    "policy_note": "effective global policy-decision mode resolution input (verbatim env or default)"
+  },
+  "method": "each suite case invoked against the real handler with live backend judgments; judgments pooled across passes; gold comparison via each suite check(); reliability over pooled (signal, correct) pairs with the score.mjs SIGNAL_MAP.",
+  "honesty": [
+    "live judgments on the eval golds; gold mismatches are backend findings, never harness failures",
+    "signals stay uncalibrated: Brier/ECE diagnose miscalibration, they do not certify probabilities",
+    "thresholds untouched (CERO cambios en src/); wrong_confident taus remain reporting slices, never prod cutoffs"
+  ],
+  "links": {
+    "bench": {
+      "primitives": null,
+      "rerank_rows": null
+    },
+    "metrics": {
+      "suites": 11
+    }
+  },
+  "layaReady": {
+    "ready": true,
+    "reason": null,
+    "loaded": [
+      "multilingual",
+      "typed-decisions",
+      "english"
+    ],
+    "failed": [],
+    "device": "auto",
+    "versions": {
+      "server": "0.4.0",
+      "laya_sdk": "0.3.12"
+    },
+    "uptimeSeconds": 1472.2679722309113,
+    "circuit": "closed"
+  },
+  "glinerReady": {
+    "ready": true,
+    "reason": null,
+    "loaded": [
+      "fastino/gliner2.5-multi-v1"
+    ],
+    "failed": [],
+    "device": "cuda",
+    "versions": {
+      "server": "0.1.0"
+    },
+    "uptimeSeconds": 1472.2774865627289,
+    "circuit": "closed"
+  },
+  "layaModels": [
+    {
+      "name": "english",
+      "repo": "convaiinnovations/laya",
+      "loaded": true,
+      "revision": null,
+      "revision_source": "unpinned",
+      "device": "auto",
+      "circuit": "closed"
+    },
+    {
+      "name": "multilingual",
+      "repo": "convaiinnovations/laya-multilingual",
+      "loaded": true,
+      "revision": null,
+      "revision_source": "unpinned",
+      "device": "auto",
+      "circuit": "closed"
+    },
+    {
+      "name": "typed-decisions",
+      "repo": "convaiinnovations/laya-typed-decisions",
+      "loaded": true,
+      "revision": null,
+      "revision_source": "unpinned",
+      "device": "auto",
+      "circuit": "closed"
+    }
+  ],
+  "glinerModels": [
+    {
+      "name": "fastino/gliner2.5-multi-v1",
+      "repo": "fastino/gliner2.5-multi-v1",
+      "loaded": true,
+      "revision": null,
+      "revision_source": "unpinned",
+      "device": "cuda",
+      "circuit": "closed"
+    }
+  ],
+  "envFacts": {
+    "venv": "%TEMP%/laya-cal-0924 (temporal, deleted at T2 end)",
+    "pinsNote": "requirements == pins EXCEPT laya: 0.3.8 yanked from PyPI 2026-09-24, resolved laya==0.3.12 within the <0.4.0 ceiling; torch 2.14.0+cu130 added for GPU attempt; requirements files NOT modified",
+    "pipFreeze": {
+      "laya": "0.3.12",
+      "torch": "2.14.0+cu130",
+      "fastapi": "0.141.1",
+      "uvicorn": "0.53.0",
+      "pydantic": "2.13.5",
+      "huggingface_hub": "0.36.2",
+      "gliner2": "2.0.0",
+      "protobuf": "7.36.2",
+      "psutil": "7.2.2",
+      "transformers": "4.57.6",
+      "tokenizers": "0.22.2"
+    },
+    "torchCuda": true,
+    "gpu": "NVIDIA GeForce RTX 5060 Ti 16GB, driver 591.74",
+    "ports": {
+      "laya": 8765,
+      "gliner": 8766
+    },
+    "coldStarts": {
+      "method": "Router loads LAZY: spawn alone never loads (633s uptime, load_attempts 0); measured warming-call to /ready ready=true",
+      "layaS": 90,
+      "layaDetail": "GET /health trigger; 3/3 ckpts in 90s; nvidia-smi: server PID GPU compute app, 5748 MiB VRAM",
+      "glinerS": 15,
+      "glinerDetail": "POST /pii_scan trigger; fastino/gliner2.5-multi-v1 ready ~15s; /ready device=cuda verbatim"
+    },
+    "devices": {
+      "layaReady": "auto (setting echo; CUDA evidenced by nvidia-smi VRAM residency + torch.cuda True)",
+      "glinerReady": "cuda (verbatim /ready + /models)"
+    },
+    "layaSdk": "0.3.12",
+    "revisions": "null both servers (revision_source unpinned)"
+  }
+}

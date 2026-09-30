@@ -1,0 +1,18 @@
+{
+  "note": "live calibration measurement (bench-notas): no throughput/latency benchmark was run; per-case wall/server latencies live in live-cases.json as absolutes.",
+  "config": {
+    "passes": 2,
+    "layaUrl": "http://127.0.0.1:8765",
+    "glinerUrl": "http://127.0.0.1:8766",
+    "seed": "none (live backend; Router judgments are deterministic, latencies vary)"
+  },
+  "coldStarts": {
+    "method": "Router loads LAZY: spawn alone never loads (633s uptime, load_attempts 0); measured warming-call to /ready ready=true",
+    "layaS": 90,
+    "layaDetail": "GET /health trigger; 3/3 ckpts in 90s; nvidia-smi: server PID GPU compute app, 5748 MiB VRAM",
+    "glinerS": 15,
+    "glinerDetail": "POST /pii_scan trigger; fastino/gliner2.5-multi-v1 ready ~15s; /ready device=cuda verbatim"
+  },
+  "venv": "%TEMP%/laya-cal-0924 (temporal, deleted at T2 end)",
+  "method": "each suite case invoked against the real handler with live backend judgments; judgments pooled across passes; gold comparison via each suite check(); reliability over pooled (signal, correct) pairs with the score.mjs SIGNAL_MAP."
+}

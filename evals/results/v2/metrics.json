@@ -1,0 +1,1936 @@
+{
+  "generated": "fut-a-calibracion T2 (LIVE backend judgments + real handlers; reliability diagnostics, never thresholds)",
+  "passes": 2,
+  "taus": [
+    0.7,
+    0.8,
+    0.9,
+    0.95
+  ],
+  "taus_note": "reporting slices only; NEVER production thresholds (see evals/calibration.md)",
+  "reliability_note": "Brier/ECE are miscalibration diagnostics over live (signal, outcome) pairs; signals stay uncalibrated and no value below is a probability.",
+  "suites": [
+    {
+      "suite": "classify",
+      "primitive": "laya_classify",
+      "family": "binary",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 2,
+        "mismatched": 14,
+        "threw": 2
+      },
+      "accuracyVsGold": 0,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 14,
+        "correct": 12,
+        "accuracy": 0.8571428571428571
+      },
+      "latencyMs": {
+        "wallMean": 50.471918749999986,
+        "serverLayaMean": 43.26664999098284,
+        "serverGlinerMean": 0
+      },
+      "task": {
+        "n": 14,
+        "correct": 6,
+        "accuracy": 0.42857142857142855
+      },
+      "binary_allow_polarity": {
+        "n": 14,
+        "tp": 12,
+        "tn": 0,
+        "fp": 2,
+        "fn": 0,
+        "accuracy": 0.8571428571428571,
+        "precision": 0.8571428571428571,
+        "recall": 1,
+        "f1": 0.923076923076923,
+        "fpr": 1,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 16,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 12,
+            "wrong_and_confident": 6,
+            "rate": 0.375,
+            "conditional_wrong_given_confident": 0.5
+          },
+          {
+            "tau": 0.8,
+            "confident": 6,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      },
+      "reliability": {
+        "signal": "winner_probability",
+        "n": 16,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "brier": 0.28421734875000004,
+        "ece": 0.4577625,
+        "eceBins": [
+          {
+            "bin": 0,
+            "lo": 0,
+            "hi": 0.1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 2,
+            "accuracy": 0,
+            "confidence": 0.5384
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 2,
+            "accuracy": 1,
+            "confidence": 0.605
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 6,
+            "accuracy": 0,
+            "confidence": 0.7645333333333334
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 4,
+            "accuracy": 1,
+            "confidence": 0.8184
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1,
+            "n": 2,
+            "accuracy": 1,
+            "confidence": 0.9281
+          }
+        ],
+        "eceClamped": 0,
+        "distributions": "no aplica: full choice-dict distributions are raw shares, not calibrated probabilities; no scoring rule over the full distribution is computed."
+      }
+    },
+    {
+      "suite": "decide",
+      "primitive": "laya_decide",
+      "family": "binary",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 4,
+        "mismatched": 12,
+        "threw": 2
+      },
+      "accuracyVsGold": 0.14285714285714285,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 2,
+        "abstention_rate": 0.14285714285714285
+      },
+      "decision": {
+        "n": 14,
+        "correct": 6,
+        "accuracy": 0.42857142857142855
+      },
+      "latencyMs": {
+        "wallMean": 54.015406250000105,
+        "serverLayaMean": 43.61638749469421,
+        "serverGlinerMean": 0
+      },
+      "task": {
+        "n": 12,
+        "correct": 8,
+        "accuracy": 0.6666666666666666
+      },
+      "binary_allow_polarity": {
+        "n": 12,
+        "tp": 6,
+        "tn": 0,
+        "fp": 6,
+        "fn": 0,
+        "accuracy": 0.5,
+        "precision": 0.5,
+        "recall": 1,
+        "f1": 0.6666666666666666,
+        "fpr": 1,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 12,
+        "excluded": {
+          "threw": 0,
+          "abstained": 2,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 12,
+            "wrong_and_confident": 4,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.8,
+            "confident": 12,
+            "wrong_and_confident": 4,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.9,
+            "confident": 12,
+            "wrong_and_confident": 4,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.95,
+            "confident": 12,
+            "wrong_and_confident": 4,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          }
+        ]
+      },
+      "reliability": {
+        "signal": "winner_probability",
+        "n": 12,
+        "excluded": {
+          "threw": 0,
+          "abstained": 2,
+          "null_signal": 0
+        },
+        "brier": 0.30776451499999996,
+        "ece": 0.29495000000000027,
+        "eceBins": [
+          {
+            "bin": 0,
+            "lo": 0,
+            "hi": 0.1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1,
+            "n": 12,
+            "accuracy": 0.6666666666666666,
+            "confidence": 0.9616166666666669
+          }
+        ],
+        "eceClamped": 0,
+        "distributions": "no aplica: full choice-dict distributions are raw shares, not calibrated probabilities; no scoring rule over the full distribution is computed."
+      }
+    },
+    {
+      "suite": "verify",
+      "primitive": "laya_verify",
+      "family": "binary",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 12,
+        "mismatched": 4,
+        "threw": 2
+      },
+      "accuracyVsGold": 0.7142857142857143,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 2,
+        "abstention_rate": 0.14285714285714285
+      },
+      "decision": {
+        "n": 14,
+        "correct": 10,
+        "accuracy": 0.7142857142857143
+      },
+      "latencyMs": {
+        "wallMean": 37.936937499999935,
+        "serverLayaMean": 30.10569374600891,
+        "serverGlinerMean": 0
+      },
+      "task": {
+        "n": 14,
+        "correct": 10,
+        "accuracy": 0.7142857142857143
+      },
+      "binary_allow_polarity": {
+        "n": 12,
+        "tp": 4,
+        "tn": 4,
+        "fp": 2,
+        "fn": 2,
+        "accuracy": 0.6666666666666666,
+        "precision": 0.6666666666666666,
+        "recall": 0.6666666666666666,
+        "f1": 0.6666666666666666,
+        "fpr": 0.3333333333333333,
+        "fnr": 0.3333333333333333
+      },
+      "wrong_confident": {
+        "signal": "per-claim support signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 14,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 8,
+            "wrong_and_confident": 4,
+            "rate": 0.2857142857142857,
+            "conditional_wrong_given_confident": 0.5
+          },
+          {
+            "tau": 0.8,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.9,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      },
+      "reliability": {
+        "signal": "per-claim support signal",
+        "n": 14,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "brier": 0.34713191,
+        "ece": 0.39232857142857136,
+        "eceBins": [
+          {
+            "bin": 0,
+            "lo": 0,
+            "hi": 0.1,
+            "n": 4,
+            "accuracy": 0.5,
+            "confidence": 0.0817
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 2,
+            "accuracy": 1,
+            "confidence": 0.6912
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 2,
+            "accuracy": 0,
+            "confidence": 0.7695
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1,
+            "n": 6,
+            "accuracy": 0.6666666666666666,
+            "confidence": 0.9437999999999999
+          }
+        ],
+        "eceClamped": 0,
+        "distributions": "no aplica: full choice-dict distributions are raw shares, not calibrated probabilities; no scoring rule over the full distribution is computed."
+      }
+    },
+    {
+      "suite": "screen",
+      "primitive": "laya_screen",
+      "family": "binary",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 10,
+        "mismatched": 6,
+        "threw": 2
+      },
+      "accuracyVsGold": 0.5714285714285714,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 14,
+        "correct": 8,
+        "accuracy": 0.5714285714285714
+      },
+      "latencyMs": {
+        "wallMean": 43.26003125000014,
+        "serverLayaMean": 35.87584999695537,
+        "serverGlinerMean": 0
+      },
+      "task": {
+        "n": 14,
+        "correct": 10,
+        "accuracy": 0.7142857142857143
+      },
+      "binary_allow_polarity": {
+        "n": 14,
+        "tp": 0,
+        "tn": 10,
+        "fp": 0,
+        "fn": 4,
+        "accuracy": 0.7142857142857143,
+        "precision": null,
+        "recall": 0,
+        "f1": null,
+        "fpr": 0,
+        "fnr": 1
+      },
+      "wrong_confident": {
+        "signal": "injection signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 14,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 4,
+            "wrong_and_confident": 2,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.5
+          },
+          {
+            "tau": 0.8,
+            "confident": 4,
+            "wrong_and_confident": 2,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.5
+          },
+          {
+            "tau": 0.9,
+            "confident": 2,
+            "wrong_and_confident": 2,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 1
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      },
+      "reliability": {
+        "signal": "injection signal",
+        "n": 14,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "brier": 0.4260129000000001,
+        "ece": 0.5983428571428572,
+        "eceBins": [
+          {
+            "bin": 0,
+            "lo": 0,
+            "hi": 0.1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 2,
+            "accuracy": 1,
+            "confidence": 0.1179
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 4,
+            "accuracy": 1,
+            "confidence": 0.3198
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 4,
+            "accuracy": 0,
+            "confidence": 0.43255
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 2,
+            "accuracy": 1,
+            "confidence": 0.8586
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1,
+            "n": 2,
+            "accuracy": 0,
+            "confidence": 0.9394
+          }
+        ],
+        "eceClamped": 0,
+        "distributions": "no aplica: full choice-dict distributions are raw shares, not calibrated probabilities; no scoring rule over the full distribution is computed."
+      }
+    },
+    {
+      "suite": "pii",
+      "primitive": "laya_pii",
+      "family": "binary",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 4,
+        "mismatched": 12,
+        "threw": 2
+      },
+      "accuracyVsGold": 0.14285714285714285,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 2,
+        "abstention_rate": 0.14285714285714285
+      },
+      "decision": {
+        "n": 14,
+        "correct": 8,
+        "accuracy": 0.5714285714285714
+      },
+      "latencyMs": {
+        "wallMean": 111.22625624999996,
+        "serverLayaMean": 20.04226249846397,
+        "serverGlinerMean": 76.38568749825936
+      },
+      "task": {
+        "n": 14,
+        "correct": 12,
+        "accuracy": 0.8571428571428571
+      },
+      "binary_allow_polarity": {
+        "n": 12,
+        "tp": 2,
+        "tn": 4,
+        "fp": 4,
+        "fn": 2,
+        "accuracy": 0.5,
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "f1": 0.4,
+        "fpr": 0.5,
+        "fnr": 0.5
+      },
+      "wrong_confident": {
+        "signal": "max detector_score",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 6,
+        "excluded": {
+          "threw": 0,
+          "abstained": 2,
+          "null_signal": 6
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.8,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.9,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.95,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          }
+        ]
+      },
+      "reliability": {
+        "signal": "max detector_score",
+        "n": 6,
+        "excluded": {
+          "threw": 0,
+          "abstained": 2,
+          "null_signal": 6
+        },
+        "brier": 0.29068589788541743,
+        "ece": 0.28565430641174316,
+        "eceBins": [
+          {
+            "bin": 0,
+            "lo": 0,
+            "hi": 0.1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1,
+            "n": 6,
+            "accuracy": 0.6666666666666666,
+            "confidence": 0.9523209730784098
+          }
+        ],
+        "eceClamped": 0,
+        "distributions": "no aplica: full choice-dict distributions are raw shares, not calibrated probabilities; no scoring rule over the full distribution is computed."
+      }
+    },
+    {
+      "suite": "extract",
+      "primitive": "laya_extract",
+      "family": "binary",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 10,
+        "mismatched": 6,
+        "threw": 2
+      },
+      "accuracyVsGold": 0.5714285714285714,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 4,
+        "abstention_rate": 0.2857142857142857
+      },
+      "decision": {
+        "n": 14,
+        "correct": 12,
+        "accuracy": 0.8571428571428571
+      },
+      "latencyMs": {
+        "wallMean": 46.80786875000001,
+        "serverLayaMean": 37.656137501471676,
+        "serverGlinerMean": 0
+      },
+      "task": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "binary_allow_polarity": {
+        "n": 10,
+        "tp": 8,
+        "tn": 0,
+        "fp": 2,
+        "fn": 0,
+        "accuracy": 0.8,
+        "precision": 0.8,
+        "recall": 1,
+        "f1": 0.888888888888889,
+        "fpr": 1,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 10,
+        "excluded": {
+          "threw": 0,
+          "abstained": 4,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.8,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.9,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      },
+      "reliability": {
+        "signal": "winner_probability",
+        "n": 10,
+        "excluded": {
+          "threw": 0,
+          "abstained": 4,
+          "null_signal": 0
+        },
+        "brier": 0.27974427199999996,
+        "ece": 0.34452,
+        "eceBins": [
+          {
+            "bin": 0,
+            "lo": 0,
+            "hi": 0.1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 2,
+            "accuracy": 1,
+            "confidence": 0.3526
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 4,
+            "accuracy": 0.5,
+            "confidence": 0.4379
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 2,
+            "accuracy": 0,
+            "confidence": 0.5747
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 2,
+            "accuracy": 1,
+            "confidence": 0.6237
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          }
+        ],
+        "eceClamped": 0,
+        "distributions": "no aplica: full choice-dict distributions are raw shares, not calibrated probabilities; no scoring rule over the full distribution is computed."
+      }
+    },
+    {
+      "suite": "find",
+      "primitive": "laya_find",
+      "family": "binary",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 8,
+        "mismatched": 8,
+        "threw": 2
+      },
+      "accuracyVsGold": 0.42857142857142855,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 4,
+        "abstention_rate": 0.2857142857142857
+      },
+      "decision": {
+        "n": 14,
+        "correct": 10,
+        "accuracy": 0.7142857142857143
+      },
+      "latencyMs": {
+        "wallMean": 49.333387500000015,
+        "serverLayaMean": 40.6500187527854,
+        "serverGlinerMean": 0
+      },
+      "task": {
+        "n": 14,
+        "correct": 8,
+        "accuracy": 0.5714285714285714
+      },
+      "binary_allow_polarity": {
+        "n": 10,
+        "tp": 6,
+        "tn": 0,
+        "fp": 4,
+        "fn": 0,
+        "accuracy": 0.6,
+        "precision": 0.6,
+        "recall": 1,
+        "f1": 0.7499999999999999,
+        "fpr": 1,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 10,
+        "excluded": {
+          "threw": 0,
+          "abstained": 4,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 10,
+            "wrong_and_confident": 4,
+            "rate": 0.4,
+            "conditional_wrong_given_confident": 0.4
+          },
+          {
+            "tau": 0.8,
+            "confident": 6,
+            "wrong_and_confident": 4,
+            "rate": 0.4,
+            "conditional_wrong_given_confident": 0.6666666666666666
+          },
+          {
+            "tau": 0.9,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      },
+      "reliability": {
+        "signal": "winner_probability",
+        "n": 10,
+        "excluded": {
+          "threw": 0,
+          "abstained": 4,
+          "null_signal": 0
+        },
+        "brier": 0.32837159,
+        "ece": 0.41914,
+        "eceBins": [
+          {
+            "bin": 0,
+            "lo": 0,
+            "hi": 0.1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 4,
+            "accuracy": 1,
+            "confidence": 0.751
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 6,
+            "accuracy": 0.3333333333333333,
+            "confidence": 0.8659
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          }
+        ],
+        "eceClamped": 0,
+        "distributions": "no aplica: full choice-dict distributions are raw shares, not calibrated probabilities; no scoring rule over the full distribution is computed."
+      }
+    },
+    {
+      "suite": "rerank",
+      "primitive": "laya_rerank",
+      "family": "ranking",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 12,
+        "mismatched": 4,
+        "threw": 2
+      },
+      "accuracyVsGold": 0.7142857142857143,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 2,
+        "abstention_rate": 0.14285714285714285
+      },
+      "decision": {
+        "n": 14,
+        "correct": 12,
+        "accuracy": 0.8571428571428571
+      },
+      "latencyMs": {
+        "wallMean": 47.69904375000007,
+        "serverLayaMean": 39.3095000035828,
+        "serverGlinerMean": 0
+      },
+      "ranking": {
+        "n": 12,
+        "excluded_abstained_or_throw": 4,
+        "mrr": 0.9166666666666666,
+        "ndcg": 0.9766197833086996,
+        "map": 0.9166666666666666,
+        "topK": {
+          "top_1": 0.8333333333333334,
+          "top_3": 1
+        }
+      },
+      "wrong_confident": {
+        "status": "no aplica",
+        "reason": "relevance_score is within-call only by contract (never comparable across calls); a single score has no correctness value, so no tau slice is meaningful."
+      },
+      "reliability": {
+        "status": "no aplica",
+        "reason": "rerank emits no binary outcome with a scalar signal; MRR/nDCG over orders is the quality measure. Full-distribution scoring is not computed (raw shares, not calibrated probabilities)."
+      }
+    },
+    {
+      "suite": "review",
+      "primitive": "laya_review",
+      "family": "agreement",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 6,
+        "mismatched": 10,
+        "threw": 2
+      },
+      "accuracyVsGold": 0.2857142857142857,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 14,
+        "correct": 6,
+        "accuracy": 0.42857142857142855
+      },
+      "latencyMs": {
+        "wallMean": 49.1954812500002,
+        "serverLayaMean": 39.0914187519229,
+        "serverGlinerMean": 0
+      },
+      "task": {
+        "n": 14,
+        "correct": 6,
+        "accuracy": 0.42857142857142855
+      },
+      "score_agreement": {
+        "status": "no computable (gold)",
+        "reason": "golds hold decisions, not rubric-score oracles; live judgments add no score oracle either."
+      },
+      "wrong_confident": {
+        "signal": "safe_to_apply signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 14,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.8,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.9,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      },
+      "reliability": {
+        "signal": "safe_to_apply signal",
+        "n": 14,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "brier": 0.3028827214285714,
+        "ece": 0.30069999999999997,
+        "eceBins": [
+          {
+            "bin": 0,
+            "lo": 0,
+            "hi": 0.1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 12,
+            "accuracy": 0.5,
+            "confidence": 0.18628333333333333
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 2,
+            "accuracy": 0,
+            "confidence": 0.2226
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          }
+        ],
+        "eceClamped": 0,
+        "distributions": "no aplica: full choice-dict distributions are raw shares, not calibrated probabilities; no scoring rule over the full distribution is computed."
+      }
+    },
+    {
+      "suite": "gate",
+      "primitive": "laya_gate",
+      "family": "agreement",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 2,
+        "mismatched": 14,
+        "threw": 2
+      },
+      "accuracyVsGold": 0,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 14,
+        "correct": 4,
+        "accuracy": 0.2857142857142857
+      },
+      "latencyMs": {
+        "wallMean": 44.316337499999975,
+        "serverLayaMean": 36.60271250191727,
+        "serverGlinerMean": 0
+      },
+      "task": {
+        "n": 14,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "score_agreement": {
+        "status": "no computable (gold)",
+        "reason": "golds hold decisions, not rubric-score oracles; live judgments add no score oracle either."
+      },
+      "wrong_confident": {
+        "signal": "per-claim support signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 16,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 12,
+            "wrong_and_confident": 12,
+            "rate": 0.75,
+            "conditional_wrong_given_confident": 1
+          },
+          {
+            "tau": 0.8,
+            "confident": 12,
+            "wrong_and_confident": 12,
+            "rate": 0.75,
+            "conditional_wrong_given_confident": 1
+          },
+          {
+            "tau": 0.9,
+            "confident": 12,
+            "wrong_and_confident": 12,
+            "rate": 0.75,
+            "conditional_wrong_given_confident": 1
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      },
+      "reliability": {
+        "signal": "per-claim support signal",
+        "n": 16,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "brier": 0.7067663187500001,
+        "ece": 0.8292124999999998,
+        "eceBins": [
+          {
+            "bin": 0,
+            "lo": 0,
+            "hi": 0.1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 2,
+            "accuracy": 0,
+            "confidence": 0.568
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 2,
+            "accuracy": 0,
+            "confidence": 0.6123
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1,
+            "n": 12,
+            "accuracy": 0,
+            "confidence": 0.9088999999999997
+          }
+        ],
+        "eceClamped": 0,
+        "distributions": "no aplica: full choice-dict distributions are raw shares, not calibrated probabilities; no scoring rule over the full distribution is computed."
+      }
+    },
+    {
+      "suite": "compare",
+      "primitive": "laya_compare",
+      "family": "binary",
+      "passes": 2,
+      "casesPerPass": 8,
+      "caseRows": 16,
+      "goldMatch": {
+        "matched": 4,
+        "mismatched": 12,
+        "threw": 2
+      },
+      "accuracyVsGold": 0.14285714285714285,
+      "abstention": {
+        "total": 16,
+        "errors": 2,
+        "scored": 14,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 14,
+        "correct": 10,
+        "accuracy": 0.7142857142857143
+      },
+      "latencyMs": {
+        "wallMean": 42.21283124999985,
+        "serverLayaMean": 35.35193749848986,
+        "serverGlinerMean": 0
+      },
+      "task": {
+        "n": 12,
+        "correct": 8,
+        "accuracy": 0.6666666666666666
+      },
+      "binary_allow_polarity": {
+        "n": 14,
+        "tp": 10,
+        "tn": 0,
+        "fp": 4,
+        "fn": 0,
+        "accuracy": 0.7142857142857143,
+        "precision": 0.7142857142857143,
+        "recall": 1,
+        "f1": 0.8333333333333333,
+        "fpr": 1,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 14,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 8,
+            "wrong_and_confident": 4,
+            "rate": 0.2857142857142857,
+            "conditional_wrong_given_confident": 0.5
+          },
+          {
+            "tau": 0.8,
+            "confident": 8,
+            "wrong_and_confident": 4,
+            "rate": 0.2857142857142857,
+            "conditional_wrong_given_confident": 0.5
+          },
+          {
+            "tau": 0.9,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.95,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          }
+        ]
+      },
+      "reliability": {
+        "signal": "winner_probability",
+        "n": 14,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "brier": 0.3842441071428571,
+        "ece": 0.49852857142857143,
+        "eceBins": [
+          {
+            "bin": 0,
+            "lo": 0,
+            "hi": 0.1,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 4,
+            "accuracy": 1,
+            "confidence": 0.3841
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 2,
+            "accuracy": 1,
+            "confidence": 0.6092
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 0,
+            "accuracy": null,
+            "confidence": null
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 2,
+            "accuracy": 0,
+            "confidence": 0.8911
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1,
+            "n": 6,
+            "accuracy": 0.6666666666666666,
+            "confidence": 0.992
+          }
+        ],
+        "eceClamped": 0,
+        "distributions": "no aplica: full choice-dict distributions are raw shares, not calibrated probabilities; no scoring rule over the full distribution is computed."
+      }
+    }
+  ]
+}
