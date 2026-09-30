@@ -149,7 +149,7 @@ export function envelopeMetadataProperties(): Record<string, unknown> {
     timestamp: { type: "string", description: "ISO-8601 creation time of the envelope." },
     model: {
       type: ["string", "null"],
-      description: "Judging backend label from evidence.model; null when no backend judged (pii, capabilities).",
+      description: "Judging backend label from evidence.model; null when the evidence bundle is not Laya-sourced (pii evidence stays GLiNER-sourced -- per-span judge signals live in findings[].laya_signal -- and capabilities judges nothing).",
     },
     model_revision: {
       type: ["string", "null"],

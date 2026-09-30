@@ -23,8 +23,10 @@
  *   - `timestamp`:      ISO-8601 creation time (new Date().toISOString()).
  *   - `model`:          judging backend label, taken from
  *                       `evidence.model` (the LayaClient already defaults a
- *                       laya call to "laya"; pii has no laya judgment so its
- *                       model is the honest null). Never invented here.
+ *                       laya call to "laya"; pii evidence stays GLiNER-sourced
+ *                       so its model is the honest null -- the per-span Laya
+ *                       judge signals live in findings[].laya_signal, not in
+ *                       evidence). Never invented here.
  *   - `model_revision`: operator pin via LAYA_MODEL_REVISION (laya tools)
  *                       or GLINER_MODEL_REVISION (laya_pii), else the
  *                       backend-supplied `evidence.revision`, else the honest

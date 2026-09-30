@@ -67,7 +67,7 @@ calibrated probability and never an authorization. The renames:
 | Max over choice dict | `confidence` number (0 when missing) | `winner_probability` | Null when missing or empty; empty-dict `-Infinity` bugfix from T3 kept (`winnerOf` returns null; JSON already serialized `-Infinity` as null, so null-readers see no change) |
 | GLiNER span score | sidecar `confidence` | `detector_score` | No threshold applied server-side (preserved: the legacy handler never cut GLiNER scores either) |
 | Review/gate 0-2 rubric numbers | `scores` flat numbers | `score` (unchanged) | Audit-only in v1; the decision reads only `safe_to_apply` + claim signals |
-| Verify per-claim verdicts | `verified` / `unsupported` / `contradicted` | `SUPPORTED` / `INSUFFICIENT_EVIDENCE` / `ABSTAIN` | A low support signal is absence of evidence, never refutation |
+| Verify per-claim verdicts | `verified` / `unsupported` / `contradicted` | `SUPPORTED` / `INSUFFICIENT_EVIDENCE` / `ABSTAIN` (+ `CONTRADICTED` since fut-b-semantica T3, emitted only on positive refutation — see §9) | A low support signal is absence of evidence, never refutation |
 | Screen sub-verdicts | `action: block/review/skip/pass` | `assessment: malicious-instruction / ambiguous / irrelevant / valid` + `decision` | Relevance is carried for audit; v1 does not branch on it (preserved: the legacy handler computed relevance but never used it) |
 | Handler decisions | `action: auto/pass/...`, `selected`, bare `winner` | `decision: {decision, reason_codes, policy{name, version}}` | Every decision names the policy and version that produced it |
 
@@ -99,11 +99,18 @@ overrides do not calibrate anything.
 - Versioning: every policy is `{name, version}` (all v1 are `1.0.0`); the
   input ref selects the definition and the decision echoes it, so consumers
   can pin and audit exactly which policy decided.
-- `context`/`risk` handling in v1: accepted, forwarded, and validated (an
-  invalid risk tier is rejected), but no v1 policy branches on `risk`.
+- `context`/`risk` handling: accepted, forwarded, and validated (an
+  invalid risk tier is rejected). Since fut-b-semantica T2, `risk` is
+  EFFECTIVE where the policy documents it — `gate`/`screen` move numeric
+  bands by the shared `RISK_CUT_DELTA` (0.05, uncalibrated step, same
+  honesty as the v1 table) and `pii` moves its non-secret branch
+  (high fails closed, low relaxes) — while every other v1 policy still
+  ignores it (pinned: identical firm evidence decides identically under
+  `low` vs `high`). `risk: "normal"` (the default) is byte-identical to
+  the pre-T2 cuts, so no policy version moved (all stay `1.0.0`).
   `find@1.0.0` reads `context.candidateCount` for the arithmetic 1/N
-  weak-winner baseline — the single documented `context` read. Risk-tiered
-  strictness is reserved for future calibration, never invented here.
+  weak-winner baseline — the single documented `context` read. Neither
+  `context` nor `risk` ever rescues abstention or a missing signal.
 
 ## 4. Policies: list, versions, threshold origins
 
@@ -112,11 +119,11 @@ profiles (`code-review`, `security`, `normal`).
 
 | Policy | Decision range (v1) | Thresholds (origin: preserved pre-P1 behavior, NOT calibrated) |
 |---|---|---|
-| `screen@1.0.0` | DENY / REVIEW / ALLOW / ESCALATE | `screenInjectionBlock` 0.75 (strict `>`), `screenInjectionReview` 0.25 (strict `>`), `screenSubstanceSkip` 0.4 (strict `<`); from `screen.ts` legacy action. Edges: 0.75 -> REVIEW, 0.25 -> substance branch, 0.4 -> ALLOW |
-| `verify@1.0.0` | ALLOW (all verified) / REVIEW (unsupported, none contradicted) / DENY (any contradicted) / ESCALATE | `claimVerified` 0.8 (`>=`), `claimContradicted` 0.4 (`<` contradicted, `>=` unsupported); shared with `gate` via the table (the pre-P1 duplication of 0.8/0.4 in `verify.ts` + `gate.ts` is gone) |
+| `screen@1.0.0` | DENY / REVIEW / ALLOW / ESCALATE | `screenInjectionBlock` 0.75 (strict `>`), `screenInjectionReview` 0.25 (strict `>`), `screenSubstanceSkip` 0.4 (strict `<`); from `screen.ts` legacy action. Edges: 0.75 -> REVIEW, 0.25 -> substance branch, 0.4 -> ALLOW. Since T2 the optional `risk` tier shifts ONLY the two injection cuts by `RISK_CUT_DELTA` (high 0.70/0.20, low 0.80/0.30; strict edges pinned in `tests/t4_semantica_edges.mjs`); the substance cut never moves |
+| `verify@1.0.0` | ALLOW (all verified) / REVIEW (unsupported, none contradicted) / DENY (any positively-refuted claim) / ESCALATE | `claimVerified` 0.8 (`>=` — since T3 the firm band for BOTH the support and the dedicated refutation probe). `claimContradicted` 0.4 is RETAINED in the shared table (defaults, env override, compat) but NO LONGER consulted (T3 BREAKING vs P1: low support without firm refutation REVIEWs as unsupported instead of DENYing; absence is never refutation). Shared with `gate` via the table |
 | `review@1.0.0` | ALLOW / REVIEW / ESCALATE (never DENY) | `reviewAuto` 0.85 (strict `>`), `reviewReview` 0.5 (strict `>`); shared with `gate`/`code-review`. Edges: 0.85 -> REVIEW, 0.5 -> ESCALATE |
-| `gate@1.0.0` | ALLOW / REVIEW / ESCALATE (never DENY) | `claimVerified`/`claimContradicted` (shared) + `reviewAuto`. Contradicted claims dominate safety (ESCALATE even with high `safe_to_apply`); low safety alone REVIEWs (deliberate difference from `review`, which ESCALATEs at <= 0.5). Gate asks 3 rubric questions (not test_gap/blast_radius) so 61 claims fit the 64-question server budget |
-| `pii@1.0.0` | DENY (secret) / REVIEW (finding) / ALLOW (clean) / ESCALATE | No numeric cut: count-based (`secrets > 0 ? deny : findings > 0 ? review : allow`, preserved). Secret membership from the shared `secretTypes` table (`["api_key", "token_secreto", "password"]`, from `pii.ts` `SECRET_TYPES`) |
+| `gate@1.0.0` | ALLOW / REVIEW / ESCALATE (never DENY) | `claimVerified` 0.8 (firm band for support AND refutation probes since T3; `claimContradicted` 0.4 retained but unconsulted, same T3 breaking as `verify`) + `reviewAuto` 0.85 (strict `>`, moved by `risk` since T2: high 0.90 / low 0.80 — the 0.80-low edge is a deterministic IEEE-754 float fact, pinned in `tests/t4_semantica_edges.mjs`). Positively-refuted claims dominate safety (ESCALATE even with high `safe_to_apply`); low safety alone REVIEWs (deliberate difference from `review`, which ESCALATEs at <= 0.5). Gate asks 3 rubric questions (not test_gap/blast_radius) plus two per claim (support + refutation since T3), so 30 claims fit the 64-question server budget (3 + 2x30 = 63) |
+| `pii@1.0.0` | DENY (secret) / REVIEW (finding) / ALLOW (clean) / ESCALATE | No numeric cut: count-based (`secrets > 0 ? deny : findings > 0 ? review : allow`, preserved). Secret membership from the shared `secretTypes` table (`["api_key", "token_secreto", "password"]`, from `pii.ts` `SECRET_TYPES`). Since T2 the optional `risk` tier moves ONLY the non-secret branch (high `pii_high_risk_deny` DENY, low `pii_low_risk_allow` ALLOW); secrets, clean, and abstention are fixed points |
 | `find@1.0.0` | ALLOW-or-ESCALATE | No numeric cut (legacy find had none). Derived checks only: exact tie (1e-9) and weak winner (top share <= 1/N from `context.candidateCount`; arithmetic baseline, not a tuned threshold) |
 | `rerank@1.0.0` | ALLOW-or-ESCALATE | None (legacy rerank sorts, never cuts). Authorizes use of the ordering when every candidate signal is firm |
 | `classify@1.0.0` | ALLOW-or-ESCALATE | None numeric (legacy had none). Firmness = signal presence |
@@ -134,7 +141,10 @@ Env overrides (ops/tests only): `LAYA_POLICY_SCREEN_BLOCK` (0.75),
 `LAYA_POLICY_REQUIRE_SUPPORT` (0.8), `LAYA_POLICY_SECRET_TYPES`
 (`"api_key,token_secreto,password"`). Missing or non-finite values fall back
 to v1 defaults without throwing; the decision path never touches
-`process.env`.
+`process.env`. Since T3, `LAYA_POLICY_CLAIM_CONTRADICTED` still resolves
+into the table (compat) but moves no verify/gate decision — the firm cut
+for both probes is `LAYA_POLICY_CLAIM_VERIFIED` (pinned inert in
+`tests/t4_semantica_edges.mjs`).
 
 ## 5. Evidence schema per tool
 
@@ -158,7 +168,7 @@ span{start,end}?, detector?, model?, revision?, metadata?}`,
 | `laya_extract` | 1 `choice` per field (`candidate` = key, `metadata.field_id/candidate_count`, entity mode adds `span` + `detector_score`) | Zero candidates or invalid pattern per field |
 | `laya_review` | 4 `score` (correctness/spec_match/test_gap/blast_radius, audit-only) + 1 `noul` (`safe_to_apply`) | Missing `safe_to_apply`; mid band (0.5, 0.85] (neither firm auto nor firm escalate) |
 | `laya_gate` | 2 `score` (correctness/spec_match, audit-only) + 1 `noul` (`safe_to_apply`) + 1 `noul` per claim | Missing `safe_to_apply`; mid-band safety (same band as review) |
-| `laya_pii` | 1 `span` per finding (`detector: gliner:<type>`, `span` offsets, `detector_score`, `metadata.weak_type`) | All findings weak-type only (ambiguous detector judgment). Each rendered finding adds `entity_type`, `category` (secret/credential/pii/identifier/unknown; `false-positive` reserved, never emitted), `laya_signal: null` (explicit: no Laya risk judge runs in v1), `finding_status: "candidate"`, and the sidecar-verbatim `type` alias for span round-trip consumers |
+| `laya_pii` | 1 `span` per finding (`detector: gliner:<type>`, `span` offsets, `detector_score`, `metadata.weak_type`) | All findings weak-type only (ambiguous detector judgment). Each rendered finding adds `entity_type`, `category` (secret/credential/pii/identifier/unknown; `false-positive` reserved, never emitted), `laya_signal` (per-span Laya judge `noul`, raw and uncalibrated, since fut-b-semantica T2 — real signal when the backend judges the span, `null` + honest `pipeline.laya_note` reason when it does not; informational only, the count-based policy never reads it), `finding_status: "candidate"`, `pipeline.laya_judged` (true iff every finding carries a signal, vacuously true on zero spans), and the sidecar-verbatim `type` alias for span round-trip consumers |
 
 ## 6. Changes made (per slice/commit)
 
@@ -188,8 +198,31 @@ span{start,end}?, detector?, model?, revision?, metadata?}`,
   (17/17).** Zero functional code; blind spots pinned honestly (see §9).
 - **T8 (this commit) docs(policy): `README.md` P1 section + this file.** No
   functional code changed in T8.
+- **fut-b-semantica T2 `d3b3f67` feat(pii,policy), +822/-110: Laya-judge per
+  span in `laya_pii` (one additional `/predict` call, one `noul`
+  confirmation per GLiNER span; `laya_signal` real per finding, `null` +
+  honest note on outage; `laya_judged` flag; 64-question cap) + effective
+  `risk` in `gate`/`screen`/`pii` (optional `risk` input on
+  `laya_gate`/`laya_screen`/`laya_pii`; `RISK_CUT_DELTA` 0.05,
+  uncalibrated; `normal`/unset byte-identical, no version bump).**
+  `tests/t2_pii_judge_risk.mjs` (22/22). Intentional breakings, documented
+  in code + §4/§9 deltas above: judge-failure vocabulary (`laya_judged`,
+  notes), new optional `risk` inputs, risk-moved bands.
+- **fut-b-semantica T3 `814e08b` feat(verify,gate), +901/-259: dedicated
+  refutation probe (`refute_<i>`) per claim in `laya_verify`/`laya_gate`;
+  `CONTRADICTED` emitted ONLY on positive refutation (firm denial at the
+  shared 0.8 cut + weak support; conflicting firm probes ->
+  `INSUFFICIENT_EVIDENCE`; low support alone never contradicts); band
+  abstention removed from `verify`/`review`/`gate` evidence (present
+  mid/low signals reach policy REVIEW/DENY bands; only genuine missing
+  signals abstain); caps 64->32 (`laya_verify`) and 61->30 (`laya_gate`)
+  claims for the two-questions-per-claim budget.** `tests/t3_refute_bands.
+  mjs` (20/20). Intentional breakings: `claimContradicted` unconsulted
+  (compat-retained), tighter claim caps (previously-valid 33-64/31-61
+  claim calls now `input_too_large` — contract-major, see
+  `MCP_CONTRACT.md` §11).
 
-## 7. Tests (acceptance criteria -> file + counts; total 42/42 py + 126 mjs)
+## 7. Tests (acceptance criteria -> file + counts; total 42/42 py + 126 mjs at T8, + 49 fut-b-semantica checks since: t2 22 + t3 20 + t4 7)
 
 - `tests/test_opencode_v2.py` — pre-existing config-layer unit tests. 9/9
   pass (untouched).
@@ -217,6 +250,21 @@ span{start,end}?, detector?, model?, revision?, metadata?}`,
   obfuscated-secret blind spots, tie/uniform/empty-distribution flats,
   risk-never-rescues, env overrides end to end, `winnerOf` null pin).
   Covers: adversarial property, risk posture, remaining semantic gaps.
+- `tests/t2_pii_judge_risk.mjs` — 22 checks (fut-b-semantica T2: judge
+  confirm/doubt/abstain per span, honest-null outage degrade, vacuous
+  zero-span, 64-question cap, non-backend errors propagate, timeout
+  degrade, invalid-risk rejection, gate/screen/pii risk bands + fixed
+  points, abstention precedence over risk, `riskCutDelta` unit + other
+  policies ignore risk, tool-level screen/pii risk).
+- `tests/t3_refute_bands.mjs` — 20 checks (fut-b-semantica T3:
+  CONTRADICTED positive + negative (handler + engine, verify + gate),
+  0.80 refutation edge, both-firm conflict, missing-probe ABSTAIN,
+  mid-band REVIEW reachability (verify/review/gate), legacy support-only
+  degrade, builder caps 32/30).
+- `tests/t4_semantica_edges.mjs` — 7 checks (fut-b-semantica T4 gap-fill:
+  risk-shifted strict edges for screen high/low + gate normal/low,
+  `claimContradicted` override inert, `normal` == unset for gate/pii,
+  screen/pii `risk` inputSchema shape).
 - No-regression vs Fase 2 (`519d3f0`), T8 re-run:
 
 | Check (command:result) | Fase 2 (`519d3f0`) | Now | Verdict + cause |
@@ -258,7 +306,7 @@ All pre-P1 MCP vocabularies below were verified old-vs-new (`git show
 | `laya_decide` | `confidence` dict, requirement verdicts | `distribution` + `winner_probability`, requirements as `{signal, supported}` (display-only; the policy owns the cut), `decision` (decide@1.0.0) |
 | `laya_compare` | `confidence` dict per judgment | `distribution` + `winner_probability` per judgment, `decision` (compare@1.0.0) |
 | `laya_extract` | `confidence` number (0 when missing) | `winner_probability` (null when missing/empty), `decision` (extract@1.0.0). Entity mode keeps `span` + `detector_score` |
-| `laya_pii` | `action: block/review/pass` | `decision` (pii@1.0.0 over the shared secret table), enriched findings (`entity_type`, `span`, `detector_score`, `laya_signal: null`, `category`, `finding_status: "candidate"`, `type` alias kept) |
+| `laya_pii` | `action: block/review/pass` | `decision` (pii@1.0.0 over the shared secret table), enriched findings (`entity_type`, `span`, `detector_score`, `laya_signal` (reserved-null in P1; real per-span judge signal since fut-b-semantica T2, `null` + note when unjudged), `category`, `finding_status: "candidate"`, `type` alias kept) |
 
 ## 9. Risks
 
@@ -267,24 +315,37 @@ All pre-P1 MCP vocabularies below were verified old-vs-new (`git show
   must not read them as probabilities; env overrides move uncalibrated cuts
   without calibrating them. Any future calibration needs a harness that
   does not exist here (explicitly out of scope).
-- **`CONTRADICTED` is reserved, never emitted from support signals.**
-  A low support signal is absence of evidence, never refutation:
-  contradiction needs positive refutation evidence no v1 detector carries.
-  The engine reason code `verify_contradicted_deny` exists and is covered in
-  the engine battery, but it is reachable only with hand-built evidence with
-  the abstention flag cleared — never via handlers (evidence constructors
-  abstain on the low/mid bands first, so the global rule fires instead).
-- **`risk` is accepted but ignored in v1.** `RiskTier` is validated and
-  forwarded, yet no v1 policy branches on it (pinned by tests: identical
-  firm evidence decides identically under `low` vs `high`; `high` never
-  rescues missing signals or abstention). Callers must not assume tiered
-  strictness until a calibrated policy version introduces it.
-- **REVIEW/DENY are unreachable under the global abstain rule.** When
-  evidence abstains, the engine returns ESCALATE before any policy runs, so
-  no fail-closed posture can be expressed as "DENY on abstain" — v1
-  expresses it as "never ALLOW" (`security@1.0.0`). Informational policies
-  (`find`/`rerank`/`classify`/`compare`/`extract`/`decide`) never return
-  REVIEW or DENY at all; `review`/`gate`/`code-review` never return DENY.
+- **`CONTRADICTED` is emitted, but ONLY on positive refutation (since
+  fut-b-semantica T3).** A low support signal is still absence of
+  evidence, never refutation — but a FIRM denial from the dedicated
+  `refute_<i>` probe (>= shared 0.8 cut) PLUS weak support (< 0.8) now
+  labels the claim `CONTRADICTED` (`verify_contradicted_deny` DENY in
+  `verify`, `gate_contradicted_escalate` ESCALATE in `gate`). Both probes
+  firm means conflicting evidence (`INSUFFICIENT_EVIDENCE`, REVIEW —
+  never a silent confirm). Legacy support-only evidence (no `refute_<i>`
+  signals) still cannot DENY (absence != refutation); an explicit null on
+  either probe is a missing signal (-> ESCALATE), never a weak one.
+- **`risk` is effective where documented (since fut-b-semantica T2),
+  ignored everywhere else.** `gate`/`screen` shift numeric bands by the
+  shared `RISK_CUT_DELTA` (0.05 — an uncalibrated documented step, same
+  honesty as the v1 table, NOT a calibrated cut); `pii` moves only its
+  non-secret branch (high fails closed, low relaxes). `normal`/unset is
+  byte-identical to the pre-T2 cuts (no version bump: all policies stay
+  `1.0.0`). Fixed points at every tier: the global abstain rule,
+  missing-signal escalations, contradicted-claim exits, secret DENY,
+  clean ALLOW, the substance cut. Callers must still not read any cut as
+  a probability.
+- **REVIEW/DENY are reachable via the handlers (since fut-b-semantica
+  T3).** The global abstain rule is unchanged — real abstention still
+  precedes every band — but band-position abstention is gone: a present
+  mid/low signal is firm evidence for its REVIEW/DENY band, not
+  ambiguity. Evidence abstains ONLY on missing/degraded input (null
+  signals, empty claims, missing `safe_to_apply`). Reachable now:
+  `verify` REVIEW (unsupported) + DENY (positively-refuted),
+  `review`/`gate` REVIEW (mid-band safety), `screen` DENY/REVIEW
+  (injection bands), `pii` DENY (secret, plus high-risk non-secret).
+  Still never: DENY from `review`/`gate`/`code-review`/informational
+  policies, ALLOW from `security`.
 - **Documented blind spots (pinned adversarially in T7, not fixed).**
   Zero-width-evaded instructions can miss the detector (the output still
   grants no permission); spaced-out secrets can miss GLiNER stubs (ALLOW
@@ -294,9 +355,16 @@ All pre-P1 MCP vocabularies below were verified old-vs-new (`git show
   consistency check). The screen-pass property ("detector, never authority")
   is documented in README and tested adversarially, but enforcement lives
   with the calling agent/policy, not in this repo.
-- **PII pipeline has no Laya judge in v1.** `laya_signal` is explicitly
-  null and the count-based policy is preserved; weak-type-only scans
-  abstain to ESCALATE rather than guessing.
+- **PII pipeline carries a per-span Laya judge (since fut-b-semantica
+  T2).** `laya_signal` is the raw judge `noul` per finding (high supports
+  the span, low doubts it, `null` abstains with the reason in
+  `pipeline.laya_note`); `pipeline.laya_judged` is true iff every finding
+  carries a signal (vacuously true on zero spans, when no Laya call is
+  made). The signal is informational only: the policy still decides from
+  GLiNER candidate counts, `finding_status` stays `"candidate"`, and
+  weak-type-only scans still abstain to ESCALATE before any policy runs
+  (so the pii risk branches fire on engine-direct inputs — documented in
+  the policy header, not hidden).
 
 ## 10. Non-facts (explicitly did not happen)
 

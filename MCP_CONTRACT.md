@@ -61,7 +61,7 @@ are listed where they exist. Primitives come from `TOOL_PRIMITIVES`
 
 | Tool | Primitive | Input (required + optional) | Output (required keys) |
 |---|---|---|---|
-| `laya_screen` | `noul` | required: `text`, `purpose` | `signals`, `assessment`, `decision`, `latency_ms`, `evidence`, `abstention`, `authority_note` |
+| `laya_screen` | `noul` | required: `text`, `purpose`; optional: `risk` (`low`/`normal`/`high`, default `normal`; tightens/relaxes the injection bands) | `signals`, `assessment`, `decision`, `latency_ms`, `evidence`, `abstention`, `authority_note` |
 | `laya_verify` | `noul` | required: `claims`, `evidence` | `verdicts`, `decision`, `latency_ms`, `evidence`, `abstention` |
 | `laya_find` | `choice` | required: `query`, `candidates`; optional: `top_k` (max 250), `min_score` | `winner`, `exists`, `distribution`, `winner_probability`, `decision`, `latency_ms`, `evidence`, `abstention`, `pruned`, `pruning` |
 | `laya_rerank` | `noul` | required: `query`, `candidates`; optional: `top_k` (max 64) | `ranked`, `truncated`, `truncated_ids`, `decision`, `latency_ms`, `evidence`, `abstention`, `pruned`, `pruning` |
@@ -71,7 +71,7 @@ are listed where they exist. Primitives come from `TOOL_PRIMITIVES`
 | `laya_extract` | `choice` | required: `document`, `fields`; optional: `source` (`auto` default, `regex`, `entities`), `top_k`, `max_candidates`, `min_gliner_score` | `results`, `source`, `truncated`, `dropped`, `latency_ms`, `decision`, `evidence`, `abstention` |
 | `laya_review` | `score` | required: `request`, `diff`; optional: `tests` | `rubric`, `decision`, `latency_ms`, `evidence`, `abstention` |
 | `laya_gate` | `score` | required: `request`, `diff`, `claims`; optional: `evidence`, `context`, `risk` | `review`, `claims`, `decision`, `context`, `risk`, `latency_ms`, `evidence`, `abstention` |
-| `laya_pii` | `spans` | required: `text`; optional: `extra_types`. Served only while the GLiNER sidecar is live-ready. | `pipeline`, `findings`, `counts`, `secrets_found`, `decision`, `latency_ms`, `recommendation`, `evidence`, `abstention` |
+| `laya_pii` | `spans` | required: `text`; optional: `extra_types`, `risk` (`low`/`normal`/`high`, default `normal`; moves only the non-secret branch). Served only while the GLiNER sidecar is live-ready. | `pipeline`, `findings`, `counts`, `secrets_found`, `decision`, `latency_ms`, `recommendation`, `evidence`, `abstention` |
 | `laya_capabilities` | none (`null`) | optional: `timeout_ms` (integer, 100–30000, default 2000) | `models`, `backend`, `gliner`, `primitives`, `tools`, `policies`, `features`, `mode`, `schema_version`, `latency_ms` — plus OPTIONAL (never required) `modes`, `metrics` (Fase 6, §10) |
 
 Notes:
@@ -342,3 +342,29 @@ batteries listed in the intro):
 6. **Immutability**: no input path (args, `_meta`, text content) can
    change policy/config/mode/thresholds/permissions
    (`tests/fase6_t5_security_discovery.mjs`, 16 checks).
+
+## 11. fut-b-semantica surface deltas (T2-T4, classified per §6)
+
+Minor (additive, old clients keep working):
+
+1. **Optional `risk` input** on `laya_screen` and `laya_pii`
+   (`low`/`normal`/`high`, default `normal`; §3 rows above).
+   `laya_gate` already carried it. New optional input parameter.
+2. **`CONTRADICTED` verdicts now emitted** by `laya_verify`/`laya_gate`
+   on positive refutation only (firm `refute_<i>` denial + weak support).
+   No schema change: the outputSchema enum already carried
+   `CONTRADICTED` as reserved (verified against `50a9cbd`), and
+   `summary` already counted `contradicted`.
+3. **`laya_signal` values** in `laya_pii` findings are now real judge
+   signals where available (still `["number", "null"]` per the schema;
+   `null` + `pipeline.laya_note` reason when unjudged).
+
+Major (previously-valid inputs now rejected):
+
+4. **Claim caps tightened** for the two-questions-per-claim budget
+   (support + refutation probes): `laya_verify` 64 -> 32 claims,
+   `laya_gate` 61 -> 30 claims (`src/limits.ts`). Calls with 33-64 /
+   31-61 claims that succeeded before now fail `input_too_large`
+   (pinned in `tests/t6_limits.mjs` + `tests/t3_refute_bands.mjs`).
+   All 14 policies stay at `1.0.0` (risk `normal`/unset is byte-identical
+   to the pre-T2 cuts, so no policy version moved).

@@ -2,19 +2,21 @@
  * Fase-7 T3 eval suite: gate (laya_gate, completion gate).
  *
  * STUB MODEL: the rubric + per-claim stubs emulate what a real backend would
- * plausibly return for each completion: firm rubric with supported claims for
- * a truthful completion, edge-cut signals for a barely-passing one, mid-band
- * safety for an unverified one, contradictory high claims scored
- * independently (no cross-claim check, same as verify), a low claim signal
- * for refuted work, low safety alone for a risky-but-true completion, `{}`
- * for a dropped claim answer.
+ * plausibly return for each completion: firm rubric with supported claims
+ * (weak refutation) for a truthful completion, edge-cut signals for a
+ * barely-passing one, mid-band safety for an unverified one, contradictory
+ * high claims scored independently (no cross-claim check, same as verify),
+ * a firm refutation + low support pair for refuted work, low safety alone
+ * for a risky-but-true completion, `{}` for a dropped claim answer.
  *
  * STUB LIMITS (honesty): the stub is NOT the model. Safety and claim signals
- * are oracle-assigned: no completion-truthfulness claim transfers. v1 pins:
- * contradicted claims dominate safety (ESCALATE even when safe); low safety
- * WITHOUT contradicted claims only REVIEWs (deliberate difference from
- * review@1.0.0, which escalates on safety alone); mid-band safety abstains;
- * v1 never returns DENY (gate refuses authority; worst case is ESCALATE).
+ * are oracle-assigned: no completion-truthfulness claim transfers. Pins:
+ * contradicted claims (firm refutation + weak support) dominate safety
+ * (ESCALATE even when safe); low safety WITHOUT contradicted claims only
+ * REVIEWs (deliberate difference from review@1.0.0, which escalates on
+ * safety alone); mid-band safety reaches REVIEW (no band abstention since
+ * T3); low support alone never contradicts; v1 never returns DENY (gate
+ * refuses authority; worst case is ESCALATE).
  */
 import assert from "node:assert";
 import { handleGate } from "../../dist/tools/gate.js";
@@ -39,7 +41,7 @@ export const cases = [
     stub: {
       answers: {
         correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.95 },
-        claim_0: { noul: 0.9 },
+        claim_0: { noul: 0.9 }, refute_0: { noul: 0.1 },
       },
     },
     gold: { verdict: "SUPPORTED", decision: "ALLOW", abstained: false, why: "firm safety plus a verified claim auto-allows." },
@@ -52,7 +54,7 @@ export const cases = [
     stub: {
       answers: {
         correctness: { score: 1 }, spec_match: { score: 1 }, safe_to_apply: { noul: 0.86 },
-        claim_0: { noul: 0.8 },
+        claim_0: { noul: 0.8 }, refute_0: { noul: 0.1 },
       },
     },
     gold: { verdict: "SUPPORTED", decision: "ALLOW", abstained: false, why: "0.86 and 0.80 clear the strict auto and inclusive verified edges." },
@@ -65,10 +67,10 @@ export const cases = [
     stub: {
       answers: {
         correctness: { score: 1 }, spec_match: { score: 1 }, safe_to_apply: { noul: 0.7 },
-        claim_0: { noul: 0.9 },
+        claim_0: { noul: 0.9 }, refute_0: { noul: 0.1 },
       },
     },
-    gold: { verdict: "SUPPORTED", decision: "ESCALATE", abstained: true, why: "mid-band safety abstains even with a verified claim." },
+    gold: { verdict: "SUPPORTED", decision: "REVIEW", abstained: false, why: "mid-band safety is firm REVIEW evidence even with a verified claim." },
   },
   {
     id: "gate-adversarial-01",
@@ -78,7 +80,7 @@ export const cases = [
     stub: {
       answers: {
         correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.9 },
-        claim_0: { noul: 0.95 }, claim_1: { noul: 0.92 },
+        claim_0: { noul: 0.95 }, claim_1: { noul: 0.92 }, refute_0: { noul: 0.1 }, refute_1: { noul: 0.1 },
       },
     },
     gold: { verdicts: ["SUPPORTED", "SUPPORTED"], decision: "ALLOW", abstained: false, why: "v1 has no cross-claim check; contradictory truths both pass." },
@@ -91,10 +93,10 @@ export const cases = [
     stub: {
       answers: {
         correctness: { score: 1 }, spec_match: { score: 1 }, safe_to_apply: { noul: 0.9 },
-        claim_0: { noul: 0.2 },
+        claim_0: { noul: 0.2 }, refute_0: { noul: 0.9 },
       },
     },
-    gold: { verdict: "INSUFFICIENT_EVIDENCE", decision: "ESCALATE", abstained: false, why: "a contradicted claim escalates; high safety never rescues it." },
+    gold: { verdict: "CONTRADICTED", decision: "ESCALATE", abstained: false, why: "firm refutation with weak support contradicts the claim; high safety never rescues it." },
   },
   {
     id: "gate-negative-02",
@@ -104,7 +106,7 @@ export const cases = [
     stub: {
       answers: {
         correctness: { score: 1 }, spec_match: { score: 1 }, safe_to_apply: { noul: 0.4 },
-        claim_0: { noul: 0.9 },
+        claim_0: { noul: 0.9 }, refute_0: { noul: 0.1 },
       },
     },
     gold: { verdict: "SUPPORTED", decision: "REVIEW", abstained: false, why: "low safety alone only reviews; gate never escalates on safety alone." },
@@ -125,7 +127,7 @@ export const cases = [
     id: "gate-negative-limit-01",
     kind: "negative",
     input: { ...BASE, claims: Array.from({ length: 62 }, (_, i) => `claim ${i}`) },
-    oracle: "62 claims exceed the 3+61 question budget; builder must refuse.",
+    oracle: "62 claims exceed the 3 rubric + 2x30 question budget; builder must refuse.",
     stub: { answers: {} },
     expectError: "input_too_large",
     gold: { why: "over-budget claim lists fail fast instead of gating a subset." },

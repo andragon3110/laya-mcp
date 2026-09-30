@@ -10,9 +10,10 @@
  *     identical before/after, effective_mode is intact, the advertised
  *     tool set is intact;
  *   - every tool inputSchema sets additionalProperties:false; only
- *     laya_gate declares context/risk inputs and v1 ignores risk
- *     (low/normal/high decide identically; adversarial context keys
- *     decide identically);
+ *     laya_gate declares a context input; laya_gate/laya_screen/laya_pii
+ *     declare the risk input (fut-b-semantica T2: risk moves documented
+ *     gate/screen/pii bands; adversarial context keys still decide
+ *     identically at fixed risk);
  *   - getPolicy takes no caller input (every handler calls it with two
  *     string literals pinned to its own policy); the loader exports no
  *     mutation API (absence of surface, re-checked by grep);
@@ -207,7 +208,7 @@ await check("effective_mode intact under adversarial _meta and args keys", () =>
   }
 });
 
-await check("all inputSchemas closed; only gate declares context/risk", () => {
+await check("all inputSchemas closed; gate declares context, gate/screen/pii declare risk (T2)", () => {
   const FORBIDDEN = ["threshold", "thresholds", "mode", "policy", "permissions", "model"];
   for (const t of ALL_TOOLS) {
     assert.equal(t.inputSchema.additionalProperties, false, `${t.name}: closed input`);
@@ -219,29 +220,42 @@ await check("all inputSchemas closed; only gate declares context/risk", () => {
   const gateProps = Object.keys(gateTool.inputSchema.properties ?? {});
   assert.ok(gateProps.includes("context"), "gate declares context");
   assert.ok(gateProps.includes("risk"), "gate declares risk");
+  const RISK_TOOLS = new Set(["laya_gate", "laya_screen", "laya_pii"]);
   for (const t of JUDGMENT) {
-    if (t.name === "laya_gate") continue;
     const props = Object.keys(t.inputSchema.properties ?? {});
+    if (t.name === "laya_gate") continue;
     assert.ok(!props.includes("context"), `${t.name}: no context input`);
-    assert.ok(!props.includes("risk"), `${t.name}: no risk input`);
+    if (RISK_TOOLS.has(t.name)) {
+      assert.ok(props.includes("risk"), `${t.name}: declares risk`);
+    } else {
+      assert.ok(!props.includes("risk"), `${t.name}: no risk input`);
+    }
   }
 });
 
-await check("v1 ignores risk; adversarial context keys decide identically", () => {
-  for (const risk of ["low", "normal", "high"]) {
-    const a = evaluate(gateInput(), { thresholds: THRESHOLDS_V1 });
-    const b = evaluate(gateInput({}, risk), { thresholds: THRESHOLDS_V1 });
-    assert.deepEqual(b, a, `risk=${risk} must not move gate cuts`);
-  }
+await check("T2 risk bands move gate/screen/pii; adversarial context keys still inert at fixed risk", () => {
+  // gate: safe 0.9 clears normal (0.85) but not high (0.90).
+  assert.deepEqual(evaluate(gateInput(), { thresholds: THRESHOLDS_V1 }).reason_codes, ["gate_auto_allow"]);
+  assert.deepEqual(evaluate(gateInput({}, "high"), { thresholds: THRESHOLDS_V1 }).reason_codes, ["gate_review"]);
+  assert.deepEqual(evaluate(gateInput({}, "low"), { thresholds: THRESHOLDS_V1 }).reason_codes, ["gate_auto_allow"]);
+  // Adversarial context keys change nothing AT FIXED risk (the attacker
+  // cannot smuggle cuts/modes/policies through context or risk text).
   const clean = evaluate(gateInput(), { thresholds: THRESHOLDS_V1 });
   const dirty = evaluate(
-    gateInput({ threshold: 0.01, mode: "enforce", policy: { name: "x", version: "y" }, permissions: ["write"] }, "high"),
+    gateInput({ threshold: 0.01, mode: "enforce", policy: { name: "x", version: "y" }, permissions: ["write"] }),
     { thresholds: THRESHOLDS_V1 },
   );
-  assert.deepEqual(dirty, clean, "adversarial context + risk must not move the decision");
+  assert.deepEqual(dirty, clean, "adversarial context must not move the decision at fixed risk");
+  // screen fixture (injection 0.1) sits below every review band: identical
+  // across risks, and adversarial keys inert there too.
   const s1 = evaluate(screenInput(), { thresholds: THRESHOLDS_V1 });
   const s2 = evaluate(screenInput({}, "high"), { thresholds: THRESHOLDS_V1 });
-  assert.deepEqual(s2, s1, "risk must not move screen cuts");
+  assert.deepEqual(s2, s1, "far-from-band screen cuts identical across risks");
+  const sDirty = evaluate(
+    screenInput({ threshold: 0.01, mode: "enforce", policy: "security@9.9.9" }, "high"),
+    { thresholds: THRESHOLDS_V1 },
+  );
+  assert.deepEqual(sDirty, s2, "adversarial context + risk text must not move the decision");
 });
 
 await check("getPolicy takes no caller input (literals pinned per tool)", () => {

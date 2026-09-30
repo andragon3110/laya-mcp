@@ -16,10 +16,13 @@
  * - maxFindCandidates=250 honours the long-standing "up to 250" description,
  *   now enforced (previously silently sliced by Array iteration -- every
  *   candidate became a criterion, so >250 just built ever-larger payloads).
- * - Per-tool item caps derive from the 1-item = 1-question fan-out: classify
- *   items, verify claims and rerank candidates each become exactly one
+ * - Per-tool item caps derive from the question fan-out: classify
+ *   items and rerank candidates each become exactly one
  *   /predict question, so their caps sit at or under the 64-question budget.
- *   Gate keeps 3 fixed rubric questions, hence 61 claims (3 + 61 = 64).
+ *   Verify and gate ask TWO questions per claim (support + refutation since
+ *   fut-b-semantica T3, so absence of support is never read as denial):
+ *   verify caps at 32 claims (2x32 = 64), gate keeps 3 fixed rubric
+ *   questions, hence 30 claims (3 + 2x30 = 63 <= 64).
  * - maxRerankCandidateChars=2000 makes the old "(truncated to 2,000 chars
  *   internally)" description real -- previously zero code hits.
  * - maxExtractCandidates=20 keeps the existing slice(0,20) behaviour but
@@ -41,8 +44,8 @@ export const LIMITS = {
   maxDecideOptions: 6,
   maxDecideRequirements: 32,
   maxClassifyItems: 64,
-  maxVerifyClaims: 64,
-  maxGateClaims: 61,
+  maxVerifyClaims: 32,
+  maxGateClaims: 30,
   maxCompareAspects: 32,
   maxRerankCandidates: 64,
   maxRerankCandidateChars: 2000,

@@ -23,9 +23,17 @@
  *   - "screen_missing_signal"    (ESCALATE) injection or substance null/absent
  *   - "abstained_evidence"       (ESCALATE) global rule, applied in engine.ts
  *     before this policy runs (missing Router answers abstain in evidence.ts).
+ *
+ * Risk (fut-b-semantica T2): `risk` moves ONLY the two injection cuts by
+ * the shared RISK_CUT_DELTA (thresholds.ts) -- high tightens (block 0.70 /
+ * review 0.20), low relaxes (block 0.80 / review 0.30) with default
+ * thresholds. The substance cut is fixed (not a safety band). No version
+ * bump: risk "normal"/unset is byte-identical to the pre-T2 cuts, and
+ * reason codes are unchanged.
  */
 import type { Signal } from "../../evidence.js";
 import type { PolicyThresholds } from "../thresholds.js";
+import { riskCutDelta } from "../thresholds.js";
 import type { PolicyDecision, PolicyDefinition, PolicyEvalContext } from "../types.js";
 
 function noul(signals: Signal[], question: string): number | null {
@@ -46,10 +54,17 @@ export const screenPolicy: PolicyDefinition = {
     if (injection === null || substance === null) {
       return { decision: "ESCALATE", reason_codes: ["screen_missing_signal"], policy };
     }
-    if (injection > t.screenInjectionBlock) {
+    // fut-b-semantica T2 (risk-effective, no bump: risk "normal"/unset keeps
+    // the v1 0.75/0.25 cuts byte-identical): risk shifts ONLY the injection
+    // cuts -- high lowers them (easier to DENY/REVIEW), low raises them.
+    // Exact-edge semantics stay strict >/ <: 0.70/0.80 -> REVIEW (not block)
+    // under high/low respectively. The substance cut and the missing-signal
+    // exit are fixed points -- risk never moves them.
+    const delta = riskCutDelta(ctx.risk);
+    if (injection > t.screenInjectionBlock - delta) {
       return { decision: "DENY", reason_codes: ["screen_injection_block"], policy };
     }
-    if (injection > t.screenInjectionReview) {
+    if (injection > t.screenInjectionReview - delta) {
       return { decision: "REVIEW", reason_codes: ["screen_injection_review"], policy };
     }
     if (substance < t.screenSubstanceSkip) {

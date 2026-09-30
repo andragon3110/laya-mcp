@@ -306,22 +306,66 @@ export function screenEvidence(
   };
 }
 
+/**
+ * fut-b-semantica T3: per-claim evidence input for verify/gate.
+ *
+ * `signal` is the support probe (does the evidence state/imply the claim?);
+ * `refute` is the SEPARATE refutation probe (does the evidence DENY the
+ * claim? -- positive refutation only, never absence/silence). `refute` is
+ * optional so legacy support-only callers keep compiling: an absent field
+ * emits no `refute_<i>` signal and the policy judges on support alone (DENY
+ * unreachable on that path); a present-but-null field emits an explicit
+ * null signal, which is a missing signal (ESCALATE), never a weak one.
+ */
+export interface ClaimEvidenceInput {
+  claim: string;
+  signal: number | null;
+  verdict: string;
+  refute?: number | null;
+}
+
 export function verifyEvidence(
   raw: Pick<PredictResult, "model" | "routing">,
-  input: { claims: Array<{ claim: string; signal: number | null; verdict: string }> },
+  input: { claims: ClaimEvidenceInput[] },
 ): { evidence: Evidence; abstention: Abstention } {
-  const signals = input.claims.map((c, i) =>
-    noulSignal(raw, `claim_${i}`, c.signal, { candidate: String(c.claim), metadata: { verdict: c.verdict } }),
-  );
+  const signals = input.claims.flatMap((c, i) => {
+    const out = [
+      noulSignal(raw, `claim_${i}`, c.signal, { candidate: String(c.claim), metadata: { verdict: c.verdict } }),
+    ];
+    // fut-b-semantica T3: the refutation probe travels as its own signal
+    // (`refute_<i>`, metadata.refutation) so absence of support is never
+    // read as denial. A present-but-null refutation is a missing signal;
+    // an ABSENT refute field is legacy support-only evidence (the policy
+    // judges it on support alone, with DENY unreachable on that path).
+    if (c.refute !== undefined) {
+      out.push(
+        noulSignal(raw, `refute_${i}`, c.refute ?? null, {
+          candidate: String(c.claim),
+          metadata: { refutation: true, verdict: c.verdict },
+        }),
+      );
+    }
+    return out;
+  });
+  // fut-b-semantica T3 (BREAKING vs P1-T5/T3): band abstention is gone.
+  // Low/mid support bands are policy business (REVIEW via
+  // verify_unsupported_review); evidence abstains ONLY on missing/degraded
+  // input (zero claims, null support, unanswered refutation probe). This is
+  // what makes the REVIEW/DENY bands reachable via the handler: the engine
+  // global rule now fires on genuine missing signals, never on band
+  // position. No threshold literal remains here (the 0.4/0.8 literals are
+  // gone with the band filters; cuts live in the shared policy table).
   let abstention = notAbstained();
   if (input.claims.length === 0) {
     abstention = abstained("no claims provided; nothing to verify");
   } else {
-    const low = input.claims.filter((c) => (c.signal ?? 0) < 0.4);
-    const mid = input.claims.filter((c) => (c.signal ?? 0) >= 0.4 && (c.signal ?? 0) < 0.8);
-    if (low.length > 0) abstention = abstained(`${low.length} claim(s) in low-signal zone (<0.40): insufficient evidence`);
-    else if (mid.length > 0)
-      abstention = abstained(`${mid.length} claim(s) in mid-signal zone (0.40-0.80): ambiguous support`);
+    const missingSupport = input.claims.filter((c) => c.signal === null || c.signal === undefined);
+    const missingRefute = input.claims.filter((c) => c.refute !== undefined && (c.refute ?? null) === null);
+    if (missingSupport.length > 0) {
+      abstention = abstained(`missing Router support signal(s) for ${missingSupport.length} claim(s)`);
+    } else if (missingRefute.length > 0) {
+      abstention = abstained(`missing Router refutation signal(s) for ${missingRefute.length} claim(s)`);
+    }
   }
   return { evidence: makeEvidence(raw, signals, "router"), abstention };
 }
@@ -509,14 +553,15 @@ export function reviewEvidence(
     noulSignal(raw, "safe_to_apply", input.safe_to_apply),
   ];
   const s = input.safe_to_apply;
+  // fut-b-semantica T3 (BREAKING vs P1-T3): the mid-band safe_to_apply
+  // abstention is gone. A present signal in the (0.5, 0.85] REVIEW zone is
+  // firm evidence for human review, not ambiguity: abstaining on it made
+  // review_needs_review unreachable via the handler (the engine global rule
+  // always won). Evidence abstains ONLY on a missing signal; the policy
+  // owns every band. Missing rubric scores stay audit-only (never abstain).
   return {
     evidence: makeEvidence(raw, signals, "router"),
-    abstention:
-      s === null || s === undefined
-        ? abstained("missing safe_to_apply signal")
-        : s > 0.5 && s <= 0.85
-          ? abstained(`safe_to_apply in mid band (${s.toFixed(2)}): neither firm auto nor firm escalate`)
-          : notAbstained(),
+    abstention: s === null || s === undefined ? abstained("missing safe_to_apply signal") : notAbstained(),
   };
 }
 
@@ -526,26 +571,40 @@ export function gateEvidence(
     correctness: number | null;
     spec_match: number | null;
     safe_to_apply: number | null;
-    claims: Array<{ claim: string; signal: number | null; verdict: string }>;
+    claims: ClaimEvidenceInput[];
   },
 ): { evidence: Evidence; abstention: Abstention } {
   const signals = [
     scoreSignal(raw, "correctness", input.correctness),
     scoreSignal(raw, "spec_match", input.spec_match),
     noulSignal(raw, "safe_to_apply", input.safe_to_apply),
-    ...input.claims.map((c, i) =>
-      noulSignal(raw, `claim_${i}`, c.signal, { candidate: String(c.claim), metadata: { verdict: c.verdict } }),
-    ),
+    ...input.claims.flatMap((c, i) => {
+      const out = [
+        noulSignal(raw, `claim_${i}`, c.signal, { candidate: String(c.claim), metadata: { verdict: c.verdict } }),
+      ];
+      // fut-b-semantica T3: same refutation-probe contract as verifyEvidence
+      // (separate `refute_<i>` signal; absence of support is never denial).
+      if (c.refute !== undefined) {
+        out.push(
+          noulSignal(raw, `refute_${i}`, c.refute ?? null, {
+            candidate: String(c.claim),
+            metadata: { refutation: true, verdict: c.verdict },
+          }),
+        );
+      }
+      return out;
+    }),
   ];
   const s = input.safe_to_apply;
+  // fut-b-semantica T3 (BREAKING vs P1-T3): the mid-band safe_to_apply
+  // abstention is gone, same rationale as reviewEvidence -- a present
+  // mid-band signal is firm REVIEW evidence (gate_review), not ambiguity.
+  // Unchanged: null/missing claim or refutation signals do NOT abstain here;
+  // they stay policy-owned (gate_missing_signal -> ESCALATE), pinned by the
+  // handler batteries.
   return {
     evidence: makeEvidence(raw, signals, "router"),
-    abstention:
-      s === null || s === undefined
-        ? abstained("missing safe_to_apply signal")
-        : s > 0.5 && s <= 0.85
-          ? abstained(`safe_to_apply in mid band (${s.toFixed(2)}): neither firm auto nor firm escalate`)
-          : notAbstained(),
+    abstention: s === null || s === undefined ? abstained("missing safe_to_apply signal") : notAbstained(),
   };
 }
 

@@ -16,10 +16,9 @@
  *     plain "hello" clean and "a@b.c" weak-only; no obfuscated input exists.
  *   - flat distributions via HANDLER (find tie, decide 1/N flat, classify
  *     empty dict): policy_engine.mjs covers them at engine level only.
- *   - risk invariance + abstention-dominance: policy_engine.mjs asserts
- *     risk does not move the screen cut once; t5 asserts gate risk:high
- *     ALLOWs once. No test pairs low/high on identical evidence, and no
- *     test combines risk:high with abstained evidence.
+ *   - risk bands + abstention-dominance (fut-b-semantica T2): gate/screen/pii
+ *     move documented bands with risk (low/normal/high); the engine global
+ *     abstain rule still wins over risk:high on abstained evidence.
  *   - env overrides via HANDLER (screen block cut, pii secret set):
  *     policy_engine.mjs covers pure resolveThresholds only; no test proves
  *     a handler picks the override up end to end.
@@ -75,6 +74,18 @@ const span = (type, text = `x-${type}`, confidence = 0.9) => ({
   confidence,
 });
 
+// fut-b-semantica T2: the judge confirms every span it is asked about.
+const fakeJudgeClient = (noul = 0.9) => ({
+  predict: async (_state, questions) => ({
+    answers: Object.fromEntries(Object.keys(questions).map((qid) => [qid, { noul }])),
+    confidence: {},
+    routing: {},
+    model: "t7-judge",
+    latencyMs: 3,
+    usage: {},
+  }),
+});
+
 let passed = 0;
 function check(name, fn) {
   return Promise.resolve()
@@ -94,8 +105,9 @@ await check("all 11 handlers wire handler->evidence->engine with versioned polic
     }), { request: "r", diff: "d" })],
     ["gate", handleGate(fakeClient({
       correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.9 }, claim_0: { noul: 0.9 },
+      refute_0: { noul: 0.1 },
     }), { request: "r", diff: "d", claims: ["tests pass"], evidence: "log" })],
-    ["verify", handleVerify(fakeClient({ claim_0: { noul: 0.95 } }), { claims: ["sky is blue"], evidence: "log" })],
+    ["verify", handleVerify(fakeClient({ claim_0: { noul: 0.95 }, refute_0: { noul: 0.1 } }), { claims: ["sky is blue"], evidence: "log" })],
     ["screen", handleScreen(
       fakeClient({ is_injection: { noul: 0.1 }, has_substance: { noul: 0.9 }, is_relevant: { noul: 0.9 } }),
       { text: "hello world", purpose: "test" },
@@ -145,8 +157,18 @@ await check("all 11 handlers wire handler->evidence->engine with versioned polic
 
 // ------------------------------------------------------------------ semantic ---
 const verifyArgs = (claims) => ({ claims, evidence: "log" });
-const verifyAnswers = (signals) =>
-  Object.fromEntries(signals.map((v, i) => [`claim_${i}`, v === null ? {} : { noul: v }]));
+// T3: every support stub gets a weak refutation answer by default (no
+// denial); refutation cases pin their own refute_N answers inline.
+const verifyAnswers = (signals, refutes = []) =>
+  Object.fromEntries(
+    signals.flatMap((v, i) => {
+      const r = i < refutes.length ? refutes[i] : 0.1;
+      return [
+        [`claim_${i}`, v === null ? {} : { noul: v }],
+        [`refute_${i}`, r === null ? {} : { noul: r }],
+      ];
+    }),
+  );
 
 await check("semantic: signal exactly 0.80 -> SUPPORTED + ALLOW (verified edge)", async () => {
   const body = JSON.parse(await handleVerify(fakeClient(verifyAnswers([0.8])), verifyArgs(["edge claim"])));
@@ -156,12 +178,12 @@ await check("semantic: signal exactly 0.80 -> SUPPORTED + ALLOW (verified edge)"
   assert.deepEqual(body.decision.reason_codes, ["verify_all_verified"]);
 });
 
-await check("semantic: signal exactly 0.40 -> INSUFFICIENT_EVIDENCE + abstained ESCALATE (mid-band floor)", async () => {
+await check("semantic: signal exactly 0.40 -> INSUFFICIENT_EVIDENCE + REVIEW (T3: mid band reachable, no abstention)", async () => {
   const body = JSON.parse(await handleVerify(fakeClient(verifyAnswers([0.4])), verifyArgs(["floor claim"])));
   assert.equal(body.verdicts[0].verdict, "INSUFFICIENT_EVIDENCE");
-  assert.equal(body.abstention.abstained, true);
-  assert.equal(body.decision.decision, "ESCALATE");
-  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+  assert.equal(body.abstention.abstained, false);
+  assert.equal(body.decision.decision, "REVIEW");
+  assert.deepEqual(body.decision.reason_codes, ["verify_unsupported_review"]);
 });
 
 await check("semantic: mutually-contradictory claims both high -> both SUPPORTED + ALLOW (v1 has no cross-claim check)", async () => {
@@ -231,15 +253,16 @@ await check("adversarial: spaced-out secret missed by GLiNER stub -> ALLOW with 
   assert.equal(body.decision.decision, "ALLOW");
   assert.deepEqual(body.evidence.signals, []);
   assert.equal(body.abstention.abstained, false);
-  assert.equal(body.pipeline.laya_judged, false);
+  assert.equal(body.pipeline.laya_judged, true, "T2: vacuous cover, no Laya call on zero spans");
 });
 
 await check("adversarial: '[at]/[dot]'-obfuscated email hit -> ESCALATE abstained (ambiguous detector judgment)", async () => {
   const body = JSON.parse(
-    await handlePii({}, { text: "reach me at a [at] b [dot] c" }, fakePiiCtx([span("email", "a [at] b [dot] c")])),
+    await handlePii(fakeJudgeClient(), { text: "reach me at a [at] b [dot] c" }, fakePiiCtx([span("email", "a [at] b [dot] c")])),
   );
   assert.equal(body.findings[0].category, "pii");
   assert.equal(body.findings[0].finding_status, "candidate");
+  assert.equal(body.findings[0].laya_signal, 0.9, "T2: judge informs even when policy abstains");
   assert.equal(body.abstention.abstained, true);
   assert.equal(body.decision.decision, "ESCALATE");
   assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
@@ -286,17 +309,25 @@ await check("flat: classify empty distribution via handler -> null winner + ESCA
 });
 
 // ------------------------------------------------------------------- risk ---
-const gateAnswers = ({ correctness = 2, spec_match = 2, safe = 0.9, claims = [] } = {}) => ({
+const gateAnswers = ({ correctness = 2, spec_match = 2, safe = 0.9, claims = [], refutes = [] } = {}) => ({
   correctness: { score: correctness },
   spec_match: { score: spec_match },
   ...(safe === null ? {} : { safe_to_apply: { noul: safe } }),
   ...Object.fromEntries(claims.map((v, i) => [`claim_${i}`, v === null ? {} : { noul: v }])),
+  // T3: weak refutation answers by default (no denial).
+  ...Object.fromEntries(
+    claims.map((_, i) => {
+      const r = i < refutes.length ? refutes[i] : 0.1;
+      return [`refute_${i}`, r === null ? {} : { noul: r }];
+    }),
+  ),
 });
 const gateArgs = (claims, extra = {}) => ({ request: "r", diff: "d", claims, evidence: "log", ...extra });
 
 await check("risk: gate missing-signal evidence + risk high still ESCALATEs missing (risk never rescues)", async () => {
-  // gateEvidence abstains only on safe_to_apply bands (not on missing
-  // claims), so the engine exits via gate_missing_signal -- pinned in t5.
+  // gateEvidence abstains only on a missing safe_to_apply signal (T3: band
+  // abstention is gone; not on missing claims either), so the engine exits
+  // via gate_missing_signal -- pinned in t5.
   // The point here: risk:high changes neither the code nor the outcome.
   const body = JSON.parse(
     await handleGate(fakeClient(gateAnswers({ safe: 0.9, claims: [null] })), gateArgs(["a"], { risk: "high" })),
@@ -311,13 +342,16 @@ await check("risk: gate missing-signal evidence + risk high still ESCALATEs miss
   assert.deepEqual(normal.decision, body.decision);
 });
 
-await check("risk: gate low vs high on identical firm evidence -> identical ALLOW (v1 ignores risk)", async () => {
+await check("risk: gate low vs high on identical firm evidence -> high tightens (T2 bands)", async () => {
+  // safe 0.9 clears normal (0.85) and low (0.80) but not high (0.90).
   const mk = (risk) =>
     handleGate(fakeClient(gateAnswers({ safe: 0.9, claims: [0.9] })), gateArgs(["a"], { risk }));
   const low = JSON.parse(await mk("low"));
   const high = JSON.parse(await mk("high"));
   assert.equal(low.decision.decision, "ALLOW");
-  assert.deepEqual(low.decision, high.decision);
+  assert.deepEqual(low.decision.reason_codes, ["gate_auto_allow"]);
+  assert.equal(high.decision.decision, "REVIEW");
+  assert.deepEqual(high.decision.reason_codes, ["gate_review"]);
   assert.equal(high.risk, "high");
 });
 
@@ -369,14 +403,14 @@ await check("policy override: LAYA_POLICY_SECRET_TYPES moves the pii handler cut
     // Default table: passport is not a secret -> weak-only scan abstains.
     delete process.env.LAYA_POLICY_SECRET_TYPES;
     const before = JSON.parse(
-      await handlePii({}, { text: "passport X123" }, fakePiiCtx([span("passport", "X123")])),
+      await handlePii(fakeJudgeClient(), { text: "passport X123" }, fakePiiCtx([span("passport", "X123")])),
     );
     assert.equal(before.abstention.abstained, true);
     assert.deepEqual(before.decision.reason_codes, ["abstained_evidence"]);
     // Operator override adds passport to the secret set -> DENY.
     process.env.LAYA_POLICY_SECRET_TYPES = "api_key,token_secreto,password,passport";
     const after = JSON.parse(
-      await handlePii({}, { text: "passport X123" }, fakePiiCtx([span("passport", "X123")])),
+      await handlePii(fakeJudgeClient(), { text: "passport X123" }, fakePiiCtx([span("passport", "X123")])),
     );
     assert.equal(after.abstention.abstained, false);
     assert.equal(after.decision.decision, "DENY");

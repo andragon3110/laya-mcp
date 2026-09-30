@@ -51,7 +51,16 @@ export interface PolicyThresholds {
   screenSubstanceSkip: number;
   /** Shared verify+gate cut: signal >= this is a verified claim. */
   claimVerified: number;
-  /** Shared verify+gate cut: signal < this is a contradicted claim. */
+  /**
+   * Legacy verify+gate low-support cut (v1 0.4, `<` contradicted).
+   *
+   * fut-b-semantica T3: verify@1.0.0 and gate@1.0.0 NO LONGER consult this
+   * field -- inferring contradiction from low support labelled absence of
+   * evidence a refutation. CONTRADICTED now needs a firm refutation probe
+   * (refute >= claimVerified) plus weak support. The field stays in the
+   * table (defaults, LAYA_POLICY_CLAIM_CONTRADICTED override, and the
+   * v1-defaults battery) for compat; no value changed (NOT calibrated).
+   */
   claimContradicted: number;
   /** Shared review+gate+code-review cut: safe_to_apply > this is auto/allow. */
   reviewAuto: number;
@@ -75,6 +84,30 @@ export const THRESHOLDS_V1: PolicyThresholds = {
   requireSupport: 0.8,
   secretTypes: ["api_key", "token_secreto", "password"],
 };
+
+/**
+ * fut-b-semantica T2: risk strictness delta (NOT calibrated -- same honesty
+ * as the v1 table above: a documented step, not a measured cut).
+ *
+ * Semantics (per-policy documentation owns the exact application):
+ *   - risk "high" tightens bands by +DELTA (harder to ALLOW, easier to
+ *     DENY/REVIEW/ESCALATE-adjacent outcomes);
+ *   - risk "low" relaxes bands by -DELTA;
+ *   - risk "normal" (default) applies zero delta: byte-identical v1 cuts.
+ *
+ * Fixed points (never moved by risk, in any policy): the global abstention
+ * rule (engine.ts), missing-signal escalations, and confirmed-harm exits
+ * (e.g. contradicted-claim escalation, secret DENY, clean ALLOW). Risk moves
+ * leniency bands only, never safety floors.
+ */
+export const RISK_CUT_DELTA = 0.05;
+
+/** Pure resolver: signed cut adjustment for a risk tier (0 when unset/unknown). */
+export function riskCutDelta(risk: string | undefined): number {
+  if (risk === "high") return RISK_CUT_DELTA;
+  if (risk === "low") return -RISK_CUT_DELTA;
+  return 0;
+}
 
 /** Env var names for each override (single source; loader/tests reuse). */
 export const THRESHOLD_ENV_VARS = {

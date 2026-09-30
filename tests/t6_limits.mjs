@@ -129,8 +129,10 @@ check("extract tool builder exposes budget errors", () => {
 });
 
 // verify / screen / review / gate / compare / pii text+count caps.
-check("verify 64 claims ok, 65 throws; long evidence throws", () => {
-  const claims = Array.from({ length: 64 }, (_, i) => `claim ${i}`);
+check("verify 32 claims ok (64 questions: support+refute each), 33 throws; long evidence throws", () => {
+  const claims = Array.from({ length: 32 }, (_, i) => `claim ${i}`);
+  // fut-b-semantica T3: two server questions per claim (support probe +
+  // dedicated refutation probe) -- the 64-question budget caps claims at 32.
   assert.equal(Object.keys(verifyTool.buildQuestions({ claims, evidence: "e" })).length, 64);
   throwsInputTooLarge(
     () => verifyTool.buildQuestions({ claims: [...claims, "one more"], evidence: "e" }),
@@ -144,9 +146,13 @@ check("screen long text throws", () => {
 check("review long diff throws", () => {
   throwsInputTooLarge(() => reviewTool.buildQuestions({ request: "r", diff: "d".repeat(20001) }), "diff");
 });
-check("gate 61 claims ok, 62 throws", () => {
-  const claims = Array.from({ length: 61 }, (_, i) => `claim ${i}`);
-  assert.ok(gateTool.buildQuestions({ request: "r", diff: "d", claims }).correctness);
+check("gate 30 claims ok (3 rubric + 60 = 63 questions), 31 throws", () => {
+  const claims = Array.from({ length: 30 }, (_, i) => `claim ${i}`);
+  // fut-b-semantica T3: 3 fixed rubric questions + two per claim (support +
+  // refutation) -- 3 + 2x30 = 63 fits the 64-question server budget.
+  const q = gateTool.buildQuestions({ request: "r", diff: "d", claims });
+  assert.ok(q.correctness);
+  assert.equal(Object.keys(q).length, 63);
   throwsInputTooLarge(() => gateTool.buildQuestions({ request: "r", diff: "d", claims: [...claims, "x"] }), "claims");
 });
 check("compare 33 aspects throw; long passage throws", () => {
