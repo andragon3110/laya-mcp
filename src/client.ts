@@ -250,19 +250,31 @@ export class LayaClient {
         );
       }
       const body = (await res.json()) as Record<string, unknown>;
-      if (typeof body.answers !== "object" || body.answers === null) {
+      // Some laya-server builds nest answers under results[0].answers instead
+      // of returning them at the top level. Accept either shape.
+      const nested = Array.isArray(body.results)
+        ? (body.results[0] as Record<string, unknown> | undefined)?.answers
+        : undefined;
+      const rawAnswers =
+        typeof body.answers === "object" && body.answers !== null
+          ? body.answers
+          : nested;
+      if (typeof rawAnswers !== "object" || rawAnswers === null) {
         throw new LayaUnavailableError(
           "laya-server returned invalid payload (missing answers)",
           "invalid_json",
         );
       }
+      const results = body.results as Array<Record<string, unknown>> | undefined;
       return {
-        answers: body.answers as Record<string, unknown>,
-        confidence: (body.confidence as Record<string, number>) ?? {},
+        answers: rawAnswers as Record<string, unknown>,
+        confidence: (body.confidence as Record<string, number>) ??
+          (results?.[0]?.confidence as Record<string, number>) ?? {},
         routing: (body.routing as Record<string, unknown>) ?? {},
         model: (body.model as string) ?? "laya",
         latencyMs: Number(body.latency_ms ?? 0),
-        usage: (body.usage as Record<string, number>) ?? {},
+        usage: (body.usage as Record<string, number>) ??
+          (results?.[0]?.usage as Record<string, number>) ?? {},
       };
     } catch (err) {
       if (err instanceof LayaUnavailableError) throw err;
