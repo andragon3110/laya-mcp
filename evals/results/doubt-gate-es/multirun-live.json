@@ -1,0 +1,30 @@
+{
+ "generated": "doubt-gate-es T2 live multirun summary (evidence index; numbers derived in BASELINE.md)",
+ "method": "stock py/laya_server.py @ 1d9168a (fixed usage Dict[str,Any]) + venv laya 0.3.23 (T3 reuse, pip check clean), LAYA_DEVICE=cpu, port 8791; real dist/ handlers + live LayaClient; singular predict only; N=6 passes (batches A+B x3) over 20 ES cases + 1 anchor pass over 80 base cases",
+ "passes": 6,
+ "batches": {
+  "A": "pass-0..2",
+  "B": "pass-3..5"
+ },
+ "es_predict_calls": 114,
+ "anchor_predict_calls": 72,
+ "http_500": 0,
+ "stability": {
+  "flips": 0,
+  "unstable_decisions": 0,
+  "unstable_questions": 0,
+  "question_byte_identity": "120/120 rows identical across passes"
+ },
+ "es_gold_agreement_per_pass": "9/20 every pass (screen 6/11, verify 3/9)",
+ "anchor_gold_agreement": "35/80 (per-suite identical to T5 B-fixed 35/80)",
+ "sha256": {
+  "pass-0.json": "73eea74d7ec1a7c669c8a198e91604b70c5183de6230ff3c941cfde48e169606",
+  "pass-1.json": "783e44ea88bd03101df1a231d317cba98c54d46e1e4bb5ac616724ec69cb63ba",
+  "pass-2.json": "63de71f04de88e6ab48361de1443b873d2cefcbc8cd52562840f12b34c4925f8",
+  "pass-3.json": "4eae0a8d64e71466b15760ccbb5c71462ae136cded9d123c5a121cb026e3e671",
+  "pass-4.json": "7108466a4bf8ec497e8ea0b1109c98545308a815718a06fac2dc136469fb02ab",
+  "pass-5.json": "80b4e0358be27c1838922deb03f5a22b779bb4734aaf7ac349414a6283208445",
+  "anchor-base-1pass.json": "65fa51e3b8c93873da47158f6c3432391f0fa7afd1376bed2707b0bfae3ba922"
+ },
+ "at": "2026-10-02T04:40:56.928Z"
+}
