@@ -1,0 +1,47 @@
+{
+ "served_a_0_3_21": {
+  "by_model": {
+   "english": 72
+  },
+  "by_reason": {
+   "English Latin text": 39,
+   "Latin script, language not identified and no non-English letters; using default (english)": 33
+  },
+  "total_calls": 72
+ },
+ "served_b_0_3_23": {
+  "by_model": {
+   "english": 2
+  },
+  "note": "only 2 empty-question calls succeed (old-shape usage); 68 model calls HTTP 500",
+  "total_calls": 2
+ },
+ "direct_a_0_3_21": {
+  "by_model": {
+   "english": 72
+  },
+  "total_pairs": 72
+ },
+ "direct_b_0_3_23": {
+  "by_model": {
+   "english": 72
+  },
+  "total_pairs": 72
+ },
+ "extras_served_a_0_3_21": {
+  "english": 3,
+  "multilingual": 11
+ },
+ "extras_served_b_0_3_23": {
+  "error": "0/14, all HTTP 500"
+ },
+ "extras_direct_a_0_3_21": {
+  "english": 3,
+  "multilingual": 11
+ },
+ "extras_direct_b_0_3_23": {
+  "english": 3,
+  "multilingual": 11
+ },
+ "note": "Base routing identical across arms and vs v2/T4 (72 english, 39/33 reasons). Extras routing identical A->B (direct)."
+}
