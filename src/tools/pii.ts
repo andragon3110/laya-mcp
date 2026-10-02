@@ -4,6 +4,7 @@ import type { ToolContext } from "../index.js";
 import { piiEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
+import { scenarioPredictOpts } from "../policy/scenarioCuts.js";
 import { getPolicy } from "../policy/loader.js";
 import type { RiskTier } from "../policy/types.js";
 import { type ToolDefinition, READONLY_TOOL_ANNOTATIONS, TOOL_TIMEOUT_MS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
@@ -270,7 +271,7 @@ export async function judgePiiSpans(
   const { questions, judgedCount } = piiJudgeQuestions(findings);
   const truncated = findings.length - judgedCount;
   try {
-    const raw = await client.predict({ text }, questions, TOOL_TIMEOUT_MS);
+    const raw = await client.predict({ text }, questions, TOOL_TIMEOUT_MS, scenarioPredictOpts("laya_pii"));
     const signals: Array<number | null> = findings.map((_, i) => {
       if (i >= judgedCount) return null;
       const ans = (raw.answers ?? {})[`pii_judge_${i}`] as { noul?: unknown } | undefined;

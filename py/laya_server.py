@@ -600,6 +600,25 @@ class PredictRequest(BaseModel):
         default=None,
         description="Force a language hint (e.g. 'en', 'es', 'fr').",
     )
+    head_max_len: int | None = Field(
+        default=None,
+        description="Cap on answer head length (SDK per-call `head_max_len`). Unset by default.",
+    )
+    min_confidence: float | None = Field(
+        default=None,
+        description="Per-answer low-confidence threshold (SDK per-call `min_confidence`). Unset by default.",
+    )
+
+    @field_validator("min_confidence")
+    @classmethod
+    def _check_min_confidence(cls, v: float | None) -> float | None:
+        # laya-calibration T2: explicit range so an out-of-range value is a
+        # 422 here instead of a ValueError from the SDK surfacing as a 500.
+        if v is None:
+            return None
+        if not isinstance(v, (int, float)) or not 0.0 <= float(v) <= 1.0:
+            raise ValueError("min_confidence must be a number in [0.0, 1.0]")
+        return float(v)
 
     @field_validator("state")
     @classmethod
@@ -805,6 +824,10 @@ async def predict(req: PredictRequest) -> PredictResponse:
             kwargs["task"] = req.task
         if req.lang is not None:
             kwargs["lang"] = req.lang
+        if req.head_max_len is not None:
+            kwargs["head_max_len"] = req.head_max_len
+        if req.min_confidence is not None:
+            kwargs["min_confidence"] = req.min_confidence
         # Single-flight load (one construction for N concurrent requests),
         # then bound inference (503 + Retry-After when saturated, no queue).
         router_obj = await router.ensure_async()

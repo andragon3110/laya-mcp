@@ -4,6 +4,7 @@ import type { ToolContext } from "../index.js";
 import { extractEvidence, winnerOf, type ExtractFieldEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength, extractLimitsFromEnv } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
+import { scenarioPredictOpts } from "../policy/scenarioCuts.js";
 import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
@@ -552,7 +553,7 @@ export async function handleExtract(
     out.evidence = evidence;
     out.abstention = abstention;
     return JSON.stringify(out, null, 2);
-  }, judgeOpts);
+  }, { ...scenarioPredictOpts("laya_extract"), ...judgeOpts });
   if (!result.ok) throw new Error(result.error);
   return result.content;
 }

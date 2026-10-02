@@ -2,6 +2,7 @@ import type { LayaClient } from "../client.js";
 import { verifyEvidence } from "../evidence.js";
 import { LIMITS, assertCount, assertLength } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
+import { scenarioPredictOpts } from "../policy/scenarioCuts.js";
 import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
@@ -200,7 +201,7 @@ export async function handleVerify(client: LayaClient, args: Record<string, unkn
       abstain: verdicts.filter((v) => v.verdict === "ABSTAIN").length,
     };
     return JSON.stringify({ summary, verdicts, decision, ...(shadow ? { shadow } : {}), latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
-  });
+  }, scenarioPredictOpts("laya_verify"));
   if (!result.ok) throw new Error(result.error);
   return result.content;
 }

@@ -48,6 +48,7 @@
  */
 import { evaluate, type EvaluateOptions } from "./engine.js";
 import { takeDoubtTable } from "./doubt.js";
+import { scenarioCutFor } from "./scenarioCuts.js";
 import type { PolicyDecision, PolicyInput, PolicyRef } from "./types.js";
 
 /** Policy-decision modes. Never `write`/`act`: laya-mcp never executes actions. */
@@ -188,7 +189,13 @@ export function evaluateForTool(
     input.context?.min_confidence === undefined
       ? { ...input, context: { ...(input.context ?? {}), answer_confidence: doubt } }
       : input;
-  const out = evaluateWithMode(inputWithDoubt, { thresholds: opts?.thresholds, mode, shadowPolicy: candidate });
+  // laya-calibration T2: select the per-scenario doubt-gate cut by tool name.
+  // All rows are 0.90-UNCALIBRATED today (see scenarioCuts.ts), so default
+  // behavior is identical; tools without a row keep the global fallback.
+  const cut = scenarioCutFor(toolName);
+  const thresholds =
+    cut && opts?.thresholds ? { ...opts.thresholds, minConfidence: cut.minConfidence } : opts?.thresholds;
+  const out = evaluateWithMode(inputWithDoubt, { thresholds, mode, shadowPolicy: candidate });
   if (mode === "shadow" && out.shadow === null) {
     const raw = env[shadowPolicyEnvVar(toolName)] ?? env[SHADOW_POLICY_ENV_VAR];
     console.error(

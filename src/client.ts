@@ -99,6 +99,18 @@ export interface PredictOpts {
   task?: string;
   /** Force a language hint (e.g. "es"). */
   lang?: string;
+  /**
+   * laya-calibration T2: cap on answer head length (SDK `head_max_len`,
+   * per-call). UNSET by default (plumbing only, byte-identical payloads).
+   */
+  head_max_len?: number;
+  /**
+   * laya-calibration T2: per-answer low-confidence threshold (SDK
+   * `min_confidence`, per-call). UNSET by default (plumbing only,
+   * byte-identical payloads). Handlers do not read the `low_confidence` /
+   * `abstention` fields it enables (T3+ work at earliest).
+   */
+  min_confidence?: number;
   /** Per-call timeout override. */
   timeoutMs?: number;
 }
@@ -247,6 +259,8 @@ export class LayaClient {
           ...(opts?.model ? { model: opts.model } : {}),
           ...(opts?.task ? { task: opts.task } : {}),
           ...(opts?.lang ? { lang: opts.lang } : {}),
+          ...(opts?.head_max_len != null ? { head_max_len: opts.head_max_len } : {}),
+          ...(opts?.min_confidence != null ? { min_confidence: opts.min_confidence } : {}),
         }),
       });
       if (!res.ok) {

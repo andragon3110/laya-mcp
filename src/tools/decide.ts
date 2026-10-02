@@ -2,6 +2,7 @@ import type { LayaClient, PredictResult } from "../client.js";
 import { decideEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount, inputTooLarge } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
+import { scenarioPredictOpts } from "../policy/scenarioCuts.js";
 import { getPolicy } from "../policy/loader.js";
 import { TOOL_TIMEOUT_MS, type ToolDefinition, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
@@ -222,7 +223,7 @@ export async function handleDecide(client: LayaClient, args: Record<string, unkn
 
   let raw1: PredictResult;
   try {
-    raw1 = await client.predict(args, selectionQuestions, TOOL_TIMEOUT_MS);
+    raw1 = await client.predict(args, selectionQuestions, TOOL_TIMEOUT_MS, scenarioPredictOpts("laya_decide"));
   } catch (err) {
     throw new Error(err instanceof Error ? err.message : String(err));
   }
@@ -238,7 +239,7 @@ export async function handleDecide(client: LayaClient, args: Record<string, unkn
   if (requirements.length > 0 && selected !== null) {
     const reqQuestions = buildRequirementQuestions(args, selected);
     try {
-      raw2 = await client.predict(args, reqQuestions, TOOL_TIMEOUT_MS);
+      raw2 = await client.predict(args, reqQuestions, TOOL_TIMEOUT_MS, scenarioPredictOpts("laya_decide"));
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : String(err));
     }
