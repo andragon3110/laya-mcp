@@ -648,6 +648,12 @@ class PredictRequest(BaseModel):
 class PredictResponse(BaseModel):
     answers: Dict[str, Any]
     confidence: Dict[str, float] = Field(default_factory=dict)
+    # doubt-gate-es T3: first-class `answer_confidence` passthrough, read off
+    # each answer dict (`answer_confidence` preferred, `confidence` fallback,
+    # 0.0 when neither is usable). Tolerant to its absence on older SDK
+    # builds (0.3.21 emits it; a build that does not yields {}-equivalent
+    # 0.0 entries, never a 500). Transport only: no threshold lives here.
+    answer_confidence: Dict[str, float] = Field(default_factory=dict)
     routing: Dict[str, Any] = Field(default_factory=dict)
     latency_ms: float
     # Opaque Router `usage` passthrough. laya 0.3.21 emits 2 int keys
@@ -839,6 +845,26 @@ async def predict(req: PredictRequest) -> PredictResponse:
         for qid, answer in answers.items()
         if isinstance(answer, dict)
     }
+    # doubt-gate-es T3: propagate `answer_confidence` as a first-class field
+    # (in addition to `confidence`). Per-answer tolerant read: prefer the
+    # `answer_confidence` key, fall back to `confidence`, else 0.0 -- a build
+    # without the key (older 0.3.21 shapes) yields zeros, never an error.
+    def _answer_confidence(answer: Dict[str, Any]) -> float:
+        for key in ("answer_confidence", "confidence"):
+            try:
+                value = answer.get(key)
+                if value is None:
+                    continue
+                return float(value)
+            except (TypeError, ValueError):
+                continue
+        return 0.0
+
+    answer_confidence = {
+        qid: _answer_confidence(answer)
+        for qid, answer in answers.items()
+        if isinstance(answer, dict)
+    }
     routing = result.get("routing", {}) if isinstance(result, dict) else {}
     latency_ms = (time.perf_counter() - start) * 1000.0
     usage = _coerce_usage(result.get("usage", {}) if isinstance(result, dict) else {})
@@ -846,6 +872,7 @@ async def predict(req: PredictRequest) -> PredictResponse:
     return PredictResponse(
         answers=answers,
         confidence=confidence,
+        answer_confidence=answer_confidence,
         routing=routing,
         latency_ms=latency_ms,
         usage=usage,

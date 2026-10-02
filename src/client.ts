@@ -8,6 +8,12 @@
 export interface PredictResult {
   answers: Record<string, unknown>;
   confidence: Record<string, number>;
+  /**
+   * doubt-gate-es T3: first-class `answer_confidence` passthrough from the
+   * backend (per-question declared confidence). Empty when the backend
+   * omits it (older builds); transport only, no logic here.
+   */
+  answer_confidence: Record<string, number>;
   routing: Record<string, unknown>;
   model: string;
   latencyMs: number;
@@ -270,6 +276,9 @@ export class LayaClient {
         answers: rawAnswers as Record<string, unknown>,
         confidence: (body.confidence as Record<string, number>) ??
           (results?.[0]?.confidence as Record<string, number>) ?? {},
+        // doubt-gate-es T3: passthrough only -- never derived, never defaulted from `confidence`.
+        answer_confidence: (body.answer_confidence as Record<string, number>) ??
+          (results?.[0]?.answer_confidence as Record<string, number>) ?? {},
         routing: (body.routing as Record<string, unknown>) ?? {},
         model: (body.model as string) ?? "laya",
         latencyMs: Number(body.latency_ms ?? 0),
