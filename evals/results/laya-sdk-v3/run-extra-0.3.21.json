@@ -1,0 +1,948 @@
+{
+ "layaUrl": "http://127.0.0.1:8775",
+ "at": "2026-10-02T03:16:05.411Z",
+ "totalCases": 14,
+ "ready": {
+  "ready": true,
+  "loaded": [
+   "multilingual",
+   "typed-decisions",
+   "english"
+  ],
+  "device": "cpu",
+  "versions": {
+   "server": "0.4.0",
+   "laya_sdk": "0.3.21"
+  }
+ },
+ "models": [
+  {
+   "name": "english",
+   "repo": "convaiinnovations/laya",
+   "loaded": true,
+   "revision": null,
+   "revision_source": "unpinned",
+   "device": "cpu",
+   "circuit": "closed"
+  },
+  {
+   "name": "multilingual",
+   "repo": "convaiinnovations/laya-multilingual",
+   "loaded": true,
+   "revision": null,
+   "revision_source": "unpinned",
+   "device": "cpu",
+   "circuit": "closed"
+  },
+  {
+   "name": "typed-decisions",
+   "repo": "convaiinnovations/laya-typed-decisions",
+   "loaded": true,
+   "revision": null,
+   "revision_source": "unpinned",
+   "device": "cpu",
+   "circuit": "closed"
+  }
+ ],
+ "warmup_ms": 314,
+ "rows": [
+  {
+   "id": "x207a-pt-ticket-en-traceback",
+   "topic": "#207 PT-ticket",
+   "note": "PR #207 repro 1 verbatim shape (PT customer + EN traceback). Expect multilingual on 0.3.21 (mixed_segment), english on 0.3.12.",
+   "state": "O sistema caiu de novo hoje de manhÃ£, segue o log:\nTraceback (most recent call last):\n  File \"/app/main.py\", line 42, in handler\n    result = db.query(sql)\nConnectionError: the connection to the database was refused because the pool is exhausted",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "technical",
+      "probabilities": {
+       "billing": 0.0014,
+       "technical": 0.9928,
+       "cancel": 0.0014,
+       "other": 0.0043
+      },
+      "confidence": 0.9645,
+      "answer_confidence": 0.9928,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.9645
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script, mostly English, but a line or field reads as 'pt' ('O sistema caiu de novo hoje de manhÃ£, segue o log:'); the English checkpoint cannot read it",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "pt",
+      "is_english": false,
+      "language_undecided": false,
+      "diacritic_rate": 0.0041,
+      "non_latin_fraction": 0,
+      "mixed_segment": "O sistema caiu de novo hoje de manhÃ£, segue o log:"
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 138,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 195.1
+  },
+  {
+   "id": "x207b-pt-field-en-payload",
+   "topic": "#207 PT-ticket",
+   "note": "PR #207 repro 2 shape (PT descricao + EN error payload dict).",
+   "state": {
+    "descricao": "O pagamento nÃ£o foi processado",
+    "error": {
+     "message": "Your card was declined. Please try again with a different card."
+    }
+   },
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "billing",
+      "probabilities": {
+       "billing": 0.8445,
+       "technical": 0.0052,
+       "cancel": 0.1496,
+       "other": 0.0007
+      },
+      "confidence": 0.6685,
+      "answer_confidence": 0.8445,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.6685
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script, mostly English, but a line or field reads as 'pt' ('O pagamento nÃ£o foi processado'); the English checkpoint cannot read it",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "pt",
+      "is_english": false,
+      "language_undecided": false,
+      "diacritic_rate": 0.0105,
+      "non_latin_fraction": 0,
+      "mixed_segment": "O pagamento nÃ£o foi processado"
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 103,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 132.1
+  },
+  {
+   "id": "x207c-en-template-pt-body",
+   "topic": "#207 PT-ticket",
+   "note": "PR #207 repro 3 shape (EN form template + PT body).",
+   "state": {
+    "subject": "New ticket from the web form",
+    "body": "Quero cancelar meu plano"
+   },
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "cancel",
+      "probabilities": {
+       "billing": 0,
+       "technical": 0,
+       "cancel": 1,
+       "other": 0
+      },
+      "confidence": 1,
+      "answer_confidence": 1,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 1
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script, mostly English, but a line or field reads as 'pt' ('Quero cancelar meu plano'); the English checkpoint cannot read it",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "pt",
+      "is_english": false,
+      "language_undecided": false,
+      "diacritic_rate": 0,
+      "non_latin_fraction": 0,
+      "mixed_segment": "Quero cancelar meu plano"
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 89,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 125.2
+  },
+  {
+   "id": "x207d-es-ticket-en-log",
+   "topic": "#207 Spanish-heavy",
+   "note": "Spanish customer + English stack trace (our interest: ES, not PT).",
+   "state": "El sistema se cayÃ³ otra vez esta maÃ±ana, adjunto el registro:\nTraceback (most recent call last):\n  File \"/app/main.py\", line 42, in handler\nConnectionError: the connection to the database was refused because the pool is exhausted",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "technical",
+      "probabilities": {
+       "billing": 0.0008,
+       "technical": 0.9932,
+       "cancel": 0.0009,
+       "other": 0.0052
+      },
+      "confidence": 0.967,
+      "answer_confidence": 0.9932,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.967
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script, mostly English, but a line or field reads as 'es' ('El sistema se cayÃ³ otra vez esta maÃ±ana, adjunto el regist'); the English checkpoint cannot read it",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "es",
+      "is_english": false,
+      "language_undecided": false,
+      "diacritic_rate": 0.0087,
+      "non_latin_fraction": 0,
+      "mixed_segment": "El sistema se cayÃ³ otra vez esta maÃ±ana, adjunto el registro:"
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 128,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 146.7
+  },
+  {
+   "id": "x207e-en-ticket-pt-error",
+   "topic": "#207 reverse",
+   "note": "PR #207 reverse direction: English ticket pasting a Portuguese error goes multilingual on new SDK.",
+   "state": "The nightly sync failed, here is the gateway reply:\nErro: o pagamento foi recusado pelo banco emissor, tente novamente mais tarde por favor",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "technical",
+      "probabilities": {
+       "billing": 0.2232,
+       "technical": 0.3791,
+       "cancel": 0.3548,
+       "other": 0.0429
+      },
+      "confidence": 0.1307,
+      "answer_confidence": 0.3791,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.1307
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script but language looks like 'pt', not English",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "pt",
+      "is_english": false,
+      "language_undecided": false,
+      "diacritic_rate": 0,
+      "non_latin_fraction": 0,
+      "mixed_segment": null
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 99,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 117
+  },
+  {
+   "id": "x350a-cafe-resume",
+   "topic": "#350 loanwords",
+   "note": "PR #350 class: plain English + accented loanwords stays english on 0.3.21.",
+   "state": "Please meet me at the cafÃ© at noon to discuss the rÃ©sumÃ©.",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "billing",
+      "probabilities": {
+       "billing": 0.4934,
+       "technical": 0.0719,
+       "cancel": 0.3252,
+       "other": 0.1095
+      },
+      "confidence": 0.1738,
+      "answer_confidence": 0.4934,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.1738
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script, language not identified but 5% non-English letters; not safe for the English checkpoint",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": null,
+      "is_english": false,
+      "language_undecided": true,
+      "diacritic_rate": 0.05,
+      "non_latin_fraction": 0,
+      "mixed_segment": null
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 88,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 103.4
+  },
+  {
+   "id": "x350b-jose-zurich",
+   "topic": "#350 loanwords",
+   "note": "PR #350 class: proper nouns with diacritics in plain English.",
+   "state": "JosÃ© confirmed the delivery for ZÃ¼rich yesterday morning and the team approved it.",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "technical",
+      "probabilities": {
+       "billing": 0.0042,
+       "technical": 0.8833,
+       "cancel": 0.0284,
+       "other": 0.0842
+      },
+      "confidence": 0.6813,
+      "answer_confidence": 0.8833,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.6813
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script, language not identified but 2% non-English letters; not safe for the English checkpoint",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": null,
+      "is_english": false,
+      "language_undecided": true,
+      "diacritic_rate": 0.0238,
+      "non_latin_fraction": 0,
+      "mixed_segment": null
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 87,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 103.4
+  },
+  {
+   "id": "x350c-de-control",
+   "topic": "#350 control",
+   "note": "Control: accented non-English with no English function words stays multilingual on both.",
+   "state": "Die Abrechnung fÃ¼r MÃ¤rz ist fehlerhaft und muss dringend korrigiert werden",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "billing",
+      "probabilities": {
+       "billing": 0.987,
+       "technical": 0.0123,
+       "cancel": 0.0001,
+       "other": 0.0006
+      },
+      "confidence": 0.9478,
+      "answer_confidence": 0.987,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.9478
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script but language looks like 'de', not English",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "de",
+      "is_english": false,
+      "language_undecided": false,
+      "diacritic_rate": 0.0263,
+      "non_latin_fraction": 0,
+      "mixed_segment": null
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 89,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 110.2
+  },
+  {
+   "id": "x350d-en-plain",
+   "topic": "#350 control",
+   "note": "Control: plain English regression guard.",
+   "state": "The quarterly report shows steady growth in cloud sales across every region.",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "other",
+      "probabilities": {
+       "billing": 0.2249,
+       "technical": 0.0681,
+       "cancel": 0.0412,
+       "other": 0.6658
+      },
+      "confidence": 0.3358,
+      "answer_confidence": 0.6658,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.3358
+    },
+    "routing": {
+     "model": "english",
+     "repo": "convaiinnovations/laya",
+     "reason": "English Latin text",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "en",
+      "is_english": true,
+      "language_undecided": false,
+      "diacritic_rate": 0,
+      "non_latin_fraction": 0,
+      "mixed_segment": null
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 82,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 289.5
+  },
+  {
+   "id": "x406a-long-en-note-short-de",
+   "topic": "#406 dict-state",
+   "note": "PR #406 gap 1: long English sibling note + short non-English message in a dict.",
+   "state": {
+    "note": "Thank you for contacting customer support. An agent will review your case shortly. Your reference number is T-88912 and the estimated response time is two business days. Please do not open duplicate tickets while you wait for our reply.",
+    "message": "Die Zahlung ist fehlgeschlagen, bitte prÃ¼fen Sie das Konto"
+   },
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "billing",
+      "probabilities": {
+       "billing": 0.6949,
+       "technical": 0.2988,
+       "cancel": 0.0042,
+       "other": 0.0021
+      },
+      "confidence": 0.5312,
+      "answer_confidence": 0.6949,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.5312
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script, mostly English, but a line or field reads as 'de' ('Die Zahlung ist fehlgeschlagen, bitte prÃ¼fen Sie das Konto'); the English checkpoint cannot read it",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "de",
+      "is_english": false,
+      "language_undecided": false,
+      "diacritic_rate": 0.0034,
+      "non_latin_fraction": 0,
+      "mixed_segment": "Die Zahlung ist fehlgeschlagen, bitte prÃ¼fen Sie das Konto"
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 141,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 156.2
+  },
+  {
+   "id": "x406b-es-body-en-meta",
+   "topic": "#406 dict-state",
+   "note": "Multi-field ticket: English metadata next to a short Spanish body.",
+   "state": {
+    "ticket_id": "T-1234",
+    "source": "web form",
+    "priority": "high",
+    "customer": "El cargo aparece duplicado en mi tarjeta, necesito un reembolso"
+   },
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "billing",
+      "probabilities": {
+       "billing": 0.9776,
+       "technical": 0.0184,
+       "cancel": 0.0008,
+       "other": 0.0032
+      },
+      "confidence": 0.9135,
+      "answer_confidence": 0.9776,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.9135
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script but language looks like 'es', not English",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "es",
+      "is_english": false,
+      "language_undecided": false,
+      "diacritic_rate": 0,
+      "non_latin_fraction": 0,
+      "mixed_segment": null
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 111,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 117.8
+  },
+  {
+   "id": "x207f-pt-shout",
+   "topic": "#207 all-caps",
+   "note": "PR #207 test: all-caps Portuguese line inside English context.",
+   "state": "Customer added a note to ticket T-556:\nQUERO MEU DINHEIRO DE VOLTA AGORA",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "technical",
+      "probabilities": {
+       "billing": 0.003,
+       "technical": 0.8448,
+       "cancel": 0.1283,
+       "other": 0.0239
+      },
+      "confidence": 0.6302,
+      "answer_confidence": 0.8448,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.6302
+    },
+    "routing": {
+     "model": "multilingual",
+     "repo": "convaiinnovations/laya/multilingual",
+     "reason": "Latin script but language looks like 'pt', not English",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "pt",
+      "is_english": false,
+      "language_undecided": false,
+      "diacritic_rate": 0,
+      "non_latin_fraction": 0,
+      "mixed_segment": null
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 93,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 120.6
+  },
+  {
+   "id": "x350e-cafe-boundary",
+   "topic": "#350 loanwords",
+   "note": "Boundary case for the #350 rescue: ONE accented word, diacritic rate in [0.02, 0.06), >=2 EN-only function words. analyse() on 0.3.12 gives language None/is_english False; on 0.3.21 en/True. Live routing should follow.",
+   "state": "The meeting is at noon in the main cafÃ© downtown.",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "other",
+      "probabilities": {
+       "billing": 0.1972,
+       "technical": 0.098,
+       "cancel": 0.0741,
+       "other": 0.6307
+      },
+      "confidence": 0.2561,
+      "answer_confidence": 0.6307,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.2561
+    },
+    "routing": {
+     "model": "english",
+     "repo": "convaiinnovations/laya",
+     "reason": "English Latin text",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "en",
+      "is_english": true,
+      "language_undecided": false,
+      "diacritic_rate": 0.02,
+      "non_latin_fraction": 0,
+      "mixed_segment": null
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 82,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 280.4
+  },
+  {
+   "id": "x350f-maria-invoice",
+   "topic": "#350 loanwords",
+   "note": "Second boundary probe: single accented proper noun, short sentence (rate ~0.027).",
+   "state": "MarÃ­a will send the invoice tomorrow.",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "response": {
+    "answers": {
+     "intent": {
+      "type": "choice",
+      "choice": "billing",
+      "probabilities": {
+       "billing": 0.9321,
+       "technical": 0.0234,
+       "cancel": 0.0151,
+       "other": 0.0293
+      },
+      "confidence": 0.7689,
+      "answer_confidence": 0.9321,
+      "action": {
+       "act_probability": 1
+      }
+     }
+    },
+    "confidence": {
+     "intent": 0.7689
+    },
+    "routing": {
+     "model": "english",
+     "repo": "convaiinnovations/laya",
+     "reason": "English Latin text",
+     "detection": {
+      "script": "latin",
+      "script_profile": {
+       "latin": 1
+      },
+      "language": "en",
+      "is_english": true,
+      "language_undecided": false,
+      "diacritic_rate": 0.0263,
+      "non_latin_fraction": 0,
+      "mixed_segment": null
+     },
+     "workflow": null
+    },
+    "usage": {
+     "input_tokens": 79,
+     "output_tokens": 0
+    }
+   },
+   "latency_ms": 274.3
+  }
+ ]
+}

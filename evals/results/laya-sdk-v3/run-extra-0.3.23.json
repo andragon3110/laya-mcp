@@ -1,0 +1,333 @@
+{
+ "layaUrl": "http://127.0.0.1:8776",
+ "at": "2026-10-02T03:19:42.610Z",
+ "totalCases": 14,
+ "ready": {
+  "ready": true,
+  "loaded": [
+   "multilingual",
+   "typed-decisions",
+   "english"
+  ],
+  "device": "cpu",
+  "versions": {
+   "server": "0.4.0",
+   "laya_sdk": "0.3.23"
+  }
+ },
+ "models": [
+  {
+   "name": "english",
+   "repo": "convaiinnovations/laya",
+   "loaded": true,
+   "revision": null,
+   "revision_source": "unpinned",
+   "device": "cpu",
+   "circuit": "closed"
+  },
+  {
+   "name": "multilingual",
+   "repo": "convaiinnovations/laya-multilingual",
+   "loaded": true,
+   "revision": null,
+   "revision_source": "unpinned",
+   "device": "cpu",
+   "circuit": "closed"
+  },
+  {
+   "name": "typed-decisions",
+   "repo": "convaiinnovations/laya-typed-decisions",
+   "loaded": true,
+   "revision": null,
+   "revision_source": "unpinned",
+   "device": "cpu",
+   "circuit": "closed"
+  }
+ ],
+ "warmup_ms": 0,
+ "warmup_error": "laya-server /predict returned HTTP 500: Internal Server Error",
+ "rows": [
+  {
+   "id": "x207a-pt-ticket-en-traceback",
+   "topic": "#207 PT-ticket",
+   "note": "PR #207 repro 1 verbatim shape (PT customer + EN traceback). Expect multilingual on 0.3.21 (mixed_segment), english on 0.3.12.",
+   "state": "O sistema caiu de novo hoje de manhÃ£, segue o log:\nTraceback (most recent call last):\n  File \"/app/main.py\", line 42, in handler\n    result = db.query(sql)\nConnectionError: the connection to the database was refused because the pool is exhausted",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x207b-pt-field-en-payload",
+   "topic": "#207 PT-ticket",
+   "note": "PR #207 repro 2 shape (PT descricao + EN error payload dict).",
+   "state": {
+    "descricao": "O pagamento nÃ£o foi processado",
+    "error": {
+     "message": "Your card was declined. Please try again with a different card."
+    }
+   },
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x207c-en-template-pt-body",
+   "topic": "#207 PT-ticket",
+   "note": "PR #207 repro 3 shape (EN form template + PT body).",
+   "state": {
+    "subject": "New ticket from the web form",
+    "body": "Quero cancelar meu plano"
+   },
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x207d-es-ticket-en-log",
+   "topic": "#207 Spanish-heavy",
+   "note": "Spanish customer + English stack trace (our interest: ES, not PT).",
+   "state": "El sistema se cayÃ³ otra vez esta maÃ±ana, adjunto el registro:\nTraceback (most recent call last):\n  File \"/app/main.py\", line 42, in handler\nConnectionError: the connection to the database was refused because the pool is exhausted",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x207e-en-ticket-pt-error",
+   "topic": "#207 reverse",
+   "note": "PR #207 reverse direction: English ticket pasting a Portuguese error goes multilingual on new SDK.",
+   "state": "The nightly sync failed, here is the gateway reply:\nErro: o pagamento foi recusado pelo banco emissor, tente novamente mais tarde por favor",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x350a-cafe-resume",
+   "topic": "#350 loanwords",
+   "note": "PR #350 class: plain English + accented loanwords stays english on 0.3.21.",
+   "state": "Please meet me at the cafÃ© at noon to discuss the rÃ©sumÃ©.",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x350b-jose-zurich",
+   "topic": "#350 loanwords",
+   "note": "PR #350 class: proper nouns with diacritics in plain English.",
+   "state": "JosÃ© confirmed the delivery for ZÃ¼rich yesterday morning and the team approved it.",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x350c-de-control",
+   "topic": "#350 control",
+   "note": "Control: accented non-English with no English function words stays multilingual on both.",
+   "state": "Die Abrechnung fÃ¼r MÃ¤rz ist fehlerhaft und muss dringend korrigiert werden",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x350d-en-plain",
+   "topic": "#350 control",
+   "note": "Control: plain English regression guard.",
+   "state": "The quarterly report shows steady growth in cloud sales across every region.",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x406a-long-en-note-short-de",
+   "topic": "#406 dict-state",
+   "note": "PR #406 gap 1: long English sibling note + short non-English message in a dict.",
+   "state": {
+    "note": "Thank you for contacting customer support. An agent will review your case shortly. Your reference number is T-88912 and the estimated response time is two business days. Please do not open duplicate tickets while you wait for our reply.",
+    "message": "Die Zahlung ist fehlgeschlagen, bitte prÃ¼fen Sie das Konto"
+   },
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x406b-es-body-en-meta",
+   "topic": "#406 dict-state",
+   "note": "Multi-field ticket: English metadata next to a short Spanish body.",
+   "state": {
+    "ticket_id": "T-1234",
+    "source": "web form",
+    "priority": "high",
+    "customer": "El cargo aparece duplicado en mi tarjeta, necesito un reembolso"
+   },
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x207f-pt-shout",
+   "topic": "#207 all-caps",
+   "note": "PR #207 test: all-caps Portuguese line inside English context.",
+   "state": "Customer added a note to ticket T-556:\nQUERO MEU DINHEIRO DE VOLTA AGORA",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x350e-cafe-boundary",
+   "topic": "#350 loanwords",
+   "note": "Boundary case for the #350 rescue: ONE accented word, diacritic rate in [0.02, 0.06), >=2 EN-only function words. analyse() on 0.3.12 gives language None/is_english False; on 0.3.21 en/True. Live routing should follow.",
+   "state": "The meeting is at noon in the main cafÃ© downtown.",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  },
+  {
+   "id": "x350f-maria-invoice",
+   "topic": "#350 loanwords",
+   "note": "Second boundary probe: single accented proper noun, short sentence (rate ~0.027).",
+   "state": "MarÃ­a will send the invoice tomorrow.",
+   "questions": {
+    "intent": {
+     "type": "choice",
+     "instructions": "What is the customer asking about? Answer with the single best class.",
+     "criteria": {
+      "billing": "A payment, charge, refund, invoice or card matter.",
+      "technical": "A system error, crash, malfunction or log trace.",
+      "cancel": "Cancelling a plan or subscription.",
+      "other": "None of the above."
+     }
+    }
+   },
+   "error": "laya-server /predict returned HTTP 500: Internal Server Error"
+  }
+ ]
+}

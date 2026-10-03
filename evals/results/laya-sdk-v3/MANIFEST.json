@@ -1,0 +1,101 @@
+{
+ "protocol": "fresco T4, AB_REPORT v2 sections 2-4 reused; partial: arm-B served path 500s",
+ "arms": {
+  "a": {
+   "laya": "0.3.21",
+   "venv": "%TEMP%\\opencode\\laya-t3a-0321",
+   "python": "3.11.9",
+   "url": "http://127.0.0.1:8775",
+   "torch": "2.14.1+cpu",
+   "transformers": "4.57.6",
+   "fastapi": "0.141.1",
+   "uvicorn": "0.53.0",
+   "pydantic": "2.13.5",
+   "huggingface_hub": "0.36.2",
+   "psutil": "7.2.2",
+   "numpy": "2.4.6",
+   "pip_check": "clean"
+  },
+  "b": {
+   "laya": "0.3.23",
+   "venv": "%TEMP%\\opencode\\laya-t3b-0323",
+   "python": "3.11.9",
+   "url": "http://127.0.0.1:8776",
+   "torch": "2.14.1+cpu",
+   "transformers": "4.57.6",
+   "fastapi": "0.141.1",
+   "uvicorn": "0.53.0",
+   "pydantic": "2.13.5",
+   "huggingface_hub": "0.36.2",
+   "psutil": "7.2.2",
+   "numpy": "2.4.6",
+   "pip_check": "clean"
+  }
+ },
+ "harness_fidelity": {
+  "pairs_replay_vs_served_A_questions": "72/72 byte-identical, 0 mismatches (SDK-independent capture)",
+  "direct_A_vs_B_inputs": "72/72 pairs byte-identical by construction (same pairs.json)",
+  "served_A_vs_v2_questions": "67/80 identical; 13 differ (verify x6 + gate x7: refute_0 dual probe + reworded criteria from post-v2 handler evolution, not the SDK)",
+  "t4_stored_run": "MISSING (no odd/spike-laya-fresco, no laya-sdk-v1 dir): gap, v2 crudos used as reference"
+ },
+ "served_base_80": {
+  "a_pass": 35,
+  "b_pass": 12,
+  "n": 80,
+  "a_predict_calls": 72,
+  "b_predict_calls": 2,
+  "b_fail_mode": "68x HTTP 500 (every non-empty /predict); 10 limit-guards + 2 empty-question calls pass",
+  "root_cause": "usage.truncated_questions: [] (list) rejects PredictResponse.usage Dict[str,int] (py/laya_server.py:652)"
+ },
+ "direct_router_base_72_pairs": {
+  "questions_identical": "72/72",
+  "answers_identical": "72/72",
+  "choice_flips": 0,
+  "confidence_compared": 158,
+  "confidence_nonzero": 0,
+  "routing": "72/72 english both, reasons identical (39x English Latin text / 33x default)",
+  "usage_identical": "2/72 (70 differ ONLY by +4 keys on B)",
+  "answer_keys_added_on_B": 0
+ },
+ "extras_14": {
+  "served": "A 14/14 ok (11 multilingual / 3 english); B 0/14 (all HTTP 500)",
+  "direct_routing_same": "14/14",
+  "direct_confidence_nonzero": "0/14",
+  "direct_choice_same": "14/14"
+ },
+ "same_version_rerun_drift_0_3_21_sep29_vs_today": {
+  "weights": "identical snapshots (english 55cf4c4e, multilingual e4e9ddf2, typed-decisions 1a793eb5); refs unchanged",
+  "env_delta": "torch 2.14.0+cpu -> 2.14.1+cpu (only dep that floated; transformers 4.57.6 both)",
+  "base_80_same_question_answers": "59/59 identical, confidence 107/107 delta 0, 0 choice flips (deterministic)",
+  "extras_routing": "14/14 same",
+  "extras_confidence_differ": "9/14 (multilingual-path sensitivity to torch numerics; routing stable)",
+  "extras_choice_flips": [
+   "x350a other->billing",
+   "x350c technical->billing"
+  ]
+ },
+ "payload_deltas_0_3_21_to_0_3_23": {
+  "usage_added": [
+   "state_tokens",
+   "state_tokens_dropped",
+   "truncated",
+   "truncated_questions"
+  ],
+  "usage_always_emitted_on_B": true,
+  "answer_keys_added": [],
+  "detection": "mixed_segment: null retained (both arms)",
+  "temp_clamp_warning": "both arms, same values (router.py:456 on 0.3.21 vs :594 on 0.3.23)"
+ },
+ "sha256": {
+  "run-sdk-0.3.21.json": "915d4ae0fbe1ee63effd31d0161d8ca2a49373f27a38b9b297bc67426a61d151",
+  "run-sdk-0.3.23.json": "867663eeb4833fc51b8a1784fa1588267211d937fdfc40b1edf8a6426dda171c",
+  "run-extra-0.3.21.json": "32abaadaeb06da46a9186cb944d14e29d62e1f950fd4a854398feb17db67a9d7",
+  "run-extra-0.3.23.json": "508e7816e55349159c271dc152f3c9e016a9b3c4a133e94cffec40f59db58374",
+  "direct-0.3.21.json": "c544fff8ff135282542d0ecb540e8a6c21cf8746bba929facdb73e0c37a13fac",
+  "direct-0.3.23.json": "3f4fbfa1177a29de604a9dc0cfa985b896dca04fc20d517bc45d966550729cd3",
+  "direct-extra-0.3.21.json": "15dbabb47dea699f2b2c8009b44a8a74c2d2fbca0b05e9d12ce4555cdced927a",
+  "direct-extra-0.3.23.json": "113fe1c1ff3e5ff8f6f6c25b5c79e06b6043f933af95ea3f091873156e600484",
+  "pairs.json": "0eb6a0fbc0ccffc3fcb9adcf216da47c91b3ec3189b9450f081d51e1da50ba76",
+  "pairs-extra.json": "a99a026c24f5b3c471a9e81385c1e328128dfcd56c35f23f6cb1edcaf4593266"
+ }
+}

@@ -5,7 +5,9 @@
 # validated pin (A/B 80+14 vs 0.3.12 sin regresión, fixes #207/#350/#406
 # medidos; warning de temperaturas del checkpoint persiste).
 # See odd/tasks/laya-0312-0321.md.
-laya==0.3.21,<0.4.0
+# 0.3.23 validated T1 clean-room (%TEMP% venv, 2026-10-02), supersedes 0.3.21.
+# See odd/tasks/laya-0321-0323.md.
+laya==0.3.23,<0.4.0
 fastapi==0.141.1
 uvicorn[standard]==0.53.0
 pydantic==2.13.5

@@ -650,7 +650,25 @@ class PredictResponse(BaseModel):
     confidence: Dict[str, float] = Field(default_factory=dict)
     routing: Dict[str, Any] = Field(default_factory=dict)
     latency_ms: float
-    usage: Dict[str, int] = Field(default_factory=dict)
+    # Opaque Router `usage` passthrough. laya 0.3.21 emits 2 int keys
+    # (input_tokens, output_tokens); 0.3.23 adds state_tokens: int,
+    # state_tokens_dropped: int, truncated: bool,
+    # truncated_questions: list (and may emit a dict `options`).
+    # Dict[str, Any] keeps both shapes (list/dict values included).
+    usage: Dict[str, Any] = Field(default_factory=dict)
+
+
+def _coerce_usage(raw: Any) -> Dict[str, Any]:
+    """Tolerant passthrough for Router `usage` (never raises on shape drift).
+
+    Tolerant reads for the 0.3.23 truncation fields (absent on 0.3.21):
+    `truncated` is a bool when present, `truncated_questions` a list,
+    `state_tokens`/`state_tokens_dropped` ints when present (else None).
+    Values are passed through uncoerced so list/dict payloads survive.
+    """
+    if not isinstance(raw, dict):
+        return {}
+    return dict(raw)
 
 
 app = FastAPI(title="laya-mcp", version=SERVER_VERSION)
@@ -823,7 +841,7 @@ async def predict(req: PredictRequest) -> PredictResponse:
     }
     routing = result.get("routing", {}) if isinstance(result, dict) else {}
     latency_ms = (time.perf_counter() - start) * 1000.0
-    usage = result.get("usage", {}) if isinstance(result, dict) else {}
+    usage = _coerce_usage(result.get("usage", {}) if isinstance(result, dict) else {})
 
     return PredictResponse(
         answers=answers,
