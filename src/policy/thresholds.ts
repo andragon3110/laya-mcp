@@ -27,6 +27,17 @@
  *     `secrets > 0 ? block : findings > 0 ? review : pass`
  *       -> secretTypes = ["api_key", "token_secreto", "password"]
  *          (count-based, no numeric cut point)
+ *   - doubt-gate-es T3 `minConfidence = 0.90` (UNCALIBRATED-CONSERVATIVE):
+ *     the global doubt gate in engine.ts escalates when the case
+ *     min-confidence falls below this cut. Unlike every value above, this
+ *     number is NOT preserved behavior -- it comes from
+ *     `evals/results/doubt-gate-es/BASELINE.md` §6, which found NO positive
+ *     calibration signal (bands overlap: >=0.90 -> 0/6, 0.80-0.90 -> 0.50,
+ *     <0.80 -> 0.43 on effectively ~19 cases), so the cut is a conservative
+ *     tripwire (~95% of ES-like traffic escalates: 108/114 case-passes <
+ *     0.90, p90 = 0.877), explicitly NOT a measurement. See
+ *     DOUBT_GATE_UNCALIBRATED below; do NOT lower it to "reduce noise"
+ *     (0.50 would escalate nothing: min observed is 0.5155).
  *
  * ENV OVERRIDES (documented; for ops/tests only — overrides do NOT
  * calibrate anything, they only move the preserved cut points):
@@ -40,6 +51,8 @@
  *   - LAYA_POLICY_REQUIRE_SUPPORT       (default 0.8)
  *   - LAYA_POLICY_SECRET_TYPES          (default "api_key,token_secreto,password";
  *                                        comma-separated list)
+ *   - LAYA_POLICY_MIN_CONFIDENCE        (default 0.90, doubt-gate-es T3;
+ *                                        UNCALIBRATED -- see DOUBT_GATE_UNCALIBRATED)
  * Missing or non-finite values fall back to the v1 defaults above (no
  * throw: the engine stays total). Resolution happens in loader.ts at load
  * time; the decision path itself never touches process.env.
@@ -68,6 +81,12 @@ export interface PolicyThresholds {
   reviewReview: number;
   /** decide requirement cut: signal < this is an unsupported requirement. */
   requireSupport: number;
+  /**
+   * doubt-gate-es T3: global doubt-gate cut. The engine escalates (never
+   * blocks) when the case min-confidence falls below this value.
+   * UNCALIBRATED-CONSERVATIVE 0.90 -- see DOUBT_GATE_UNCALIBRATED.
+   */
+  minConfidence: number;
   /** PII secret types (count-based, from pii.ts SECRET_TYPES). */
   secretTypes: string[];
 }
@@ -82,8 +101,23 @@ export const THRESHOLDS_V1: PolicyThresholds = {
   reviewAuto: 0.85,
   reviewReview: 0.5,
   requireSupport: 0.8,
+  minConfidence: 0.9,
   secretTypes: ["api_key", "token_secreto", "password"],
 };
+
+/**
+ * doubt-gate-es T3: the `minConfidence` cut above is UNCALIBRATED.
+ *
+ * `evals/results/doubt-gate-es/BASELINE.md` §4/§6 (T2, N = 6 passes over 20
+ * ES cases + 80-case anchor): declared model confidence does NOT separate
+ * hits from misses on these slices (bands overlap), so no data-driven cut
+ * exists. Per the task contract the gate ships at the conservative tripwire
+ * 0.90 anyway -- escalating on doubt, never blocking, never inventing
+ * certainty -- with ~95% escalation expected on ES-like traffic until real
+ * labels exist. `true` while this holds; flip only with a measured
+ * recalibration, never to quiet the gate.
+ */
+export const DOUBT_GATE_UNCALIBRATED = true;
 
 /**
  * fut-b-semantica T2: risk strictness delta (NOT calibrated -- same honesty
@@ -119,6 +153,7 @@ export const THRESHOLD_ENV_VARS = {
   reviewAuto: "LAYA_POLICY_REVIEW_AUTO",
   reviewReview: "LAYA_POLICY_REVIEW_MIN",
   requireSupport: "LAYA_POLICY_REQUIRE_SUPPORT",
+  minConfidence: "LAYA_POLICY_MIN_CONFIDENCE",
   secretTypes: "LAYA_POLICY_SECRET_TYPES",
 } as const;
 
@@ -150,6 +185,7 @@ export function resolveThresholds(env: Record<string, string | undefined>): Poli
     reviewAuto: numOrDefault(env[THRESHOLD_ENV_VARS.reviewAuto], THRESHOLDS_V1.reviewAuto),
     reviewReview: numOrDefault(env[THRESHOLD_ENV_VARS.reviewReview], THRESHOLDS_V1.reviewReview),
     requireSupport: numOrDefault(env[THRESHOLD_ENV_VARS.requireSupport], THRESHOLDS_V1.requireSupport),
+    minConfidence: numOrDefault(env[THRESHOLD_ENV_VARS.minConfidence], THRESHOLDS_V1.minConfidence),
     secretTypes: secretTypes.length > 0 ? secretTypes : [...THRESHOLDS_V1.secretTypes],
   };
 }

@@ -454,6 +454,7 @@ check("v1 defaults equal the preserved pre-P1 literals", () => {
     reviewAuto: 0.85,
     reviewReview: 0.5,
     requireSupport: 0.8,
+    minConfidence: 0.9,
     secretTypes: ["api_key", "token_secreto", "password"],
   });
 });

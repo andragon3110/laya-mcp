@@ -11,7 +11,17 @@
  *   2. SINGLE GLOBAL ABSTAIN RULE (see types.ts): abstained evidence
  *      short-circuits to ESCALATE + ["abstained_evidence"] before any
  *      policy logic runs. `context`/`risk` never rescue abstention.
- *   3. Otherwise delegate to the policy definition with the resolved
+ *   3. GLOBAL DOUBT GATE (doubt-gate-es T3): when the caller passes the
+ *      case confidence via `context.answer_confidence` (per-question map)
+ *      or `context.min_confidence` (precomputed case-min scalar) and its
+ *      minimum falls below `thresholds.minConfidence`, short-circuit to
+ *      ESCALATE + ["low_confidence"] before any policy logic runs. The
+ *      gate ESCALATES, never blocks and never invents certainty: a missing
+ *      or non-finite confidence sleeps the gate (passthrough to the
+ *      policy), and a non-finite cut disables it. The cut is
+ *      UNCALIBRATED-CONSERVATIVE (see DOUBT_GATE_UNCALIBRATED in
+ *      thresholds.ts) -- review-by-default until real labels exist.
+ *   4. Otherwise delegate to the policy definition with the resolved
  *      shared thresholds.
  *
  * fut-b-semantica T3 (BREAKING precedence change, implemented in
@@ -31,14 +41,50 @@
  * documents it (gate/screen numeric bands via thresholds.RISK_CUT_DELTA,
  * pii non-secret branch); every other v1 policy ignores it. Neither
  * `context` nor `risk` ever rescues abstention (rule above).
+ *
+ * doubt-gate-es T3 exception: the GLOBAL doubt gate (this file, step 3
+ * above) reads `context.answer_confidence` / `context.min_confidence` as a
+ * pure passthrough tripwire. It never moves a policy cut -- it
+ * short-circuits to ESCALATE before any policy runs, and only on doubt.
  */
 import { getPolicy } from "./loader.js";
 import type { PolicyThresholds } from "./thresholds.js";
-import { ABSTAIN_REASON_CODE, type PolicyDecision, type PolicyInput } from "./types.js";
+import {
+  ABSTAIN_REASON_CODE,
+  type PolicyContext,
+  type PolicyDecision,
+  type PolicyInput,
+} from "./types.js";
 
 export interface EvaluateOptions {
   /** Injected thresholds (pure/test path). Defaults to the loader-resolved shared table. */
   thresholds?: PolicyThresholds;
+}
+
+/**
+ * doubt-gate-es T3: reason code for the global doubt gate. Escalate-only:
+ * low declared confidence routes to human review, never to a block.
+ */
+export const LOW_CONFIDENCE_REASON_CODE = "low_confidence";
+
+/**
+ * doubt-gate-es T3: case min-confidence from the caller context. Accepts the
+ * per-question `answer_confidence` map (min over finite values) or a
+ * precomputed `min_confidence` scalar. Returns null when neither is usable --
+ * the gate sleeps rather than inventing certainty.
+ */
+export function caseMinConfidence(context: PolicyContext | undefined): number | null {
+  if (!context || typeof context !== "object") return null;
+  const scalar = (context as Record<string, unknown>).min_confidence;
+  if (typeof scalar === "number") return Number.isFinite(scalar) ? scalar : null;
+  const table = (context as Record<string, unknown>).answer_confidence;
+  if (typeof table !== "object" || table === null) return null;
+  let min: number | null = null;
+  for (const v of Object.values(table as Record<string, unknown>)) {
+    if (typeof v !== "number" || !Number.isFinite(v)) continue;
+    min = min === null ? v : Math.min(min, v);
+  }
+  return min;
 }
 
 export function evaluate(input: PolicyInput, opts?: EvaluateOptions): PolicyDecision {
@@ -54,6 +100,18 @@ export function evaluate(input: PolicyInput, opts?: EvaluateOptions): PolicyDeci
     return {
       decision: "ESCALATE",
       reason_codes: [ABSTAIN_REASON_CODE],
+      policy: { name: definition.name, version: definition.version },
+    };
+  }
+  const minConf = caseMinConfidence(input.context);
+  if (
+    minConf !== null &&
+    Number.isFinite(thresholds.minConfidence) &&
+    minConf < thresholds.minConfidence
+  ) {
+    return {
+      decision: "ESCALATE",
+      reason_codes: [LOW_CONFIDENCE_REASON_CODE],
       policy: { name: definition.name, version: definition.version },
     };
   }

@@ -5,9 +5,17 @@
  * callers receive a structured `LayaUnavailableError` so tool handlers can
  * return an MCP `isError: true` response rather than hanging the agent.
  */
+import { clearDoubtTable, doubtTableFromRaw, mergeDoubtTable } from "./policy/doubt.js";
+
 export interface PredictResult {
   answers: Record<string, unknown>;
   confidence: Record<string, number>;
+  /**
+   * doubt-gate-es T3: first-class `answer_confidence` passthrough from the
+   * backend (per-question declared confidence). Empty when the backend
+   * omits it (older builds); transport only, no logic here.
+   */
+  answer_confidence: Record<string, number>;
   routing: Record<string, unknown>;
   model: string;
   latencyMs: number;
@@ -266,10 +274,20 @@ export class LayaClient {
         );
       }
       const results = body.results as Array<Record<string, unknown>> | undefined;
+      const confidence =
+        (body.confidence as Record<string, number>) ??
+        (results?.[0]?.confidence as Record<string, number>) ?? {};
+      // doubt-gate-es T3: passthrough only -- never derived, never defaulted from `confidence`.
+      const answerConfidence =
+        (body.answer_confidence as Record<string, number>) ??
+        (results?.[0]?.answer_confidence as Record<string, number>) ?? {};
+      // doubt-gate-es T5: feed the ambient case-confidence the doubt gate
+      // reads (see policy/doubt.ts). Transport only: no threshold here.
+      mergeDoubtTable(doubtTableFromRaw({ answer_confidence: answerConfidence, confidence }));
       return {
         answers: rawAnswers as Record<string, unknown>,
-        confidence: (body.confidence as Record<string, number>) ??
-          (results?.[0]?.confidence as Record<string, number>) ?? {},
+        confidence,
+        answer_confidence: answerConfidence,
         routing: (body.routing as Record<string, unknown>) ?? {},
         model: (body.model as string) ?? "laya",
         latencyMs: Number(body.latency_ms ?? 0),
@@ -277,6 +295,9 @@ export class LayaClient {
           (results?.[0]?.usage as Record<string, number>) ?? {},
       };
     } catch (err) {
+      // doubt-gate-es T5: a dead predict feeds nothing -- drop any ambient
+      // so the next case cannot inherit this one's confidence.
+      clearDoubtTable();
       if (err instanceof LayaUnavailableError) throw err;
       if ((err as Error).name === "AbortError") {
         throw new LayaUnavailableError(

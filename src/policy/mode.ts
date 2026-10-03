@@ -47,6 +47,7 @@
  * stays true under every policy mode.
  */
 import { evaluate, type EvaluateOptions } from "./engine.js";
+import { takeDoubtTable } from "./doubt.js";
 import type { PolicyDecision, PolicyInput, PolicyRef } from "./types.js";
 
 /** Policy-decision modes. Never `write`/`act`: laya-mcp never executes actions. */
@@ -175,7 +176,19 @@ export function evaluateForTool(
   const env = process.env as Record<string, string | undefined>;
   const mode = resolveMode(env, toolName);
   const candidate = mode === "shadow" ? resolveShadowRef(env, toolName) : null;
-  const out = evaluateWithMode(input, { thresholds: opts?.thresholds, mode, shadowPolicy: candidate });
+  // doubt-gate-es T5: fill the gate context from the ambient case
+  // confidence fed by LayaClient.predict (see doubt.ts). Consumed exactly
+  // once here, so every judgment sees its own case and nothing else.
+  // Explicit handler context always wins; abstention still precedes the
+  // gate (engine order untouched); base and shadow share the same input.
+  const doubt = takeDoubtTable();
+  const inputWithDoubt =
+    doubt !== null &&
+    input.context?.answer_confidence === undefined &&
+    input.context?.min_confidence === undefined
+      ? { ...input, context: { ...(input.context ?? {}), answer_confidence: doubt } }
+      : input;
+  const out = evaluateWithMode(inputWithDoubt, { thresholds: opts?.thresholds, mode, shadowPolicy: candidate });
   if (mode === "shadow" && out.shadow === null) {
     const raw = env[shadowPolicyEnvVar(toolName)] ?? env[SHADOW_POLICY_ENV_VAR];
     console.error(
