@@ -2,6 +2,7 @@ import type { LayaClient } from "../client.js";
 import { screenEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
+import { scenarioPredictOpts } from "../policy/scenarioCuts.js";
 import { getPolicy } from "../policy/loader.js";
 import type { RiskTier } from "../policy/types.js";
 import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
@@ -225,7 +226,7 @@ export async function handleScreen(client: LayaClient, args: Record<string, unkn
       null,
       2,
     );
-  });
+  }, scenarioPredictOpts("laya_screen"));
   if (!result.ok) throw new Error(result.error);
   return result.content;
 }

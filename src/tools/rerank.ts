@@ -2,6 +2,7 @@ import type { LayaClient } from "../client.js";
 import { rerankEvidence } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
+import { scenarioPredictOpts } from "../policy/scenarioCuts.js";
 import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 import { overlapScore, tokenizeForFind } from "./find.js";
@@ -398,7 +399,7 @@ export async function handleRerank(client: LayaClient, args: Record<string, unkn
       null,
       2,
     );
-  });
+  }, scenarioPredictOpts("laya_rerank"));
   if (!result.ok) throw new Error(result.error);
   return result.content;
 }

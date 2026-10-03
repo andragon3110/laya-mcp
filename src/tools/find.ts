@@ -2,6 +2,7 @@ import type { LayaClient } from "../client.js";
 import { findEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
+import { scenarioPredictOpts } from "../policy/scenarioCuts.js";
 import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
@@ -337,7 +338,7 @@ export async function handleFind(client: LayaClient, args: Record<string, unknow
       null,
       2,
     );
-  });
+  }, scenarioPredictOpts("laya_find"));
   if (!result.ok) throw new Error(result.error);
   return result.content;
 }

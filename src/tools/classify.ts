@@ -2,6 +2,7 @@ import type { LayaClient } from "../client.js";
 import { classifyEvidence, winnerOf } from "../evidence.js";
 import { LIMITS, assertCount } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
+import { scenarioPredictOpts } from "../policy/scenarioCuts.js";
 import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
@@ -147,7 +148,7 @@ export async function handleClassify(client: LayaClient, args: Record<string, un
       { thresholds },
     );
     return JSON.stringify({ classifications, decision, ...(shadow ? { shadow } : {}), latency_ms: raw.latencyMs, evidence, abstention }, null, 2);
-  });
+  }, scenarioPredictOpts("laya_classify"));
   if (!result.ok) throw new Error(result.error);
   return result.content;
 }

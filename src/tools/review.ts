@@ -2,6 +2,7 @@ import type { LayaClient } from "../client.js";
 import { reviewEvidence } from "../evidence.js";
 import { LIMITS, assertLength } from "../limits.js";
 import { evaluateForTool } from "../policy/mode.js";
+import { scenarioPredictOpts } from "../policy/scenarioCuts.js";
 import { getPolicy } from "../policy/loader.js";
 import { type ToolDefinition, runTool, READONLY_TOOL_ANNOTATIONS, decisionSchema, evidenceSchema, abstentionSchema, shadowSchema, envelopeMetadataProperties } from "../tool.js";
 
@@ -168,7 +169,7 @@ export async function handleReview(client: LayaClient, args: Record<string, unkn
       null,
       2,
     );
-  });
+  }, scenarioPredictOpts("laya_review"));
   if (!result.ok) throw new Error(result.error);
   return result.content;
 }
