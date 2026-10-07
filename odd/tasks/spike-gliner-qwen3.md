@@ -64,6 +64,7 @@ tsconfig.json
 - 2026-10-07 S4 DONE (worker general ses_ee8446af1ffePTXrsMJ10PJR82): 4 golds rerank/find, v3 stub + v4 live. :8765/:8767/:8768 quedan encendidos. Nota: `score --live` reescribe `artifacts/evals-t4-metrics.json` (restaurar tras runs).
 - 2026-10-07 S5 DONE (worker general ses_ee83accfcffeKcupqWIKdM9GVN): §7.8 con veredictos + S6 NO. S6 SKIPPED (criterio: ≥10 independientes + corte fuera del gap).
 - 2026-10-07 S7 DONE (worker general ses_ee838171bffev6xQivGqES4VI1): modernización lock-only + verificación final. Feature completo (S6 skipped con criterio = DONE).
+- 2026-10-07 push autorizado: `odd/spike-gliner-qwen3` → origin (6 commits hasta f956f84), in sync. PRs pendientes de autorización.
 - Forecast: grande (~1200 líneas autoradas; servidores nuevos exceden la heurística por naturaleza). Estrategia: stacked-to-main (cacheada). Running: ~1200. Slice 1: 59da599+44c58cc+e293c66; slice 2: 32b448d+e01ca71+commit de cierre.
 
 ## Verification evidence
