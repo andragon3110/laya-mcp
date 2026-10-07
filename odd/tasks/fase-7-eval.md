@@ -25,13 +25,13 @@ Fase 7 lo exige; tests/stubs/metrics/capabilities reutilizables sin redefinir.
 Lectura total + escritura en Scope. Prohibido: tocar src thresholds/semánticas/robustez, push/PR/merge.
 
 ## Acceptance criteria
-- [ ] evals/{10 suites} con harness común sin lógica duplicada.
-- [ ] datasets 6 clases por suite.
-- [ ] métricas válidas por primitive + Brier/ECE/veredicto calibración honestos.
-- [ ] wrong_confident_rate τ=0.70/0.80/0.90/0.95 por primitive (o "no aplica" justificado), nunca como threshold prod.
-- [ ] benchmarks primitives + rerank 10-1000 + manifest reproducibilidad.
-- [ ] integration benchmark comparable (o imposibilidad documentada con requisitos).
-- [ ] EVALUATION.md + evals/results/ versionados; criterio §11 respondible por corrida.
+- [x] evals/{10 suites} con harness común sin lógica duplicada.
+- [x] datasets 6 clases por suite.
+- [x] métricas válidas por primitive + Brier/ECE/veredicto calibración honestos.
+- [x] wrong_confident_rate τ=0.70/0.80/0.90/0.95 por primitive (o "no aplica" justificado), nunca como threshold prod.
+- [x] benchmarks primitives + rerank 10-1000 + manifest reproducibilidad.
+- [x] integration benchmark comparable (o imposibilidad documentada con requisitos).
+- [x] EVALUATION.md + evals/results/ versionados; criterio §11 respondible por corrida.
 
 ## Applicable checks
 - typecheck, build, py 42/42, mjs (378+73=451) + nuevos, smoke LAYA_SKIP, doctor --no-live.

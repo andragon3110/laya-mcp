@@ -28,14 +28,14 @@ El prompt de Fase 1 lo exige y prohíbe implementar; hacerlo sin baseline invent
 - Rama: crear `odd/fase-1-baseline-audit` si se está en default branch antes del primer commit work-unit.
 
 ## Acceptance criteria
-- [ ] Baseline ejecutado con comando/resultado/duración/errores/warnings registrados.
-- [ ] Contratos públicos inventariados (MCP/HTTP/CLI/config).
-- [ ] Arquitectura real documentada (no asumida).
-- [ ] 10 tools laya_* analizadas + laya_pii extra.
-- [ ] Problemas propuestos verificados con formato exigido + severidad P0-P3.
-- [ ] AUDIT.md con las 17 secciones.
-- [ ] Discrepancias prompt-vs-código documentadas.
-- [ ] Orden de implementación recomendado + breaking changes + riesgos + open questions.
+- [x] Baseline ejecutado con comando/resultado/duración/errores/warnings registrados.
+- [x] Contratos públicos inventariados (MCP/HTTP/CLI/config).
+- [x] Arquitectura real documentada (no asumida).
+- [x] 10 tools laya_* analizadas + laya_pii extra.
+- [x] Problemas propuestos verificados con formato exigido + severidad P0-P3.
+- [x] AUDIT.md con las 17 secciones.
+- [x] Discrepancias prompt-vs-código documentadas.
+- [x] Orden de implementación recomendado + breaking changes + riesgos + open questions.
 
 ## Applicable checks
 - `npm run typecheck`, `npm run build`, `python -m unittest` / `pytest` según repo, `tests/test_tools_offline.sh`, `tests/mcp_smoke.mjs`, `py/doctor.py --no-live`.

@@ -20,6 +20,11 @@
  * fakePiiCtx from the latter. Suites hold ONLY data + thin per-primitive
  * adapters (invoke + check); all orchestration lives here.
  *
+ * CAPABILITIES (harness-spike-ready T2): `laya_capabilities` has no suite
+ * here by category -- live discovery/inventory over /models + /ready
+ * probes, not a judgment primitive with oracle golds (see CAPABILITIES
+ * NOTE in evals/bench.mjs for the justification and where it is covered).
+ *
  * Run from the repo root:  node evals/run.mjs [suite] [--json]
  *   suite  optional suite name filter (e.g. `verify`); default runs all 11.
  *   --json print a machine-readable summary instead of the per-case log.

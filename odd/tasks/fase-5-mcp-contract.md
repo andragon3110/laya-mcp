@@ -23,13 +23,13 @@ Fase 5 lo exige; P1/P0 dejaron evidence/decision/models-list reutilizables.
 Lectura total + escritura en Scope. Prohibido: cambiar semánticas de decisión, robustez P0, engine core, push/PR/merge.
 
 ## Acceptance criteria
-- [ ] inputSchemas explícitos donde el SDK permite; inputs ambiguos eliminados o documentados.
-- [ ] structuredContent+outputSchema en tools compatibles, con texto-JSON preservado (mismo objeto).
-- [ ] decision metadata: decision_id/timestamp/model/model_revision/primitive/policy/policy_version/schema_version/latency_ms.
-- [ ] model_revision registrada cuando resoluble, configurable, reproducible (o null honesto documentado).
-- [ ] laya_capabilities con models/primitives/tools/policies/features/mode reales (nada inventado).
-- [ ] schema_version definido; incompatibilidades identificadas/documentadas/versionadas; compat razonable.
-- [ ] tests schema/contract/structured/back-compat/invalid/malformed; MCP_CONTRACT.md completo.
+- [x] inputSchemas explícitos donde el SDK permite; inputs ambiguos eliminados o documentados.
+- [x] structuredContent+outputSchema en tools compatibles, con texto-JSON preservado (mismo objeto).
+- [x] decision metadata: decision_id/timestamp/model/model_revision/primitive/policy/policy_version/schema_version/latency_ms.
+- [x] model_revision registrada cuando resoluble, configurable, reproducible (o null honesto documentado).
+- [x] laya_capabilities con models/primitives/tools/policies/features/mode reales (nada inventado).
+- [x] schema_version definido; incompatibilidades identificadas/documentadas/versionadas; compat razonable.
+- [x] tests schema/contract/structured/back-compat/invalid/malformed; MCP_CONTRACT.md completo.
 
 ## Applicable checks
 - typecheck, build, py 42/42, mjs (16+49+19+25+17+22+26+26+11+16=227) + nuevos, smoke LAYA_SKIP, doctor --no-live.

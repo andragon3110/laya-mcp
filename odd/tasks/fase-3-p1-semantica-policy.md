@@ -26,13 +26,13 @@ Fase 3 lo exige; P0 dejó robustez (probes, retry/circuit, límites 413) reutili
 Lectura total + escritura en Scope. Prohibido: calibración, shadow mode, eval harness, CUA, cambiar robustez P0 (probes/retry/límites) salvo línea necesaria, push/PR/merge.
 
 ## Acceptance criteria
-- [ ] Ningún output MCP usa `confidence`/`probability` para señal sin calibrar (nombres honestos + doc).
-- [ ] ABSTAIN/INSUFFICIENT_EVIDENCE de primera clase donde el prompt lo exige (verify/find/extract/review/decide/gate).
-- [ ] Evidencia explícita con source/score/candidate/span/detector/model/revision/metadata según tool.
-- [ ] Policy Engine determinista + policies versionadas; decisión {ALLOW/REVIEW/DENY/ESCALATE + reason_codes + policy{name,version}}.
-- [ ] review produce evidencia (no AUTO directo); gate consume evidence+policy+context+risk; verify con SUPPORTED/CONTRADICTED/INSUFFICIENT/ABSTAIN; screen separa injection/substance/relevance con PASS/REVIEW/BLOCK; pii pipeline GLiNER→spans→Laya→risk→Policy.
-- [ ] Propiedad "screen-pass ≠ autoridad" documentada y testeada adversarialmente.
-- [ ] Tests unit/integration/policy/semantic/adversarial; no-regression vs Fase 2; P1_IMPLEMENTATION.md.
+- [x] Ningún output MCP usa `confidence`/`probability` para señal sin calibrar (nombres honestos + doc).
+- [x] ABSTAIN/INSUFFICIENT_EVIDENCE de primera clase donde el prompt lo exige (verify/find/extract/review/decide/gate).
+- [x] Evidencia explícita con source/score/candidate/span/detector/model/revision/metadata según tool.
+- [x] Policy Engine determinista + policies versionadas; decisión {ALLOW/REVIEW/DENY/ESCALATE + reason_codes + policy{name,version}}.
+- [x] review produce evidencia (no AUTO directo); gate consume evidence+policy+context+risk; verify con SUPPORTED/CONTRADICTED/INSUFFICIENT/ABSTAIN; screen separa injection/substance/relevance con PASS/REVIEW/BLOCK; pii pipeline GLiNER→spans→Laya→risk→Policy.
+- [x] Propiedad "screen-pass ≠ autoridad" documentada y testeada adversarialmente.
+- [x] Tests unit/integration/policy/semantic/adversarial; no-regression vs Fase 2; P1_IMPLEMENTATION.md.
 
 ## Applicable checks
 - `npm run typecheck`, `npm run build`, unittests py (9+14+11+8 existentes), `node tests/t6_limits.mjs`, `LAYA_SKIP=1 python tests/smoke.py`, `doctor --no-live`, batería nueva.

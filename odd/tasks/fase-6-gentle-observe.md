@@ -25,12 +25,12 @@ Fase 6 lo exige; Fases 0-5 dejaron envelope/metadata/capabilities/policies reuti
 Lectura total + escritura en Scope. Prohibido: cambiar decisiones/semánticas, robustez P0, push/PR/merge.
 
 ## Acceptance criteria
-- [ ] trace_id/span_id entrantes (vía _meta) correlacionan con decision_id; flujo documentado.
-- [ ] métricas requests_total/failed/latency p50-p99/load/abstentions/escalations/allow/review/deny por tool (+modelo razonable), expuestas sin inventar infra.
-- [ ] modos observe/shadow/enforce configurables global/tool/policy; shadow no altera flujo.
-- [ ] invocación declarativa adaptada (tabla hooks) sin obligar todos los requests.
-- [ ] discovery reutiliza capabilities (modelos/primitives/tools/policies/features/mode/versiones).
-- [ ] seguridad: tests de inmutabilidad + doc; tests §8 (modos, trace, correlación, fallos, back-compat); GENTLE_INTEGRATION.md.
+- [x] trace_id/span_id entrantes (vía _meta) correlacionan con decision_id; flujo documentado.
+- [x] métricas requests_total/failed/latency p50-p99/load/abstentions/escalations/allow/review/deny por tool (+modelo razonable), expuestas sin inventar infra.
+- [x] modos observe/shadow/enforce configurables global/tool/policy; shadow no altera flujo.
+- [x] invocación declarativa adaptada (tabla hooks) sin obligar todos los requests.
+- [x] discovery reutiliza capabilities (modelos/primitives/tools/policies/features/mode/versiones).
+- [x] seguridad: tests de inmutabilidad + doc; tests §8 (modos, trace, correlación, fallos, back-compat); GENTLE_INTEGRATION.md.
 
 ## Applicable checks
 - typecheck, build, py 42/42, mjs (227+64+23+14+50=378) + nuevos, smoke LAYA_SKIP, doctor --no-live.
