@@ -177,6 +177,55 @@ export async function buildManifest({ bench = null, metrics = null, backend = nu
   };
 }
 
+/**
+ * Spike S4: score the rerank/find suites through the connected Qwen lane
+ * (live deps with a ready rerank sidecar). Per case: invoke via the suite
+ * adapter (which routes to Qwen when rerankReady), check against the case
+ * gold, record pass/threw + the judged output. Pure data for the
+ * manifest spike_qwen block; it never changes what run/score/bench
+ * execute. Independent golds judge the backend; oracle-stub mismatches
+ * measure backend-vs-oracle divergence (documented, not failure).
+ */
+export async function scoreRerankFindLive(deps) {
+  const suites = [findSuite, rerankSuite];
+  const cases = [];
+  for (const suite of suites) {
+    for (const c of suite.cases) {
+      const capture = {};
+      try {
+        const body = await suite.invoke(deps, c.input, c.stub, capture);
+        if (c.expectError) {
+          cases.push({ suite: suite.name, id: c.id, kind: c.kind, gold_source: c.gold_source ?? suite.goldSource ?? "oracle-stub", pass: false, threw: false, detail: `expected throw /${c.expectError}/ but got output` });
+        } else {
+          let actual = null;
+          try {
+            actual = suite.check(body, c.gold);
+            cases.push({ suite: suite.name, id: c.id, kind: c.kind, gold_source: c.gold_source ?? suite.goldSource ?? "oracle-stub", pass: true, threw: false, actual });
+          } catch (err) {
+            cases.push({ suite: suite.name, id: c.id, kind: c.kind, gold_source: c.gold_source ?? suite.goldSource ?? "oracle-stub", pass: false, threw: false, actual, detail: String(err?.message ?? err).split("\n").slice(0, 3).join(" | ") });
+          }
+        }
+      } catch (err) {
+        if (c.expectError && String(err?.message ?? err).includes(c.expectError)) {
+          cases.push({ suite: suite.name, id: c.id, kind: c.kind, gold_source: c.gold_source ?? suite.goldSource ?? "oracle-stub", pass: true, threw: true, actual: { threw: c.expectError } });
+        } else {
+          cases.push({ suite: suite.name, id: c.id, kind: c.kind, gold_source: c.gold_source ?? suite.goldSource ?? "oracle-stub", pass: false, threw: true, detail: String(err?.message ?? err).split("\n").slice(0, 3).join(" | ") });
+        }
+      }
+    }
+  }
+  const ind = cases.filter((r) => r.gold_source === "independent");
+  const indPass = ind.filter((r) => r.pass).length;
+  return {
+    lane: "qwen-rerank (rerank suite direct + find via argmax-over-rerank-scores; see evals/suites/rerank.mjs + find.mjs S4 notes)",
+    cases: cases.length,
+    passed: cases.filter((r) => r.pass).length,
+    threw: cases.filter((r) => r.threw && !r.pass).length,
+    independent: { n: ind.length, passed: indPass, ids: ind.map((r) => `${r.suite}/${r.id}:${r.pass ? "pass" : "FAIL"}`) },
+    honesty: "independent golds judge the backend (human-fixed truth); oracle-stub mismatches measure backend-vs-oracle divergence, never backend quality",
+    rows: cases,
+  };
+}
 /** Capture the T4 score report via subprocess (reuses score.mjs untouched).
  * `live: true` passes --live through so a live bench saves paired live
  * metrics; the stub default captures the stub report as before. */
@@ -241,12 +290,19 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
         console.error(`\nmanifest --live refused: backend unreachable at ${backend.baseUrl ?? "unknown"} (${backend.error ?? "no probe result"}). Start laya-server or run the stub default (no --live).`);
         process.exit(2);
       }
-      const { client, gliner } = await connectLiveBackend({ baseUrl: backend.baseUrl, glinerUrl: backend.glinerUrl });
-      live = { backend, deps: makeLiveDeps({ client, gliner }), client };
+      const { client, gliner, rerank } = await connectLiveBackend({ baseUrl: backend.baseUrl, glinerUrl: backend.glinerUrl, rerankUrl: backend.rerankUrl });
+      live = { backend, deps: makeLiveDeps({ client, gliner, rerank }), client };
     }
     const bench = await runBench({}, live);
     const metrics = captureScoreMetrics({ live: live !== null });
     const manifest = await buildManifest({ bench, metrics, backend: bench.backend });
+    // Spike S4: when the Qwen sidecar was probed reachable, score the
+    // rerank/find suites through it and version the pass inside the
+    // manifest (independent golds judge; oracle-stub mismatches are
+    // backend-vs-oracle divergence, never quality).
+    if (live !== null && backend.rerank?.reachable === true) {
+      manifest.spike_qwen = await scoreRerankFindLive(live.deps);
+    }
     const saved = saveRun({ manifest, bench, metrics });
     if (asJson) console.log(JSON.stringify({ saved, manifest }, null, 2));
     else {

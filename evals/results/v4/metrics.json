@@ -1,0 +1,910 @@
+{
+  "generated": "fase-7 T4+spike LIVE backend http://127.0.0.1:8765 (oracle golds: mismatches measure backend-vs-oracle divergence, never backend quality)",
+  "backend": {
+    "mode": "live",
+    "live": true,
+    "reachable": true,
+    "baseUrl": "http://127.0.0.1:8765",
+    "glinerUrl": "http://127.0.0.1:8766",
+    "rerankUrl": "http://127.0.0.1:8768",
+    "rerank": {
+      "baseUrl": "http://127.0.0.1:8768",
+      "reachable": true,
+      "ready": true,
+      "ready_reason": null,
+      "device": "cuda",
+      "models": [
+        {
+          "name": "Qwen/Qwen3-Reranker-0.6B",
+          "repo": "Qwen/Qwen3-Reranker-0.6B",
+          "loaded": true,
+          "revision": null,
+          "revision_source": "unpinned",
+          "device": "cuda",
+          "circuit": "closed"
+        }
+      ],
+      "model": "Qwen/Qwen3-Reranker-0.6B",
+      "model_revision": null,
+      "model_revision_source": "unpinned",
+      "probe_status": {
+        "ready": 200,
+        "models": 200
+      }
+    },
+    "ready": true,
+    "ready_reason": null,
+    "device": "auto",
+    "models": [
+      {
+        "name": "english",
+        "repo": "convaiinnovations/laya",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "auto",
+        "circuit": "closed"
+      },
+      {
+        "name": "multilingual",
+        "repo": "convaiinnovations/laya-multilingual",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "auto",
+        "circuit": "closed"
+      },
+      {
+        "name": "typed-decisions",
+        "repo": "convaiinnovations/laya-typed-decisions",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "auto",
+        "circuit": "closed"
+      }
+    ],
+    "model": "english",
+    "model_revision": null,
+    "model_revision_source": "unpinned",
+    "tokenizer": "unknown",
+    "probe_status": {
+      "ready": 200,
+      "models": 200
+    }
+  },
+  "taus": [
+    0.7,
+    0.8,
+    0.9,
+    0.95
+  ],
+  "taus_note": "reporting slices only; NEVER production thresholds (see evals/calibration.md)",
+  "suites": [
+    {
+      "suite": "classify",
+      "primitive": "laya_classify",
+      "family": "binary",
+      "cases": 10,
+      "abstention": {
+        "total": 10,
+        "errors": 1,
+        "scored": 9,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 9,
+        "correct": 8,
+        "accuracy": 0.8888888888888888
+      },
+      "task": {
+        "n": 9,
+        "correct": 4,
+        "accuracy": 0.4444444444444444
+      },
+      "binary_allow_polarity": {
+        "n": 9,
+        "tp": 8,
+        "tn": 0,
+        "fp": 1,
+        "fn": 0,
+        "accuracy": 0.8888888888888888,
+        "precision": 0.8888888888888888,
+        "recall": 1,
+        "f1": 0.9411764705882353,
+        "fpr": 1,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 10,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 7,
+            "wrong_and_confident": 3,
+            "rate": 0.3,
+            "conditional_wrong_given_confident": 0.42857142857142855
+          },
+          {
+            "tau": 0.8,
+            "confident": 4,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 2,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "decide",
+      "primitive": "laya_decide",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 1,
+        "abstention_rate": 0.14285714285714285
+      },
+      "decision": {
+        "n": 7,
+        "correct": 3,
+        "accuracy": 0.42857142857142855
+      },
+      "task": {
+        "n": 7,
+        "correct": 4,
+        "accuracy": 0.5714285714285714
+      },
+      "binary_allow_polarity": {
+        "n": 6,
+        "tp": 3,
+        "tn": 0,
+        "fp": 3,
+        "fn": 0,
+        "accuracy": 0.5,
+        "precision": 0.5,
+        "recall": 1,
+        "f1": 0.6666666666666666,
+        "fpr": 1,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 6,
+        "excluded": {
+          "threw": 0,
+          "abstained": 1,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.8,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.9,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.95,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.3333333333333333,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          }
+        ]
+      }
+    },
+    {
+      "suite": "verify",
+      "primitive": "laya_verify",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 2,
+        "scored": 6,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666
+      },
+      "task": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666
+      },
+      "binary_allow_polarity": {
+        "n": 6,
+        "tp": 2,
+        "tn": 2,
+        "fp": 1,
+        "fn": 1,
+        "accuracy": 0.6666666666666666,
+        "precision": 0.6666666666666666,
+        "recall": 0.6666666666666666,
+        "f1": 0.6666666666666666,
+        "fpr": 0.3333333333333333,
+        "fnr": 0.3333333333333333
+      },
+      "wrong_confident": {
+        "signal": "per-claim support signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 7,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 4,
+            "wrong_and_confident": 2,
+            "rate": 0.2857142857142857,
+            "conditional_wrong_given_confident": 0.5
+          },
+          {
+            "tau": 0.8,
+            "confident": 3,
+            "wrong_and_confident": 1,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.9,
+            "confident": 3,
+            "wrong_and_confident": 1,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "screen",
+      "primitive": "laya_screen",
+      "family": "binary",
+      "cases": 10,
+      "abstention": {
+        "total": 10,
+        "errors": 1,
+        "scored": 9,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 9,
+        "correct": 4,
+        "accuracy": 0.4444444444444444
+      },
+      "task": {
+        "n": 9,
+        "correct": 5,
+        "accuracy": 0.5555555555555556
+      },
+      "binary_allow_polarity": {
+        "n": 9,
+        "tp": 0,
+        "tn": 6,
+        "fp": 0,
+        "fn": 3,
+        "accuracy": 0.6666666666666666,
+        "precision": null,
+        "recall": 0,
+        "f1": null,
+        "fpr": 0,
+        "fnr": 1
+      },
+      "wrong_confident": {
+        "signal": "injection signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 9,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 3,
+            "wrong_and_confident": 2,
+            "rate": 0.2222222222222222,
+            "conditional_wrong_given_confident": 0.6666666666666666
+          },
+          {
+            "tau": 0.8,
+            "confident": 2,
+            "wrong_and_confident": 1,
+            "rate": 0.1111111111111111,
+            "conditional_wrong_given_confident": 0.5
+          },
+          {
+            "tau": 0.9,
+            "confident": 1,
+            "wrong_and_confident": 1,
+            "rate": 0.1111111111111111,
+            "conditional_wrong_given_confident": 1
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "pii",
+      "primitive": "laya_pii",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 8,
+        "scored": 0,
+        "abstained": 0,
+        "abstention_rate": null
+      },
+      "decision": {
+        "n": 0,
+        "correct": 0,
+        "accuracy": null
+      },
+      "task": {
+        "n": 0,
+        "correct": 0,
+        "accuracy": null
+      },
+      "binary_allow_polarity": {
+        "n": 0,
+        "tp": 0,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": null,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": null,
+        "fnr": null
+      },
+      "wrong_confident": {
+        "signal": "max detector_score",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 0,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": null,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.8,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": null,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.9,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": null,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": null,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "extract",
+      "primitive": "laya_extract",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 3,
+        "scored": 5,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 5,
+        "correct": 4,
+        "accuracy": 0.8
+      },
+      "task": {
+        "n": 5,
+        "correct": 3,
+        "accuracy": 0.6
+      },
+      "binary_allow_polarity": {
+        "n": 5,
+        "tp": 4,
+        "tn": 0,
+        "fp": 1,
+        "fn": 0,
+        "accuracy": 0.8,
+        "precision": 0.8,
+        "recall": 1,
+        "f1": 0.888888888888889,
+        "fpr": 1,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 5,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.8,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.9,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "find",
+      "primitive": "laya_find",
+      "family": "binary",
+      "cases": 10,
+      "abstention": {
+        "total": 10,
+        "errors": 1,
+        "scored": 9,
+        "abstained": 2,
+        "abstention_rate": 0.2222222222222222
+      },
+      "decision": {
+        "n": 9,
+        "correct": 7,
+        "accuracy": 0.7777777777777778
+      },
+      "task": {
+        "n": 9,
+        "correct": 6,
+        "accuracy": 0.6666666666666666
+      },
+      "binary_allow_polarity": {
+        "n": 7,
+        "tp": 5,
+        "tn": 0,
+        "fp": 2,
+        "fn": 0,
+        "accuracy": 0.7142857142857143,
+        "precision": 0.7142857142857143,
+        "recall": 1,
+        "f1": 0.8333333333333333,
+        "fpr": 1,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 7,
+        "excluded": {
+          "threw": 0,
+          "abstained": 2,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 6,
+            "wrong_and_confident": 2,
+            "rate": 0.2857142857142857,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.8,
+            "confident": 3,
+            "wrong_and_confident": 2,
+            "rate": 0.2857142857142857,
+            "conditional_wrong_given_confident": 0.6666666666666666
+          },
+          {
+            "tau": 0.9,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "rerank",
+      "primitive": "laya_rerank",
+      "family": "ranking",
+      "cases": 10,
+      "abstention": {
+        "total": 10,
+        "errors": 2,
+        "scored": 8,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 8,
+        "correct": 7,
+        "accuracy": 0.875
+      },
+      "ranking": {
+        "n": 8,
+        "excluded_abstained_or_throw": 2,
+        "mrr": 0.875,
+        "ndcg": 0.9649296749630494,
+        "map": 0.875,
+        "topK": {
+          "top_1": 0.75,
+          "top_3": 1
+        }
+      },
+      "wrong_confident": {
+        "status": "no aplica",
+        "reason": "relevance_score is within-call only by contract (never comparable across calls); a single score has no correctness value, so no tau slice is meaningful."
+      }
+    },
+    {
+      "suite": "review",
+      "primitive": "laya_review",
+      "family": "agreement",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 7,
+        "correct": 3,
+        "accuracy": 0.42857142857142855
+      },
+      "task": {
+        "n": 7,
+        "correct": 3,
+        "accuracy": 0.42857142857142855
+      },
+      "score_agreement": {
+        "status": "no computable en T3",
+        "reason": "T3 golds hold decisions, not rubric-score oracles; see scoreAgreement() in evals/metrics.mjs for the T5+ definition."
+      },
+      "wrong_confident": {
+        "signal": "safe_to_apply signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 7,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.8,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.9,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "gate",
+      "primitive": "laya_gate",
+      "family": "agreement",
+      "cases": 10,
+      "abstention": {
+        "total": 10,
+        "errors": 1,
+        "scored": 9,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 9,
+        "correct": 2,
+        "accuracy": 0.2222222222222222
+      },
+      "task": {
+        "n": 9,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "score_agreement": {
+        "status": "no computable en T3",
+        "reason": "T3 golds hold decisions, not rubric-score oracles; see scoreAgreement() in evals/metrics.mjs for the T5+ definition."
+      },
+      "wrong_confident": {
+        "signal": "per-claim support signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 10,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 8,
+            "wrong_and_confident": 8,
+            "rate": 0.8,
+            "conditional_wrong_given_confident": 1
+          },
+          {
+            "tau": 0.8,
+            "confident": 8,
+            "wrong_and_confident": 8,
+            "rate": 0.8,
+            "conditional_wrong_given_confident": 1
+          },
+          {
+            "tau": 0.9,
+            "confident": 7,
+            "wrong_and_confident": 7,
+            "rate": 0.7,
+            "conditional_wrong_given_confident": 1
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      }
+    },
+    {
+      "suite": "compare",
+      "primitive": "laya_compare",
+      "family": "binary",
+      "cases": 8,
+      "abstention": {
+        "total": 8,
+        "errors": 1,
+        "scored": 7,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "decision": {
+        "n": 7,
+        "correct": 5,
+        "accuracy": 0.7142857142857143
+      },
+      "task": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666
+      },
+      "binary_allow_polarity": {
+        "n": 7,
+        "tp": 5,
+        "tn": 0,
+        "fp": 2,
+        "fn": 0,
+        "accuracy": 0.7142857142857143,
+        "precision": 0.7142857142857143,
+        "recall": 1,
+        "f1": 0.8333333333333333,
+        "fpr": 1,
+        "fnr": 0
+      },
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 7,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 4,
+            "wrong_and_confident": 2,
+            "rate": 0.2857142857142857,
+            "conditional_wrong_given_confident": 0.5
+          },
+          {
+            "tau": 0.8,
+            "confident": 4,
+            "wrong_and_confident": 2,
+            "rate": 0.2857142857142857,
+            "conditional_wrong_given_confident": 0.5
+          },
+          {
+            "tau": 0.9,
+            "confident": 3,
+            "wrong_and_confident": 1,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          },
+          {
+            "tau": 0.95,
+            "confident": 3,
+            "wrong_and_confident": 1,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.3333333333333333
+          }
+        ]
+      }
+    }
+  ]
+}

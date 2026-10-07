@@ -107,10 +107,46 @@ export const cases = [
     expectError: "input_too_large",
     gold: { why: "over-ceiling pools fail fast, never silently cut." },
   },
+  {
+    id: "rerank-independent-01",
+    kind: "normal",
+    gold_source: "independent",
+    input: {
+      query: "how do I reset my password",
+      candidates: [
+        { id: "a", text: "Click Settings, then Reset password, and follow the emailed link to choose a new password." },
+        { id: "b", text: "Zebra migration notes for the spring season." },
+      ],
+    },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): candidate a answers the query directly while b is topically unrelated; any competent ranker orders a first. The stub scores below only feed the handler the signal a working backend would return.",
+    stub: { answers: { relevance_0_a: { noul: 0.85 }, relevance_1_b: { noul: 0.15 } } },
+    gold: { order: ["a", "b"], decision: "ALLOW", abstained: false, why: "human-fixed relevance gap orders a first without abstention." },
+  },
+  {
+    id: "rerank-independent-02",
+    kind: "normal",
+    gold_source: "independent",
+    input: {
+      query: "¿cómo restablezco mi contraseña?",
+      candidates: [
+        { id: "a", text: "Abre los Ajustes, pulsa Restablecer contraseña y sigue el enlace que recibes por correo para elegir una nueva." },
+        { id: "b", text: "Notas sobre la migración de las cebras en primavera." },
+      ],
+    },
+    oracle: "INDEPENDENT GOLD (human-fixed truth, español): el candidato a responde la consulta directamente mientras b es ajeno al tema; cualquier ranker competente ordena a primero. Las señales stub solo alimentan al handler con lo que devolvería un backend funcional.",
+    stub: { answers: { relevance_0_a: { noul: 0.85 }, relevance_1_b: { noul: 0.15 } } },
+    gold: { order: ["a", "b"], decision: "ALLOW", abstained: false, why: "human-fixed relevance gap (ES) orders a first without abstention." },
+  },
 ];
 
 export async function invoke(deps, input, stub, capture) {
-  const client = deps.fakeClient(stub.answers ?? {}, capture);
+  // S4 spike lane: judge through the live Qwen sidecar when one is
+  // connected (makeRerankCtx present AND rerankReady). Stub default and
+  // Laya-live both fall back to fakeClient, so non-Qwen behavior is
+  // byte-identical to S3.
+  const rctx = deps.makeRerankCtx?.();
+  const fake = rctx && rctx.rerankReady() ? rctx.rerankFakeClient : deps.fakeClient;
+  const client = fake(stub.answers ?? {}, capture);
   return JSON.parse(await handleRerank(client, input));
 }
 

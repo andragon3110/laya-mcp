@@ -1,0 +1,565 @@
+{
+  "generated": "fase-7 T5 (oracle-stub canonicals + real handlers; stub ceiling, not backend quality)",
+  "backend": {
+    "mode": "stub",
+    "live": false,
+    "reachable": false,
+    "note": "stub default: oracle answers + real handlers (stub ceiling, not backend quality)"
+  },
+  "method": "single process; stub-reported latency_ms kept separate from measured wall (wall = pipeline overhead; stubs report latency_ms as a field, never conflated; optional injected delay via delayMs, unused by default); memory = absolute heapUsed in MB (approx, whole process, single sample, no GC forcing); quantiles = nearest-rank p50/p95/p99 (src/metrics.ts definition); throughput = count/meanWall; rerank N>64 = pure selector + projected judge (64 transport cap) unless opt-in --rerank-paged pages N>64 through <=64 judge windows (deterministic concat merge); quality = MRR/nDCG vs construction-truth gold (stub ceiling, NOT backend quality); absolutes only, no baseline, no claims.",
+  "config": {
+    "reps": 15,
+    "e2eReps": 5,
+    "stubLatencyMs": 0,
+    "topK": 10,
+    "rerankNs": [
+      10,
+      50,
+      100,
+      500,
+      1000
+    ],
+    "seed": "none (deterministic construction, no RNG)",
+    "rerankPaged": false,
+    "rerankPagedNs": [
+      130
+    ],
+    "rerankPagedWindow": 64
+  },
+  "mem_baseline_heap_mb": 6.8994598388671875,
+  "primitives": [
+    {
+      "suite": "classify",
+      "primitive": "laya_classify",
+      "canonical": "classify-normal-01",
+      "canonical_kind": "normal",
+      "reps": 15,
+      "threw": null,
+      "input": {
+        "count": 1,
+        "unit": "items"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 1.2384440000000012,
+      "warm_wall_ms": {
+        "count": 14,
+        "p50": 0.3241030000000009,
+        "p95": 0.6950779999999952,
+        "p99": 0.6950779999999952,
+        "mean": 0.3416629285714277,
+        "min": 0.2730800000000002,
+        "max": 0.6950779999999952
+      },
+      "ops_per_s": 2926.861290398794,
+      "cand_per_s": 2926.861290398794,
+      "pruning": null,
+      "mem_heap_mb": 7.7984619140625
+    },
+    {
+      "suite": "decide",
+      "primitive": "laya_decide",
+      "canonical": "decide-normal-01",
+      "canonical_kind": "normal",
+      "reps": 15,
+      "threw": null,
+      "input": {
+        "count": 2,
+        "unit": "options"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 0.621454,
+      "warm_wall_ms": {
+        "count": 14,
+        "p50": 0.2655729999999963,
+        "p95": 0.47492499999999893,
+        "p99": 0.47492499999999893,
+        "mean": 0.2802118571428573,
+        "min": 0.24275199999999586,
+        "max": 0.47492499999999893
+      },
+      "ops_per_s": 3568.728355025252,
+      "cand_per_s": 7137.456710050504,
+      "pruning": null,
+      "mem_heap_mb": 7.867088317871094
+    },
+    {
+      "suite": "verify",
+      "primitive": "laya_verify",
+      "canonical": "verify-normal-01",
+      "canonical_kind": "normal",
+      "reps": 15,
+      "threw": null,
+      "input": {
+        "count": 1,
+        "unit": "claims"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 0.940018000000002,
+      "warm_wall_ms": {
+        "count": 14,
+        "p50": 0.2940889999999996,
+        "p95": 0.3988739999999993,
+        "p99": 0.3988739999999993,
+        "mean": 0.3007754999999998,
+        "min": 0.26343299999999914,
+        "max": 0.3988739999999993
+      },
+      "ops_per_s": 3324.7388833199534,
+      "cand_per_s": 3324.7388833199534,
+      "pruning": null,
+      "mem_heap_mb": 7.9281005859375
+    },
+    {
+      "suite": "screen",
+      "primitive": "laya_screen",
+      "canonical": "screen-normal-01",
+      "canonical_kind": "normal",
+      "reps": 15,
+      "threw": null,
+      "input": {
+        "count": 1,
+        "unit": "call"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 0.6067439999999991,
+      "warm_wall_ms": {
+        "count": 14,
+        "p50": 0.2633900000000011,
+        "p95": 0.30531400000000275,
+        "p99": 0.30531400000000275,
+        "mean": 0.2697431428571423,
+        "min": 0.2483219999999946,
+        "max": 0.30531400000000275
+      },
+      "ops_per_s": 3707.2304764003084,
+      "cand_per_s": 3707.230476400308,
+      "pruning": null,
+      "mem_heap_mb": 7.950714111328125
+    },
+    {
+      "suite": "pii",
+      "primitive": "laya_pii",
+      "canonical": "pii-normal-01",
+      "canonical_kind": "normal",
+      "reps": 15,
+      "threw": null,
+      "input": {
+        "count": 1,
+        "unit": "text"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 0.6789790000000053,
+      "warm_wall_ms": {
+        "count": 14,
+        "p50": 0.24808300000000116,
+        "p95": 0.3645920000000018,
+        "p99": 0.3645920000000018,
+        "mean": 0.2605530714285718,
+        "min": 0.23369699999999938,
+        "max": 0.3645920000000018
+      },
+      "ops_per_s": 3837.9896829354425,
+      "cand_per_s": 3837.9896829354425,
+      "pruning": null,
+      "mem_heap_mb": 7.943397521972656
+    },
+    {
+      "suite": "extract",
+      "primitive": "laya_extract",
+      "canonical": "extract-normal-01",
+      "canonical_kind": "normal",
+      "reps": 15,
+      "threw": null,
+      "input": {
+        "count": 1,
+        "unit": "fields"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 1.671908000000002,
+      "warm_wall_ms": {
+        "count": 14,
+        "p50": 0.8023629999999997,
+        "p95": 0.9645089999999925,
+        "p99": 0.9645089999999925,
+        "mean": 0.8366937142857164,
+        "min": 0.7579630000000037,
+        "max": 0.9645089999999925
+      },
+      "ops_per_s": 1195.1804859125755,
+      "cand_per_s": 1195.1804859125755,
+      "pruning": null,
+      "mem_heap_mb": 7.860313415527344
+    },
+    {
+      "suite": "find",
+      "primitive": "laya_find",
+      "canonical": "find-normal-01",
+      "canonical_kind": "normal",
+      "reps": 15,
+      "threw": null,
+      "input": {
+        "count": 2,
+        "unit": "candidates"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 0.817805000000007,
+      "warm_wall_ms": {
+        "count": 14,
+        "p50": 0.28350399999999354,
+        "p95": 0.43211399999999855,
+        "p99": 0.43211399999999855,
+        "mean": 0.2942430714285708,
+        "min": 0.2566010000000034,
+        "max": 0.43211399999999855
+      },
+      "ops_per_s": 3398.5507123240986,
+      "cand_per_s": 6797.101424648197,
+      "pruning": {
+        "kept": 2,
+        "dropped": 0,
+        "method": "token-overlap+exact-dedup"
+      },
+      "mem_heap_mb": 7.946617126464844
+    },
+    {
+      "suite": "rerank",
+      "primitive": "laya_rerank",
+      "canonical": "rerank-normal-01",
+      "canonical_kind": "normal",
+      "reps": 15,
+      "threw": null,
+      "input": {
+        "count": 2,
+        "unit": "candidates"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 0.9365960000000086,
+      "warm_wall_ms": {
+        "count": 14,
+        "p50": 0.299705000000003,
+        "p95": 0.4027399999999943,
+        "p99": 0.4027399999999943,
+        "mean": 0.30652364285714384,
+        "min": 0.2645859999999942,
+        "max": 0.4027399999999943
+      },
+      "ops_per_s": 3262.3910856561647,
+      "cand_per_s": 6524.782171312329,
+      "pruning": {
+        "kept": 2,
+        "dropped": 0,
+        "method": "token-overlap"
+      },
+      "mem_heap_mb": 8.055198669433594
+    },
+    {
+      "suite": "review",
+      "primitive": "laya_review",
+      "canonical": "review-normal-01",
+      "canonical_kind": "normal",
+      "reps": 15,
+      "threw": null,
+      "input": {
+        "count": 1,
+        "unit": "call"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 0.567655000000002,
+      "warm_wall_ms": {
+        "count": 14,
+        "p50": 0.2656039999999962,
+        "p95": 0.40720599999998797,
+        "p99": 0.40720599999998797,
+        "mean": 0.2789132857142848,
+        "min": 0.25082899999999597,
+        "max": 0.40720599999998797
+      },
+      "ops_per_s": 3585.3437294643154,
+      "cand_per_s": 3585.343729464315,
+      "pruning": null,
+      "mem_heap_mb": 8.048385620117188
+    },
+    {
+      "suite": "gate",
+      "primitive": "laya_gate",
+      "canonical": "gate-normal-01",
+      "canonical_kind": "normal",
+      "reps": 15,
+      "threw": null,
+      "input": {
+        "count": 1,
+        "unit": "claims"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 0.8721089999999947,
+      "warm_wall_ms": {
+        "count": 14,
+        "p50": 0.33415499999999554,
+        "p95": 0.4609870000000029,
+        "p99": 0.4609870000000029,
+        "mean": 0.34699721428571856,
+        "min": 0.2939630000000051,
+        "max": 0.4609870000000029
+      },
+      "ops_per_s": 2881.867516021604,
+      "cand_per_s": 2881.867516021604,
+      "pruning": null,
+      "mem_heap_mb": 10.078239440917969
+    }
+  ],
+  "latency_demo": [
+    {
+      "suite": "classify",
+      "primitive": "laya_classify",
+      "canonical": "classify-normal-01",
+      "canonical_kind": "normal",
+      "reps": 8,
+      "threw": null,
+      "input": {
+        "count": 1,
+        "unit": "items"
+      },
+      "stub_latency_ms": 0,
+      "reported_latency_ms": 0,
+      "cold_first_ms": 0.35026600000000485,
+      "warm_wall_ms": {
+        "count": 7,
+        "p50": 0.31083300000000236,
+        "p95": 0.38461199999998996,
+        "p99": 0.38461199999998996,
+        "mean": 0.3224048571428528,
+        "min": 0.2932299999999941,
+        "max": 0.38461199999998996
+      },
+      "ops_per_s": 3101.690243943549,
+      "cand_per_s": 3101.6902439435485,
+      "pruning": null,
+      "mem_heap_mb": 11.096817016601562,
+      "demo": "classify stub reports 0ms (reported moves, wall ~= overhead; never conflated)"
+    },
+    {
+      "suite": "classify",
+      "primitive": "laya_classify",
+      "canonical": "classify-normal-01",
+      "canonical_kind": "normal",
+      "reps": 8,
+      "threw": null,
+      "input": {
+        "count": 1,
+        "unit": "items"
+      },
+      "stub_latency_ms": 5,
+      "reported_latency_ms": 5,
+      "cold_first_ms": 0.31473599999999635,
+      "warm_wall_ms": {
+        "count": 7,
+        "p50": 0.26019900000000007,
+        "p95": 0.530344999999997,
+        "p99": 0.530344999999997,
+        "mean": 0.32539985714285535,
+        "min": 0.24476799999999344,
+        "max": 0.530344999999997
+      },
+      "ops_per_s": 3073.1420990175334,
+      "cand_per_s": 3073.1420990175334,
+      "pruning": null,
+      "mem_heap_mb": 8.237098693847656,
+      "demo": "classify stub reports 5ms (reported moves, wall ~= overhead; never conflated)"
+    }
+  ],
+  "rerank_sweep": [
+    {
+      "n": 10,
+      "top_k": 10,
+      "kept": 10,
+      "dropped": 0,
+      "pruning_ratio": 0,
+      "e2e_projected": false,
+      "e2e_note": null,
+      "selector_wall_ms": {
+        "count": 200,
+        "p50": 0.00037700000000029377,
+        "p95": 0.0007379999999983511,
+        "p99": 0.0032899999999926877,
+        "mean": 0.0004942599999999686,
+        "min": 0.0003240000000062082,
+        "max": 0.005554000000003612
+      },
+      "selector_cand_per_s": 20232266,
+      "e2e": {
+        "wall_ms": {
+          "count": 5,
+          "p50": 0.2879469999999884,
+          "p95": 0.3295320000000004,
+          "p99": 0.3295320000000004,
+          "mean": 0.29343259999999705,
+          "min": 0.27430999999999983,
+          "max": 0.3295320000000004
+        },
+        "ranked": 10,
+        "swap_note": "intentional adjacent swap of stub positions 0/1 (discrimination proof; stub ceiling applies)",
+        "mrr": 0.5,
+        "ndcg": 0.792460683721477,
+        "map": 0.5
+      },
+      "mrr_selector": 1,
+      "ndcg_selector": 0.9400143738329981,
+      "mem_heap_mb": 8.2493896484375
+    },
+    {
+      "n": 50,
+      "top_k": 10,
+      "kept": 10,
+      "dropped": 40,
+      "pruning_ratio": 0.8,
+      "e2e_projected": false,
+      "e2e_note": null,
+      "selector_wall_ms": {
+        "count": 200,
+        "p50": 0.044136000000008835,
+        "p95": 0.1001759999999905,
+        "p99": 0.1699430000000035,
+        "mean": 0.05618702500000005,
+        "min": 0.04226299999999128,
+        "max": 0.9379440000000017
+      },
+      "selector_cand_per_s": 889885,
+      "e2e": {
+        "wall_ms": {
+          "count": 5,
+          "p50": 0.3821350000000052,
+          "p95": 0.4938489999999973,
+          "p99": 0.4938489999999973,
+          "mean": 0.4042970000000025,
+          "min": 0.3570610000000016,
+          "max": 0.4938489999999973
+        },
+        "ranked": 10,
+        "swap_note": "intentional adjacent swap of stub positions 0/1 (discrimination proof; stub ceiling applies)",
+        "mrr": 0.5,
+        "ndcg": 0.7604157948464779,
+        "map": 0.5
+      },
+      "mrr_selector": 1,
+      "ndcg_selector": 0.843378168826363,
+      "mem_heap_mb": 9.363304138183594
+    },
+    {
+      "n": 100,
+      "top_k": 10,
+      "kept": 10,
+      "dropped": 90,
+      "pruning_ratio": 0.9,
+      "e2e_projected": true,
+      "e2e_note": "projected judge load (transport rejects pools > 64 with input_too_large before pruning)",
+      "selector_wall_ms": {
+        "count": 200,
+        "p50": 0.08399000000000001,
+        "p95": 0.11433099999999286,
+        "p99": 0.16021800000001463,
+        "mean": 0.08909387500000016,
+        "min": 0.08135599999999954,
+        "max": 0.2153509999999983
+      },
+      "selector_cand_per_s": 1122412,
+      "e2e": null,
+      "mrr_selector": 1,
+      "ndcg_selector": 0.8030592286428169,
+      "mem_heap_mb": 9.56622314453125
+    },
+    {
+      "n": 500,
+      "top_k": 10,
+      "kept": 10,
+      "dropped": 490,
+      "pruning_ratio": 0.98,
+      "e2e_projected": true,
+      "e2e_note": "projected judge load (transport rejects pools > 64 with input_too_large before pruning)",
+      "selector_wall_ms": {
+        "count": 50,
+        "p50": 0.4304939999999817,
+        "p95": 0.5270239999999831,
+        "p99": 0.6203720000000033,
+        "mean": 0.44996438000000183,
+        "min": 0.4124390000000062,
+        "max": 0.6203720000000033
+      },
+      "selector_cand_per_s": 1111199,
+      "e2e": null,
+      "mrr_selector": 1,
+      "ndcg_selector": 0.7377174786823715,
+      "mem_heap_mb": 10.379676818847656
+    },
+    {
+      "n": 1000,
+      "top_k": 10,
+      "kept": 10,
+      "dropped": 990,
+      "pruning_ratio": 0.99,
+      "e2e_projected": true,
+      "e2e_note": "projected judge load (transport rejects pools > 64 with input_too_large before pruning)",
+      "selector_wall_ms": {
+        "count": 50,
+        "p50": 0.8855419999999867,
+        "p95": 1.0187489999999855,
+        "p99": 1.845657999999986,
+        "mean": 0.9302298200000001,
+        "min": 0.8441540000000032,
+        "max": 1.845657999999986
+      },
+      "selector_cand_per_s": 1075003,
+      "e2e": null,
+      "mrr_selector": 1,
+      "ndcg_selector": 0.7170710431342203,
+      "mem_heap_mb": 7.84405517578125
+    }
+  ],
+  "model_load": {
+    "cold_import_wall_ms": 30.927967999999993,
+    "cold_import_note": "fresh node process spawn + import (includes spawn cost; MCP-side load only)",
+    "warm_import_wall_ms": {
+      "count": 5,
+      "p50": 0.008518000000009351,
+      "p95": 0.08618699999999535,
+      "p99": 0.08618699999999535,
+      "mean": 0.0253563999999983,
+      "min": 0.005819999999999936,
+      "max": 0.08618699999999535
+    },
+    "warm_import_note": "in-process cached re-import (same specifier: ESM cache hit)",
+    "primer_live_note": "primer-live first-call cost is recorded per primitive as cold_first_ms (fresh stub context, modules warm)",
+    "probe_holder": {
+      "cold_first": {
+        "wall_ms": 0.04273799999998573,
+        "models": 1,
+        "ready": true,
+        "reported_latency_ms": 3
+      },
+      "warm_wall_ms": {
+        "count": 10,
+        "p50": 0.0019530000000145264,
+        "p95": 0.0033549999999991087,
+        "p99": 0.0033549999999991087,
+        "mean": 0.002189299999997729,
+        "min": 0.0014799999999866031,
+        "max": 0.0033549999999991087
+      },
+      "note": "fake /models+/ready holder (reports 3ms, burns no wall time); shape demo only -- real model load needs a live backend"
+    },
+    "live_probe": {
+      "probed": false,
+      "note": "no live backend connected (stub default); real /models+/ready timing needs --live with a reachable laya-server"
+    },
+    "limit": "no local model weights in this repo; real model-load/warm/cold timing requires live laya-server + gliner (T6 integration scope), not measured here"
+  }
+}

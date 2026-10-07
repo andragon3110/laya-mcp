@@ -1,0 +1,529 @@
+{
+  "generated": "fase-7 T5+spike reproducibility manifest (LIVE backend http://127.0.0.1:8765; absolutes + method, no improvement claims)",
+  "date": "2026-10-07T19:06:36.544Z",
+  "commit": "e293c660e65cb011889bc5b501ddd9cea29e6060",
+  "commit_short": "e293c66",
+  "model": "english",
+  "model_note": "live backend model inventory name at http://127.0.0.1:8765 (verbatim probe; \"name unreported\" when the backend sent none)",
+  "model_revision": null,
+  "model_revision_source": "unpinned",
+  "model_revision_note": "operator pin (LAYA_MODEL_REVISION) wins, else the backend-reported revision, else the honest null (cf. capabilities revision_source unpinned; a hash is never invented)",
+  "tokenizer": "unknown",
+  "tokenizer_note": "explicit unknown: laya_capabilities exposes name/repo/loaded/revision/device/circuit per model, never a tokenizer",
+  "device": "auto",
+  "device_note": "probed LIVE from GET /ready (or the explicit unknown string when the backend reported no device)",
+  "backend": {
+    "mode": "live",
+    "live": true,
+    "reachable": true,
+    "baseUrl": "http://127.0.0.1:8765",
+    "glinerUrl": "http://127.0.0.1:8766",
+    "rerankUrl": "http://127.0.0.1:8768",
+    "rerank": {
+      "baseUrl": "http://127.0.0.1:8768",
+      "reachable": true,
+      "ready": true,
+      "ready_reason": null,
+      "device": "cuda",
+      "models": [
+        {
+          "name": "Qwen/Qwen3-Reranker-0.6B",
+          "repo": "Qwen/Qwen3-Reranker-0.6B",
+          "loaded": true,
+          "revision": null,
+          "revision_source": "unpinned",
+          "device": "cuda",
+          "circuit": "closed"
+        }
+      ],
+      "model": "Qwen/Qwen3-Reranker-0.6B",
+      "model_revision": null,
+      "model_revision_source": "unpinned",
+      "probe_status": {
+        "ready": 200,
+        "models": 200
+      }
+    },
+    "ready": true,
+    "ready_reason": null,
+    "device": "auto",
+    "models": [
+      {
+        "name": "english",
+        "repo": "convaiinnovations/laya",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "auto",
+        "circuit": "closed"
+      },
+      {
+        "name": "multilingual",
+        "repo": "convaiinnovations/laya-multilingual",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "auto",
+        "circuit": "closed"
+      },
+      {
+        "name": "typed-decisions",
+        "repo": "convaiinnovations/laya-typed-decisions",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "auto",
+        "circuit": "closed"
+      }
+    ],
+    "model": "english",
+    "model_revision": null,
+    "model_revision_source": "unpinned",
+    "tokenizer": "unknown",
+    "probe_status": {
+      "ready": 200,
+      "models": 200
+    }
+  },
+  "policy": [
+    {
+      "name": "classify",
+      "version": "1.0.0"
+    },
+    {
+      "name": "code-review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "compare",
+      "version": "1.0.0"
+    },
+    {
+      "name": "decide",
+      "version": "1.0.0"
+    },
+    {
+      "name": "extract",
+      "version": "1.0.0"
+    },
+    {
+      "name": "find",
+      "version": "1.0.0"
+    },
+    {
+      "name": "gate",
+      "version": "1.0.0"
+    },
+    {
+      "name": "normal",
+      "version": "1.0.0"
+    },
+    {
+      "name": "pii",
+      "version": "1.0.0"
+    },
+    {
+      "name": "rerank",
+      "version": "1.0.0"
+    },
+    {
+      "name": "review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "screen",
+      "version": "1.0.0"
+    },
+    {
+      "name": "security",
+      "version": "1.0.0"
+    },
+    {
+      "name": "verify",
+      "version": "1.0.0"
+    }
+  ],
+  "policy_note": "live registry truth (availability-independent); 14 entries",
+  "schema_version": "1.0.0",
+  "software": {
+    "node": "v26.7.0",
+    "platform": "linux",
+    "arch": "x64",
+    "package_version": "0.4.0"
+  },
+  "hardware": {
+    "arch": "x64",
+    "cpus": 22,
+    "cpu_model": "Intel(R) Core(TM) Ultra 9 185H",
+    "totalmem_mb": 23443
+  },
+  "config": {
+    "reps": 15,
+    "e2eReps": 5,
+    "stubLatencyMs": 0,
+    "topK": 10,
+    "rerankNs": [
+      10,
+      50,
+      100,
+      500,
+      1000
+    ],
+    "seed": "none (deterministic construction, no RNG)",
+    "rerankPaged": false,
+    "rerankPagedNs": [
+      130
+    ],
+    "rerankPagedWindow": 64
+  },
+  "mode": {
+    "mcp": "observe",
+    "mcp_note": "the MCP layer only observes and reports judgments; it never acts, under every policy mode",
+    "policy": "observe (default)",
+    "policy_note": "effective global policy-decision mode resolution input (verbatim env or default)"
+  },
+  "method": "single process; stub-reported latency_ms kept separate from measured wall (wall = pipeline overhead; stubs report latency_ms as a field, never conflated; optional injected delay via delayMs, unused by default); memory = absolute heapUsed in MB (approx, whole process, single sample, no GC forcing); quantiles = nearest-rank p50/p95/p99 (src/metrics.ts definition); throughput = count/meanWall; rerank N>64 = pure selector + projected judge (64 transport cap) unless opt-in --rerank-paged pages N>64 through <=64 judge windows (deterministic concat merge); quality = MRR/nDCG vs construction-truth gold (stub ceiling, NOT backend quality); absolutes only, no baseline, no claims.",
+  "gold_corpus": {
+    "independent": 10,
+    "oracle_stub": 88,
+    "total": 98,
+    "per_suite": [
+      {
+        "suite": "classify",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "decide",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "verify",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "screen",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "pii",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "extract",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "find",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "rerank",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "review",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "gate",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "compare",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      }
+    ]
+  },
+  "gold_corpus_note": "provenance census (case gold_source wins, else the suite goldSource default): independent golds carry human-fixed truth (spike-grade: a live backend is judged against them), oracle-stub golds were written together with their stub answers (plumbing-grade: live mismatches measure backend-vs-oracle divergence, never backend quality)",
+  "honesty": [
+    "absolutes only; no cross-machine comparison; no improvement claimed (no baseline exists)",
+    "stub ceiling: numbers measure harness + handler plumbing, never backend quality",
+    "thresholds untouched (CERO cambios en src/); wrong_confident taus remain reporting slices, never prod cutoffs"
+  ],
+  "links": {
+    "bench": {
+      "primitives": 10,
+      "rerank_rows": 5
+    },
+    "metrics": {
+      "suites": 11
+    }
+  },
+  "spike_qwen": {
+    "lane": "qwen-rerank (rerank suite direct + find via argmax-over-rerank-scores; see evals/suites/rerank.mjs + find.mjs S4 notes)",
+    "cases": 20,
+    "passed": 11,
+    "threw": 1,
+    "independent": {
+      "n": 4,
+      "passed": 4,
+      "ids": [
+        "find/find-independent-01:pass",
+        "find/find-independent-02:pass",
+        "rerank/rerank-independent-01:pass",
+        "rerank/rerank-independent-02:pass"
+      ]
+    },
+    "honesty": "independent golds judge the backend (human-fixed truth); oracle-stub mismatches measure backend-vs-oracle divergence, never backend quality",
+    "rows": [
+      {
+        "suite": "find",
+        "id": "find-normal-01",
+        "kind": "normal",
+        "gold_source": "oracle-stub",
+        "pass": false,
+        "threw": false,
+        "actual": null,
+        "detail": "decision"
+      },
+      {
+        "suite": "find",
+        "id": "find-difficult-01",
+        "kind": "difficult",
+        "gold_source": "oracle-stub",
+        "pass": false,
+        "threw": false,
+        "actual": null,
+        "detail": "winner"
+      },
+      {
+        "suite": "find",
+        "id": "find-ambiguous-01",
+        "kind": "ambiguous",
+        "gold_source": "oracle-stub",
+        "pass": false,
+        "threw": false,
+        "actual": null,
+        "detail": "winner"
+      },
+      {
+        "suite": "find",
+        "id": "find-adversarial-01",
+        "kind": "adversarial",
+        "gold_source": "oracle-stub",
+        "pass": false,
+        "threw": false,
+        "actual": null,
+        "detail": "decision"
+      },
+      {
+        "suite": "find",
+        "id": "find-negative-01",
+        "kind": "negative",
+        "gold_source": "oracle-stub",
+        "pass": false,
+        "threw": false,
+        "actual": null,
+        "detail": "winner"
+      },
+      {
+        "suite": "find",
+        "id": "find-abstention-01",
+        "kind": "abstention",
+        "gold_source": "oracle-stub",
+        "pass": true,
+        "threw": false,
+        "actual": {
+          "decision": "ESCALATE",
+          "winner": "a"
+        }
+      },
+      {
+        "suite": "find",
+        "id": "find-abstention-02",
+        "kind": "abstention",
+        "gold_source": "oracle-stub",
+        "pass": false,
+        "threw": false,
+        "actual": null,
+        "detail": "winner"
+      },
+      {
+        "suite": "find",
+        "id": "find-negative-limit-01",
+        "kind": "negative",
+        "gold_source": "oracle-stub",
+        "pass": true,
+        "threw": true,
+        "actual": {
+          "threw": "input_too_large"
+        }
+      },
+      {
+        "suite": "find",
+        "id": "find-independent-01",
+        "kind": "normal",
+        "gold_source": "independent",
+        "pass": true,
+        "threw": false,
+        "actual": {
+          "decision": "ALLOW",
+          "winner": "a"
+        }
+      },
+      {
+        "suite": "find",
+        "id": "find-independent-02",
+        "kind": "normal",
+        "gold_source": "independent",
+        "pass": true,
+        "threw": false,
+        "actual": {
+          "decision": "ALLOW",
+          "winner": "a"
+        }
+      },
+      {
+        "suite": "rerank",
+        "id": "rerank-normal-01",
+        "kind": "normal",
+        "gold_source": "oracle-stub",
+        "pass": true,
+        "threw": false,
+        "actual": {
+          "decision": "ALLOW",
+          "order": [
+            "a",
+            "b"
+          ]
+        }
+      },
+      {
+        "suite": "rerank",
+        "id": "rerank-normal-02",
+        "kind": "normal",
+        "gold_source": "oracle-stub",
+        "pass": true,
+        "threw": false,
+        "actual": {
+          "decision": "ALLOW",
+          "order": [
+            "a"
+          ]
+        }
+      },
+      {
+        "suite": "rerank",
+        "id": "rerank-difficult-01",
+        "kind": "difficult",
+        "gold_source": "oracle-stub",
+        "pass": true,
+        "threw": false,
+        "actual": {
+          "decision": "ALLOW",
+          "order": [
+            "a",
+            "b"
+          ]
+        }
+      },
+      {
+        "suite": "rerank",
+        "id": "rerank-ambiguous-01",
+        "kind": "ambiguous",
+        "gold_source": "oracle-stub",
+        "pass": true,
+        "threw": false,
+        "actual": {
+          "decision": "ALLOW",
+          "order": [
+            "a",
+            "b"
+          ]
+        }
+      },
+      {
+        "suite": "rerank",
+        "id": "rerank-adversarial-01",
+        "kind": "adversarial",
+        "gold_source": "oracle-stub",
+        "pass": false,
+        "threw": false,
+        "actual": null,
+        "detail": "order"
+      },
+      {
+        "suite": "rerank",
+        "id": "rerank-negative-01",
+        "kind": "negative",
+        "gold_source": "oracle-stub",
+        "pass": false,
+        "threw": false,
+        "actual": null,
+        "detail": "decision"
+      },
+      {
+        "suite": "rerank",
+        "id": "rerank-abstention-01",
+        "kind": "abstention",
+        "gold_source": "oracle-stub",
+        "pass": false,
+        "threw": true,
+        "detail": "rerank-server POST /rerank returned HTTP 422: 422"
+      },
+      {
+        "suite": "rerank",
+        "id": "rerank-negative-limit-01",
+        "kind": "negative",
+        "gold_source": "oracle-stub",
+        "pass": true,
+        "threw": true,
+        "actual": {
+          "threw": "input_too_large"
+        }
+      },
+      {
+        "suite": "rerank",
+        "id": "rerank-independent-01",
+        "kind": "normal",
+        "gold_source": "independent",
+        "pass": true,
+        "threw": false,
+        "actual": {
+          "decision": "ALLOW",
+          "order": [
+            "a",
+            "b"
+          ]
+        }
+      },
+      {
+        "suite": "rerank",
+        "id": "rerank-independent-02",
+        "kind": "normal",
+        "gold_source": "independent",
+        "pass": true,
+        "threw": false,
+        "actual": {
+          "decision": "ALLOW",
+          "order": [
+            "a",
+            "b"
+          ]
+        }
+      }
+    ]
+  }
+}

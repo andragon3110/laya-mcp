@@ -109,9 +109,67 @@ export const cases = [
     expectError: "input_too_large",
     gold: { why: "over-ceiling pools fail fast, never silently truncated." },
   },
+  {
+    id: "find-independent-01",
+    kind: "normal",
+    gold_source: "independent",
+    input: {
+      query: "how do I reset my password",
+      candidates: [
+        { id: "a", text: "Open Settings and click Reset password to receive an email link." },
+        { id: "b", text: "Zebra migration notes for the spring season." },
+      ],
+    },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): candidate a answers the query directly while b is topically unrelated; any competent judge picks a firmly above the 1/2 baseline. The stub choice below only feeds the handler the signal a working backend would return.",
+    stub: { answers: { exists: { choice: "a", probabilities: { a: 0.82, b: 0.1, none: 0.08 } } } },
+    gold: { winner: "a", exists: true, decision: "ALLOW", abstained: false, why: "human-fixed answer wins firmly; 0.82 clears the 1/2 uniform baseline." },
+  },
+  {
+    id: "find-independent-02",
+    kind: "normal",
+    gold_source: "independent",
+    input: {
+      query: "¿cómo restablezco mi contraseña?",
+      candidates: [
+        { id: "a", text: "Abre los Ajustes y pulsa Restablecer contraseña para recibir un enlace por correo." },
+        { id: "b", text: "Notas sobre la migración de las cebras en primavera." },
+      ],
+    },
+    oracle: "INDEPENDENT GOLD (human-fixed truth, español): el candidato a responde la consulta directamente mientras b es ajeno al tema; cualquier juez competente elige a con holgura sobre la base 1/2. La elección stub solo alimenta al handler con lo que devolvería un backend funcional.",
+    stub: { answers: { exists: { choice: "a", probabilities: { a: 0.8, b: 0.12, none: 0.08 } } } },
+    gold: { winner: "a", exists: true, decision: "ALLOW", abstained: false, why: "human-fixed answer (ES) wins firmly; 0.80 clears the 1/2 uniform baseline." },
+  },
 ];
 
 export async function invoke(deps, input, stub, capture) {
+  // S4 spike lane: the Qwen cross-encoder scores (query, candidate)
+  // pairs; it cannot answer the exists-choice question, so under a
+  // connected sidecar (makeRerankCtx present AND rerankReady) the winner
+  // is the argmax over live rerank scores mapped back to the choice
+  // shape. Uniqueness/baseline adjudication stays inside the handler
+  // (ties/weak resolve to ESCALATE there, never here). Stub default and
+  // Laya-live both fall back to fakeClient, so non-Qwen behavior is
+  // byte-identical to S3.
+  const rctx = deps.makeRerankCtx?.();
+  if (rctx && rctx.rerankReady()) {
+    const pool = Array.isArray(input.candidates) ? input.candidates : [];
+    const res = await rctx.rerank.rerank(input.query, pool);
+    const ranked = Array.isArray(res?.ranked) ? [...res.ranked].sort((a, b) => a.rank - b.rank) : [];
+    const top = ranked[0];
+    const probabilities = {};
+    for (const row of ranked) {
+      if (row && typeof row.id === "string" && typeof row.score === "number") probabilities[row.id] = row.score;
+    }
+    const answers = { exists: { choice: top && typeof top.id === "string" ? top.id : "none", probabilities } };
+    const liveClient = (_answers, cap) => ({
+      predict: async (_args, questions) => {
+        if (cap) cap.questions = questions;
+        return { answers, confidence: {}, routing: {}, model: "qwen-rerank-via-find", latencyMs: res?.latencyMs ?? 0, usage: {} };
+      },
+    });
+    const client = liveClient(answers, capture);
+    return JSON.parse(await handleFind(client, input));
+  }
   const client = deps.fakeClient(stub.answers ?? {}, capture);
   return JSON.parse(await handleFind(client, input));
 }
