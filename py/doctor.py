@@ -678,6 +678,155 @@ def check_gliner_decide_live_classify(host: str, port: int) -> Dict[str, Any]:
         return _fail("decide-spanish", f"POST {url} failed: {exc!r}", url=url)
 
 
+QWEN_RERANK_MODEL_ID = "Qwen/Qwen3-Reranker-0.6B"
+QWEN_RERANK_CACHE_DIR = HF_HUB / "models--Qwen--Qwen3-Reranker-0.6B"
+QWEN_RERANK_DEFAULT_PORT = 8768
+
+# Smoke query in Spanish for the rerank sidecar. Verified against the real
+# checkpoint (S1 smoke + S3 server): the password-reset passage ranks first
+# with a score near 1.0, far above the distractors.
+QWEN_RERANK_SMOKE_QUERY = "¿Cómo restablezco mi contraseña?"
+QWEN_RERANK_SMOKE_CANDIDATES = [
+    {"id": "password", "text": "Para restablecer tu contraseña, ve a Ajustes > Seguridad > Cambiar contraseña."},
+    {"id": "reembolso", "text": "Nuestra política de reembolsos cubre compras dentro de los 30 días."},
+    {"id": "router", "text": "El restablecimiento de fábrica del router se hace con el botón trasero."},
+    {"id": "perfil", "text": "Puedes cambiar tu foto de perfil desde la pestaña de cuenta."},
+]
+QWEN_RERANK_SMOKE_EXPECTED_TOP = "password"
+
+
+def check_qwen_rerank_checkpoint() -> Dict[str, Any]:
+    """Is the Qwen3-Reranker-0.6B checkpoint cached? Skip when transformers is absent."""
+    if importlib.util.find_spec("transformers") is None:
+        return _skip("rerank-checkpoint", "transformers not installed -- skipping rerank checkpoint check")
+    found_at: Optional[Path] = None
+    if QWEN_RERANK_CACHE_DIR.exists():
+        for snap in QWEN_RERANK_CACHE_DIR.glob("snapshots/*"):
+            found_at = snap
+            break
+    if found_at is None:
+        return _warn(
+            "rerank-checkpoint",
+            f"{QWEN_RERANK_MODEL_ID} not cached -- rerank-server will download ~1.2 GB on first request",
+            repo=QWEN_RERANK_MODEL_ID,
+        )
+    try:
+        size_bytes = sum(p.stat().st_size for p in found_at.rglob("*") if p.is_file())
+    except OSError:
+        size_bytes = 0
+    return _ok(
+        "rerank-checkpoint",
+        f"{QWEN_RERANK_MODEL_ID} cached",
+        path=str(found_at),
+        size_mb=round(size_bytes / 1024 / 1024, 1),
+    )
+
+
+def check_qwen_rerank_server_reachable(host: str, port: int) -> Dict[str, Any]:
+    """Can we reach the rerank-server? Skip when transformers is absent (not opted in).
+
+    Probes GET /ready (not /health): /ready is the non-warming readiness
+    snapshot, so the doctor never forces a 1.2 GB model load as a side
+    effect. A 503 means reachable-but-not-ready and surfaces as warn.
+    """
+    if importlib.util.find_spec("transformers") is None:
+        return _skip("rerank-server", "transformers not installed -- rerank-server is opt-in")
+    url = f"http://{host}:{port}/ready"
+    started = time.time()
+    try:
+        import urllib.request
+
+        try:
+            with urllib.request.urlopen(url, timeout=2) as r:
+                body = json.loads(r.read())
+                status, latency_ms = r.status, int((time.time() - started) * 1000)
+        except urllib.error.HTTPError as exc:
+            # 503 + structured not-ready body: reachable, backend warming/backing off.
+            try:
+                body = json.loads(exc.read())
+            except Exception:  # noqa: BLE001
+                body = {}
+            latency_ms = int((time.time() - started) * 1000)
+            return _warn(
+                "rerank-server",
+                f"GET {url} returned HTTP {exc.code} (reachable but not ready): "
+                f"{body.get('reason', 'no reason detail')}",
+                url=url,
+                latency_ms=latency_ms,
+            )
+        if status != 200:
+            return _fail("rerank-server", f"GET {url} returned HTTP {status}", url=url, latency_ms=latency_ms)
+        if not body.get("ready"):
+            return _warn(
+                "rerank-server",
+                f"GET {url} returned ready=false: {body.get('reason', 'no reason detail')}",
+                url=url,
+                latency_ms=latency_ms,
+            )
+        return _ok(
+            "rerank-server",
+            f"GET {url} reachable in {latency_ms} ms",
+            url=url,
+            latency_ms=latency_ms,
+            model=body.get("loaded"),
+            device=body.get("device"),
+        )
+    except (urllib.error.URLError, socket.timeout, ConnectionRefusedError, OSError) as exc:
+        return _warn(
+            "rerank-server",
+            f"cannot reach {url}: {exc}. start it with "
+            f"RERANK_PORT={port} <spike-venv-python> py/qwen_rerank_server.py",
+            url=url,
+            hint="py/qwen_rerank_server.py",
+        )
+    except Exception as exc:  # noqa: BLE001
+        return _fail("rerank-server", f"unexpected error reaching {url}: {exc!r}", url=url)
+
+
+def check_qwen_rerank_live_spanish(host: str, port: int) -> Dict[str, Any]:
+    """End-to-end Spanish rerank smoke test against the running rerank-server."""
+    if importlib.util.find_spec("transformers") is None:
+        return _skip("rerank-spanish", "transformers not installed -- skipping live Spanish rerank smoke test")
+    url = f"http://{host}:{port}/rerank"
+    payload = {
+        "query": QWEN_RERANK_SMOKE_QUERY,
+        "candidates": QWEN_RERANK_SMOKE_CANDIDATES,
+    }
+    started = time.time()
+    try:
+        import urllib.request
+
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode(),
+            headers={"content-type": "application/json"},
+        )
+        # First call warms up (lazy-loads the 1.2 GB checkpoint): budget 300 s.
+        with urllib.request.urlopen(req, timeout=300) as r:
+            body = json.loads(r.read())
+        latency_ms = int((time.time() - started) * 1000)
+        if r.status != 200:
+            return _fail("rerank-spanish", f"POST {url} returned HTTP {r.status}", url=url)
+        ranked = body.get("ranked", []) if isinstance(body, dict) else []
+        top = ranked[0].get("id") if ranked and isinstance(ranked[0], dict) else None
+        if top != QWEN_RERANK_SMOKE_EXPECTED_TOP:
+            return _fail(
+                "rerank-spanish",
+                f"Spanish rerank smoke test: expected top {QWEN_RERANK_SMOKE_EXPECTED_TOP!r}, got {top!r}",
+                url=url,
+                latency_ms=latency_ms,
+            )
+        return _ok(
+            "rerank-spanish",
+            f"Spanish rerank smoke test ok in {latency_ms} ms (top={top}, "
+            f"score={ranked[0].get('score'):.4f})",
+            url=url,
+            latency_ms=latency_ms,
+        )
+    except Exception as exc:  # noqa: BLE001
+        return _fail("rerank-spanish", f"POST {url} failed: {exc!r}", url=url)
+
+
 def check_mcp_server_starts() -> Dict[str, Any]:
     """Spawn the MCP server briefly to confirm it boots without errors."""
     import subprocess
@@ -1216,6 +1365,8 @@ def run_doctor(
     gliner_port: int = 8766,
     decide_host: str = "127.0.0.1",
     decide_port: int = GLINER_DECIDE_DEFAULT_PORT,
+    rerank_host: str = "127.0.0.1",
+    rerank_port: int = QWEN_RERANK_DEFAULT_PORT,
     include_models: bool = False,
     include_policy: bool = False,
     include_mcp: bool = False,
@@ -1235,6 +1386,7 @@ def run_doctor(
     checks.append(check_gliner_package())
     checks.append(check_gliner_checkpoint())
     checks.append(check_gliner_decide_checkpoint())
+    checks.append(check_qwen_rerank_checkpoint())
     if include_live_calls:
         checks.append(check_mcp_server_reachable(laya_host, laya_port))
         checks.append(check_live_predict(laya_host, laya_port))
@@ -1242,6 +1394,8 @@ def run_doctor(
         checks.append(check_gliner_live_spanish(gliner_host, gliner_port))
         checks.append(check_gliner_decide_server_reachable(decide_host, decide_port))
         checks.append(check_gliner_decide_live_classify(decide_host, decide_port))
+        checks.append(check_qwen_rerank_server_reachable(rerank_host, rerank_port))
+        checks.append(check_qwen_rerank_live_spanish(rerank_host, rerank_port))
     checks.append(check_mcp_server_starts())
     checks.extend(check_optional_agent_configs())
     # Fase-8-final T3 opt-in sections: real data only, never invented.
@@ -1300,6 +1454,8 @@ def main() -> int:
     parser.add_argument("--gliner-port", type=int, default=8766, help="gliner-server port")
     parser.add_argument("--decide-host", default="127.0.0.1", help="decide-server host")
     parser.add_argument("--decide-port", type=int, default=GLINER_DECIDE_DEFAULT_PORT, help="decide-server port")
+    parser.add_argument("--rerank-host", default="127.0.0.1", help="rerank-server host")
+    parser.add_argument("--rerank-port", type=int, default=QWEN_RERANK_DEFAULT_PORT, help="rerank-server port")
     parser.add_argument(
         "--no-live",
         action="store_true",
@@ -1362,6 +1518,8 @@ def main() -> int:
         gliner_port=args.gliner_port,
         decide_host=args.decide_host,
         decide_port=args.decide_port,
+        rerank_host=args.rerank_host,
+        rerank_port=args.rerank_port,
         include_models=args.models,
         include_policy=args.policy,
         include_mcp=args.mcp,
