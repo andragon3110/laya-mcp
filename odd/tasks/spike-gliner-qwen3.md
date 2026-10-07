@@ -1,0 +1,71 @@
+# ODD Feature: spike-gliner-qwen3
+
+## Objective
+Correr el spike A/B con backends reales: `fastino/GLiNER2.5-multi-Decide` (classify/gate/screen) y `Qwen/Qwen3-Reranker-0.6B` (rerank/find) en modo `--live` contra el corpus independiente, comparando con la baseline v2 del stub. Veredicto: ¿discriminan o no?
+
+## Problem
+El harness quedó spike-ready (PRs #18+#19 mergeados) pero nunca midió un backend real. Recon 2026-10-07 (explorer ses_ee874ccbcffeewLfY0LDK24RxW): torch/transformers/gliner2 ausentes en Python 3.14.8; `connectLiveBackend` solo conecta LayaClient+GlinerClient (Qwen3 necesita carril nuevo); rerank/find tienen 0 golds independientes; pins validados en Python 3.11.9 (riesgo de ruedas en 3.14).
+
+## Why
+Es el motivo de todo el trabajo previo: saber si existe un modelo local liviano que supere a Laya y justifique el unpause. Sin medición live, todo número vendor es hipótesis.
+
+## Scope
+Rama `odd/spike-gliner-qwen3` sobre `main@a2ce4f1`. Incluye: env (venv+pip+HG downloads, sin tocar pins todavía), 2 servidores nuevos (:8767 decide, :8768 rerank), carril RerankClient en live-client, golds independientes para rerank/find, runs live + results versionados por backend, análisis con ECE/AUROC/histogramas. Si hay discriminación: recalibrar thresholds como follow-up (S6). Modernización general de deps/TS: S7 acotada (auditoría + minors seguros con tests en verde).
+
+## Constraints
+- Taus siguen solo reporte; thresholds prod (`src/policy/thresholds.ts`) solo se tocan en S6 y solo con evidencia de discriminación.
+- `evals/results/v1|v2` intactos; nuevos runs en `v3+` por backend.
+- Pesos en caché HF (no en el repo). `package-lock.json` y pins Python no se ensucian sin decisión explícita.
+- Test-first donde aplique; si no, excepción explícita.
+- ~400 líneas/task es heurística de planning, no cap: los servidores nuevos la excederán por naturaleza (se explica, no se recorta).
+
+## Checklist
+- [x] S1 env: venv + torch CPU + transformers + gliner2 + descargas + smoke-load de ambos modelos — DONE venv `~/.venvs/s1-spike-gliner-qwen3` py3.14, torch 2.14.1+cpu, transformers 4.57.6, gliner2 2.0.0; snaps a35a0cd (1.1GB) + e61197e (1.2GB); smokes OK. Route: delegated direct.
+- [ ] S2 servidor decide :8767 (plantilla gliner_server) + checks doctor — route: delegated direct (2+ files nuevos).
+- [ ] S3 servidor rerank :8768 + carril RerankClient en live-client + probes — route: delegated direct (2+ non-trivial files).
+- [ ] S4 golds independientes rerank/find + runs live + results v3+ por backend — route: delegated direct (suites + manifest + results).
+- [ ] S5 análisis: discriminación, ECE/AUROC/histogramas, veredicto por primitiva — route: delegated direct (research + docs).
+- [ ] S6 (condicional: solo si S5 muestra discriminación) recalibrar thresholds + tests — route: delegated direct.
+- [ ] S7 modernización acotada Node/Python + verificación final + cierre — route: delegated direct.
+
+## Authorized scope
+py/gliner_decide_server.py
+py/qwen_rerank_server.py
+py/doctor.py
+py/requirements.txt
+evals/live-client.mjs
+evals/suites/*.mjs
+evals/manifest.mjs
+evals/score.mjs
+evals/bench.mjs
+evals/results/
+EVALUATION.md
+odd/tasks/spike-gliner-qwen3.md
+package.json
+package-lock.json
+tsconfig.json
+
+## Acceptance criteria
+- Ambos modelos cargan y responden en CPU con latencia/memoria medidas y registradas.
+- Runs `--live` sobre el corpus independiente versionados en `v3+` por backend, comparables con v2.
+- Veredicto de discriminación por primitiva con números (no adjetivos), más decisión S6 sí/no.
+- `node evals/run.mjs` sigue 94/94+ en stub default; v1/v2 intactos; thresholds intactos salvo S6.
+- Feature doc registra commit IDs por task.
+
+## Applicable checks
+- `node evals/run.mjs`, `node evals/bench.mjs`, `node --test tests/` o suites estructurales, `git diff --stat`, `git status --short`.
+- Servidores: smoke `/ready`+`/models`+1 inferencia real por server.
+
+## Progress
+- 2026-10-07 rama odd/spike-gliner-qwen3 creada desde main@a2ce4f1. Recon completo (env + contratos + riesgos).
+- 2026-10-07 S1 DONE (worker general ses_ee8519e4bffe12abUaHtP3SUgj): py3.14 venv, ambos modelos en CPU con smokes correctos. Qwen3 es CausalLM sin head (patrón logits yes/no para S3).
+- Forecast: grande (~1200 líneas autoradas; servidores nuevos exceden la heurística por naturaleza). Estrategia: stacked-to-main (cacheada). Running: ~10 (solo tracking; env vive fuera del repo).
+
+## Verification evidence
+- S1: venv `~/.venvs/s1-spike-gliner-qwen3` py3.14.8, torch 2.14.1+cpu (cuda False), 9/9 + 14/14 archivos HF. GLiNER smoke 3/3 (ES 0.993) ~0.06s/texto RSS ~2931MB; Qwen3 smoke ranking correcto (0.9996 vs resto) batch 1.07s RSS ~3861MB. Repo intacto (`git status`: solo este tracking).
+
+## Next step
+- Ejecutar S2 (servidor decide :8767) con un writer acotado.
+
+## Delivery
+- Estrategia: stacked-to-main (cacheada del feature anterior). Slices se definen al cerrar (probable: env+servers / runs+análisis / modernización).
