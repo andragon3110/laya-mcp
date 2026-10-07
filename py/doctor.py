@@ -525,6 +525,159 @@ def check_gliner_live_spanish(host: str, port: int) -> Dict[str, Any]:
         return _fail("gliner-spanish", f"POST {url} failed: {exc!r}", url=url)
 
 
+GLINER_DECIDE_MODEL_ID = "fastino/GLiNER2.5-multi-Decide"
+GLINER_DECIDE_CACHE_DIR = HF_HUB / "models--fastino--GLiNER2.5-multi-Decide"
+GLINER_DECIDE_DEFAULT_PORT = 8767
+
+# Smoke task in Spanish for the decide sidecar. Verified against the real
+# checkpoint: the winning label is "trabajo" with confidence > 0.9.
+GLINER_DECIDE_SMOKE_TEXT = "María García trabaja en Acme España en Madrid."
+GLINER_DECIDE_SMOKE_TASKS = {"tema": ["trabajo", "deporte"]}
+GLINER_DECIDE_SMOKE_EXPECTED = "trabajo"
+
+
+def check_gliner_decide_checkpoint() -> Dict[str, Any]:
+    """Is the GLiNER2.5-multi-Decide checkpoint cached? Skip when the SDK is absent."""
+    if importlib.util.find_spec("gliner2") is None:
+        return _skip("decide-checkpoint", "gliner2 not installed -- skipping decide checkpoint check")
+    found_at: Optional[Path] = None
+    if GLINER_DECIDE_CACHE_DIR.exists():
+        for snap in GLINER_DECIDE_CACHE_DIR.glob("snapshots/*"):
+            found_at = snap
+            break
+    if found_at is None:
+        return _warn(
+            "decide-checkpoint",
+            f"{GLINER_DECIDE_MODEL_ID} not cached -- decide-server will download ~1.1 GB on first request",
+            repo=GLINER_DECIDE_MODEL_ID,
+        )
+    try:
+        size_bytes = sum(p.stat().st_size for p in found_at.rglob("*") if p.is_file())
+    except OSError:
+        size_bytes = 0
+    return _ok(
+        "decide-checkpoint",
+        f"{GLINER_DECIDE_MODEL_ID} cached",
+        path=str(found_at),
+        size_mb=round(size_bytes / 1024 / 1024, 1),
+    )
+
+
+def check_gliner_decide_server_reachable(host: str, port: int) -> Dict[str, Any]:
+    """Can we reach the decide-server? Skip when the SDK is absent (not opted in).
+
+    Probes GET /ready (not /health): /ready is the non-warming readiness
+    snapshot, so the doctor never forces a 1.1 GB model load as a side
+    effect. A 503 means reachable-but-not-ready and surfaces as warn.
+    """
+    if importlib.util.find_spec("gliner2") is None:
+        return _skip("decide-server", "gliner2 not installed -- decide-server is opt-in")
+    url = f"http://{host}:{port}/ready"
+    started = time.time()
+    try:
+        import urllib.request
+
+        try:
+            with urllib.request.urlopen(url, timeout=2) as r:
+                body = json.loads(r.read())
+                status, latency_ms = r.status, int((time.time() - started) * 1000)
+        except urllib.error.HTTPError as exc:
+            # 503 + structured not-ready body: reachable, backend warming/backing off.
+            try:
+                body = json.loads(exc.read())
+            except Exception:  # noqa: BLE001
+                body = {}
+            latency_ms = int((time.time() - started) * 1000)
+            return _warn(
+                "decide-server",
+                f"GET {url} returned HTTP {exc.code} (reachable but not ready): "
+                f"{body.get('reason', 'no reason detail')}",
+                url=url,
+                latency_ms=latency_ms,
+            )
+        if status != 200:
+            return _fail("decide-server", f"GET {url} returned HTTP {status}", url=url, latency_ms=latency_ms)
+        if not body.get("ready"):
+            return _warn(
+                "decide-server",
+                f"GET {url} returned ready=false: {body.get('reason', 'no reason detail')}",
+                url=url,
+                latency_ms=latency_ms,
+            )
+        return _ok(
+            "decide-server",
+            f"GET {url} reachable in {latency_ms} ms",
+            url=url,
+            latency_ms=latency_ms,
+            model=body.get("loaded"),
+            device=body.get("device"),
+        )
+    except (urllib.error.URLError, socket.timeout, ConnectionRefusedError, OSError) as exc:
+        return _warn(
+            "decide-server",
+            f"cannot reach {url}: {exc}. start it with "
+            f"GLINER_DECIDE_PORT={port} <spike-venv-python> py/gliner_decide_server.py",
+            url=url,
+            hint="py/gliner_decide_server.py",
+        )
+    except Exception as exc:  # noqa: BLE001
+        return _fail("decide-server", f"unexpected error reaching {url}: {exc!r}", url=url)
+
+
+def check_gliner_decide_live_classify(host: str, port: int) -> Dict[str, Any]:
+    """End-to-end Spanish classify smoke test against the running decide-server."""
+    if importlib.util.find_spec("gliner2") is None:
+        return _skip("decide-spanish", "gliner2 not installed -- skipping live Spanish classify smoke test")
+    url = f"http://{host}:{port}/classify"
+    payload = {
+        "text": GLINER_DECIDE_SMOKE_TEXT,
+        "tasks": GLINER_DECIDE_SMOKE_TASKS,
+    }
+    started = time.time()
+    try:
+        import urllib.request
+
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode(),
+            headers={"content-type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=60) as r:
+            body = json.loads(r.read())
+        latency_ms = int((time.time() - started) * 1000)
+        if r.status != 200:
+            return _fail("decide-spanish", f"POST {url} returned HTTP {r.status}", url=url)
+        result = body.get("result", {}) if isinstance(body, dict) else {}
+        # classify_text returns {task: winning-label} in the common case
+        # (dict-of-scores and list shapes are also tolerated); the smoke
+        # passes when "trabajo" wins the "tema" task by any shape.
+        winner: Optional[str] = None
+        tema = result.get("tema") if isinstance(result, dict) else None
+        if isinstance(tema, str):
+            winner = tema
+        elif isinstance(tema, dict) and tema:
+            winner = max(tema, key=lambda k: tema[k])
+        elif isinstance(tema, list) and tema:
+            first = tema[0]
+            winner = first.get("label", first) if isinstance(first, dict) else first
+            winner = str(winner)
+        if winner != GLINER_DECIDE_SMOKE_EXPECTED:
+            return _fail(
+                "decide-spanish",
+                f"Spanish classify smoke test: expected winner {GLINER_DECIDE_SMOKE_EXPECTED!r}, got {winner!r}",
+                url=url,
+                latency_ms=latency_ms,
+            )
+        return _ok(
+            "decide-spanish",
+            f"Spanish classify smoke test ok in {latency_ms} ms (tema={winner})",
+            url=url,
+            latency_ms=latency_ms,
+        )
+    except Exception as exc:  # noqa: BLE001
+        return _fail("decide-spanish", f"POST {url} failed: {exc!r}", url=url)
+
+
 def check_mcp_server_starts() -> Dict[str, Any]:
     """Spawn the MCP server briefly to confirm it boots without errors."""
     import subprocess
@@ -1061,6 +1214,8 @@ def run_doctor(
     include_live_calls: bool = True,
     gliner_host: str = "127.0.0.1",
     gliner_port: int = 8766,
+    decide_host: str = "127.0.0.1",
+    decide_port: int = GLINER_DECIDE_DEFAULT_PORT,
     include_models: bool = False,
     include_policy: bool = False,
     include_mcp: bool = False,
@@ -1079,11 +1234,14 @@ def run_doctor(
     checks.extend(check_checkpoints_present())
     checks.append(check_gliner_package())
     checks.append(check_gliner_checkpoint())
+    checks.append(check_gliner_decide_checkpoint())
     if include_live_calls:
         checks.append(check_mcp_server_reachable(laya_host, laya_port))
         checks.append(check_live_predict(laya_host, laya_port))
         checks.append(check_gliner_server_reachable(gliner_host, gliner_port))
         checks.append(check_gliner_live_spanish(gliner_host, gliner_port))
+        checks.append(check_gliner_decide_server_reachable(decide_host, decide_port))
+        checks.append(check_gliner_decide_live_classify(decide_host, decide_port))
     checks.append(check_mcp_server_starts())
     checks.extend(check_optional_agent_configs())
     # Fase-8-final T3 opt-in sections: real data only, never invented.
@@ -1140,6 +1298,8 @@ def main() -> int:
     parser.add_argument("--port", type=int, default=8765, help="laya-server port")
     parser.add_argument("--gliner-host", default="127.0.0.1", help="gliner-server host")
     parser.add_argument("--gliner-port", type=int, default=8766, help="gliner-server port")
+    parser.add_argument("--decide-host", default="127.0.0.1", help="decide-server host")
+    parser.add_argument("--decide-port", type=int, default=GLINER_DECIDE_DEFAULT_PORT, help="decide-server port")
     parser.add_argument(
         "--no-live",
         action="store_true",
@@ -1200,6 +1360,8 @@ def main() -> int:
         include_live_calls=not args.no_live,
         gliner_host=args.gliner_host,
         gliner_port=args.gliner_port,
+        decide_host=args.decide_host,
+        decide_port=args.decide_port,
         include_models=args.models,
         include_policy=args.policy,
         include_mcp=args.mcp,

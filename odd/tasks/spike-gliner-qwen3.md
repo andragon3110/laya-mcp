@@ -21,7 +21,7 @@ Rama `odd/spike-gliner-qwen3` sobre `main@a2ce4f1`. Incluye: env (venv+pip+HG do
 
 ## Checklist
 - [x] S1 env: venv + torch CPU + transformers + gliner2 + descargas + smoke-load de ambos modelos — DONE venv `~/.venvs/s1-spike-gliner-qwen3` py3.14, torch 2.14.1+cpu, transformers 4.57.6, gliner2 2.0.0; snaps a35a0cd (1.1GB) + e61197e (1.2GB); smokes OK. Route: delegated direct.
-- [ ] S2 servidor decide :8767 (plantilla gliner_server) + checks doctor — route: delegated direct (2+ files nuevos).
+- [x] S2 servidor decide :8767 (plantilla gliner_server) + checks doctor — DONE nuevo server + 3 checks doctor, classify ES OK (63ms caliente). Route: delegated direct.
 - [ ] S3 servidor rerank :8768 + carril RerankClient en live-client + probes — route: delegated direct (2+ non-trivial files).
 - [ ] S4 golds independientes rerank/find + runs live + results v3+ por backend — route: delegated direct (suites + manifest + results).
 - [ ] S5 análisis: discriminación, ECE/AUROC/histogramas, veredicto por primitiva — route: delegated direct (research + docs).
@@ -59,13 +59,15 @@ tsconfig.json
 ## Progress
 - 2026-10-07 rama odd/spike-gliner-qwen3 creada desde main@a2ce4f1. Recon completo (env + contratos + riesgos).
 - 2026-10-07 S1 DONE (worker general ses_ee8519e4bffe12abUaHtP3SUgj): py3.14 venv, ambos modelos en CPU con smokes correctos. Qwen3 es CausalLM sin head (patrón logits yes/no para S3).
-- Forecast: grande (~1200 líneas autoradas; servidores nuevos exceden la heurística por naturaleza). Estrategia: stacked-to-main (cacheada). Running: ~10 (solo tracking; env vive fuera del repo).
+- 2026-10-07 S2 DONE (worker general ses_ee84dfed7ffeq4yIxnt6MNhKcA): server :8767 + doctor, classify ES OK. Nota: sirvió con `~/laya-mcp/.venv` (S1 venv sin fastapi); S3 usa mismo python o instala fastapi en S1.
+- Forecast: grande (~1200 líneas autoradas; servidores nuevos exceden la heurística por naturaleza). Estrategia: stacked-to-main (cacheada). Running: ~240 (tracking + doctor + server nuevo).
 
 ## Verification evidence
 - S1: venv `~/.venvs/s1-spike-gliner-qwen3` py3.14.8, torch 2.14.1+cpu (cuda False), 9/9 + 14/14 archivos HF. GLiNER smoke 3/3 (ES 0.993) ~0.06s/texto RSS ~2931MB; Qwen3 smoke ranking correcto (0.9996 vs resto) batch 1.07s RSS ~3861MB. Repo intacto (`git status`: solo este tracking).
+- S2: `node evals/run.mjs`: 94/94. Server :8767 `/ready` 200 cálido, `/models` loaded true, `POST /classify` ES → trabajo (63ms caliente, 8s con carga). Parent spot-check: diff solo superficies, 94/94 re-ejecutado OK.
 
 ## Next step
-- Ejecutar S2 (servidor decide :8767) con un writer acotado.
+- Ejecutar S3 (servidor rerank :8768 + carril RerankClient) con un writer acotado.
 
 ## Delivery
 - Estrategia: stacked-to-main (cacheada del feature anterior). Slices se definen al cerrar (probable: env+servers / runs+análisis / modernización).

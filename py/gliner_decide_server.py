@@ -1,0 +1,943 @@
+#!/usr/bin/env python3
+"""
+gliner-decide-server: spike sidecar for laya-mcp (S2 of spike-gliner-qwen3).
+
+Thin HTTP wrapper around GLiNER2.5-multi-Decide
+(fastino/GLiNER2.5-multi-Decide), the classification-oriented sibling of the
+span-extraction sidecar in py/gliner_server.py. It answers *which label wins*
+(classify/gate/screen primitives); Qwen3-Reranker (:8768, S3) covers
+rerank/find. Laya remains the judge for prod paths.
+
+Process independence mirrors the template: own OS process, own port (8767),
+own holder, no shared state with laya-server (:8765) or gliner-server
+(:8766). All three sidecars may run concurrently.
+
+Contract vs the template (py/gliner_server.py) and vs GlinerClient
+(src/gliner.ts:223-224, evals/live-client.mjs):
+  - POST /classify {text, tasks} -> {result, latency_ms}: IDENTICAL shape.
+    `tasks` passes straight to `classify_text`; GlinerClient.classify maps
+    `latency_ms` -> `latencyMs`. No adapter change needed in live-client.
+  - GET /ready (non-warming 200/503 snapshot) and GET /models (always 200,
+    never loads): IDENTICAL shapes, only `service` differs
+    ("gliner-decide-server").
+  - GET /live, GET /health, POST /reload: identical, service renamed.
+  - POST /extract_entities and POST /pii_scan: PRESENT and functional (the
+    Decide checkpoint is a BoundaryExtractor exposing both classify_text
+    and extract_entities, verified live), but the spike only exercises
+    /classify; extraction quality on Decide is uncharacterized.
+  - Env tuning (retry/backoff/circuit GLINER_LOAD_*, limits GLINER_LIMITS_*,
+    inflight GLINER_MAX_INFLIGHT) is SHARED with gliner-server by design
+    for the spike; only identity envs are distinct: GLINER_DECIDE_MODEL,
+    GLINER_DECIDE_DEVICE, GLINER_DECIDE_HOST, GLINER_DECIDE_PORT,
+    GLINER_DECIDE_LOG_LEVEL.
+
+Default port 8767 (gliner-server uses 8766, laya-server 8765).
+"""
+from __future__ import annotations
+
+import asyncio
+import json
+import logging
+import math
+import os
+import random
+import sys
+import threading
+import time
+from typing import Any, Dict, List, Optional, Union
+
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+logging.basicConfig(
+    level=os.getenv("GLINER_DECIDE_LOG_LEVEL", os.getenv("GLINER_LOG_LEVEL", os.getenv("LAYA_LOG_LEVEL", "WARNING"))),
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    stream=sys.stderr,
+)
+log = logging.getLogger("gliner-decide-server")
+
+DEFAULT_MODEL = os.getenv("GLINER_DECIDE_MODEL", "fastino/GLiNER2.5-multi-Decide")
+DEFAULT_DEVICE_SETTING = os.getenv("GLINER_DECIDE_DEVICE", "auto")  # auto|cpu|cuda|mps
+
+SERVER_VERSION = "0.1.0"
+_SERVER_START = time.time()
+
+# Fixed label set for /pii_scan. Descriptions are short English phrases;
+# the multilingual encoder handles Spanish text against them (verified).
+PII_LABELS: Dict[str, str] = {
+    "email": "Email addresses like name@domain.com",
+    "telefono": "Phone numbers in any format, with or without country code",
+    "api_key": "API keys and secrets starting with sk-, ghp_, AKIA, xox- and similar prefixes",
+    "token_secreto": "Authentication tokens, bearer tokens and session secrets",
+    "password": "Passwords and credentials",
+    "persona": "Names of people",
+}
+
+
+def _resolve_device() -> str:
+    req = DEFAULT_DEVICE_SETTING.lower()
+    if req != "auto":
+        return req
+    try:
+        import torch
+
+        if torch.cuda.is_available():
+            return "cuda"
+        backends = getattr(torch, "backends", None)
+        mps = getattr(getattr(backends, "mps", None), "is_available", None)
+        if callable(mps) and mps():
+            return "mps"
+    except Exception:  # noqa: BLE001
+        pass
+    return "cpu"
+
+
+class _LoadNotReady(RuntimeError):
+    """Fail-fast refusal from the backoff/circuit gate.
+
+    Raised WITHOUT touching the model constructor, so a burst of requests
+    against a failing backend costs one cheap timestamp check each instead
+    of N expensive construction attempts. Carries `retry_after_seconds` so
+    endpoints can answer 503 + Retry-After.
+    """
+
+    def __init__(self, message: str, retry_after_seconds: float) -> None:
+        super().__init__(message)
+        self.retry_after_seconds = max(0.0, retry_after_seconds)
+
+
+def _load_retry_cfg() -> Dict[str, float]:
+    """Load retry/backoff/circuit tuning, all via env with sane defaults.
+
+    Read dynamically (per load decision, never per request hot path) so
+    tests can tune via env without a module reload; production cost is a
+    few os.getenv calls per construction attempt only.
+
+    Defaults (documented, T4):
+      GLINER_LOAD_RETRY_BASE_S=1.0      first backoff delay after 1 failure
+      GLINER_LOAD_RETRY_FACTOR=2.0      exponential growth per failure
+      GLINER_LOAD_RETRY_CAP_S=60.0      ceiling for any single backoff delay
+      GLINER_LOAD_RETRY_MAX=5           attempts before only probes may pass
+      GLINER_LOAD_CIRCUIT_THRESHOLD=3   consecutive failures to open circuit
+      GLINER_LOAD_CIRCUIT_COOLDOWN_S=30.0 open -> half-open probe delay
+      GLINER_LOAD_ERROR_TTL_S=300.0     cached error expiry (transients must
+                                        not poison the holder until restart)
+    """
+
+    def _f(name: str, default: float) -> float:
+        try:
+            return float(os.getenv(name, str(default)))
+        except ValueError:
+            return default
+
+    def _i(name: str, default: int) -> int:
+        try:
+            return max(1, int(os.getenv(name, str(default))))
+        except ValueError:
+            return default
+
+    return {
+        "base_s": max(0.0, _f("GLINER_LOAD_RETRY_BASE_S", 1.0)),
+        "factor": max(1.0, _f("GLINER_LOAD_RETRY_FACTOR", 2.0)),
+        "cap_s": max(0.0, _f("GLINER_LOAD_RETRY_CAP_S", 60.0)),
+        "max_attempts": _i("GLINER_LOAD_RETRY_MAX", 5),
+        "circuit_threshold": _i("GLINER_LOAD_CIRCUIT_THRESHOLD", 3),
+        "circuit_cooldown_s": max(0.0, _f("GLINER_LOAD_CIRCUIT_COOLDOWN_S", 30.0)),
+        "error_ttl_s": max(0.0, _f("GLINER_LOAD_ERROR_TTL_S", 300.0)),
+    }
+
+
+def _backoff_delay_s(attempts: int, cfg: Dict[str, float]) -> float:
+    """Exponential backoff with +/-25% jitter: base * factor^(attempts-1)."""
+    delay = min(cfg["cap_s"], cfg["base_s"] * (cfg["factor"] ** max(0, attempts - 1)))
+    return max(0.0, delay * (1.0 + random.uniform(-0.25, 0.25)))
+
+
+def _retry_after_header(seconds: float) -> Dict[str, str]:
+    # Retry-After takes whole seconds; always at least 1 on a 503.
+    return {"Retry-After": str(max(1, math.ceil(seconds)))}
+
+
+# -- Input limits (T6) --------------------------------------------------------
+# Defaults are documented HERE (module, not README — single source of truth).
+# Every value was validated against the real system, not copied blindly:
+#   - MAX_TEXT_CHARS=50000: GLiNER2.5 does span extraction over whole
+#     documents (no 512/1024-token judge window like Laya), so the cap is
+#     roomier than LAYA_LIMITS_MAX_STATE_CHARS=20000 — still a DoS/memory
+#     guard, far above legit PII/extract payloads (TS tools already trim
+#     criteria to 240 chars and rerank candidates to 2000).
+#   - MAX_LABELS=64: one zero-shot head per label per forward pass; bounds
+#     compute. Matches the TS extract fan-out (2 labels per field max, 64
+#     fields → worst case still near budget; the server stays authoritative).
+#   - MAX_TASKS=32 / MAX_EXTRA_TYPES=32: maps whose entries each cost a
+#     classification/extraction head; 32 keeps /classify and /pii_scan inside
+#     one cheap forward pass each.
+#   - MAX_BODY_CHARS=100000: total-JSON DoS guard, same scale as laya-server.
+
+
+def _limits_cfg() -> Dict[str, int]:
+    """Size guards for /extract_entities, /classify and /pii_scan, all via
+    env. Read dynamically per validation (like _load_retry_cfg) so tests tune
+    via env without a module reload."""
+
+    def _i(name: str, default: int) -> int:
+        try:
+            return max(1, int(os.getenv(name, str(default))))
+        except ValueError:
+            return default
+
+    return {
+        "max_text_chars": _i("GLINER_LIMITS_MAX_TEXT_CHARS", 50000),
+        "max_labels": _i("GLINER_LIMITS_MAX_LABELS", 64),
+        "max_tasks": _i("GLINER_LIMITS_MAX_TASKS", 32),
+        "max_extra_types": _i("GLINER_LIMITS_MAX_EXTRA_TYPES", 32),
+        "max_body_chars": _i("GLINER_LIMITS_MAX_BODY_CHARS", 100000),
+    }
+
+
+class _InputTooLarge(Exception):
+    """Size-guard refusal. Answered as 413 (not 422): the payload is
+    syntactically valid but exceeds the admitted size — the fix is to shrink
+    it, not to correct the schema. Identical structured body {code, field,
+    limit, actual, hint} on both servers, no Retry-After (retrying the same
+    payload can never succeed)."""
+
+    def __init__(self, field: str, limit: int, actual: int, hint: str) -> None:
+        super().__init__(f"input too large: {field} actual={actual} limit={limit}: {hint}")
+        self.field = field
+        self.limit = limit
+        self.actual = actual
+        self.hint = hint
+
+
+def _too_large_response(exc: _InputTooLarge) -> JSONResponse:
+    return JSONResponse(
+        status_code=413,
+        content={
+            "code": "input_too_large",
+            "field": exc.field,
+            "limit": exc.limit,
+            "actual": exc.actual,
+            "hint": exc.hint,
+        },
+    )
+
+
+def _check_text(field: str, text: str) -> str:
+    limit = _limits_cfg()["max_text_chars"]
+    if len(text) > limit:
+        raise _InputTooLarge(
+            field,
+            limit,
+            len(text),
+            "reduce text to within GLINER_LIMITS_MAX_TEXT_CHARS chars or split the document",
+        )
+    return text
+
+
+def _check_body(payload: Dict[str, Any]) -> None:
+    limit = _limits_cfg()["max_body_chars"]
+    try:
+        actual = len(json.dumps(payload, default=str))
+    except Exception:  # noqa: BLE001
+        return  # unmeasurable here: endpoint serialization decides
+    if actual > limit:
+        raise _InputTooLarge(
+            "body",
+            limit,
+            actual,
+            "total JSON body exceeds GLINER_LIMITS_MAX_BODY_CHARS chars; shorten text or split the request",
+        )
+
+
+class _InflightSaturated(RuntimeError):
+    """Inference bound hit: fail fast instead of queueing (never enqueues).
+
+    Carries `retry_after_seconds` so the endpoint answers 503 + Retry-After.
+    """
+
+    def __init__(self, message: str, retry_after_seconds: float = 1.0) -> None:
+        super().__init__(message)
+        self.retry_after_seconds = max(0.0, retry_after_seconds)
+
+
+def _max_inflight(env_name: str, default: int) -> int:
+    """Inference concurrency bound from env (validated >= 1)."""
+    try:
+        return max(1, int(os.getenv(env_name, str(default))))
+    except ValueError:
+        return default
+
+
+class _ExtractorHolder:
+    """Lazy GLiNER loader so the HTTP server boots even when weights are missing.
+
+    T4 failure-tracking: a failed construction records {error, at,
+    attempts} instead of a permanent _load_error. Later callers fail fast
+    (no constructor call) until the backoff delay elapses; after MAX
+    attempts only a post-cooldown half-open probe may pass; a cached error
+    older than TTL expires on its own. Any success clears error+attempts.
+    The process is never blocked by a model: no sleep, no retry loop in
+    the request path -- the *client* retries after Retry-After.
+    """
+
+    def __init__(self) -> None:
+        self._model = None
+        self._load_error: str | None = None
+        self._load_error_at: float | None = None
+        self._load_attempts = 0
+        self._consecutive_failures = 0
+        self._device: str | None = None
+        self._loaded_at: float | None = None
+        # T5 concurrency guards. Justification per guard (no global locks):
+        # - _load_mutex (threading.Lock, per holder): serializes concurrent
+        #   SYNC constructions (threads / legacy sync paths) so N threads
+        #   with an unloaded model cause ONE AutoExtractor call; the rest
+        #   wait on the mutex and see the loaded model. Only held during load.
+        # - _load_lock (asyncio.Lock, per holder, lazy): serializes
+        #   concurrent ASYNC load dispatches in the event loop so N requests
+        #   dispatch ONE to_thread construction; the rest await the same
+        #   result. Only guards the load phase, never inference.
+        # - _inflight (asyncio.Semaphore, per holder, lazy): bounds
+        #   concurrent inference workers (see _inflight_sem for the
+        #   throughput/VRAM trade-off). Saturation answers 503 + Retry-After
+        #   immediately instead of queueing unboundedly.
+        self._load_mutex = threading.Lock()
+        self._load_lock: asyncio.Lock | None = None
+        self._inflight: asyncio.Semaphore | None = None
+        self._inflight_limit = 0
+
+    # -- circuit breaker (T4) -------------------------------------------
+    def circuit_state(self, now: float | None = None) -> str:
+        """closed | open | half-open. Closed below threshold; open while the
+        cooldown after threshold failures has not elapsed; half-open when a
+        probe may pass (post-cooldown)."""
+        cfg = _load_retry_cfg()
+        if self._consecutive_failures < cfg["circuit_threshold"]:
+            return "closed"
+        if self._load_error_at is None:
+            return "closed"
+        now = time.time() if now is None else now
+        if now - self._load_error_at >= cfg["circuit_cooldown_s"]:
+            return "half-open"
+        return "open"
+
+    def retry_after_seconds(self, now: float | None = None) -> float:
+        """Seconds until the next construction attempt may pass (0 if now)."""
+        if self._model is not None:
+            return 0.0
+        if self._load_error_at is None or self._load_attempts <= 0:
+            return 0.0
+        now = time.time() if now is None else now
+        cfg = _load_retry_cfg()
+        elapsed = now - self._load_error_at
+        if self._load_attempts >= cfg["max_attempts"]:
+            return max(0.0, cfg["circuit_cooldown_s"] - elapsed)
+        return max(0.0, _backoff_delay_s(self._load_attempts, cfg) - elapsed)
+
+    def _clear_failure(self) -> None:
+        self._load_error = None
+        self._load_error_at = None
+        self._load_attempts = 0
+        self._consecutive_failures = 0
+
+    def reset(self) -> Dict[str, Any]:
+        """Operational (non-destructive) reset for POST /reload.
+
+        Clears failure-tracking so the next use retries construction.
+        Never unloads a healthy model: if loaded, next use just works.
+        """
+        had_error = self._load_error is not None
+        cleared_attempts = self._load_attempts
+        self._clear_failure()
+        return {
+            "cleared_error": had_error,
+            "cleared_attempts": cleared_attempts,
+            "circuit": self.circuit_state(),
+            "loaded": self._model is not None,
+        }
+
+    def _check_retry_allowed(self, now: float) -> None:
+        """Fail-fast gate. Raises _LoadNotReady without touching the
+        constructor when a retry would be aggressive. Gate refusals never
+        count as attempts. A cached error older than TTL expires first."""
+        if self._model is not None:
+            return
+        cfg = _load_retry_cfg()
+        if (
+            self._load_error_at is not None
+            and cfg["error_ttl_s"] > 0
+            and now - self._load_error_at >= cfg["error_ttl_s"]
+        ):
+            # A transient failure (VRAM pressure, HF network blip) must not
+            # poison the holder until restart: expire the cached error.
+            self._clear_failure()
+            return
+        if self._load_attempts <= 0 or self._load_error_at is None:
+            return  # never attempted (or reset): a probe may pass
+        if self._load_attempts >= cfg["max_attempts"]:
+            # Budget exhausted: only a post-cooldown half-open probe passes.
+            if now - self._load_error_at < cfg["circuit_cooldown_s"]:
+                raise _LoadNotReady(
+                    f"gliner not loaded: retry budget exhausted "
+                    f"({self._load_attempts} attempts): {self._load_error}",
+                    cfg["circuit_cooldown_s"] - (now - self._load_error_at),
+                )
+            return
+        delay = _backoff_delay_s(self._load_attempts, cfg)
+        if now - self._load_error_at < delay:
+            raise _LoadNotReady(
+                f"gliner not loaded: backing off "
+                f"(attempt {self._load_attempts}): {self._load_error}",
+                delay - (now - self._load_error_at),
+            )
+
+    def _record_failure(self, exc: BaseException, now: float) -> None:
+        self._load_attempts += 1
+        self._consecutive_failures += 1
+        self._load_error = f"gliner not loaded: {exc!r}"
+        self._load_error_at = now
+        log.warning(
+            "GLiNER load failed (attempt %d, circuit=%s): %s",
+            self._load_attempts,
+            self.circuit_state(now),
+            self._load_error,
+        )
+
+    def _record_success(self, now: float) -> None:
+        self._clear_failure()
+        self._loaded_at = now
+
+    def _do_load(self) -> None:
+        from gliner2 import AutoExtractor
+
+        device = _resolve_device()
+        log.info("loading GLiNER model=%s device=%s", DEFAULT_MODEL, device)
+        self._model = AutoExtractor.from_pretrained(DEFAULT_MODEL, map_location=device)
+        self._device = device
+        log.info("GLiNER ready: %s on %s", type(self._model).__name__, device)
+
+    def _ensure(self) -> Any:
+        if self._model is not None:
+            return self._model
+        # Single-flight (sync side): concurrent threads collapse onto one
+        # construction; the double-check after acquiring avoids a second
+        # build when a waiter finds the model already loaded.
+        with self._load_mutex:
+            if self._model is not None:
+                return self._model
+            self._check_retry_allowed(time.time())
+            try:
+                self._do_load()
+            except Exception as exc:  # noqa: BLE001
+                self._record_failure(exc, time.time())
+                raise
+            self._record_success(time.time())
+            return self._model
+
+    def _async_load_lock(self) -> asyncio.Lock:
+        # Lazily created in the running loop: asyncio primitives must not be
+        # shared across loops, and this server runs a single loop.
+        if self._load_lock is None:
+            self._load_lock = asyncio.Lock()
+        return self._load_lock
+
+    async def ensure_async(self) -> Any:
+        """Single-flight async load: N concurrent requests -> ONE blocking
+        construction in a worker thread; the rest await the same result.
+        Funnels through the sync _ensure (and its mutex), so a sync load
+        racing an async one still builds only once."""
+        if self._model is not None:
+            return self._model
+        async with self._async_load_lock():
+            if self._model is not None:
+                return self._model
+            return await asyncio.to_thread(self._ensure)
+
+    def _inflight_sem(self) -> "tuple[asyncio.Semaphore, int]":
+        """Inference semaphore, sized from GLINER_MAX_INFLIGHT.
+
+        Trade-off (documented, T5): each inflight inference holds a worker
+        thread + transient memory for a span-extraction forward pass of a
+        287M model. Default 4: extraction is lighter than a Laya Router
+        pass, so a small amount of overlap is safe; raise only with
+        measured headroom. Saturation is backpressure, not a bug.
+        """
+        limit = _max_inflight("GLINER_MAX_INFLIGHT", 4)
+        if self._inflight is None or self._inflight_limit != limit:
+            self._inflight = asyncio.Semaphore(limit)
+            self._inflight_limit = limit
+        return self._inflight, limit
+
+    async def run_bounded(self, func: Any, *args: Any, **kwargs: Any) -> Any:
+        """Run blocking inference in a worker thread under the inflight
+        bound. Raises _InflightSaturated immediately when saturated -- never
+        queues. The locked() check + acquire() below are atomic within one
+        event-loop task (no await between them), so no hidden queue forms."""
+        sem, limit = self._inflight_sem()
+        if sem.locked():
+            raise _InflightSaturated(
+                f"gliner-decide-server saturated ({limit} inflight, limit {limit}): "
+                "retry shortly",
+                1.0,
+            )
+        await sem.acquire()
+        try:
+            return await asyncio.to_thread(func, *args, **kwargs)
+        finally:
+            sem.release()
+
+    def health(self) -> Dict[str, Any]:
+        if self._model is None:
+            try:
+                self._ensure()
+            except Exception as exc:  # noqa: BLE001
+                return {"ready": False, "error": str(exc)}
+        return {
+            "ready": True,
+            "model": DEFAULT_MODEL,
+            "device": self._device,
+            "uptime_seconds": (time.time() - self._loaded_at) if self._loaded_at else 0.0,
+        }
+
+    def snapshot(self) -> Dict[str, Any]:
+        """Non-warming readiness snapshot. Never triggers a model load.
+
+        T4: failure-tracking state is surfaced as `circuit`
+        (closed|open|half-open), `load_attempts` and `retry_after_seconds`
+        so operators can tell a backing-off backend from a dead one.
+        """
+        uptime = time.time() - _SERVER_START
+        versions = {"server": SERVER_VERSION}
+        circuit = self.circuit_state()
+        if self._model is None and self._load_error is None:
+            return {
+                "ready": False,
+                "reason": "not loaded yet (no load attempted)",
+                "loaded": [],
+                "failed": [
+                    {
+                        "name": DEFAULT_MODEL,
+                        "repo": DEFAULT_MODEL,
+                        "error": "not loaded yet",
+                    }
+                ],
+                "device": self._device,
+                "versions": versions,
+                "uptime_seconds": uptime,
+                "circuit": circuit,
+                "load_attempts": self._load_attempts,
+                "retry_after_seconds": 0.0,
+            }
+        if self._load_error is not None:
+            return {
+                "ready": False,
+                "reason": self._load_error,
+                "loaded": [],
+                "failed": [
+                    {
+                        "name": DEFAULT_MODEL,
+                        "repo": DEFAULT_MODEL,
+                        "error": self._load_error,
+                    }
+                ],
+                "device": self._device,
+                "versions": versions,
+                "uptime_seconds": uptime,
+                "circuit": circuit,
+                "load_attempts": self._load_attempts,
+                "retry_after_seconds": self.retry_after_seconds(),
+            }
+        return {
+            "ready": True,
+            "reason": None,
+            "loaded": [DEFAULT_MODEL],
+            "failed": [],
+            "device": self._device,
+            "versions": versions,
+            "uptime_seconds": uptime,
+            "circuit": circuit,
+            "load_attempts": self._load_attempts,
+            "retry_after_seconds": 0.0,
+        }
+
+    def models_info(self) -> List[Dict[str, Any]]:
+        """Single-model inventory. Never triggers a model load.
+
+        `revision` is null + revision_source="unpinned" because the pin is
+        not resolvable offline here; never invent a hash (T3). `circuit`
+        mirrors the holder breaker state (T4).
+        """
+        circuit = self.circuit_state()
+        return [
+            {
+                "name": DEFAULT_MODEL,
+                "repo": DEFAULT_MODEL,
+                "loaded": self._model is not None,
+                "revision": None,
+                "revision_source": "unpinned",
+                "device": self._device if self._device is not None else DEFAULT_DEVICE_SETTING,
+                "circuit": circuit,
+            }
+        ]
+
+
+# Process-independence note (T4, verified by construction): this holder lives
+# in the gliner-decide-server OS process only. laya-server and gliner-server
+# are separate processes (own FastAPI apps, own ports, own holders, no shared
+# state or locks), so a failure in one cannot crash the others. The spike
+# harness treats this sidecar as opt-in (evals/live-client.mjs --live).
+holder = _ExtractorHolder()
+
+
+# -- HTTP contract ----------------------------------------------------------
+
+Labels = Union[List[str], Dict[str, str]]
+
+
+class ExtractRequest(BaseModel):
+    text: str = Field(..., description="Document text to extract from.")
+    labels: Labels = Field(
+        ...,
+        description="Entity types: list of names or {name: description} map.",
+    )
+    include_spans: bool = True
+    include_confidence: bool = True
+
+    @field_validator("text")
+    @classmethod
+    def _cap_text(cls, v: str) -> str:
+        return _check_text("text", v)
+
+    @field_validator("labels")
+    @classmethod
+    def _cap_labels(cls, v: Labels) -> Labels:
+        limit = _limits_cfg()["max_labels"]
+        actual = len(v)
+        if actual > limit:
+            raise _InputTooLarge(
+                "labels",
+                limit,
+                actual,
+                "send at most GLINER_LIMITS_MAX_LABELS labels per request; split into batches",
+            )
+        return v
+
+    @model_validator(mode="after")
+    def _cap_body(self) -> "ExtractRequest":
+        _check_body({"text": self.text, "labels": self.labels})
+        return self
+
+
+class ClassifyRequest(BaseModel):
+    text: str = Field(..., description="Text to classify.")
+    tasks: Dict[str, Any] = Field(
+        ...,
+        description="Tasks map passed straight to classify_text, e.g. {\"intent\": [\"a\", \"b\"]}.",
+    )
+
+    @field_validator("text")
+    @classmethod
+    def _cap_text(cls, v: str) -> str:
+        return _check_text("text", v)
+
+    @field_validator("tasks")
+    @classmethod
+    def _cap_tasks(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+        limit = _limits_cfg()["max_tasks"]
+        if len(v) > limit:
+            raise _InputTooLarge(
+                "tasks",
+                limit,
+                len(v),
+                "send at most GLINER_LIMITS_MAX_TASKS tasks per request; split into batches",
+            )
+        return v
+
+    @model_validator(mode="after")
+    def _cap_body(self) -> "ClassifyRequest":
+        _check_body({"text": self.text, "tasks": self.tasks})
+        return self
+
+
+class PiiRequest(BaseModel):
+    text: str = Field(..., description="Text to scan for PII and secrets.")
+    extra_types: List[str] = Field(
+        default_factory=list,
+        description="Extra zero-shot entity types to look for alongside the PII set.",
+    )
+
+    @field_validator("text")
+    @classmethod
+    def _cap_text(cls, v: str) -> str:
+        return _check_text("text", v)
+
+    @field_validator("extra_types")
+    @classmethod
+    def _cap_extra_types(cls, v: List[str]) -> List[str]:
+        limit = _limits_cfg()["max_extra_types"]
+        if len(v) > limit:
+            raise _InputTooLarge(
+                "extra_types",
+                limit,
+                len(v),
+                "send at most GLINER_LIMITS_MAX_EXTRA_TYPES extra types per request",
+            )
+        return v
+
+    @model_validator(mode="after")
+    def _cap_body(self) -> "PiiRequest":
+        _check_body({"text": self.text, "extra_types": self.extra_types})
+        return self
+
+
+app = FastAPI(title="gliner-decide-server", version=SERVER_VERSION)
+
+# CORS is permissive because this process binds to 127.0.0.1 only.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.exception_handler(_InputTooLarge)
+async def _input_too_large_handler(_request: Any, exc: _InputTooLarge) -> JSONResponse:
+    # Custom exceptions raised inside pydantic validators propagate unwrapped
+    # (verified: only ValueError/AssertionError become 422), so the size
+    # guards above land here as structured 413s.
+    return _too_large_response(exc)
+
+
+@app.get("/live")
+async def live() -> Dict[str, Any]:
+    """Liveness only. Immediate: never touches the holder, never loads models.
+
+    Safe to poll aggressively; works with the model down or never loaded.
+    """
+    return {
+        "alive": True,
+        "service": "gliner-decide-server",
+        "version": SERVER_VERSION,
+        "uptime_seconds": time.time() - _SERVER_START,
+    }
+
+
+@app.get("/health")
+async def health() -> Dict[str, Any]:
+    """Legacy liveness + readiness. WARNING: may warm up (lazy-load) the model
+    on first call -- but never aggressively: inside the backoff/cooldown
+    window it fails fast without touching the constructor (T4). Prefer
+    /live (liveness) + /ready (readiness) for k8s-style probes; the TS
+    health watcher polls those since T4."""
+    return {"status": "ok", **holder.health()}
+
+
+@app.get("/ready")
+async def ready() -> Dict[str, Any]:
+    """Readiness only (non-warming snapshot). 200 when ready, else 503 with a
+    structured body {ready:false, reason, loaded, failed, device, versions,
+    uptime_seconds, circuit, load_attempts, retry_after_seconds} plus a
+    Retry-After header -- a not-ready backend is never hidden."""
+    info = holder.snapshot()
+    if not info.get("ready"):
+        return JSONResponse(
+            status_code=503,
+            content={"status": "not_ready", **info},
+            headers=_retry_after_header(float(info.get("retry_after_seconds") or 0.0)),
+        )
+    return {"status": "ready", **info}
+
+
+@app.get("/models")
+async def models() -> Dict[str, Any]:
+    """Model inventory. Always 200, never triggers a model load."""
+    return {
+        "service": "gliner-decide-server",
+        "device": holder._device if holder._device is not None else DEFAULT_DEVICE_SETTING,
+        "versions": {"server": SERVER_VERSION},
+        "uptime_seconds": time.time() - _SERVER_START,
+        "circuit": holder.circuit_state(),
+        "models": holder.models_info(),
+    }
+
+
+@app.post("/reload")
+async def reload() -> Dict[str, Any]:
+    """Operational (non-destructive) reset of load failure-tracking.
+
+    Clears the cached {error, at, attempts} and closes the circuit so the
+    next use retries construction immediately instead of waiting out the
+    backoff/cooldown. Never unloads a healthy model. Always 200 -- the
+    body reports what was cleared. Use after fixing the underlying cause
+    (VRAM freed, HF reachable again); without a fix the next attempt will
+    simply fail and re-enter backoff.
+    """
+    return {"status": "reloaded", "service": "gliner-decide-server", **holder.reset()}
+
+
+@app.post("/extract_entities")
+async def extract_entities(req: ExtractRequest) -> Dict[str, Any]:
+    """Zero-shot entity spans with character offsets. No regex required."""
+    start = time.perf_counter()
+    try:
+        # Single-flight load, then bound inference (503 + Retry-After when
+        # saturated, never an unbounded queue).
+        model = await holder.ensure_async()
+        result = await holder.run_bounded(
+            model.extract_entities,
+            req.text,
+            req.labels,
+            include_confidence=req.include_confidence,
+            include_spans=req.include_spans,
+        )
+    except _LoadNotReady as exc:
+        # Backoff/circuit fail-fast: 503 with Retry-After, no retry loop.
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+            headers=_retry_after_header(exc.retry_after_seconds),
+        ) from exc
+    except _InflightSaturated as exc:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": str(exc),
+                "code": "inflight_saturated",
+                "retry_after_seconds": exc.retry_after_seconds,
+                "limit": holder._inflight_limit,
+            },
+            headers=_retry_after_header(exc.retry_after_seconds),
+        )
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+            headers=_retry_after_header(holder.retry_after_seconds()),
+        ) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"extraction error: {exc!r}") from exc
+    return {
+        "entities": result.get("entities", result) if isinstance(result, dict) else result,
+        "latency_ms": (time.perf_counter() - start) * 1000.0,
+    }
+
+
+@app.post("/classify")
+async def classify(req: ClassifyRequest) -> Dict[str, Any]:
+    """Zero-shot text classification. Tasks map is passed straight through."""
+    start = time.perf_counter()
+    try:
+        model = await holder.ensure_async()
+        result = await holder.run_bounded(model.classify_text, req.text, req.tasks)
+    except _LoadNotReady as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+            headers=_retry_after_header(exc.retry_after_seconds),
+        ) from exc
+    except _InflightSaturated as exc:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": str(exc),
+                "code": "inflight_saturated",
+                "retry_after_seconds": exc.retry_after_seconds,
+                "limit": holder._inflight_limit,
+            },
+            headers=_retry_after_header(exc.retry_after_seconds),
+        )
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+            headers=_retry_after_header(holder.retry_after_seconds()),
+        ) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"classification error: {exc!r}") from exc
+    return {
+        "result": result,
+        "latency_ms": (time.perf_counter() - start) * 1000.0,
+    }
+
+
+@app.post("/pii_scan")
+async def pii_scan(req: PiiRequest) -> Dict[str, Any]:
+    """Scan for PII and secrets. Returns flat findings sorted by offset."""
+    start = time.perf_counter()
+    labels: Dict[str, str] = dict(PII_LABELS)
+    for extra in req.extra_types or []:
+        labels.setdefault(extra, extra.replace("_", " "))
+    try:
+        model = await holder.ensure_async()
+        result = await holder.run_bounded(
+            model.extract_entities,
+            req.text,
+            labels,
+            include_confidence=True,
+            include_spans=True,
+        )
+    except _LoadNotReady as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+            headers=_retry_after_header(exc.retry_after_seconds),
+        ) from exc
+    except _InflightSaturated as exc:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": str(exc),
+                "code": "inflight_saturated",
+                "retry_after_seconds": exc.retry_after_seconds,
+                "limit": holder._inflight_limit,
+            },
+            headers=_retry_after_header(exc.retry_after_seconds),
+        )
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+            headers=_retry_after_header(holder.retry_after_seconds()),
+        ) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"pii scan error: {exc!r}") from exc
+
+    entities = result.get("entities", {}) if isinstance(result, dict) else {}
+    findings: List[Dict[str, Any]] = []
+    for etype, spans in entities.items():
+        for s in spans or []:
+            findings.append(
+                {
+                    "type": etype,
+                    "text": s.get("text"),
+                    "start": s.get("start"),
+                    "end": s.get("end"),
+                    "confidence": s.get("confidence", 0.0),
+                }
+            )
+    findings.sort(key=lambda f: (f["start"] is None, f["start"] or 0))
+    counts: Dict[str, int] = {}
+    for f in findings:
+        counts[f["type"]] = counts.get(f["type"], 0) + 1
+    return {
+        "findings": findings,
+        "counts": counts,
+        "latency_ms": (time.perf_counter() - start) * 1000.0,
+    }
+
+
+def main() -> None:
+    import uvicorn
+
+    host = os.getenv("GLINER_DECIDE_HOST", "127.0.0.1")
+    port = int(os.getenv("GLINER_DECIDE_PORT", "8767"))
+    log.info("gliner-decide-server starting on http://%s:%d", host, port)
+    uvicorn.run(app, host=host, port=port, log_level="warning")
+
+
+if __name__ == "__main__":
+    main()
