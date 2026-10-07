@@ -20,6 +20,11 @@ claim about the real backend or about agent quality.
   (verified by the T6 no-regression battery, section 12). The
   wrong_confident taus (0.70/0.80/0.90/0.95) are reporting slices, never
   production cutoffs.
+- Gold provenance is explicit: every suite defaults to
+  `goldSource: "oracle-stub"`; the 6 T5 independent cases carry
+  per-case `gold_source: "independent"` with human-fixed truth
+  (section 7.6). Only the independent slice can judge a backend;
+  the oracle-stub slice only checks plumbing.
 - No live comparison exists: the +/-Laya integration comparison is defined
   as a protocol with explicit requirements (section 8). No live result is
   reported because no live run happened.
@@ -29,24 +34,27 @@ claim about the real backend or about agent quality.
 | Path | Role |
 |---|---|
 | `evals/run.mjs` | Common harness: loads the 11 suites, runs every case against the real handler with the oracle stub, checks the output against the case gold. Exit 0 when all golds match. |
-| `evals/suites/*.mjs` | 11 datasets with golds plus thin per-primitive adapters (`invoke` + `check`): `classify`, `decide`, `verify`, `screen`, `pii`, `extract`, `find`, `rerank`, `review`, `gate`, plus `compare` (cierre-pendientes T4). |
+| `evals/suites/*.mjs` | 11 datasets with golds plus thin per-primitive adapters (`invoke` + `check`): `classify`, `decide`, `verify`, `screen`, `pii`, `extract`, `find`, `rerank`, `review`, `gate`, plus `compare` (cierre-pendientes T4). Every suite exports its default gold provenance (`goldSource: "oracle-stub"`); the 6 T5 independent cases in `classify`/`screen`/`gate` carry per-case `gold_source: "independent"` (section 7.6). |
 | `evals/metrics.mjs` | Shared pure metric functions (binary, decision accuracy, abstention, ranking, score agreement, wrong_confident). No I/O, no thresholds. |
-| `evals/score.mjs` | T4 runner: applies `metrics.mjs` to the 11 suites; prints the metrics table; optionally saves to `--out` (default `artifacts/`, untracked). |
+| `evals/score.mjs` | T4 runner: applies `metrics.mjs` to the 11 suites; prints the metrics table; optionally saves to `--out` (default `artifacts/`, untracked). `--live` routes judge calls to the probed backend (stub stays default). |
+| `evals/live-client.mjs` | T4 live adapter (harness-spike-ready): explicit opt-in gate (`--live` / `LAYA_EVAL_LIVE=1`), backend probe (`/ready` + `/models`), and the live `deps` shape for the suites. Never active by default; refuses (exit 2) when unreachable. |
 | `evals/calibration.md` | Calibration verdict: no output is a probability; Brier/ECE do not apply; forbidden conclusions. |
-| `evals/bench.mjs` | T5 benchmarks: primitive latency/throughput/memory, rerank scale sweep, model-load shape. Absolutes only. |
-| `evals/manifest.mjs` | T5 reproducibility manifest plus the never-overwrite versioned saver for `evals/results/vN/`. |
+| `evals/bench.mjs` | T5 benchmarks: primitive latency/throughput/memory, rerank scale sweep, model-load shape. Absolutes only. `--live` benches the real backend with the same wall/reported split. |
+| `evals/manifest.mjs` | T5 reproducibility manifest plus the never-overwrite versioned saver for `evals/results/vN/`. Records probed revision/device under `--live`, honest nulls otherwise. Every manifest carries the `gold_corpus` provenance census (case `gold_source` wins, else the suite `goldSource` default). |
 | `evals/integration.mjs` | T6 comparable +/-Laya protocol: 4-task hook-chain set with golds, stub arm, and live-requirements gate. |
-| `evals/results/v1/` | First versioned run: `manifest.json` + `bench.json` + `metrics.json`. Never overwritten; new runs take `v2`, `v3`, … |
+| `evals/results/v1/` | First versioned run: `manifest.json` + `bench.json` + `metrics.json`. Frozen at the 88 oracle-stub cases; never overwritten. New runs take `v2`, `v3`, … (`v2` is the T5-spike stub baseline: 94 cases = 88 oracle-stub + 6 independent, section 7.6). |
 | `tests/fase7_t4_metrics.mjs` | 10 hand-fixture checks over `metrics.mjs` (pure functions). |
 | `tests/fase7_t5_bench_manifest.mjs` | 14 structural checks over `bench.mjs` + `manifest.mjs` (shapes and versioning; no timing asserted). |
 | `tests/fase7_t6_integration.mjs` | 12 structural checks over `integration.mjs` (task set, halt, null-slot honesty, live-gate refusal). |
 
 ## 3. Datasets
 
-11 suites x 8 cases = 88 cases. Every suite covers the six honest
-classes: normal, ambiguous, difficult, adversarial, negative, abstention.
-One negative case per suite is a fail-fast limit test (`input_too_large`
-throw), counted in `abstention.errors`, never in quality denominators.
+11 suites x 8 oracle-stub cases = 88, plus 6 T5 independent-gold cases
+(`classify`/`screen`/`gate` x 2, section 7.6) = 94 total. Every suite
+covers the six honest classes: normal, ambiguous, difficult,
+adversarial, negative, abstention. One negative case per suite is a
+fail-fast limit test (`input_too_large` throw), counted in
+`abstention.errors`, never in quality denominators.
 
 | Suite | Primitive | Normal | Difficult | Ambiguous | Adversarial | Negative (incl. limit) | Abstention | Total |
 |---|---|---|---|---|---|---|---|---|
@@ -61,11 +69,15 @@ throw), counted in `abstention.errors`, never in quality denominators.
 | `review` | `laya_review` | 1 | 1 | 1 | 1 | 3 (1) | 1 | 8 |
 | `gate` | `laya_gate` | 1 | 1 | 1 | 1 | 3 (1) | 1 | 8 |
 | `compare` | `laya_compare` | 1 | 1 | 1 | 1 | 2 (1) | 2 | 8 |
-| **Total** | | **14** | **11** | **11** | **12** | **25 (11)** | **15** | **88** |
+| **Total (oracle-stub)** | | **14** | **11** | **11** | **12** | **25 (11)** | **15** | **88** |
+| **T5 independent slice** | | **+4** | | | **+1** | **+1** | | **+6** |
+| **Total (v2 corpus)** | | **18** | **11** | **11** | **13** | **26 (11)** | **15** | **94** |
 
 Each suite file documents its own `stubModel` (which backend signal each
-oracle answer emulates) and `stubLimits` (what the stub cannot prove).
-The harness smoke state is 88/88 golds matching (`node evals/run.mjs`).
+oracle answer emulates), `stubLimits` (what the stub cannot prove), and
+`goldSource` (default provenance: `"oracle-stub"`; the 6 T5 cases carry
+per-case `gold_source: "independent"`). The harness smoke state is
+94/94 golds matching (`node evals/run.mjs`).
 
 ## 4. Metrics by primitive
 
@@ -145,7 +157,8 @@ traffic, circular on stub data).
 Recorded run: `evals/results/v1/bench.json` (config: 15 e2e reps per
 primitive, 5 judge reps, rerank N in [10, 50, 100, 500, 1000] at top_k=10;
 machine: Node v24.18.0, win32 x64, AMD Ryzen 7 5700X, 16 CPUs; commit
-`e6c0b98`). All values are absolutes from that run. Rows within one run
+`e6c0b98`; corpus: the 88 oracle-stub cases, before the T5 independent
+slice). All values are absolutes from that run. Rows within one run
 share the process: compare shapes, not machines.
 
 ### 7.1 Primitives (canonical case each; stub reports 0 ms)
@@ -254,7 +267,7 @@ improvement is claimed and none can be derived from these tables.
 
 Bench freeze note (cierre-pendientes T7): the bench covers the 10 T5
 primitives only. `laya_compare` has a T3 dataset plus run/score wiring
-(88/88) but no bench row -- deliberately, not by omission: the T5 bench
+(88/88 at the v1 freeze, 94/94 after the T5 corpus) but no bench row -- deliberately, not by omission: the T5 bench
 froze with the versioned `v1` run, and adding an 11th row would
 invalidate that record without a re-record. See the COMPARE NOTE in
 `evals/bench.mjs`. Harness-spike-ready T2 (2026-10-07) confirms the
@@ -266,6 +279,95 @@ not a judgment primitive with oracle golds (see the CAPABILITIES NOTE in
 `evals/bench.mjs`; contract coverage in
 `tests/fase6_t5_security_discovery.mjs` plus the gentle-integration
 live/down arms).
+
+### 7.5 Live backend adapter (opt-in, harness-spike-ready T4)
+
+`evals/live-client.mjs` makes score/bench pluggable against a real
+backend (`laya-server` at `LAYA_URL`, GLiNER sidecar at `GLINER_URL`)
+without changing the default: the stub stays active unless the caller
+passes the explicit `--live` flag or sets `LAYA_EVAL_LIVE=1`. There is
+no auto-detection and no silent switch. With the opt-in but no
+reachable backend, every entry point refuses with exit 2 and the probe
+evidence instead of silently measuring the stub as backend output (the
+same refusal precedent as `integration.mjs --mode live`).
+
+What changes under `--live`:
+
+- Judge calls go to the backend: `score.mjs`/`bench.mjs` build the
+  suite `deps` from the connected `LayaClient` (oracle answers ignored,
+  real questions forwarded, question capture kept). The PII sidecar
+  uses the live GLiNER client; without one, PII cases record `threw`
+  instead of silently measuring stub spans.
+- The wall/reported split is reused unchanged: `reported_latency_ms`
+  carries the backend `latencyMs`, `wall_ms` the measured round trip,
+  so overhead vs model time never conflate. `model_load.live_probe`
+  adds the real `/models`+`/ready` round-trip walls plus the probed
+  device/inventory (stub runs report `probed: false`, never zeros).
+- The manifest records probed values: `model` (verbatim inventory
+  name), `model_revision` (operator `LAYA_MODEL_REVISION` pin wins,
+  else the backend-reported revision, else the explicit `unpinned`
+  null -- a hash is never invented), `model_revision_source`
+  (`env:…` / `backend` / `unpinned`, the `src/evidence.ts`
+  vocabulary), and `device` (live `/ready` device or the explicit
+  unknown string). `tokenizer` stays `"unknown"`: no probe exposes
+  one. The full probe descriptor lands in `manifest.backend` and in
+  the score/bench `backend` blocks.
+- Golds stay the stub oracles (the independent corpus is T5 work):
+  live mismatches measure backend-vs-oracle divergence, never backend
+  quality. Expected, documented, not an adapter failure.
+
+No weights are downloaded, no GLiNER2.5/Qwen3 integration happens
+here: this adapter only moves judge calls from stub to backend so a
+later spike can compare backends under a fixed protocol.
+
+### 7.6 Independent gold corpus + per-backend versioned runs (harness-spike-ready T5)
+
+The 88 T3 case golds were written together with their oracle stub
+answers: a new backend candidate judged against them measures
+backend-vs-oracle divergence, never backend quality. The T5 corpus
+fixes the judging side: 6 cases with human-fixed truth, decided from
+the input alone before any stub signal was chosen. The stub answers on
+those cases only feed the handler the signal a working backend would
+return, so the stub baseline still passes 94/94 — and a live candidate
+that fails them is wrong, not divergent.
+
+| Suite | Independent cases | Human-fixed truth |
+|---|---|---|
+| `classify` | `classify-independent-01/02` | crash report is `bug`; explicit new-capability request is `feature` |
+| `screen` | `screen-independent-01/02` | factual ops report is benign (`ALLOW`); plain override plus exfiltration target is an injection (`DENY`) |
+| `gate` | `gate-independent-01/02` | claim matching passing-test evidence is `SUPPORTED`/`ALLOW`; claim contradicting failing-test evidence is `CONTRADICTED`/`ESCALATE` |
+
+Labels (machine-readable, counted per run in `manifest.gold_corpus`):
+
+- Suite default `export const goldSource = "oracle-stub"` in all 11
+  suites: every case gold without an override is plumbing-grade.
+- Per-case `gold_source: "independent"` on the 6 cases above:
+  spike-grade. Resolution rule: case `gold_source` wins, else the
+  suite default. Current census: 6 independent / 88 oracle-stub / 94
+  total (see `evals/results/v2/manifest.json`, `gold_corpus`).
+
+Spike runbook (stub baseline vs live candidate, same corpus):
+
+- Stub baseline (default, no backend): `node evals/run.mjs` (94/94),
+  `node evals/manifest.mjs --save` (next `evals/results/vN/`, never
+  overwrites; `v2` is the recorded stub baseline on this corpus).
+- Live candidate (needs `laya-server` at `LAYA_URL` plus the GLiNER
+  sidecar): `node evals/run.mjs` stays stub-only (no `--live` there);
+  judge the candidate with `node evals/score.mjs --live [--json]` and
+  version it with `node evals/manifest.mjs --save --live` (refuses
+  exit 2 when unreachable; records probed revision/device).
+- Reading the result: on the 6 independent cases, live mismatches are
+  candidate errors. On the 88 oracle-stub cases, live mismatches are
+  backend-vs-oracle divergence (expected, not candidate failure).
+  Compare candidates against each other on the independent slice,
+  never against the stub baseline as if it were quality.
+
+Partial coverage (deliberate): only `classify`/`screen`/`gate` carry
+independent golds — the three decision primitives where a wrong
+backend answer has direct allow/deny/ship consequences. The other 8
+suites stay oracle-stub-only until a spike needs them; extending the
+corpus means adding `gold_source: "independent"` cases (same shape as
+above) plus a new `--save` version, never editing `v1`/`v2`.
 
 ## 8. Integration
 
@@ -322,14 +424,24 @@ work.
 
 ## 9. Reproducibility
 
-- `node evals/run.mjs [--json] [suite]` — 88-case harness smoke.
+- `node evals/run.mjs [--json] [suite]` — 94-case harness smoke (88 oracle-stub + 6 independent, section 7.6).
 - `node evals/score.mjs [--json] [--out <path>]` — T4 metrics report.
+- `node evals/score.mjs --live [--json]` — same against the probed live
+  backend (stub oracles: divergence expected; refuses exit 2 when
+  unreachable). Env equivalent: `LAYA_EVAL_LIVE=1`.
 - `node evals/bench.mjs [--json]` — T5 benchmark tables (absolutes).
+- `node evals/bench.mjs --live [--json]` — same with real judge calls
+  (wall = round trip, reported = backend `latencyMs`); `--save` pairs it
+  with live metrics in the versioned run.
 - `node evals/bench.mjs --rerank-paged [--rerank-paged-window=64] [--rerank-paged-n=130]` — same plus the opt-in N>64 paged example (env equivalents: `LAYA_BENCH_RERANK_PAGED=1`, `LAYA_BENCH_RERANK_WINDOW`, `LAYA_BENCH_RERANK_PAGED_N`).
 - `node evals/manifest.mjs [--json]` — manifest for the current tree.
 - `node evals/manifest.mjs --save [--json]` — full run (bench + score
   capture + manifest) saved under `evals/results/vN/`. Never overwrites:
   each run takes the next free version.
+- `node evals/manifest.mjs --save --live [--json]` — same versioned run
+  against the probed live backend (refuses exit 2 when unreachable);
+  the next `evals/results/vN/` pairs live metrics with the independent
+  corpus (`v2` is the stub baseline on that corpus).
 - `node evals/integration.mjs [--json]` — T6 stub protocol run.
 - `node evals/integration.mjs --mode live` — live-requirements gate.
 - `node tests/fase7_t4_metrics.mjs`, `node tests/fase7_t5_bench_manifest.mjs`,
@@ -356,7 +468,7 @@ work.
 5. No live comparison: OpenCode, the Gentle orchestrator session, and
    models are absent here, so the paired +/-Laya table is future work.
 6. `laya_compare` has a T3 dataset (`evals/suites/compare.mjs`, 8 cases)
-   with run/score wiring (88/88 with the other 10 suites), but no T5
+   with run/score wiring (88/88 at the v1 freeze, 94/94 after the T5 corpus, with the other 10 suites), but no T5
    bench row -- by version-freeze, documented in `evals/bench.mjs`
    (COMPARE NOTE) and section 7.4, not silently dropped. Harness-spike-ready
    T2 confirms the exclusion; the re-record protocol (new results version +
@@ -379,7 +491,11 @@ by one `--save` run, and no later run mutates them:
   registry, envelope schema version, software (Node, platform, arch,
   package version), hardware (arch, CPU count/model, total memory),
   bench config, MCP/policy modes, the method string, the honesty notes,
-  and the bench/metrics link counts.
+  and the bench/metrics link counts. Under `--live` the same file
+  carries the probed `model` name, the resolved `model_revision` (+
+  `model_revision_source`: `env:…` / `backend` / `unpinned`), the
+  probed `device`, and the full `backend` probe descriptor (section
+  7.5); revision/device are never invented.
 - `bench.json` — method, config, heap baseline, the 10 primitive rows
   (canonical, stub vs reported latency, cold-first wall, warm p50/p95/p99,
   ops/s, cand/s, pruning, heap), the latency-split demo, the 5 rerank
@@ -395,7 +511,10 @@ by one `--save` run, and no later run mutates them:
 Answerable per run: which commit and date produced it, which stub and
 config, which method, and which numbers came from it. `v1` answers:
 commit `e6c0b98`, 2026-09-23, default bench config, method and honesty
-strings quoted in sections 7.4 and 1.
+strings quoted in sections 7.4 and 1. `v2` answers: commit `e72c3c2`,
+2026-10-07, stub baseline over the T5 corpus (94 cases: 88
+oracle-stub + 6 independent, census in `gold_corpus`), default bench
+config, same method and honesty strings.
 
 ## 12. Verification evidence (T6 no-regression)
 

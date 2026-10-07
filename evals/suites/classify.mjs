@@ -28,6 +28,12 @@ export const stubLimits =
   "Stub shares are oracle-chosen, not measured: no calibration, tie-rate, or " +
   "phrasing-robustness claim transfers to the real backend.";
 
+/** T5 gold provenance: every case gold in this file defaults to
+ * "oracle-stub" (gold written together with its oracle stub answers).
+ * Cases with human-fixed truth carry gold_source: "independent" per
+ * case; the manifest gold_corpus block counts both. */
+export const goldSource = "oracle-stub";
+
 const CLASSES = [
   { id: "bug", description: "A software defect report." },
   { id: "feature", description: "A request for new functionality." },
@@ -115,6 +121,24 @@ export const cases = [
     stub: { answers: {} },
     expectError: "input_too_large",
     gold: { why: "over-budget batches fail fast, never silently truncated." },
+  },
+  {
+    id: "classify-independent-01",
+    kind: "normal",
+    gold_source: "independent",
+    input: { purpose: "triage", items: [{ id: "i1", text: "NullPointerException on checkout when the cart is empty" }], classes: CLASSES },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): a crash report is a defect, not a feature request; any competent backend classifies it bug. The stub share below only feeds the handler the signal a working backend would return.",
+    stub: { answers: { class_0_i1: { choice: "bug", probabilities: { bug: 0.87, feature: 0.08, other: 0.05 } } } },
+    gold: { classification: "bug", winner_probability: 0.87, decision: "ALLOW", abstained: false, why: "crash text is human-fixed bug; the handler echoes the judge choice." },
+  },
+  {
+    id: "classify-independent-02",
+    kind: "normal",
+    gold_source: "independent",
+    input: { purpose: "triage", items: [{ id: "i1", text: "Add CSV export to the reports page" }], classes: CLASSES },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): an explicit new-capability request is a feature, not a defect; any competent backend classifies it feature. The stub share below only feeds the handler the signal a working backend would return.",
+    stub: { answers: { class_0_i1: { choice: "feature", probabilities: { feature: 0.86, bug: 0.09, other: 0.05 } } } },
+    gold: { classification: "feature", winner_probability: 0.86, decision: "ALLOW", abstained: false, why: "new-capability text is human-fixed feature; the handler echoes the judge choice." },
   },
 ];
 

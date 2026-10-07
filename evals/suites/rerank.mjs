@@ -27,6 +27,12 @@ export const stubLimits =
   "Relevance magnitudes are oracle-assigned: no ranking-quality claim " +
   "transfers; score comparisons across calls are meaningless by contract.";
 
+/** T5 gold provenance: every case gold in this file defaults to
+ * "oracle-stub" (gold written together with its oracle stub answers).
+ * Cases with human-fixed truth carry gold_source: "independent" per
+ * case; the manifest gold_corpus block counts both. */
+export const goldSource = "oracle-stub";
+
 const PAIR = [
   { id: "a", text: "apple harvest report" },
   { id: "b", text: "zebra migration notes" },

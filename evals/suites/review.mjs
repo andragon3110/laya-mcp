@@ -27,6 +27,12 @@ export const stubLimits =
   "Scores and safety are oracle-assigned: no review-quality claim transfers; " +
   "mid-band safety REVIEWs via the handler (firm evidence, not ambiguity).";
 
+/** T5 gold provenance: every case gold in this file defaults to
+ * "oracle-stub" (gold written together with its oracle stub answers).
+ * Cases with human-fixed truth carry gold_source: "independent" per
+ * case; the manifest gold_corpus block counts both. */
+export const goldSource = "oracle-stub";
+
 export const cases = [
   {
     id: "review-normal-01",

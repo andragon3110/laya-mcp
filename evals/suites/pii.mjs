@@ -32,6 +32,12 @@ export const stubLimits =
   "Span recall/precision and judge signals are oracle-assigned: no detector- " +
   "or judge-quality claim transfers to the real GLiNER sidecar or Laya backend.";
 
+/** T5 gold provenance: every case gold in this file defaults to
+ * "oracle-stub" (gold written together with its oracle stub answers).
+ * Cases with human-fixed truth carry gold_source: "independent" per
+ * case; the manifest gold_corpus block counts both. */
+export const goldSource = "oracle-stub";
+
 const span = (type, text, confidence = 0.9) => ({ text, start: 0, end: text.length, type, confidence });
 
 export const cases = [

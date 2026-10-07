@@ -86,6 +86,10 @@
  * Run from the repo root:
  *   node evals/bench.mjs            # human-readable tables (absolutes)
  *   node evals/bench.mjs --json     # machine-readable report on stdout
+ *   node evals/bench.mjs --live     # T4 live adapter: judge calls go to the
+ *                                   # probed backend (LAYA_URL); refuses
+ *                                   # (exit 2) when unreachable -- stub stays
+ *                                   # the default without the flag
  *   node evals/bench.mjs --rerank-paged  # + opt-in N>64 paged example
  *                                   # (windows of <=64 through the real
  *                                   # judge; default 64 cap intact)
@@ -108,6 +112,7 @@ import * as rerank from "./suites/rerank.mjs";
 import * as review from "./suites/review.mjs";
 import * as gate from "./suites/gate.mjs";
 import { rankingMetrics } from "./metrics.mjs";
+import { connectLiveBackend, isLiveEnabled, makeLiveDeps, probeJson, resolveLiveBackend } from "./live-client.mjs";
 import {
   buildRerankQuestionsWithInfo,
   handleRerank,
@@ -328,8 +333,8 @@ export function inputCountOf(suiteName, input) {
   }
 }
 
-function benchDeps(factory) {
-  return { fakeClient: factory, makePiiCtx: makeBenchPiiCtx };
+function benchDeps(factory, makePii = makeBenchPiiCtx) {
+  return { fakeClient: factory, makePiiCtx: makePii };
 }
 
 /**
@@ -337,9 +342,9 @@ function benchDeps(factory) {
  * samples; the FIRST sample is reported separately as cold_first_ms
  * (primer-live in a fresh stub context), the rest as the warm distribution.
  */
-export async function benchPrimitive(suite, { reps = BENCH_CONFIG_DEFAULT.reps, factory = stubClientFactory() } = {}) {
+export async function benchPrimitive(suite, { reps = BENCH_CONFIG_DEFAULT.reps, factory = stubClientFactory(), makePiiCtx = makeBenchPiiCtx } = {}) {
   const canonical = suite.cases[0];
-  const deps = benchDeps(factory);
+  const deps = benchDeps(factory, makePiiCtx);
   const walls = [];
   let reportedLatency = null;
   let pruning = null;
@@ -427,8 +432,11 @@ export function constructionGoldOrder(n) {
  * (N <= 64 only) carries one intentional adjacent swap so MRR/nDCG prove
  * the metric pipeline discriminates. N > 64 rows are selector-only +
  * projected judge (64 transport cap rejects before pruning).
+ * `judgeFor(n, pool)` optionally replaces the stub judge (e.g. the live
+ * backend under --live): it returns a predict-client used as-is, so no
+ * oracle answers flow anywhere in the live path.
  */
-export async function benchRerankSweep({ ns = BENCH_CONFIG_DEFAULT.rerankNs, topK = RERANK_TOP_K, selRepsFor = null } = {}) {
+export async function benchRerankSweep({ ns = BENCH_CONFIG_DEFAULT.rerankNs, topK = RERANK_TOP_K, selRepsFor = null, judgeFor = null } = {}) {
   const rows = [];
   for (const n of ns) {
     const pool = rerankPool(n);
@@ -448,29 +456,35 @@ export async function benchRerankSweep({ ns = BENCH_CONFIG_DEFAULT.rerankNs, top
     const selQuality = rankingMetrics(first.shown.map((c) => c.id), gold);
     let e2e = null;
     if (n <= 64) {
-      const built = buildRerankQuestionsWithInfo({ query: RERANK_QUERY, candidates: pool, top_k: topK });
+      const liveJudge = judgeFor ? await judgeFor(n, pool) : null;
+      const built = liveJudge ? null : buildRerankQuestionsWithInfo({ query: RERANK_QUERY, candidates: pool, top_k: topK });
       const answers = {};
-      built.shown.forEach((c, i) => {
-        answers[`relevance_${i}_${c.id}`] = { noul: 0.9 - i * 0.001 };
-      });
-      const keys = Object.keys(answers);
-      if (keys.length >= 2) {
-        const tmp = answers[keys[0]];
-        answers[keys[0]] = answers[keys[1]];
-        answers[keys[1]] = tmp;
+      if (!liveJudge) {
+        built.shown.forEach((c, i) => {
+          answers[`relevance_${i}_${c.id}`] = { noul: 0.9 - i * 0.001 };
+        });
+        const keys = Object.keys(answers);
+        if (keys.length >= 2) {
+          const tmp = answers[keys[0]];
+          answers[keys[0]] = answers[keys[1]];
+          answers[keys[1]] = tmp;
+        }
       }
       const e2eWalls = [];
       let body = null;
       for (let r = 0; r < BENCH_CONFIG_DEFAULT.e2eReps; r++) {
         const t0 = performance.now();
-        body = JSON.parse(await handleRerank(stubClientFactory()(answers), { query: RERANK_QUERY, candidates: pool, top_k: topK }));
+        const judge = liveJudge ?? stubClientFactory()(answers);
+        body = JSON.parse(await handleRerank(judge, { query: RERANK_QUERY, candidates: pool, top_k: topK }));
         e2eWalls.push(performance.now() - t0);
       }
       const judgeQuality = rankingMetrics(body.ranked.map((c) => c.id), gold);
       e2e = {
         wall_ms: summarizeSamples(e2eWalls),
         ranked: body.ranked.length,
-        swap_note: "intentional adjacent swap of stub positions 0/1 (discrimination proof; stub ceiling applies)",
+        swap_note: liveJudge
+          ? "live judge: real backend order, no intentional swap (backend-vs-oracle divergence, not backend quality)"
+          : "intentional adjacent swap of stub positions 0/1 (discrimination proof; stub ceiling applies)",
         mrr: judgeQuality.mrr,
         ndcg: judgeQuality.ndcg,
         map: judgeQuality.map,
@@ -515,7 +529,7 @@ export async function benchRerankSweep({ ns = BENCH_CONFIG_DEFAULT.rerankNs, top
  * (parallel to the sweep's top-k retention language: nothing is dropped
  * here, windows only band the order).
  */
-export async function benchRerankPagedRow({ n, window = RERANK_PAGED_DEFAULTS.window, topK = RERANK_TOP_K, e2eReps = BENCH_CONFIG_DEFAULT.e2eReps } = {}) {
+export async function benchRerankPagedRow({ n, window = RERANK_PAGED_DEFAULTS.window, topK = RERANK_TOP_K, e2eReps = BENCH_CONFIG_DEFAULT.e2eReps, judgeFor = null } = {}) {
   if (!Number.isInteger(n) || n <= 64) {
     throw new Error(`rerank paged protocol needs N > 64 (got ${JSON.stringify(String(n))}); N <= 64 uses the direct judge path`);
   }
@@ -529,21 +543,25 @@ export async function benchRerankPagedRow({ n, window = RERANK_PAGED_DEFAULTS.wi
   for (const w of chunks) {
     const ids = new Set(w.items.map((c) => c.id));
     const windowGold = gold.filter((id) => ids.has(id));
+    const liveJudge = judgeFor ? await judgeFor(n, w.items) : null;
     const answers = {};
-    w.items.forEach((c, i) => {
-      answers[`relevance_${i}_${c.id}`] = { noul: 0.9 - i * 0.001 };
-    });
-    const keys = Object.keys(answers);
-    if (keys.length >= 2) {
-      const tmp = answers[keys[0]];
-      answers[keys[0]] = answers[keys[1]];
-      answers[keys[1]] = tmp;
+    if (!liveJudge) {
+      w.items.forEach((c, i) => {
+        answers[`relevance_${i}_${c.id}`] = { noul: 0.9 - i * 0.001 };
+      });
+      const keys = Object.keys(answers);
+      if (keys.length >= 2) {
+        const tmp = answers[keys[0]];
+        answers[keys[0]] = answers[keys[1]];
+        answers[keys[1]] = tmp;
+      }
     }
     const walls = [];
     let body = null;
     for (let r = 0; r < e2eReps; r++) {
       const t0 = performance.now();
-      body = JSON.parse(await handleRerank(stubClientFactory()(answers), { query: RERANK_QUERY, candidates: w.items }));
+      const judge = liveJudge ?? stubClientFactory()(answers);
+      body = JSON.parse(await handleRerank(judge, { query: RERANK_QUERY, candidates: w.items }));
       walls.push(performance.now() - t0);
     }
     const rankedIds = body.ranked.map((c) => c.id);
@@ -554,7 +572,9 @@ export async function benchRerankPagedRow({ n, window = RERANK_PAGED_DEFAULTS.wi
       size: w.items.length,
       wall_ms: summarizeSamples(walls),
       ranked: body.ranked.length,
-      swap_note: "intentional adjacent swap of stub positions 0/1 within this window (discrimination proof; stub ceiling applies)",
+      swap_note: liveJudge
+        ? "live judge: real backend order, no intentional swap (backend-vs-oracle divergence, not backend quality)"
+        : "intentional adjacent swap of stub positions 0/1 within this window (discrimination proof; stub ceiling applies)",
       mrr: q.mrr,
       ndcg: q.ndcg,
       map: q.map,
@@ -590,10 +610,10 @@ export async function benchRerankPagedRow({ n, window = RERANK_PAGED_DEFAULTS.wi
 }
 
 /** Paged sweep over several N>64 pools (opt-in only; default is exampleNs). */
-export async function benchRerankPagedSweep({ ns = RERANK_PAGED_DEFAULTS.exampleNs, window = RERANK_PAGED_DEFAULTS.window, topK = RERANK_TOP_K, e2eReps = BENCH_CONFIG_DEFAULT.e2eReps } = {}) {
+export async function benchRerankPagedSweep({ ns = RERANK_PAGED_DEFAULTS.exampleNs, window = RERANK_PAGED_DEFAULTS.window, topK = RERANK_TOP_K, e2eReps = BENCH_CONFIG_DEFAULT.e2eReps, judgeFor = null } = {}) {
   const rows = [];
   for (const n of ns) {
-    rows.push(await benchRerankPagedRow({ n, window, topK, e2eReps }));
+    rows.push(await benchRerankPagedRow({ n, window, topK, e2eReps, judgeFor }));
   }
   return rows;
 }
@@ -604,8 +624,12 @@ export async function benchRerankPagedSweep({ ns = RERANK_PAGED_DEFAULTS.example
  * live backend and is NOT measured here: cold/warm import covers the MCP-side
  * load that exists, and the probe holder demonstrates the live-probe shape
  * (capabilities.ts recordProbe path) with injected latency only.
+ * Under --live (backend reachable + liveClient connected), `live_probe`
+ * records the REAL /models + /ready round-trip walls plus the probed
+ * device/model inventory: the only model-side timing this repo can
+ * honestly report (server-internal load stays server-side).
  */
-export async function benchModelLoad() {
+export async function benchModelLoad({ backend = null, liveClient = null } = {}) {
   const here = path.dirname(fileURLToPath(import.meta.url));
   const target = path.join(here, "..", "dist", "tools", "rerank.js");
   const targetUrl = pathToFileURL(target).href;
@@ -639,27 +663,75 @@ export async function benchModelLoad() {
       warm_wall_ms: summarizeSamples(probeWalls),
       note: "fake /models+/ready holder (reports 3ms, burns no wall time); shape demo only -- real model load needs a live backend",
     },
+    live_probe: await benchLiveProbe({ backend, liveClient }),
     limit: "no local model weights in this repo; real model-load/warm/cold timing requires live laya-server + gliner (T6 integration scope), not measured here",
   };
 }
 
-/** Full bench report (pure data; printing/saving is the CLI layer below). */
-export async function runBench(config = {}) {
+/**
+ * Live /models + /ready probe timing (only under --live with a connected
+ * client). Walls are measured here; device/inventory come from the
+ * backend verbatim. Stub runs report live_probe: null with the reason --
+ * never a fabricated zero.
+ */
+export async function benchLiveProbe({ backend = null, liveClient = null } = {}) {
+  if (!backend?.live || !backend?.reachable || !liveClient) {
+    return { probed: false, note: "no live backend connected (stub default); real /models+/ready timing needs --live with a reachable laya-server" };
+  }
+  const walls = [];
+  let models = null;
+  let ready = null;
+  for (let r = 0; r < 3; r++) {
+    const t0 = performance.now();
+    const [m, rd] = await Promise.all([liveClient.models(2000), liveClient.ready(2000)]);
+    walls.push(performance.now() - t0);
+    if (r === 0) {
+      models = m;
+      ready = rd;
+    }
+  }
+  return {
+    probed: true,
+    base_url: backend.baseUrl,
+    wall_ms: summarizeSamples(walls),
+    device: ready?.device ?? backend.device ?? null,
+    models: Array.isArray(models) ? models.map((m) => ({ name: m?.name ?? null, loaded: m?.loaded ?? null, revision: m?.revision ?? null, device: m?.device ?? null })) : null,
+    ready: ready?.ready ?? null,
+    mem_heap_mb: heapMB(),
+    note: "round-trip walls for the discovery probes (parallel /models+/ready); server-internal model load stays server-side and is not timed here",
+  };
+}
+
+/** Full bench report (pure data; printing/saving is the CLI layer below).
+ * `live` is null on the stub default, else { backend, deps, client } from
+ * evals/live-client.mjs: primitives + the rerank judges then call the real
+ * backend while the wall/reported split is preserved (reported_latency_ms
+ * carries the backend latencyMs, wall_ms the measured round trip). */
+export async function runBench(config = {}, live = null) {
   const cfg = { ...BENCH_CONFIG_DEFAULT, ...config };
   const memBaseline = heapMB();
+  const factory = live ? live.deps.fakeClient : stubClientFactory({ latencyMs: cfg.stubLatencyMs });
+  const piiMaker = live ? live.deps.makePiiCtx : undefined;
   const primitives = [];
   for (const suite of BENCH_SUITES) {
-    primitives.push(await benchPrimitive(suite, { reps: cfg.reps, factory: stubClientFactory({ latencyMs: cfg.stubLatencyMs }) }));
+    primitives.push(
+      await benchPrimitive(suite, live ? { reps: cfg.reps, factory, makePiiCtx: piiMaker } : { reps: cfg.reps, factory }),
+    );
   }
   const latencyDemo = await benchLatencyDemo({ reps: Math.min(8, cfg.reps) });
+  const judgeFor = live ? async () => live.client : null;
   const rerankSweep = await benchRerankSweep({
     ns: cfg.rerankNs,
     topK: cfg.topK,
     selRepsFor: typeof cfg.selReps === "number" ? () => cfg.selReps : null,
+    judgeFor,
   });
-  const modelLoad = await benchModelLoad();
+  const modelLoad = await benchModelLoad(live ? { backend: live.backend, liveClient: live.client } : {});
   const report = {
-    generated: "fase-7 T5 (oracle-stub canonicals + real handlers; stub ceiling, not backend quality)",
+    generated: live
+      ? `fase-7 T5+spike LIVE backend ${live.backend.baseUrl} (real judge calls; wall = round trip, reported = backend latencyMs; quality vs stub-oracle construction gold, never backend quality)`
+      : "fase-7 T5 (oracle-stub canonicals + real handlers; stub ceiling, not backend quality)",
+    backend: live?.backend ?? { mode: "stub", live: false, reachable: false, note: "stub default: oracle answers + real handlers (stub ceiling, not backend quality)" },
     method: BENCH_METHOD,
     config: cfg,
     mem_baseline_heap_mb: memBaseline,
@@ -674,6 +746,7 @@ export async function runBench(config = {}) {
       window: cfg.rerankPagedWindow,
       topK: cfg.topK,
       e2eReps: cfg.e2eReps,
+      judgeFor,
     });
   }
   return report;
@@ -684,7 +757,11 @@ const asJson = args.includes("--json");
 const wantSave = args.includes("--save");
 
 function printTables(rep) {
-  console.log("\nFase-7 T5 benchmarks (deterministic stubs + real handlers; absolutes, no baseline claims):");
+  console.log(
+    rep.backend?.live
+      ? `\nFase-7 T5 benchmarks, LIVE backend ${rep.backend.baseUrl} (real judge calls; wall = round trip, reported = backend latencyMs; quality vs stub-oracle construction gold, never backend quality):`
+      : "\nFase-7 T5 benchmarks (deterministic stubs + real handlers; absolutes, no baseline claims):",
+  );
   console.log(`method: ${rep.method}`);
   console.log("\n| primitive | canonical | N | stub_ms | reported_ms | cold_1st_ms | warm_p50 | warm_p95 | warm_p99 | ops/s | cand/s | pruning | mem_MB~ |");
   console.log("|-----------|-----------|---|---------|-------------|-------------|----------|----------|----------|-------|--------|---------|---------|");
@@ -725,19 +802,35 @@ function printTables(rep) {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const paged = isPagedRerankEnabled(args, process.env);
-  const rep = await runBench(
-    paged
-      ? {
-          rerankPaged: true,
-          rerankPagedNs: resolvePagedRerankNs(args, process.env),
-          rerankPagedWindow: resolvePagedRerankWindow(args, process.env),
-        }
-      : {},
-  );
+  const benchCfg = paged
+    ? {
+        rerankPaged: true,
+        rerankPagedNs: resolvePagedRerankNs(args, process.env),
+        rerankPagedWindow: resolvePagedRerankWindow(args, process.env),
+      }
+    : {};
+  /* T4 live adapter (harness-spike-ready): stub default; --live /
+   * LAYA_EVAL_LIVE=1 routes judge calls to the probed backend. Live without
+   * a reachable backend refuses (exit 2) instead of silently stubbing. */
+  let live = null;
+  if (isLiveEnabled(args, process.env)) {
+    const backend = await resolveLiveBackend({ argv: args, env: process.env });
+    if (!backend.reachable) {
+      const msg = `live backend unreachable at ${backend.baseUrl ?? "unknown"} (${backend.error ?? "no probe result"}); refusing the live run (never silently stubbing). Start laya-server or run the stub default (no --live).`;
+      if (asJson) console.log(JSON.stringify({ mode: "live", backend, error: msg }, null, 2));
+      else console.error(`\nbench --live refused: ${msg}`);
+      process.exit(2);
+    }
+    const { client, gliner } = await connectLiveBackend({ baseUrl: backend.baseUrl, glinerUrl: backend.glinerUrl });
+    live = { backend, deps: makeLiveDeps({ client, gliner }), client };
+  }
+  const rep = await runBench(benchCfg, live);
   if (wantSave) {
     const { buildManifest, saveRun, captureScoreMetrics } = await import("./manifest.mjs");
-    const metrics = captureScoreMetrics();
-    const manifest = await buildManifest({ bench: rep, metrics });
+    /* Paired metrics follow the same backend: a live bench saves live
+     * metrics (oracle golds: divergence expected), a stub bench stub ones. */
+    const metrics = captureScoreMetrics({ live: live !== null });
+    const manifest = await buildManifest({ bench: rep, metrics, backend: rep.backend });
     const saved = saveRun({ manifest, bench: rep, metrics });
     if (!asJson) printTables(rep);
     console.log(`\nsaved versioned run: ${saved.path} (manifest.json + bench.json + metrics.json; never overwritten)`);
