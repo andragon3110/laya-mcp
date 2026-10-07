@@ -189,6 +189,50 @@ one intentional adjacent swap (positions 0/1), which is why MRR_judge is
 Every quality figure measures harness conservation under the stub
 ceiling, not backend ranking quality.
 
+### 7.2.1 Rerank N>64 paged protocol (opt-in, harness-spike-ready T3)
+
+Pools above the 64 transport cap can be judged end to end without
+changing the default cap: chunk the pool into consecutive windows of at
+most 64 candidates, judge every window through the real handler on the
+legacy unpruned path, and merge the window orders by deterministic
+concatenation in window order (ranks reassigned 1..N). Cross-window
+scores are never compared -- scores are within-call only by contract --
+so the merged order reflects window bands, not a global judge. Chunking
+is gold-agnostic (input order slices, never the construction gold), so
+the same pool and window always yield the same windows and the same
+merged order: no RNG, stable sort, reproducible.
+
+Enablement (explicit only; the default sweep stays selector-only plus
+projected for N > 64):
+
+- `node evals/bench.mjs --rerank-paged` -- runs the default example
+  (N=130: windows 64+64+2, exercising multi-window plus a short tail)
+  alongside the standard tables.
+- `LAYA_BENCH_RERANK_PAGED=1` -- env equivalent of the flag.
+- `--rerank-paged-window=<1..64>` / `LAYA_BENCH_RERANK_WINDOW` --
+  window size override (above 64 is rejected: the transport cap stands).
+- `--rerank-paged-n=<N,...>` / `LAYA_BENCH_RERANK_PAGED_N` -- example
+  N override (every N must exceed 64: smaller pools use the direct
+  judge path, which needs no protocol).
+
+Each paged row reports per-window walls plus MRR/nDCG/MAP against the
+construction gold restricted to that window (gold order preserved), and
+an aggregate merged MRR/nDCG/MAP against the full gold with the gold
+top-1 rank in the merged order. Every window carries the same
+intentional adjacent swap as the default sweep, so per-window numbers
+prove discrimination per window too. All magnitudes stay
+oracle-assigned: paged quality measures harness plumbing under the stub
+ceiling, never backend ranking quality.
+
+Future spike use (not integrated here): a Qwen3-reranker spike replaces
+the stub judge inside each window -- one cross-encoder call per window
+of at most 64 -- while chunking, merge, and metrics stay identical, so
+the spike compares judge backends (stub vs Qwen3) under a fixed
+protocol. The GLiNER2.5 sidecar is unaffected: it serves the
+extraction/PII path, never rerank, so this protocol does not touch it.
+Under the stub, `model_revision`/`device` stay honest nulls; real values
+appear only with a live backend (T4 adapter scope).
+
 ### 7.3 Model load / warm / cold (MCP side only)
 
 Cold import wall 44.7 ms (fresh Node spawn plus import, spawn cost
@@ -281,6 +325,7 @@ work.
 - `node evals/run.mjs [--json] [suite]` — 88-case harness smoke.
 - `node evals/score.mjs [--json] [--out <path>]` — T4 metrics report.
 - `node evals/bench.mjs [--json]` — T5 benchmark tables (absolutes).
+- `node evals/bench.mjs --rerank-paged [--rerank-paged-window=64] [--rerank-paged-n=130]` — same plus the opt-in N>64 paged example (env equivalents: `LAYA_BENCH_RERANK_PAGED=1`, `LAYA_BENCH_RERANK_WINDOW`, `LAYA_BENCH_RERANK_PAGED_N`).
 - `node evals/manifest.mjs [--json]` — manifest for the current tree.
 - `node evals/manifest.mjs --save [--json]` — full run (bench + score
   capture + manifest) saved under `evals/results/vN/`. Never overwrites:
@@ -302,8 +347,10 @@ work.
    authorization).
 2. No calibrated probabilities: Brier/ECE absent by verdict, not by
    omission.
-3. Rerank transport cap: pools above 64 cannot run the judge end to end;
-   large-N rows are selector-only plus projection.
+3. Rerank transport cap: pools above 64 cannot run the judge end to end
+   in one call; large-N rows are selector-only plus projection by
+   default, or full-judge per window under the opt-in paged protocol
+   (section 7.2.1).
 4. Single-machine absolutes: benchmark walls and throughput describe one
    recorded run, not hardware claims.
 5. No live comparison: OpenCode, the Gentle orchestrator session, and
@@ -338,6 +385,8 @@ by one `--save` run, and no later run mutates them:
   ops/s, cand/s, pruning, heap), the latency-split demo, the 5 rerank
   sweep rows (selector walls, retention quality, judge quality or
   projection note), and the model-load shape block with its limit note.
+  Runs with `--rerank-paged` additionally carry `rerank_paged` rows
+  (per-window plus merged quality, section 7.2.1).
 - `metrics.json` — the full T4 score report: per-suite family, abstention
   accounting, decision/task accuracy, binary ALLOW metrics or ranking
   means or the score-agreement non-computability note, and the

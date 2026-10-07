@@ -63,6 +63,22 @@
  *   every quality number below measures harness conservation under a stub
  *   ceiling -- NOT backend ranking quality. No thresholds anywhere.
  *
+ * RERANK N>64 PAGED PROTOCOL (harness-spike-ready T3, opt-in only): pools
+ * above the 64 transport cap can be exercised end to end WITHOUT touching
+ * the default cap by chunking the pool into consecutive windows of at most
+ * 64 (default 64, override via --rerank-paged-window / env), judging each
+ * window through the real handler on the legacy unpruned path (every
+ * window is N <= 64, so the transport accepts it), and merging the window
+ * orders by deterministic concatenation in window order with ranks
+ * reassigned 1..N. Cross-window scores are NEVER compared (scores are
+ * within-call only by contract), so the merged order reflects window
+ * bands, not a global judge -- documented, stable, and reproducible, but
+ * a harness convention, not a quality claim. Per-window quality (MRR/nDCG
+ * vs the construction gold restricted to that window) plus aggregate
+ * merged quality (vs the full gold) are both reported. Enabled only via
+ * the explicit --rerank-paged CLI flag or LAYA_BENCH_RERANK_PAGED=1; the
+ * default sweep stays selector-only + projected for N > 64.
+ *
  * STUB HONESTY (inherits T3): stub answers are the suites' oracle-derived
  * canonicals (each suite's cases[0]); the stub is NOT the model and nothing
  * here transfers to the real backend.
@@ -70,6 +86,9 @@
  * Run from the repo root:
  *   node evals/bench.mjs            # human-readable tables (absolutes)
  *   node evals/bench.mjs --json     # machine-readable report on stdout
+ *   node evals/bench.mjs --rerank-paged  # + opt-in N>64 paged example
+ *                                   # (windows of <=64 through the real
+ *                                   # judge; default 64 cap intact)
  *   node evals/bench.mjs --save     # run + capture T4 metrics + manifest,
  *                                   # save versioned run under evals/results/
  *                                   # (NEVER overwrites: new version per run)
@@ -109,9 +128,84 @@ export const BENCH_METHOD =
   "memory = absolute heapUsed in MB (approx, whole process, single sample, " +
   "no GC forcing); quantiles = nearest-rank p50/p95/p99 (src/metrics.ts " +
   "definition); throughput = count/meanWall; rerank N>64 = pure selector + " +
-  "projected judge (64 transport cap); quality = MRR/nDCG vs " +
-  "construction-truth gold (stub ceiling, NOT backend quality); absolutes " +
-  "only, no baseline, no claims.";
+  "projected judge (64 transport cap) unless opt-in --rerank-paged pages " +
+  "N>64 through <=64 judge windows (deterministic concat merge); quality " +
+  "= MRR/nDCG vs construction-truth gold (stub ceiling, NOT backend " +
+  "quality); absolutes only, no baseline, no claims.";
+
+export const RERANK_PAGED_DEFAULTS = {
+  /** CLI flag enabling the protocol. Env equivalent: LAYA_BENCH_RERANK_PAGED=1. */
+  flag: "--rerank-paged",
+  env: "LAYA_BENCH_RERANK_PAGED",
+  /** Max candidates judged per window: the transport cap; overrides above it are rejected. */
+  window: 64,
+  /** Example N>64 pass: 64 + 64 + 2 exercises multi-window plus a short tail. */
+  exampleNs: [130],
+};
+
+/**
+ * Opt-in gate for the N>64 paged protocol. Pure function of argv/env so it
+ * is testable without process globals; the CLI passes the real ones. Env
+ * truthy values: 1/true/yes/on (case-insensitive).
+ */
+export function isPagedRerankEnabled(argv = process.argv.slice(2), env = process.env) {
+  if (argv.includes(RERANK_PAGED_DEFAULTS.flag)) return true;
+  return ["1", "true", "yes", "on"].includes(String(env[RERANK_PAGED_DEFAULTS.env] ?? "").toLowerCase());
+}
+
+/** Resolve the per-window size (1..64; the transport cap is the ceiling). */
+export function resolvePagedRerankWindow(argv = process.argv.slice(2), env = process.env) {
+  const flagArg = argv.find((a) => a.startsWith("--rerank-paged-window="));
+  const raw = flagArg !== undefined ? flagArg.slice("--rerank-paged-window=".length) : (env.LAYA_BENCH_RERANK_WINDOW ?? "");
+  if (raw === undefined || raw === null || String(raw) === "") return RERANK_PAGED_DEFAULTS.window;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1 || n > 64) {
+    throw new Error(`rerank paged window must be an integer in 1..64 (transport cap; got ${JSON.stringify(String(raw))})`);
+  }
+  return n;
+}
+
+/** Resolve the example N list (every N must exceed 64: the protocol's domain). */
+export function resolvePagedRerankNs(argv = process.argv.slice(2), env = process.env) {
+  const flagArg = argv.find((a) => a.startsWith("--rerank-paged-n="));
+  const raw = flagArg !== undefined ? flagArg.slice("--rerank-paged-n=".length) : (env.LAYA_BENCH_RERANK_PAGED_N ?? "");
+  if (raw === undefined || raw === null || String(raw) === "") return [...RERANK_PAGED_DEFAULTS.exampleNs];
+  const ns = String(raw)
+    .split(",")
+    .map((s) => Number(s.trim()));
+  if (ns.length === 0 || ns.some((n) => !Number.isInteger(n) || n <= 64)) {
+    throw new Error(`rerank paged N list must be integers > 64 (got ${JSON.stringify(String(raw))})`);
+  }
+  return ns;
+}
+
+/**
+ * Deterministic chunking: consecutive slices of the input pool in input
+ * order (gold-agnostic: the construction gold is never consulted). Stable
+ * by construction: same pool + same window always yields the same windows.
+ */
+export function chunkRerankPool(pool, windowSize = RERANK_PAGED_DEFAULTS.window) {
+  if (!Number.isInteger(windowSize) || windowSize < 1 || windowSize > 64) {
+    throw new Error(`rerank paged window must be an integer in 1..64 (transport cap; got ${JSON.stringify(String(windowSize))})`);
+  }
+  const windows = [];
+  for (let start = 0; start < pool.length; start += windowSize) {
+    windows.push({ window: windows.length, start, items: pool.slice(start, start + windowSize) });
+  }
+  return windows;
+}
+
+/**
+ * Deterministic merge: concatenate the per-window ranked id lists in
+ * window order and reassign ranks 1..N. No cross-window score comparison
+ * ever happens (scores are within-call only by contract); the merged order
+ * therefore reflects window bands, not a global judge. Same window orders
+ * always yield the same merged order.
+ */
+export function mergePagedRankings(windowRankedIdLists) {
+  const order = windowRankedIdLists.flat();
+  return { order, ranked: order.map((id, idx) => ({ rank: idx + 1, id })) };
+}
 
 export const BENCH_CONFIG_DEFAULT = {
   reps: 15,
@@ -120,6 +214,9 @@ export const BENCH_CONFIG_DEFAULT = {
   topK: 10,
   rerankNs: [10, 50, 100, 500, 1000],
   seed: "none (deterministic construction, no RNG)",
+  rerankPaged: false,
+  rerankPagedNs: [130],
+  rerankPagedWindow: 64,
 };
 
 /** Nearest-rank quantile over an ascending-sorted copy. Null when empty. */
@@ -401,6 +498,107 @@ export async function benchRerankSweep({ ns = BENCH_CONFIG_DEFAULT.rerankNs, top
 }
 
 /**
+ * Rerank N>64 paged row (opt-in only): chunk the N pool into consecutive
+ * windows of at most `window` candidates, judge EVERY window end to end
+ * through the real handler with the deterministic stub (each window is
+ * N <= 64, so the transport accepts it on the legacy unpruned path), then
+ * merge by deterministic concatenation.
+ *
+ * Stub answers mirror the default sweep (0.9 - i*0.001 with ONE intentional
+ * adjacent swap of stub positions 0/1 WITHIN each window) so the numbers
+ * prove the metric pipeline discriminates per window too; magnitudes stay
+ * oracle-assigned (stub ceiling, NOT backend quality).
+ *
+ * Reports per-window quality (MRR/nDCG vs the construction gold restricted
+ * to that window's ids, gold order preserved) plus the aggregate merged
+ * quality (vs the full gold) and the gold top-1 rank in the merged order
+ * (parallel to the sweep's top-k retention language: nothing is dropped
+ * here, windows only band the order).
+ */
+export async function benchRerankPagedRow({ n, window = RERANK_PAGED_DEFAULTS.window, topK = RERANK_TOP_K, e2eReps = BENCH_CONFIG_DEFAULT.e2eReps } = {}) {
+  if (!Number.isInteger(n) || n <= 64) {
+    throw new Error(`rerank paged protocol needs N > 64 (got ${JSON.stringify(String(n))}); N <= 64 uses the direct judge path`);
+  }
+  const pool = rerankPool(n);
+  const memPool = heapMB();
+  const gold = constructionGoldOrder(n);
+  const chunks = chunkRerankPool(pool, window);
+  const perWindow = [];
+  const windowOrders = [];
+  const allWalls = [];
+  for (const w of chunks) {
+    const ids = new Set(w.items.map((c) => c.id));
+    const windowGold = gold.filter((id) => ids.has(id));
+    const answers = {};
+    w.items.forEach((c, i) => {
+      answers[`relevance_${i}_${c.id}`] = { noul: 0.9 - i * 0.001 };
+    });
+    const keys = Object.keys(answers);
+    if (keys.length >= 2) {
+      const tmp = answers[keys[0]];
+      answers[keys[0]] = answers[keys[1]];
+      answers[keys[1]] = tmp;
+    }
+    const walls = [];
+    let body = null;
+    for (let r = 0; r < e2eReps; r++) {
+      const t0 = performance.now();
+      body = JSON.parse(await handleRerank(stubClientFactory()(answers), { query: RERANK_QUERY, candidates: w.items }));
+      walls.push(performance.now() - t0);
+    }
+    const rankedIds = body.ranked.map((c) => c.id);
+    const q = rankingMetrics(rankedIds, windowGold);
+    perWindow.push({
+      window: w.window,
+      start: w.start,
+      size: w.items.length,
+      wall_ms: summarizeSamples(walls),
+      ranked: body.ranked.length,
+      swap_note: "intentional adjacent swap of stub positions 0/1 within this window (discrimination proof; stub ceiling applies)",
+      mrr: q.mrr,
+      ndcg: q.ndcg,
+      map: q.map,
+    });
+    windowOrders.push(rankedIds);
+    allWalls.push(...walls);
+  }
+  const merged = mergePagedRankings(windowOrders);
+  const agg = rankingMetrics(merged.order, gold);
+  return {
+    n,
+    top_k: topK,
+    window,
+    windows: chunks.length,
+    merge_note:
+      "deterministic concat in window order, ranks reassigned 1..N; cross-window scores never compared " +
+      "(within-call only by contract), so the merged order reflects window bands, not a global judge",
+    per_window: perWindow,
+    merged: {
+      length: merged.order.length,
+      wall_ms: summarizeSamples(allWalls),
+      mrr: agg.mrr,
+      ndcg: agg.ndcg,
+      map: agg.map,
+      gold_top1_rank: merged.order.indexOf(gold[0]) + 1,
+      gold_top1_in_top_k: merged.order.indexOf(gold[0]) + 1 <= topK,
+    },
+    stub_ceiling_note:
+      "stub-judge magnitudes are oracle-assigned: per-window and merged quality measure harness plumbing " +
+      "under the stub ceiling, NOT backend ranking quality",
+    mem_heap_mb: memPool,
+  };
+}
+
+/** Paged sweep over several N>64 pools (opt-in only; default is exampleNs). */
+export async function benchRerankPagedSweep({ ns = RERANK_PAGED_DEFAULTS.exampleNs, window = RERANK_PAGED_DEFAULTS.window, topK = RERANK_TOP_K, e2eReps = BENCH_CONFIG_DEFAULT.e2eReps } = {}) {
+  const rows = [];
+  for (const n of ns) {
+    rows.push(await benchRerankPagedRow({ n, window, topK, e2eReps }));
+  }
+  return rows;
+}
+
+/**
  * Model load / warm / cold. No local weights exist in this repo (the backend
  * is remote laya-server + gliner sidecar), so real model-load timing needs a
  * live backend and is NOT measured here: cold/warm import covers the MCP-side
@@ -460,7 +658,7 @@ export async function runBench(config = {}) {
     selRepsFor: typeof cfg.selReps === "number" ? () => cfg.selReps : null,
   });
   const modelLoad = await benchModelLoad();
-  return {
+  const report = {
     generated: "fase-7 T5 (oracle-stub canonicals + real handlers; stub ceiling, not backend quality)",
     method: BENCH_METHOD,
     config: cfg,
@@ -470,6 +668,15 @@ export async function runBench(config = {}) {
     rerank_sweep: rerankSweep,
     model_load: modelLoad,
   };
+  if (cfg.rerankPaged) {
+    report.rerank_paged = await benchRerankPagedSweep({
+      ns: cfg.rerankPagedNs,
+      window: cfg.rerankPagedWindow,
+      topK: cfg.topK,
+      e2eReps: cfg.e2eReps,
+    });
+  }
+  return report;
 }
 
 const args = process.argv.slice(2);
@@ -498,6 +705,16 @@ function printTables(rep) {
     );
   }
   console.log("(N>64: projected judge load; transport rejects pools > 64 before pruning.)");
+  if (rep.rerank_paged) {
+    console.log("\nrerank N>64 paged protocol (opt-in: deterministic windows + concat merge; stub ceiling, not backend quality):");
+    for (const r of rep.rerank_paged) {
+      console.log(`- N=${r.n} window=${r.window} windows=${r.windows} merged_mrr=${fmt(r.merged.mrr)} merged_ndcg=${fmt(r.merged.ndcg)} gold_top1_rank=${r.merged.gold_top1_rank} in_top${r.top_k}=${r.merged.gold_top1_in_top_k}`);
+      for (const w of r.per_window) {
+        console.log(`  window ${w.window} (start=${w.start} size=${w.size}): wall_p50=${fmt(w.wall_ms.p50)}ms mrr=${fmt(w.mrr)} ndcg=${fmt(w.ndcg)}`);
+      }
+      console.log(`  merge: ${r.merge_note}`);
+    }
+  }
   console.log("\nmodel load / warm / cold (MCP-side only; no local weights):");
   console.log(`- cold import wall: ${rep.model_load.cold_import_wall_ms.toFixed(1)}ms (${rep.model_load.cold_import_note})`);
   console.log(`- warm import p50: ${fmt(rep.model_load.warm_import_wall_ms.p50)}ms`);
@@ -507,7 +724,16 @@ function printTables(rep) {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const rep = await runBench();
+  const paged = isPagedRerankEnabled(args, process.env);
+  const rep = await runBench(
+    paged
+      ? {
+          rerankPaged: true,
+          rerankPagedNs: resolvePagedRerankNs(args, process.env),
+          rerankPagedWindow: resolvePagedRerankWindow(args, process.env),
+        }
+      : {},
+  );
   if (wantSave) {
     const { buildManifest, saveRun, captureScoreMetrics } = await import("./manifest.mjs");
     const metrics = captureScoreMetrics();

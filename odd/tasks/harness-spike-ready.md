@@ -22,7 +22,7 @@ Rama `odd/harness-spike-ready` sobre `b90489c`. Solo harness + docs. Sin pesos n
 ## Checklist
 - [x] T1 alinear INT-03 (gold REVIEW/REVIEW vs docs ESCALATE/ESCALATE) — DONE docs→código (EVALUATION.md:231 `untested-change-review` ALLOW,ALLOW,REVIEW,REVIEW; thresholds intactos). Route: delegated direct. Trigger evidence: lectura que prepara write (solo docs cambió).
 - [x] T2 bench row `compare` + cobertura `capabilities` — DONE exclusión explícita justificada (compare rompería freeze 10 filas + re-record v1, pertenece a T5; capabilities es descubrimiento sin oráculo, cubierto en fase6). Route: delegated direct.
-- [ ] T3 protocolo N>64 para rerankers — route: delegated direct. Trigger evidence: bench.mjs cap 64 + protocolo nuevo + docs.
+- [x] T3 protocolo N>64 para rerankers — DONE opt-in `--rerank-paged`/`LAYA_BENCH_RERANK_PAGED=1`, ventanas ≤64 + merge determinista, default 64 intacto. Route: delegated direct.
 - [ ] T4 adaptador LayaClient-live en score/bench (stub sigue default) — route: delegated direct. Trigger evidence: 2+ non-trivial files + broad research liviana.
 - [ ] T5 corpus gold independiente del stub + results versionados por backend — route: delegated direct. Trigger evidence: suites + manifest + results/vN nuevos.
 - [ ] T6 verificación + work-unit commits + docs de cierre — route: delegated direct (verificación con writer self-check + parent spot check). Trigger evidence: full suites delegadas.
@@ -56,14 +56,18 @@ tests/*.mjs
 ## Progress
 - 2026-10-07 rama odd/harness-spike-ready creada desde b90489c. Alcance elegido por usuario: Harness spike-ready (sin modelos nuevos).
 - Forecast: ~350 líneas autoradas (adds+deletes, generados excluidos), estrategia single-pr, sin chain.
-- T2: `node evals/run.mjs`: 88/88. `node evals/bench.mjs`: exit 0 (10 primitivas + sweep + model-load). `node tests/fase7_t5_bench_manifest.mjs`: 14 checks passed. `git diff --stat`: 3 files +41/-2, solo comentarios/docs. Parent spot-check OK.
+- T2: `node evals/run.mjs`: 88/88. `node evals/bench.mjs`: exit 0 (10 primitivas + sweep + model-load). `node tests/fase7_t5_bench_manifest.mjs`: 14 checks passed. `git diff --stat`: 3 files +41/-2, solo comentarios/docs. Parent spot-check OK. Commit 53a0b6e.
+- T3: `node evals/run.mjs`: 88/88. `node evals/bench.mjs`: exit 0 default; `--rerank-paged`: exit 0 (N=130, 3 ventanas, merged mrr 0.500/ndcg 0.693). `node tests/fase7_t5_bench_manifest.mjs`: 14 checks passed. `git diff --stat`: 2 files +282/-7. Parent spot-check: flag presente, default intacto OK.
+- Running: ~400 líneas autoradas acumuladas (T1 ~70 + T2 ~50 + T3 ~289); supera el presupuesto ~400 → se pregunta estrategia de chain antes del próximo commit (ask-on-risk).
 - 2026-10-07 T1 DONE (writer general ses_ee88bc018ffed0mw49exLbOYSt): docs→código, 88/88 + 4/4 + 12 checks. Commit df0f0bc (T1 work-unit).
+- 2026-10-07 T2 DONE (writer general ses_ee88995f6ffeGdnHCqblpONcQj): exclusión explícita, 88/88 + bench exit 0 + 14 checks. Commit 53a0b6e (T2 work-unit).
+- 2026-10-07 T3 DONE (writer general ses_ee887cca9ffe7kjfy1i4J8z7h3): protocolo N>64 opt-in, 88/88 + bench default y paged exit 0 + 14 checks. Sin commit aún.
 
 ## Verification evidence
 - T1: `node evals/run.mjs`: 88/88 passed. `node evals/integration.mjs`: 4/4 pass (INT-03 `untested-change-review`). `node tests/fase7_t6_integration.mjs`: 12 checks passed. `git diff --stat`: EVALUATION.md 1+/1-. Parent spot-check: diff mínimo docs→código OK, sin refs a `untested-change-escalate` (grep vacío), thresholds intactos.
 
 ## Next step
-- Ejecutar T3 con un writer acotado (protocolo N>64 para rerankers, sin romper el cap actual por default).
+- Ejecutar T4 con un writer acotado (adaptador LayaClient-live tras flag/env, stub sigue default). NOTA: running ~400 supera presupuesto → preguntar chain strategy antes del commit T3.
 
 ## Delivery
-- Estrategia: ask-on-risk (default). Forecast ~350 < 400, sin chain por ahora. Running: 0 líneas. Slices: ninguno aún.
+- Estrategia: ask-on-risk → elegida stacked-to-main (2026-10-07, usuario). Forecast inicial ~350 quedó corto (T3 pesó 289). Running: ~410. Slice 1: df0f0bc (T1) + 53a0b6e (T2) + commit T3 (abajo); T4-T6 irán al slice 2 salvo que el usuario indique otra cosa.
