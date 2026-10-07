@@ -631,6 +631,22 @@ work.
 - `node tests/fase7_t4_metrics.mjs`, `node tests/fase7_t5_bench_manifest.mjs`,
   `node tests/fase7_t6_integration.mjs` — structural batteries (36 checks).
 
+### 9.1 Dependency maintenance (spike S7, 2026-10-07)
+
+- `@modelcontextprotocol/sdk 1.30.0 → 1.32.1` (within `^1.0.0`):
+  fixes the `npm audit` high-severity advisory GHSA-6qxp-vccf-f47h
+  (OAuth client credential leak); `npm audit` is clean (0 vulnerabilities)
+  after the bump. Lock-only change, `package.json` range untouched.
+- `@types/node 22.20.4 → 22.20.5` (patch within `^22.0.0`).
+- Held back on purpose: `typescript` stays at 5.9.3 (7.x is a major),
+  `@types/node` stays on the 22.x line (26.x is a major). `tsconfig.json`
+  unchanged — no bump required it.
+- Python pins (`py/requirements*.txt`) untouched: `pip check` clean in
+  the spike venv, and no Node bump required a Python change.
+- Post-bump GREEN: `npm run typecheck` + `npm run build` clean,
+  `node evals/run.mjs` 98/98, `node evals/bench.mjs` OK, fase7 batteries
+  10+14+12 checks passed. Thresholds and `evals/results/v1-v4` intact.
+
 ## 10. Limitations
 
 1. Stub ceiling: oracle-assigned signals cannot validate backend quality,

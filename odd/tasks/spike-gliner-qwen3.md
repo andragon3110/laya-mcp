@@ -26,7 +26,7 @@ Rama `odd/spike-gliner-qwen3` sobre `main@a2ce4f1`. Incluye: env (venv+pip+HG do
 - [x] S4 golds independientes rerank/find + runs live + results v3+ por backend — DONE 4 golds (rerank/find x2 EN+ES), censo 10/88/98, `v3` stub 98 + `v4` live Laya+Qwen (Qwen 4/4 independientes). Route: delegated direct.
 - [x] S5 análisis: discriminación, ECE/AUROC/histogramas, veredicto por primitiva — DONE §7.8: Qwen discrimina fuerte (gaps ≥0.986); Decide 6/6 labels (n=2, sin scores); Laya sin discriminación probada salvo find. Decisión S6: NO. Route: delegated direct.
 - [x] S6 (condicional: solo si S5 muestra discriminación) recalibrar thresholds + tests — SKIPPED por decisión S5 (NO: fallas de juez no las arregla ningún threshold; screen necesitaría ≥10 independientes). Thresholds intactos.
-- [ ] S7 modernización acotada Node/Python + verificación final + cierre — route: delegated direct.
+- [x] S7 modernización acotada Node/Python + verificación final + cierre — DONE lock-only (SDK 1.30→1.32.1 audit 1high→0, types 22.20.4→22.20.5), resto retenido con razón, §9.1 docs. Batería completa verde. Route: delegated direct.
 
 ## Authorized scope
 py/gliner_decide_server.py
@@ -63,7 +63,8 @@ tsconfig.json
 - 2026-10-07 S3 DONE (worker general ses_ee849cca8ffeRpWwPtWHOGpa5N): server :8768 + carril RerankClient + doctor. Fix device: batch al device del modelo. :8768 queda corriendo para S4.
 - 2026-10-07 S4 DONE (worker general ses_ee8446af1ffePTXrsMJ10PJR82): 4 golds rerank/find, v3 stub + v4 live. :8765/:8767/:8768 quedan encendidos. Nota: `score --live` reescribe `artifacts/evals-t4-metrics.json` (restaurar tras runs).
 - 2026-10-07 S5 DONE (worker general ses_ee83accfcffeKcupqWIKdM9GVN): §7.8 con veredictos + S6 NO. S6 SKIPPED (criterio: ≥10 independientes + corte fuera del gap).
-- Forecast: grande (~1200 líneas autoradas; servidores nuevos exceden la heurística por naturaleza). Estrategia: stacked-to-main (cacheada). Running: ~1170.
+- 2026-10-07 S7 DONE (worker general ses_ee838171bffev6xQivGqES4VI1): modernización lock-only + verificación final. Feature completo (S6 skipped con criterio = DONE).
+- Forecast: grande (~1200 líneas autoradas; servidores nuevos exceden la heurística por naturaleza). Estrategia: stacked-to-main (cacheada). Running: ~1200. Slice 1: 59da599+44c58cc+e293c66; slice 2: 32b448d+e01ca71+commit de cierre.
 
 ## Verification evidence
 - S1: venv `~/.venvs/s1-spike-gliner-qwen3` py3.14.8, torch 2.14.1+cpu (cuda False), 9/9 + 14/14 archivos HF. GLiNER smoke 3/3 (ES 0.993) ~0.06s/texto RSS ~2931MB; Qwen3 smoke ranking correcto (0.9996 vs resto) batch 1.07s RSS ~3861MB. Repo intacto (`git status`: solo este tracking).
@@ -71,9 +72,11 @@ tsconfig.json
 - S3: `node evals/run.mjs`: 94/94 stub default. :8768 `/ready` 200 post-warm, `POST /rerank` ES top password 0.9996 (178ms caliente CUDA). Carril live e2e OK; `score --live` sigue exit 2 por laya :8765 caído (refusal intacto). Parent spot-check OK.
 - S4: `node evals/run.mjs`: 98/98. `manifest --save` → v3; `manifest --save --live` → v4 (Qwen 4/4 independientes; Laya-live: classify 0.889, gate 0.222, etc.). Baterías 10+14+12 checks passed. Parent spot-check: v3/v4 presentes, v1/v2 intactos, 98/98 re-ejecutado OK.
 - S5: `node evals/run.mjs`: 98/98. Solo `EVALUATION.md` +118 (§7.8). Parent spot-check OK. Thresholds intactos, v1-v4 intactos.
+- S7: `npm audit`: 0 vulns (SDK 1.32.1). `npm run typecheck/build`: limpios. `node evals/run.mjs`: 98/98. Estructurales 10+14+12 passed. Solo `EVALUATION.md` +16 y `package-lock.json` lock-only. Parent spot-check: 98/98 + audit 0 re-ejecutados OK.
+- Ningún check fallido, skipeado o pendiente salvo `node --test tests/` (preexistente: las suites corren como scripts directos, no vía runner).
 
 ## Next step
-- Ejecutar S7 (modernización acotada + verificación final + push? NO push sin usuario).
+- Decisiones del usuario: (1) push de `odd/spike-gliner-qwen3` + PRs apilados (slice 1: env+servers; slice 2: runs+análisis+modernización); (2) RDD clone switch; (3) ramas remotas no mergeadas restantes; (4) banquillo si se quiere (gte/bge-m3, SmolLM2).
 
 ## Delivery
 - Estrategia: stacked-to-main (cacheada del feature anterior). Slices se definen al cerrar (probable: env+servers / runs+análisis / modernización).
