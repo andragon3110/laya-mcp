@@ -31,10 +31,11 @@ claim about the real backend or about agent quality.
 | `evals/run.mjs` | Common harness: loads the 11 suites, runs every case against the real handler with the oracle stub, checks the output against the case gold. Exit 0 when all golds match. |
 | `evals/suites/*.mjs` | 11 datasets with golds plus thin per-primitive adapters (`invoke` + `check`): `classify`, `decide`, `verify`, `screen`, `pii`, `extract`, `find`, `rerank`, `review`, `gate`, plus `compare` (cierre-pendientes T4). |
 | `evals/metrics.mjs` | Shared pure metric functions (binary, decision accuracy, abstention, ranking, score agreement, wrong_confident). No I/O, no thresholds. |
-| `evals/score.mjs` | T4 runner: applies `metrics.mjs` to the 11 suites; prints the metrics table; optionally saves to `--out` (default `artifacts/`, untracked). |
+| `evals/score.mjs` | T4 runner: applies `metrics.mjs` to the 11 suites; prints the metrics table; optionally saves to `--out` (default `artifacts/`, untracked). `--live` routes judge calls to the probed backend (stub stays default). |
+| `evals/live-client.mjs` | T4 live adapter (harness-spike-ready): explicit opt-in gate (`--live` / `LAYA_EVAL_LIVE=1`), backend probe (`/ready` + `/models`), and the live `deps` shape for the suites. Never active by default; refuses (exit 2) when unreachable. |
 | `evals/calibration.md` | Calibration verdict: no output is a probability; Brier/ECE do not apply; forbidden conclusions. |
-| `evals/bench.mjs` | T5 benchmarks: primitive latency/throughput/memory, rerank scale sweep, model-load shape. Absolutes only. |
-| `evals/manifest.mjs` | T5 reproducibility manifest plus the never-overwrite versioned saver for `evals/results/vN/`. |
+| `evals/bench.mjs` | T5 benchmarks: primitive latency/throughput/memory, rerank scale sweep, model-load shape. Absolutes only. `--live` benches the real backend with the same wall/reported split. |
+| `evals/manifest.mjs` | T5 reproducibility manifest plus the never-overwrite versioned saver for `evals/results/vN/`. Records probed revision/device under `--live`, honest nulls otherwise. |
 | `evals/integration.mjs` | T6 comparable +/-Laya protocol: 4-task hook-chain set with golds, stub arm, and live-requirements gate. |
 | `evals/results/v1/` | First versioned run: `manifest.json` + `bench.json` + `metrics.json`. Never overwritten; new runs take `v2`, `v3`, … |
 | `tests/fase7_t4_metrics.mjs` | 10 hand-fixture checks over `metrics.mjs` (pure functions). |
@@ -267,6 +268,46 @@ not a judgment primitive with oracle golds (see the CAPABILITIES NOTE in
 `tests/fase6_t5_security_discovery.mjs` plus the gentle-integration
 live/down arms).
 
+### 7.5 Live backend adapter (opt-in, harness-spike-ready T4)
+
+`evals/live-client.mjs` makes score/bench pluggable against a real
+backend (`laya-server` at `LAYA_URL`, GLiNER sidecar at `GLINER_URL`)
+without changing the default: the stub stays active unless the caller
+passes the explicit `--live` flag or sets `LAYA_EVAL_LIVE=1`. There is
+no auto-detection and no silent switch. With the opt-in but no
+reachable backend, every entry point refuses with exit 2 and the probe
+evidence instead of silently measuring the stub as backend output (the
+same refusal precedent as `integration.mjs --mode live`).
+
+What changes under `--live`:
+
+- Judge calls go to the backend: `score.mjs`/`bench.mjs` build the
+  suite `deps` from the connected `LayaClient` (oracle answers ignored,
+  real questions forwarded, question capture kept). The PII sidecar
+  uses the live GLiNER client; without one, PII cases record `threw`
+  instead of silently measuring stub spans.
+- The wall/reported split is reused unchanged: `reported_latency_ms`
+  carries the backend `latencyMs`, `wall_ms` the measured round trip,
+  so overhead vs model time never conflate. `model_load.live_probe`
+  adds the real `/models`+`/ready` round-trip walls plus the probed
+  device/inventory (stub runs report `probed: false`, never zeros).
+- The manifest records probed values: `model` (verbatim inventory
+  name), `model_revision` (operator `LAYA_MODEL_REVISION` pin wins,
+  else the backend-reported revision, else the explicit `unpinned`
+  null -- a hash is never invented), `model_revision_source`
+  (`env:…` / `backend` / `unpinned`, the `src/evidence.ts`
+  vocabulary), and `device` (live `/ready` device or the explicit
+  unknown string). `tokenizer` stays `"unknown"`: no probe exposes
+  one. The full probe descriptor lands in `manifest.backend` and in
+  the score/bench `backend` blocks.
+- Golds stay the stub oracles (the independent corpus is T5 work):
+  live mismatches measure backend-vs-oracle divergence, never backend
+  quality. Expected, documented, not an adapter failure.
+
+No weights are downloaded, no GLiNER2.5/Qwen3 integration happens
+here: this adapter only moves judge calls from stub to backend so a
+later spike can compare backends under a fixed protocol.
+
 ## 8. Integration
 
 ### 8.1 Protocol (comparable +/-Laya)
@@ -324,7 +365,13 @@ work.
 
 - `node evals/run.mjs [--json] [suite]` — 88-case harness smoke.
 - `node evals/score.mjs [--json] [--out <path>]` — T4 metrics report.
+- `node evals/score.mjs --live [--json]` — same against the probed live
+  backend (stub oracles: divergence expected; refuses exit 2 when
+  unreachable). Env equivalent: `LAYA_EVAL_LIVE=1`.
 - `node evals/bench.mjs [--json]` — T5 benchmark tables (absolutes).
+- `node evals/bench.mjs --live [--json]` — same with real judge calls
+  (wall = round trip, reported = backend `latencyMs`); `--save` pairs it
+  with live metrics in the versioned run.
 - `node evals/bench.mjs --rerank-paged [--rerank-paged-window=64] [--rerank-paged-n=130]` — same plus the opt-in N>64 paged example (env equivalents: `LAYA_BENCH_RERANK_PAGED=1`, `LAYA_BENCH_RERANK_WINDOW`, `LAYA_BENCH_RERANK_PAGED_N`).
 - `node evals/manifest.mjs [--json]` — manifest for the current tree.
 - `node evals/manifest.mjs --save [--json]` — full run (bench + score
@@ -379,7 +426,11 @@ by one `--save` run, and no later run mutates them:
   registry, envelope schema version, software (Node, platform, arch,
   package version), hardware (arch, CPU count/model, total memory),
   bench config, MCP/policy modes, the method string, the honesty notes,
-  and the bench/metrics link counts.
+  and the bench/metrics link counts. Under `--live` the same file
+  carries the probed `model` name, the resolved `model_revision` (+
+  `model_revision_source`: `env:…` / `backend` / `unpinned`), the
+  probed `device`, and the full `backend` probe descriptor (section
+  7.5); revision/device are never invented.
 - `bench.json` — method, config, heap baseline, the 10 primitive rows
   (canonical, stub vs reported latency, cold-first wall, warm p50/p95/p99,
   ops/s, cand/s, pruning, heap), the latency-split demo, the 5 rerank

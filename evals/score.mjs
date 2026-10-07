@@ -34,6 +34,10 @@
  *   wrong_confident: non-throw, non-abstained, non-null-signal judgments.
  *
  * Run from the repo root: node evals/score.mjs [--json] [--out <path>]
+ *   --live (or LAYA_EVAL_LIVE=1) routes judge calls to the probed live
+ *   backend (see evals/live-client.mjs); default is the oracle stub.
+ *   Live golds stay the stub oracles: mismatches measure
+ *   backend-vs-oracle divergence, never backend quality.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -57,6 +61,7 @@ import {
   rankingMetrics,
   wrongConfident,
 } from "./metrics.mjs";
+import { isLiveEnabled, makeLiveDeps, connectLiveBackend, resolveLiveBackend } from "./live-client.mjs";
 
 const SUITES = [classify, decide, verify, screen, pii, extract, find, rerank, review, gate, compare];
 
@@ -80,7 +85,7 @@ const makePiiCtx = (findings) => ({
     extractEntities: async () => ({ spansByType: {}, latencyMs: 0 }),
   },
 });
-const deps = { fakeClient, makePiiCtx };
+const stubDeps = { fakeClient, makePiiCtx };
 
 const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const goldLabels = (gold) =>
@@ -182,7 +187,7 @@ function extractJudgments(suiteName, body, gold) {
 
 const FAMILY = { rerank: "ranking", review: "agreement", gate: "agreement" };
 
-async function scoreSuite(suite) {
+async function scoreSuite(suite, deps) {
   const rows = [];
   for (const c of suite.cases) {
     const capture = {};
@@ -243,6 +248,24 @@ async function scoreSuite(suite) {
 
 const args = process.argv.slice(2);
 const asJson = args.includes("--json");
+
+/* T4 live adapter (harness-spike-ready): stub default; --live / LAYA_EVAL_LIVE=1
+ * routes judge calls to the probed backend. Live without a reachable backend
+ * refuses (exit 2) instead of silently measuring the stub as backend output. */
+const wantLive = isLiveEnabled(args, process.env);
+let backend = { mode: "stub", live: false, reachable: false, note: "stub default: oracle answers + real handlers (stub ceiling, not backend quality)" };
+let deps = stubDeps;
+if (wantLive) {
+  backend = await resolveLiveBackend({ argv: args, env: process.env });
+  if (!backend.reachable) {
+    const msg = `live backend unreachable at ${backend.baseUrl ?? "unknown"} (${backend.error ?? "no probe result"}); refusing the live run (never silently stubbing). Start laya-server or run the stub default (no --live).`;
+    if (asJson) console.log(JSON.stringify({ mode: "live", backend, error: msg }, null, 2));
+    else console.error(`\nscore --live refused: ${msg}`);
+    process.exit(2);
+  }
+  const { client, gliner } = await connectLiveBackend({ baseUrl: backend.baseUrl, glinerUrl: backend.glinerUrl });
+  deps = makeLiveDeps({ client, gliner });
+}
 const rest = [];
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--json") continue;
@@ -262,17 +285,24 @@ if (selected.length === 0) {
 }
 
 const report = {
-  generated: "fase-7 T4 (oracle stub + real handlers; stub ceiling, not backend quality)",
+  generated: backend.live
+    ? `fase-7 T4+spike LIVE backend ${backend.baseUrl} (oracle golds: mismatches measure backend-vs-oracle divergence, never backend quality)`
+    : "fase-7 T4 (oracle stub + real handlers; stub ceiling, not backend quality)",
+  backend,
   taus: WRONG_CONFIDENT_TAUS,
   taus_note: "reporting slices only; NEVER production thresholds (see evals/calibration.md)",
   suites: [],
 };
-for (const suite of selected) report.suites.push(await scoreSuite(suite));
+for (const suite of selected) report.suites.push(await scoreSuite(suite, deps));
 
 if (asJson) {
   console.log(JSON.stringify(report, null, 2));
 } else {
-  console.log("\nFase-7 T4 metrics (oracle stub ceiling;taus are slices, never thresholds):");
+  console.log(
+    backend.live
+      ? `\nFase-7 T4 metrics, LIVE backend ${backend.baseUrl} (oracle golds; mismatches = backend-vs-oracle divergence, not quality):`
+      : "\nFase-7 T4 metrics (oracle stub ceiling;taus are slices, never thresholds):",
+  );
   console.log("| suite | fam | dec_acc | task_acc | bin_F1 | abst | wc@0.80 | wc@0.95 |");
   console.log("|-------|-----|---------|----------|--------|------|---------|---------|");
   const fmt = (v) => (v === null || v === undefined ? "n/a" : typeof v === "number" ? v.toFixed(3) : String(v));
