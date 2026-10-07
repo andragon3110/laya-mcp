@@ -30,6 +30,12 @@ export const stubLimits =
   "Safety and claim signals are oracle-assigned: no completion-truthfulness " +
   "claim transfers to the real backend.";
 
+/** T5 gold provenance: every case gold in this file defaults to
+ * "oracle-stub" (gold written together with its oracle stub answers).
+ * Cases with human-fixed truth carry gold_source: "independent" per
+ * case; the manifest gold_corpus block counts both. */
+export const goldSource = "oracle-stub";
+
 const BASE = { request: "ship fix", diff: "+ null check", evidence: "tests: 2 passed" };
 
 export const cases = [
@@ -131,6 +137,34 @@ export const cases = [
     stub: { answers: {} },
     expectError: "input_too_large",
     gold: { why: "over-budget claim lists fail fast instead of gating a subset." },
+  },
+  {
+    id: "gate-independent-01",
+    kind: "normal",
+    gold_source: "independent",
+    input: { ...BASE, claims: ["all tests pass"] },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): the claim matches the evidence (tests: 2 passed) and the change is low-risk; any competent backend supports it. The stub signals below only feed the handler what a working backend would return.",
+    stub: {
+      answers: {
+        correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.95 },
+        claim_0: { noul: 0.9 }, refute_0: { noul: 0.1 },
+      },
+    },
+    gold: { verdict: "SUPPORTED", decision: "ALLOW", abstained: false, why: "human-fixed evidence match plus firm safety auto-allows." },
+  },
+  {
+    id: "gate-independent-02",
+    kind: "negative",
+    gold_source: "independent",
+    input: { request: "ship fix", diff: "+ null check", evidence: "tests: 2 failed", claims: ["all tests pass"] },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): the claim contradicts the evidence (2 failed vs all pass); any competent backend refutes it. The stub signals below only feed the handler what a working backend would return.",
+    stub: {
+      answers: {
+        correctness: { score: 1 }, spec_match: { score: 1 }, safe_to_apply: { noul: 0.9 },
+        claim_0: { noul: 0.2 }, refute_0: { noul: 0.9 },
+      },
+    },
+    gold: { verdict: "CONTRADICTED", decision: "ESCALATE", abstained: false, why: "human-fixed evidence contradiction escalates; high safety never rescues it." },
   },
 ];
 

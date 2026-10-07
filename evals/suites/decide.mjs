@@ -28,6 +28,12 @@ export const stubLimits =
   "Requirement signals are oracle-assigned: no proof the backend really scopes " +
   "each requirement to the winner option.";
 
+/** T5 gold provenance: every case gold in this file defaults to
+ * "oracle-stub" (gold written together with its oracle stub answers).
+ * Cases with human-fixed truth carry gold_source: "independent" per
+ * case; the manifest gold_corpus block counts both. */
+export const goldSource = "oracle-stub";
+
 const AB = [
   { id: "a", description: "Postgres with daily backups" },
   { id: "b", description: "SQLite file on disk" },

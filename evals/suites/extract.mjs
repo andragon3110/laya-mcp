@@ -27,6 +27,12 @@ export const stubLimits =
   "Pick plausibility is oracle-assigned: no span-selection quality claim " +
   "transfers; grounding guarantees come from the handler, not the stub.";
 
+/** T5 gold provenance: every case gold in this file defaults to
+ * "oracle-stub" (gold written together with its oracle stub answers).
+ * Cases with human-fixed truth carry gold_source: "independent" per
+ * case; the manifest gold_corpus block counts both. */
+export const goldSource = "oracle-stub";
+
 const FIELD = [{ id: "f", description: "Code", pattern: "[A-Z]{2}\\d{2}" }];
 
 export const cases = [

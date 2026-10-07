@@ -30,6 +30,12 @@ export const stubLimits =
   "Signals are oracle-assigned: no support-calibration or paraphrase-sensitivity " +
   "claim transfers to the real backend.";
 
+/** T5 gold provenance: every case gold in this file defaults to
+ * "oracle-stub" (gold written together with its oracle stub answers).
+ * Cases with human-fixed truth carry gold_source: "independent" per
+ * case; the manifest gold_corpus block counts both. */
+export const goldSource = "oracle-stub";
+
 const EV = "The release passed all 120 tests on Linux and the price is $29.";
 
 export const cases = [

@@ -26,6 +26,12 @@ export const stubLimits =
   "Pick plausibility and share magnitudes are oracle-assigned: no " +
   "retrieval-quality claim transfers to the real backend.";
 
+/** T5 gold provenance: every case gold in this file defaults to
+ * "oracle-stub" (gold written together with its oracle stub answers).
+ * Cases with human-fixed truth carry gold_source: "independent" per
+ * case; the manifest gold_corpus block counts both. */
+export const goldSource = "oracle-stub";
+
 const PAIR = [
   { id: "a", text: "Postgres supports daily backups natively" },
   { id: "b", text: "SQLite is a single local file" },

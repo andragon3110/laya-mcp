@@ -4,7 +4,9 @@
  * SCOPE (T5 only): per-run manifest (model/revision/tokenizer/policy/schema/
  * software/hardware/device/config/mode + date + git commit) and the
  * never-overwrite versioned saver for evals/results/vN/ (manifest.json +
- * bench.json + metrics.json). No benchmarks (bench.mjs), no metrics (T4),
+ * bench.json + metrics.json), plus the gold_corpus provenance census
+ * (harness-spike-ready T5: independent vs oracle-stub counts per suite).
+ * No benchmarks (bench.mjs), no metrics (T4),
  * no EVALUATION.md, no integration (T6). No models, no GPU, no network.
  *
  * HONEST VALUES IN THIS REPO (stub runs, no live backend):
@@ -39,12 +41,45 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { ENVELOPE_SCHEMA_VERSION } from "../dist/envelope.js";
 import { listPolicies } from "../dist/policy/loader.js";
+import * as classifySuite from "./suites/classify.mjs";
+import * as decideSuite from "./suites/decide.mjs";
+import * as verifySuite from "./suites/verify.mjs";
+import * as screenSuite from "./suites/screen.mjs";
+import * as piiSuite from "./suites/pii.mjs";
+import * as extractSuite from "./suites/extract.mjs";
+import * as findSuite from "./suites/find.mjs";
+import * as rerankSuite from "./suites/rerank.mjs";
+import * as reviewSuite from "./suites/review.mjs";
+import * as gateSuite from "./suites/gate.mjs";
+import * as compareSuite from "./suites/compare.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.join(here, "..");
 const require = createRequire(path.join(repoRoot, "package.json"));
 
 export const RESULTS_DIR_DEFAULT = path.join(repoRoot, "evals", "results");
+
+const GOLD_CORPUS_SUITES = [
+  classifySuite, decideSuite, verifySuite, screenSuite, piiSuite,
+  extractSuite, findSuite, rerankSuite, reviewSuite, gateSuite, compareSuite,
+];
+
+/**
+ * T5-spike gold provenance census: per case, case.gold_source wins, else
+ * the suite goldSource default ("oracle-stub"). Pure data for the
+ * manifest gold_corpus block and the EVALUATION.md spike table; it never
+ * changes what run/score/bench execute.
+ */
+export function goldCorpusCounts() {
+  const perSuite = GOLD_CORPUS_SUITES.map((s) => {
+    const def = s.goldSource ?? "oracle-stub";
+    const independent = s.cases.filter((c) => (c.gold_source ?? def) === "independent").length;
+    return { suite: s.name, total: s.cases.length, independent, oracle_stub: s.cases.length - independent };
+  });
+  const independent = perSuite.reduce((a, r) => a + r.independent, 0);
+  const total = perSuite.reduce((a, r) => a + r.total, 0);
+  return { independent, oracle_stub: total - independent, total, per_suite: perSuite };
+}
 
 /** git HEAD sha, or "unknown" with the reason (never throws). */
 export function gitCommit() {
@@ -124,6 +159,12 @@ export async function buildManifest({ bench = null, metrics = null, backend = nu
       policy_note: "effective global policy-decision mode resolution input (verbatim env or default)",
     },
     method: bench?.method ?? "n/a (manifest-only run; see evals/bench.mjs BENCH_METHOD for bench runs)",
+    gold_corpus: goldCorpusCounts(),
+    gold_corpus_note:
+      "provenance census (case gold_source wins, else the suite goldSource default): " +
+      "independent golds carry human-fixed truth (spike-grade: a live backend is judged against them), " +
+      "oracle-stub golds were written together with their stub answers (plumbing-grade: live mismatches " +
+      "measure backend-vs-oracle divergence, never backend quality)",
     honesty: [
       "absolutes only; no cross-machine comparison; no improvement claimed (no baseline exists)",
       "stub ceiling: numbers measure harness + handler plumbing, never backend quality",
