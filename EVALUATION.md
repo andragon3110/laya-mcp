@@ -432,6 +432,124 @@ signals (exact ties, dropped answers, rogue ids, silence, lexical
 inversion). Whether any divergence is a Qwen error or a stub-oracle
 artifact is S5 analysis work, not an S4 verdict.
 
+### 7.8 Spike S5 analysis: discrimination verdict per primitive + S6 decision
+
+Method (2026-10-07, servers `:8765`/`:8767`/`:8768` all `ready` 200):
+
+- Stub baselines `v2`/`v3`: read from `evals/results/v2|v3/metrics.json`
+  (decision accuracy 1.000 on all 11 suites in both — stub ceiling, not
+  backend quality).
+- Laya-live full-suite aggregates: read from
+  `evals/results/v4/metrics.json` (oracle-mixed denominators: 8–10 cases
+  per suite; quoted for context, never as quality).
+- Laya-live independent slice: throwaway script `/tmp/opencode/s5-probe.mjs`
+  (outside the repo) invoking each suite's real `invoke` through live deps
+  built exactly as `score.mjs --live` does (`connectLiveBackend` at
+  `:8765`/`:8766` + `makeLiveDeps`, no rerank sidecar), judging only the
+  `gold_source: "independent"` cases against their human-fixed fields
+  (label/decision/order — NOT `winner_probability`, which the suite
+  `check()` pins to the stub-oracle value and therefore always mismatches
+  live even when the label is right).
+- Qwen independent scores: re-measured live with
+  `curl POST localhost:8768/rerank` on both independent inputs
+  (matches the `v4` record: EN `0.9863 vs 0.000020`, ES `0.9982 vs
+  0.0000087`, ~100–112 ms warm CUDA).
+- Decide (`:8767`) independent probes: `curl POST localhost:8767/classify`
+  twice per input (stability check), label maps documented below. The
+  endpoint is argmax-only (`{"result": {"<task>": "<label>"}}`, no scores),
+  so Decide yields label accuracy only — no spread, no margins.
+
+Decide label maps (S5 constructions, NOT harness-native lanes — the harness
+has no Decide lane; `score --live` judges through Laya only):
+
+| Suite | text | tasks |
+|---|---|---|
+| `classify` | item text verbatim | `{"triage": ["bug", "feature"]}` (suite `CLASSES`) |
+| `screen` | screened text verbatim | `{"screening": ["benign", "malicious-instruction"]}` |
+| `gate` | `"Evidence: <evidence> Claim: <claim>"` | `{"verdict": ["supported", "contradicted"]}` |
+
+The screen/gate maps are zero-shot transfers (Decide was never trained as
+an injection detector or NLI judge); their numbers measure transfer, not
+native capability. The corpus has 0 independent cases for
+decide/verify/extract/review/compare/pii, so no verdict is possible there.
+
+Independent-slice results (n = 2 per cell unless noted):
+
+| Primitive | Laya-live label/decision | Laya-live signals (spread = the two values) | Qwen-live | Decide-live |
+|---|---|---|---|---|
+| `classify` | label 1/2, decision 2/2 (`bug` 0.9189 ✓; `feature`→`bug` 0.4653 vs 0.4196, margin 0.046 ✗) | 0.9189 / 0.4653 | — (no lane) | 2/2 (`bug`, `feature`), stable 2/2 passes, 73–144 ms warm CPU |
+| `screen` | decision 0/2 (REVIEW vs ALLOW, REVIEW vs DENY) | injection 0.2649 (benign) vs 0.7204 (attack), gap 0.456; both tagged `suspicious-instruction` via `screen_injection_review` | — | 2/2 (`benign`, `malicious-instruction`), stable |
+| `gate` | decision 0/2 (REVIEW vs ALLOW, REVIEW vs ESCALATE) | claim support 0.9096 (match) vs 0.8575 (contradiction); refute 0.8919 vs 0.8599 — no separation | — | 2/2 (`supported`, `contradicted`), stable |
+| `find` | 2/2 winner `a` (0.62, 0.7061; runner-up gaps 0.3715/0.4758) | 0.62 / 0.7061 | 2/2, shares 0.986/0.998 | — (not probed; retrieval, not classification) |
+| `rerank` | order 1/2 (EN gap +0.0827 ✓; ES 0.6958 vs 0.6962, gap −0.0004 ✗ tie-flip) | Laya gaps +0.083 / −0.0004 | 2/2, gaps 0.986/0.998 | — (not probed) |
+
+Stub comparison: `v2` (94 cases, 6 independent) and `v3` (98 cases, 10
+independent) are 1.000 everywhere by construction (oracle-assigned signals).
+The stub baseline therefore cannot rank backends; it only certifies harness
+conservation. Live-vs-stub deltas on oracle-stub cases are divergence, not
+regressions.
+
+Calibration honesty: ECE/Brier remain not applicable to every backend, for
+the documented reason plus one new one. Laya `noul`/`winner_probability`
+shares and Qwen cross-encoder scores are uncalibrated raw signals (a 0.72
+is "the backend returned 0.72", never "72% likely correct"); no
+correctness-conditional sample exists to fit ECE on. Decide is a stronger
+case: `:8767 /classify` returns no scores at all, so even score spread is
+unobservable — calibration is not merely unmeasured, it is unmeasurable
+through this API. Nothing in this section is a probability claim.
+
+Verdict per primitive (numbers, not adjectives):
+
+- `classify`: no proven discrimination. Laya 1/2 with the error a 0.046
+  near-tie (judge uncertainty, not cut placement). Decide 2/2 labels but
+  n = 2 with no margins — suggestive, not evidentiary.
+- `screen`: Laya judge signal separates (gap 0.456) but handler decisions
+  are 0/2 — both sides misplaced (0.2649 still REVIEWs, 0.7204 never
+  DENYs). Threshold-shaped failure, but on n = 2. Decide transfer 2/2,
+  same n caveat.
+- `gate`: Laya does not discriminate — support/refute signals overlap
+  (0.9096 vs 0.8575; 0.8919 vs 0.8599). Judge-quality failure; no cut
+  separates these. Decide NLI-transfer 2/2, n = 2 caveat.
+- `find`: discriminates on both measured backends (Laya 2/2, Qwen 2/2),
+  consistent direction, clear margins — weak evidence (n = 2 each) but no
+  counter-evidence.
+- `rerank`: Qwen discriminates strongly (2/2, gaps ≥ 0.986, both
+  languages). Laya does not discriminate reliably (1/2; ES order flips on
+  a 0.0004 score difference — score noise at the 1e-3 level decides order).
+- decide/verify/extract/review/compare/pii: no verdict (0 independents).
+
+S6 decision (recalibrate `src/policy/thresholds.ts`?): NO.
+
+Explicit criterion (set before measuring): S6 YES iff some primitive shows
+(a) judge-signal class separation with non-overlapping ranges on ≥ 10
+independent cases AND (b) the current production cut falls outside the
+separating gap. Otherwise NO — fitting cuts to ≤ 2 points per class is
+noise-fitting, forbidden by the honesty contract (section 6).
+
+Why NO, per failure attribution:
+
+1. No primitive meets (a): maximum independent n per backend today is 2
+   (4 for Qwen across find+rerank, different lanes). Criterion
+   unachievable on this corpus by construction.
+2. `gate`/`classify` Laya failures are judge-quality (overlapping signals,
+   wrong argmax on a near-tie) — no threshold value fixes a wrong argmax.
+3. `screen` is the only threshold-shaped Laya failure, but a cut in
+   (0.2649, 0.7204) fitted on 2 points has no generalisation claim; the
+   DENY-side cut is likewise single-pointed.
+4. The backends that discriminate (Qwen rerank/find, Decide labels) have no
+   production thresholds to recalibrate: Qwen judges through handler
+   adjudication (1/N baseline, tie/weak → ESCALATE, unchanged), and Decide
+   has no harness lane at all — wiring one is S6-scope only if a bigger
+   corpus first proves the transfer holds.
+
+What would unblock S6: ≥ 10 independent cases per target primitive
+(classify/screen/gate first — the decision primitives with direct
+consequences), re-run this section's protocol, then apply the criterion
+above. If the screen gap replicates at n ≥ 10, S6 recalibrates the
+ALLOW/REVIEW and REVIEW/DENY cuts; if gate overlap replicates, S6 is a
+judge-replacement question, not a threshold one. `src/policy/thresholds.ts`
+stays untouched.
+
 ## 8. Integration
 
 ### 8.1 Protocol (comparable +/-Laya)
