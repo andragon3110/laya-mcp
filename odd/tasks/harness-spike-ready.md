@@ -65,6 +65,7 @@ tests/*.mjs
 - 2026-10-07 T4 DONE (writer general ses_ee884b0e5ffeSuHUiF3z1JW2MC): adaptador live mínimo, stub default intacto. Commit e72c3c2 (T4 work-unit, abre slice 2).
 - 2026-10-07 T5 DONE (writer general ses_ee87ff5caffe2O7ZhnT1AEORq8): corpus independiente + v2 baseline. Commit 62b5c02 (T5 work-unit, slice 2).
 - 2026-10-07 T6 DONE (verificador general ses_ee87c01c2ffeC2X596Kyex1t1W): 10/10 criterios PASS, sin ediciones, árbol limpio. Parent spot-check: `node evals/run.mjs` 94/94 re-ejecutado OK.
+- 2026-10-07 push: `odd/harness-spike-ready` → origin (6 commits, tracking set, in sync). PRs pendientes de autorización.
 
 ## Verification evidence
 - T1: `node evals/run.mjs`: 88/88 passed. `node evals/integration.mjs`: 4/4 pass (INT-03 `untested-change-review`). `node tests/fase7_t6_integration.mjs`: 12 checks passed. `git diff --stat`: EVALUATION.md 1+/1-. Parent spot-check: diff mínimo docs→código OK, sin refs a `untested-change-escalate` (grep vacío), thresholds intactos.
