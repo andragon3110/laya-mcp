@@ -24,14 +24,14 @@ Fase 8 lo exige; es la última fase y debe cerrar con estado real verificado.
 Lectura total + escritura en Scope. Prohibido: CUA, cambios funcionales fuera de doctor/pins-seguros, push/PR/merge.
 
 ## Acceptance criteria
-- [ ] reproducibilidad revisada (pins o justificación + tokenizer + revision documentados).
-- [ ] doctor --benchmark/--models/--policy/--mcp donde la arquitectura lo permite, con datos reales.
-- [ ] README/docs describen lo real (lista §3) sin aspiracional.
-- [ ] security review §4 verificado ítem por ítem + 4 confirmaciones.
-- [ ] contrato re-verificado + breakings identificados.
-- [ ] matriz tests ejecutada (unit/integration/contract/adversarial/e2e + lint/typecheck/build/doctor) sin eliminar fallidos.
-- [ ] arquitectura final sin Model→Action; ejecución fuera; sin CUA.
-- [ ] checklist §9 respondido; FINAL_REPORT.md con X/Y/Z exactos.
+- [x] reproducibilidad revisada (pins o justificación + tokenizer + revision documentados).
+- [x] doctor --benchmark/--models/--policy/--mcp donde la arquitectura lo permite, con datos reales.
+- [x] README/docs describen lo real (lista §3) sin aspiracional.
+- [x] security review §4 verificado ítem por ítem + 4 confirmaciones.
+- [x] contrato re-verificado + breakings identificados.
+- [x] matriz tests ejecutada (unit/integration/contract/adversarial/e2e + lint/typecheck/build/doctor) sin eliminar fallidos.
+- [x] arquitectura final sin Model→Action; ejecución fuera; sin CUA.
+- [x] checklist §9 respondido; FINAL_REPORT.md con X/Y/Z exactos.
 
 ## Applicable checks
 - typecheck, build, py 42/42, mjs 451+36, evals (80+score+bench+integration), smoke LAYA_SKIP, doctor --no-live + nuevos flags.

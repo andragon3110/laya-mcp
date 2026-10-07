@@ -556,3 +556,9 @@ and `evals/results/v1/` (recorded run, commit `e6c0b98`); the T6 re-runs
 asserted exit codes and structural shape, not new numbers. Skipped items are
 labeled skipped with the literal cause. Anything attributed to a prior work
 unit (T3/T4/T5 records, evaluation verdicts) is marked as such.
+
+## Addendum 2026-10-07 (post-cierre, histórico preservado)
+
+- HEAD: `74f0f1e` (merge PR #15 `odd/laya-0321-0323`). El cuerpo de arriba queda histórico, anclado a `913bc88` (2026-09-23); no se reescribe.
+- Pin `laya` 0.3.23: `e578ce7` (bump 0.3.21 → 0.3.23) + `1d9168a` (fix: `PredictResponse.usage` a `Dict[str, Any]`, 0.3.23 devuelve campo lista) + `df930c5` (A/B + fix-forward re-run). Detalle en `odd/tasks/laya-0321-0323.md`.
+- A/B 0.3.21 vs 0.3.23 (`evals/results/laya-sdk-v3/`): T3 `AB_REPORT.md` veredicto REVERT (arm B 500 en `/predict` por `usage`; direct-Router 72/72 idéntico); T5 `AB_REPORT_T5.md` veredicto STAY (served 200, 0 flips, 0 deltas tras el fix).

@@ -28,15 +28,15 @@ Fase 2 lo exige; Fase 1 dejó baseline y 27 problemas verificados (P0:5). No ref
 Lectura total + escritura acotada a los archivos de Scope. Prohibido: Policy Engine, shadow mode, eval harness, CUA, cambios semánticos verify/screen/PII, grandes refactors, push/PR/merge (decisión del usuario).
 
 ## Acceptance criteria
-- [ ] GET /live rápido sin cargar modelos (ambos servidores o el que aplique, adaptado a arquitectura real).
-- [ ] GET /ready informa servidor/modelos cargados/fallidos/dispositivo/versión; no oculta backend no preparado.
-- [ ] GET /models expone info verificable (nombre, loaded, revision si resoluble, device) adaptada a arquitectura real.
-- [ ] Flujo load→failure→record→backoff→retry→success→clear implementado sin loops agresivos y sin bloquear todo por un modelo.
-- [ ] Sin doble carga del mismo modelo; sin carreras; concurrencia peligrosa limitada; throughput preservado.
-- [ ] Límites configurables (texto/candidatos/longitudes/entidades/opciones/body) con errores estructurados.
-- [ ] Tests nuevos pasan y cubren la lista §5 del prompt con comportamiento real.
-- [ ] No-regresión: typecheck, build, tests Python, tests MCP relevantes vs baseline Fase 1 (registrar comparativa).
-- [ ] `P0_IMPLEMENTATION.md` con problemas/cambios/archivos/tests/benchmark/breakings/riesgos/decisiones.
+- [x] GET /live rápido sin cargar modelos (ambos servidores o el que aplique, adaptado a arquitectura real).
+- [x] GET /ready informa servidor/modelos cargados/fallidos/dispositivo/versión; no oculta backend no preparado.
+- [x] GET /models expone info verificable (nombre, loaded, revision si resoluble, device) adaptada a arquitectura real.
+- [x] Flujo load→failure→record→backoff→retry→success→clear implementado sin loops agresivos y sin bloquear todo por un modelo.
+- [x] Sin doble carga del mismo modelo; sin carreras; concurrencia peligrosa limitada; throughput preservado.
+- [x] Límites configurables (texto/candidatos/longitudes/entidades/opciones/body) con errores estructurados.
+- [x] Tests nuevos pasan y cubren la lista §5 del prompt con comportamiento real.
+- [x] No-regresión: typecheck, build, tests Python, tests MCP relevantes vs baseline Fase 1 (registrar comparativa).
+- [x] `P0_IMPLEMENTATION.md` con problemas/cambios/archivos/tests/benchmark/breakings/riesgos/decisiones.
 
 ## Applicable checks
 - `npm run typecheck`, `npm run build`, `python -m unittest tests.test_opencode_v2 -v`, `LAYA_SKIP=1 python tests/smoke.py`, `node tests/mcp_smoke.mjs` según modo viable, `python py/doctor.py --no-live`, tests nuevos (nombrar runner exacto en cada delegación).

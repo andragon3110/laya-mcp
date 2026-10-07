@@ -16,3 +16,4 @@ __pycache__/
 
 # Local config snippets that may contain paths from this machine
 examples/*.local.json
+.engram/

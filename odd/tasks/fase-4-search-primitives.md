@@ -24,11 +24,11 @@ Fase 4 lo exige; P1 dejó evidence+decision+policies que reutilizar sin redefini
 Lectura total + escritura en Scope. Prohibido: tocar otras tools, robustez P0, engine core (solo policies de las 4 si hace falta), calibración, push/PR/merge.
 
 ## Acceptance criteria
-- [ ] extract: top_k/min_gliner_score/max_candidates configurables; slice 20 justificado o sustituido; grounded source[start:end] siempre.
-- [ ] find: pruning cheap pre-filter → top-K → Laya → winner/NONE/ABSTAIN; 0/fuerte/similares/ambiguos manejados.
-- [ ] rerank: max_candidates/top_k/min_probability donde corresponda; doc score≠probability; eval 10/50/100/500/1000.
-- [ ] decide: two-stage selection→evaluate selected; tests de dependencia.
-- [ ] NONE/ABSTAIN sin winners forzados; tests §7 (cero/uno/muchos/idénticos/similares/incorrecto/ambigüedad/vacío/enorme/límites); perf (count/pruning/latencia/memoria/throughput); SEARCH_IMPLEMENTATION.md.
+- [x] extract: top_k/min_gliner_score/max_candidates configurables; slice 20 justificado o sustituido; grounded source[start:end] siempre.
+- [x] find: pruning cheap pre-filter → top-K → Laya → winner/NONE/ABSTAIN; 0/fuerte/similares/ambiguos manejados.
+- [x] rerank: max_candidates/top_k/min_probability donde corresponda; doc score≠probability; eval 10/50/100/500/1000.
+- [x] decide: two-stage selection→evaluate selected; tests de dependencia.
+- [x] NONE/ABSTAIN sin winners forzados; tests §7 (cero/uno/muchos/idénticos/similares/incorrecto/ambigüedad/vacío/enorme/límites); perf (count/pruning/latencia/memoria/throughput); SEARCH_IMPLEMENTATION.md.
 
 ## Applicable checks
 - typecheck, build, py 42/42, mjs (16+49+19+25+17) + nuevos, smoke LAYA_SKIP, doctor --no-live.
