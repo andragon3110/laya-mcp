@@ -213,7 +213,15 @@ primitives only. `laya_compare` has a T3 dataset plus run/score wiring
 (88/88) but no bench row -- deliberately, not by omission: the T5 bench
 froze with the versioned `v1` run, and adding an 11th row would
 invalidate that record without a re-record. See the COMPARE NOTE in
-`evals/bench.mjs`.
+`evals/bench.mjs`. Harness-spike-ready T2 (2026-10-07) confirms the
+exclusion: the 11th row needs a new results version plus the battery
+update (`tests/` pins the exact 10-row shape), owned by T5
+corpus/versioning work. `laya_capabilities` likewise has no suite and no
+bench row -- live discovery/inventory over `/models` + `/ready` probes,
+not a judgment primitive with oracle golds (see the CAPABILITIES NOTE in
+`evals/bench.mjs`; contract coverage in
+`tests/fase6_t5_security_discovery.mjs` plus the gentle-integration
+live/down arms).
 
 ## 8. Integration
 
@@ -303,7 +311,14 @@ work.
 6. `laya_compare` has a T3 dataset (`evals/suites/compare.mjs`, 8 cases)
    with run/score wiring (88/88 with the other 10 suites), but no T5
    bench row -- by version-freeze, documented in `evals/bench.mjs`
-   (COMPARE NOTE) and section 7.4, not silently dropped.
+   (COMPARE NOTE) and section 7.4, not silently dropped. Harness-spike-ready
+   T2 confirms the exclusion; the re-record protocol (new results version +
+   battery update) is T5 work. `laya_capabilities` has neither suite nor
+   bench row -- discovery/inventory over live probes, not a judgment
+   primitive, so no oracle golds exist for it. Its contract is pinned by
+   `tests/fase6_t5_security_discovery.mjs` and the gentle-integration
+   live/down arms, plus the probe-holder shape demo in the bench
+   model-load block.
 
 ## 11. Per-run record (what each `evals/results/vN/` answers)
 

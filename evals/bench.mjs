@@ -17,6 +17,23 @@
  * compare bench row is ever wanted, record it as a new results version
  * (evals/results/vN/) and extend the battery together -- never silently.
  *
+ * T2 VERDICT (harness-spike-ready, 2026-10-07): exclusion CONFIRMED, not
+ * coverage. The 11th row would break the exact-10-row shape the battery
+ * asserts, and both tests/ edits and results re-records belong to T5
+ * (corpus + versioned results), outside T2 scope. Re-record protocol stays
+ * as above: new results version + battery update together, never silently.
+ *
+ * CAPABILITIES NOTE (same T2): `laya_capabilities` (tool 12, discovery /
+ * inventory over live /models + /ready probes) has NO suite and NO bench
+ * row -- by category, not by omission. It is not a judgment primitive: no
+ * predict oracle exists, no ALLOW/DENY decision, no gold semantics, so it
+ * cannot fit the T3 oracle harness (golds / accuracy / wrong_confident)
+ * nor benchPrimitive (no canonical predict case). Its coverage lives
+ * elsewhere: code-truth contract checks in
+ * tests/fase6_t5_security_discovery.mjs, live/down arms in
+ * tests/fase6_t6_gentle_integration.mjs, and the recordProbe shape demo in
+ * benchModelLoad below.
+ *
  * METHOD (inherits fase-4 T7; absolutes only, never asserted, never compared
  * across machines, no improvement claimed -- there is no baseline):
  * - Stub LayaClient reports a configurable `latencyMs` field; the measured
@@ -82,6 +99,8 @@ import {
 export const BENCH_SUITES = [classify, decide, verify, screen, pii, extract, find, rerank, review, gate];
 // 10 suites by version-freeze (see COMPARE NOTE in the header): laya_compare
 // is covered by evals/run.mjs + evals/score.mjs, not benched here.
+// laya_capabilities is discovery, not a judgment primitive: no suite and no
+// bench row by category (see CAPABILITIES NOTE in the header).
 
 export const BENCH_METHOD =
   "single process; stub-reported latency_ms kept separate from measured wall " +

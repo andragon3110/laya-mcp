@@ -21,7 +21,7 @@ Rama `odd/harness-spike-ready` sobre `b90489c`. Solo harness + docs. Sin pesos n
 
 ## Checklist
 - [x] T1 alinear INT-03 (gold REVIEW/REVIEW vs docs ESCALATE/ESCALATE) — DONE docs→código (EVALUATION.md:231 `untested-change-review` ALLOW,ALLOW,REVIEW,REVIEW; thresholds intactos). Route: delegated direct. Trigger evidence: lectura que prepara write (solo docs cambió).
-- [ ] T2 bench row `compare` + cobertura `capabilities` — route: delegated direct. Trigger evidence: bench.mjs + nueva suite o exclusión explícita + docs.
+- [x] T2 bench row `compare` + cobertura `capabilities` — DONE exclusión explícita justificada (compare rompería freeze 10 filas + re-record v1, pertenece a T5; capabilities es descubrimiento sin oráculo, cubierto en fase6). Route: delegated direct.
 - [ ] T3 protocolo N>64 para rerankers — route: delegated direct. Trigger evidence: bench.mjs cap 64 + protocolo nuevo + docs.
 - [ ] T4 adaptador LayaClient-live en score/bench (stub sigue default) — route: delegated direct. Trigger evidence: 2+ non-trivial files + broad research liviana.
 - [ ] T5 corpus gold independiente del stub + results versionados por backend — route: delegated direct. Trigger evidence: suites + manifest + results/vN nuevos.
@@ -56,13 +56,14 @@ tests/*.mjs
 ## Progress
 - 2026-10-07 rama odd/harness-spike-ready creada desde b90489c. Alcance elegido por usuario: Harness spike-ready (sin modelos nuevos).
 - Forecast: ~350 líneas autoradas (adds+deletes, generados excluidos), estrategia single-pr, sin chain.
-- 2026-10-07 T1 DONE (writer general ses_ee88bc018ffed0mw49exLbOYSt): docs→código, 88/88 + 4/4 + 12 checks. Sin commit aún (se commitea abajo).
+- T2: `node evals/run.mjs`: 88/88. `node evals/bench.mjs`: exit 0 (10 primitivas + sweep + model-load). `node tests/fase7_t5_bench_manifest.mjs`: 14 checks passed. `git diff --stat`: 3 files +41/-2, solo comentarios/docs. Parent spot-check OK.
+- 2026-10-07 T1 DONE (writer general ses_ee88bc018ffed0mw49exLbOYSt): docs→código, 88/88 + 4/4 + 12 checks. Commit df0f0bc (T1 work-unit).
 
 ## Verification evidence
 - T1: `node evals/run.mjs`: 88/88 passed. `node evals/integration.mjs`: 4/4 pass (INT-03 `untested-change-review`). `node tests/fase7_t6_integration.mjs`: 12 checks passed. `git diff --stat`: EVALUATION.md 1+/1-. Parent spot-check: diff mínimo docs→código OK, sin refs a `untested-change-escalate` (grep vacío), thresholds intactos.
 
 ## Next step
-- Ejecutar T2 con un writer acotado (bench row `compare` + cobertura `capabilities`).
+- Ejecutar T3 con un writer acotado (protocolo N>64 para rerankers, sin romper el cap actual por default).
 
 ## Delivery
 - Estrategia: ask-on-risk (default). Forecast ~350 < 400, sin chain por ahora. Running: 0 líneas. Slices: ninguno aún.
