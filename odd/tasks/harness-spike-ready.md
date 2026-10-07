@@ -25,7 +25,7 @@ Rama `odd/harness-spike-ready` sobre `b90489c`. Solo harness + docs. Sin pesos n
 - [x] T3 protocolo N>64 para rerankers — DONE opt-in `--rerank-paged`/`LAYA_BENCH_RERANK_PAGED=1`, ventanas ≤64 + merge determinista, default 64 intacto. Route: delegated direct.
 - [x] T4 adaptador LayaClient-live en score/bench (stub sigue default) — DONE `evals/live-client.mjs` nuevo (opt-in `--live`/`LAYA_EVAL_LIVE=1`, refusal exit 2 sin backend, pin env→backend→`unpinned`), wiring score/bench/manifest + docs. Route: delegated direct.
 - [x] T5 corpus gold independiente del stub + results versionados por backend — DONE 6 casos `gold_source: independent` (classify/screen/gate x2), censo en manifest, `results/v2` baseline stub (v1 intacta), runbook §7.6. Route: delegated direct.
-- [ ] T6 verificación + work-unit commits + docs de cierre — route: delegated direct (verificación con writer self-check + parent spot check). Trigger evidence: full suites delegadas.
+- [x] T6 verificación + work-unit commits + docs de cierre — DONE verificado 10/10 criterios PASS por worker independiente (ses_ee87c01c2ffeC2X596Kyex1t1W), sin fallout, árbol limpio. Route: delegated direct (writer self-check + verificador independiente + parent spot-check).
 
 ## Authorized scope
 evals/integration.mjs
@@ -63,7 +63,8 @@ tests/*.mjs
 - 2026-10-07 T2 DONE (writer general ses_ee88995f6ffeGdnHCqblpONcQj): exclusión explícita, 88/88 + bench exit 0 + 14 checks. Commit 53a0b6e (T2 work-unit).
 - 2026-10-07 T3 DONE (writer general ses_ee887cca9ffe7kjfy1i4J8z7h3): protocolo N>64 opt-in, 88/88 + bench default y paged exit 0 + 14 checks. Commit fd3f69a (T3 work-unit, cierra slice 1).
 - 2026-10-07 T4 DONE (writer general ses_ee884b0e5ffeSuHUiF3z1JW2MC): adaptador live mínimo, stub default intacto. Commit e72c3c2 (T4 work-unit, abre slice 2).
-- 2026-10-07 T5 DONE (writer general ses_ee87ff5caffe2O7ZhnT1AEORq8): corpus independiente + v2 baseline. Sin commit aún (slice 2).
+- 2026-10-07 T5 DONE (writer general ses_ee87ff5caffe2O7ZhnT1AEORq8): corpus independiente + v2 baseline. Commit 62b5c02 (T5 work-unit, slice 2).
+- 2026-10-07 T6 DONE (verificador general ses_ee87c01c2ffeC2X596Kyex1t1W): 10/10 criterios PASS, sin ediciones, árbol limpio. Parent spot-check: `node evals/run.mjs` 94/94 re-ejecutado OK.
 
 ## Verification evidence
 - T1: `node evals/run.mjs`: 88/88 passed. `node evals/integration.mjs`: 4/4 pass (INT-03 `untested-change-review`). `node tests/fase7_t6_integration.mjs`: 12 checks passed. `git diff --stat`: EVALUATION.md 1+/1-. Parent spot-check: diff mínimo docs→código OK, sin refs a `untested-change-escalate` (grep vacío), thresholds intactos.
@@ -71,7 +72,12 @@ tests/*.mjs
 ## Next step
 - T4: `node evals/run.mjs`: 88/88. `node evals/bench.mjs`: exit 0 stub default. `--live` sin backend: exit 2 refusal honesto (score, bench, manifest). `node tests/fase7_t5_bench_manifest.mjs`: 14 checks passed. `git diff --stat`: 4 files +288/-71 + nuevo `evals/live-client.mjs` (~10KB). Parent spot-check: solo las 5 superficies, stub default intacto OK.
 - T5: `node evals/run.mjs`: 94/94 (88 + 6 independent). `node evals/manifest.mjs --save`: versioned run v2 (manifest+bench+metrics, commit=e72c3c2). Estructurales: 14 + 10 + 12 checks passed; `--live` sin backend: exit 2. `git diff --stat`: 13 files +255/-16 + nuevo `evals/results/v2/`. Parent spot-check: v1 intacta, superficies OK.
-- Ejecutar T6 (verificación final + cierre + push? NO push sin usuario).
+- T6: verificador independiente 10/10 PASS (94/94, INT-03, exclusiones, N>64 default+paged, live refusal exit 2, v2 con v1 intacta, thresholds intactos, taus reporte, 14 checks, limpieza). Parent spot-check: 94/94 re-ejecutado OK, árbol limpio.
+- RDD: `review mode status` → on (global). `review assess --base-ref b90489c --committed-only` → risk high, `unassessable`: runtime opencode no elegible para receipt review inmutable (solo claude-code/codex); recomienda `disable --scope clone`. NO se tocó el switch (decisión del usuario). Verificación sustituta: self-checks por writer + verificador independiente T6 + spot-checks del padre por task.
+- Ningún check fallido, skipeado o pendiente: todos los comandos requeridos pasaron (ver T1-T6 arriba).
+
+## Next step
+- Decisiones del usuario: (1) push de `odd/harness-spike-ready` + PRs (slice 1: df0f0bc+53a0b6e+fd3f69a; slice 2: e72c3c2+62b5c02+commit de cierre) con estrategia stacked-to-main; (2) si deshabilitar RDD a nivel clone para este runtime o dejarlo on.
 
 ## Delivery
-- Estrategia: ask-on-risk → elegida stacked-to-main (2026-10-07, usuario). Forecast inicial ~350 quedó corto (T3 pesó 289). Running: ~410. Slice 1: df0f0bc (T1) + 53a0b6e (T2) + commit T3 (abajo); T4-T6 irán al slice 2 salvo que el usuario indique otra cosa.
+- Estrategia: ask-on-risk → elegida stacked-to-main (2026-10-07, usuario). Forecast inicial ~350 quedó corto (T3 pesó 289, T4+T5 grandes). Running: ~950 + v2 JSON (generados). Slice 1: df0f0bc (T1) + 53a0b6e (T2) + fd3f69a (T3). Slice 2: e72c3c2 (T4) + 62b5c02 (T5) + commit de cierre T6.
