@@ -752,7 +752,7 @@ Composed system (r3a lanes + qwen find), decision / task:
 | screen r3a | 10/12 | 10/12 (1 abstain, by design) |
 | rerank r3a | 12/12 | 12/12 — owns rerank |
 | find qwen | 12/12 | 12/12 (parked, F7 scope) |
-| **Composed** | **56/60** | **55/60** (54/60 as published in `v12`) |
+| **Composed** | **56/60** | **55/60** (54/60 as published in `v12`; `v16` re-measured 55/60 live 2026-10-10, see `evals/results/v16/`) |
 
 Method: per-primitive request builders over POST /predict (classify as-is;
 gate one POST per claim; screen text + 3 labels; rerank query-as-text vs
