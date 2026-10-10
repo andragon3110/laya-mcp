@@ -32,3 +32,14 @@ demás, probar en `main`, y después evaluar qué mejorar.
 - No test-first (consolidación, no behavior nuevo). Verificación = build +
   typecheck + suites offline + conteo de tools servables (14).
 - Live (sidecars/GPU) fuera de alcance: se reporta como no corrido.
+
+## Review outcome (RDD preflight, post-close)
+- `gentle_review inspect` → target `sha256:af60eb37…`, action `start`
+  (80 files, base `a2ce4f1` → candidate, committed-only).
+- Human granted review start via relay (2026-10-10).
+- `gentle_review start` → BLOCKED in preflight:
+  `lens_context_budget_exceeded` — no authority created, nothing to
+  abandon/repair, retrying this exact candidate cannot succeed.
+- Standing disposition (slice-based review, never accumulated monolith)
+  confirmed by the provider bound: split into a chained sequence of
+  smaller reviewable candidates, or leave unreviewed / disable switch.
