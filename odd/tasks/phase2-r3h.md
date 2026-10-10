@@ -26,3 +26,8 @@ parada: si r3h no mueve gate/screen task, training agotado (no hay r3i).
 - STOP RULE: gate/screen task inmóviles en 3 rounds ⇒ training agotado,
   no hay r3i. r3h adoptado como checkpoint final.
 - :8770 sirve r3h; r3g/r3f/r3a intactos.
+
+## RDD 1c908e7e (2026-10-10)
+- Inspect: monolith + r3h promotion, start offered
+  (lineage `review-244c6b1ba2d63423`). Human DECLINED (candidate-scoped).
+- No review invoked, no authority created.
