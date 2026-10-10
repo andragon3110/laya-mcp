@@ -28,7 +28,7 @@
 
 <p align="center">
   <b>Give your coding agent judgment calls instead of vibes.</b><br>
-  Fourteen MCP tools: twelve backed by local decision models — deterministic
+  Fourteen MCP tools: eleven backed by local decision models — deterministic
   evidence-plus-policy judgments (uncalibrated signals, never probabilities;
   see `EVALUATION.md` §6) your code can branch on, sort by, and gate with.
   <br><br>

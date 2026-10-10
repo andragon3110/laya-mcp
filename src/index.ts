@@ -5,12 +5,16 @@
  * Exposes 10 Laya judgment tools (laya_screen, laya_verify, laya_find, etc.)
  * backed by a local Laya instance reachable via HTTP at LAYA_URL, plus one
  * optional tool (laya_pii) backed by the GLiNER sidecar at GLINER_URL,
- * plus the always-advertised meta tool laya_capabilities (live discovery)
+ * plus three always-servable meta tools: laya_capabilities (live discovery),
+ * laya_escalations (backend-independent local sink) and laya_redact (pure
+ * transform) -- the last two need no backend and stay advertised with
+ * everything down.
  * (14 tools total with the sidecar up, 13 without it; 3 when Laya is down).
  *
  * Behaviour contract:
  *   - If the laya-server (Python) is NOT reachable, `tools/list` advertises
- *     ONLY laya_capabilities (fase-5 T5 exemption, so hosts can tell
+ *     ONLY the three backend-independent tools (laya_capabilities,
+ *     laya_escalations, laya_redact -- fase-5 T5 exemption, so hosts can
  *     MCP-alive/backend-down apart from MCP-dead) and every other
  *     `tools/call` returns `{isError: true, ...}` -- a capabilities call
  *     then also fails isError, carrying the backend diagnosis.

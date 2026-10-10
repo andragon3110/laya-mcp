@@ -85,7 +85,7 @@ are listed where they exist. Primitives come from `TOOL_PRIMITIVES`
 
 Notes:
 
-- `laya_capabilities` (tool 12, `src/tools/capabilities.ts`) judges
+- `laya_capabilities` (meta tool, `src/tools/capabilities.ts`) judges
   nothing: it probes `GET /models` + `GET /ready` live on every call
   (never a cached snapshot) and reports models, backend readiness,
   GLiNER sidecar state, primitives, currently servable tools (with a

@@ -1,5 +1,5 @@
 /**
- * Fase-5 T5: `laya_capabilities` -- live capability discovery (tool 12).
+ * Fase-5 T5: `laya_capabilities` -- live capability discovery (meta tool).
  *
  * Reports, probed LIVE on every call (never the HealthWatch snapshot):
  *   - `models`:   verbatim `GET /models` inventory (name/repo/loaded/
@@ -13,7 +13,8 @@
  *                  judgment tools using each (derived from TOOL_PRIMITIVES;
  *                  capabilities itself judges nothing, so it lists nowhere).
  *   - `tools`:    currently SERVABLE tools (10 laya tools + pii only while
- *                  gliner is live-ready + capabilities itself) with a
+ *                  gliner is live-ready + the three meta tools capabilities,
+ *                  escalations, redact -- the last two need no backend) with
  *                  SUMMARIZED output contract per tool (name, description,
  *                  primitive, input/output REQUIRED key lists -- the full
  *                  schemas stay on tools/list).
@@ -201,11 +202,6 @@ function summarizeTool(t: ToolDefinition): Record<string, unknown> {
   };
 }
 
-/**
- * Currently servable tools: the 10 laya tools (the caller already proved
- * laya-server is up) + pii only while gliner is live-ready + this tool.
- * Mirrors the tools/list advertisement for the same backend state.
- */
 /**
  * Currently servable tools: the 10 laya tools (the caller already proved
  * laya-server is up) + pii only while gliner is live-ready + the three meta
