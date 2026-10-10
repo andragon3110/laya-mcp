@@ -71,3 +71,9 @@ a time, in a `/tmp/rev-sliceN` detached worktree so `main` stays untouched.
   with lineageId + workspaceRoot /tmp/rev-s1a → re-forecast group →
   ack runs → collect → acknowledge-approved → remove worktree → S1b.
 - Rest of chain (S1b..S5) untouched, pending.
+
+## Monolith re-probe (2026-10-10)
+- New tip candidate `bb3fb335` (81 files, +review-slices.md): inspect →
+  start offered (lineage `review-1fa3e85e4c529424`), human granted,
+  START blocked in preflight: `lens_context_budget_exceeded`, no
+  authority, stop. Confirms the paused-chain strategy; no new decision.
