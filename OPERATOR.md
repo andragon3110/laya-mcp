@@ -57,8 +57,13 @@ port via `*_PORT` env); confirm against each file's header before running.
 ## Escalation workflow (the learning loop)
 
 1. Agents `log` every ESCALATE/abstain with `case_id` when from a run.
-2. Human triages `list` (status open) — suggested cadence: open queue to
+2. Before logging/storing/forwarding flagged text, `laya_redact` its PII
+   spans (from `laya_pii`/`laya_extract` findings — offsets compose directly,
+   both speak code points). Redact-then-log keeps the queue itself clean.
+3. Human triages `list` (status open) — suggested cadence: open queue to
    zero weekly; nothing acked = nothing learned.
-  Store: `var/escalations.jsonl` (gitignored) or `LAYA_ESCALATIONS_FILE`.
-  Acked records are training data: export the acked cases before each
-  micro-train (see `odd/tasks/phase2-data-templates.md` rule zero).
+4. `ack` files `{verdict, reviewer, note}` per id. Acked records are training
+   data: export the acked cases before each micro-train (see
+   `odd/tasks/phase2-data-templates.md` rule zero).
+5. Store: `var/escalations.jsonl` (gitignored) or `LAYA_ESCALATIONS_FILE`.
+   Back it up before trains; never commit it.

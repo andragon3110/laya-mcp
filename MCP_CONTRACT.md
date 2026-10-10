@@ -45,7 +45,7 @@ plus the Fase 6 additions (`tests/fase6_t3_trace_metrics.mjs`,
   builder vocabulary, never raw throws). `outputSchema` is therefore an
   announcement for clients, not a server-side gate.
 
-## 3. Tools (13)
+## 3. Tools (14)
 
 Twelve tools carry read-only annotations
 (`{readOnlyHint: true, destructiveHint: false, idempotentHint: true}`,
@@ -56,7 +56,10 @@ read-only inference: no side effects, no mutation. The thirteenth tool,
 `laya_escalations`, is the announced exception: a local abstention sink
 (append-only JSONL, `log`/`list`/`ack`) with
 `{readOnlyHint: false, destructiveHint: false, idempotentHint: false}`
-(`src/tools/escalations.ts`).
+(`src/tools/escalations.ts`). The fourteenth, `laya_redact`, keeps
+read-only annotations (a pure transform modifies nothing) but is not a
+judgment: it deterministically redacts caller-supplied spans
+(`src/tools/redact.ts`, §3.1).
 
 `input_required` / `output_required` below are the literal `required`
 arrays from the shipped schemas (dumped from `dist/`); optional inputs
@@ -78,6 +81,7 @@ are listed where they exist. Primitives come from `TOOL_PRIMITIVES`
 | `laya_pii` | `spans` | required: `text`; optional: `extra_types`, `risk` (`low`/`normal`/`high`, default `normal`; moves only the non-secret branch). Served only while the GLiNER sidecar is live-ready. | `pipeline`, `findings`, `counts`, `secrets_found`, `decision`, `latency_ms`, `recommendation`, `evidence`, `abstention` |
 | `laya_capabilities` | none (`null`) | optional: `timeout_ms` (integer, 100–30000, default 2000) | `models`, `backend`, `gliner`, `primitives`, `tools`, `policies`, `features`, `mode`, `schema_version`, `latency_ms` — plus OPTIONAL (never required) `modes`, `metrics` (Fase 6, §10), `measured` (r3a track, §3.1) |
 | `laya_escalations` | none (`null`) | required: `action` (`log`\|`list`\|`ack`); per-action fields, all optional except the action | `action`, `ok` — plus per-action `escalation_id`, `escalation`, `escalations`, `status`, `open`, `acked`, `store` (§3.1) |
+| `laya_redact` | none (`null`) | required: `text`, `findings [{start, end, entity_type?}]`; optional: `strategy` (`label` default, `placeholder`) | `redacted`, `spans_redacted`, `spans_dropped`, `strategy` (§3.1) |
 
 Notes:
 
@@ -108,7 +112,7 @@ Notes:
 - When laya-server is up but GLiNER is down, `laya_pii` is absent from
   the list and `gliner.reachable` is `false` in the capabilities report.
 
-### 3.1 `laya_escalations` + measured track numbers
+### 3.1 `laya_escalations` + `laya_redact` + measured track numbers
 
 - `laya_escalations` (tool 13, `src/tools/escalations.ts`) is the abstention
   sink: judgment tools say ESCALATE/abstain instead of guessing, and this
@@ -127,6 +131,15 @@ Notes:
   the versioned r3a track numbers agents route on (`MEASURED_TRACK` code
   truth, pinned by contract tests): 56/60 decision, 55/60 task, per-lane
   strings, method, assistive standing, `EVALUATION.md` §13 pointer.
+- `laya_redact` (tool 14, `src/tools/redact.ts`) deterministically redacts
+  caller-supplied spans (e.g. from `laya_pii`/`laya_extract`) before
+  logging, storing, or forwarding text. Strategies `label` (default,
+  `[REDACTED:<type>]`) and `placeholder` (`[REDACTED]`); offsets are Unicode
+  code points (matches the GLiNER producer; emoji-safe, pinned by test);
+  overlaps resolve earliest-wins/longest-wins-ties; empty findings and
+  malformed spans reject `invalid_argument`. Pure transform, no backend:
+  always advertised alongside capabilities (down-list is `[laya_capabilities,
+  laya_escalations, laya_redact]`).
 
 ## 4. Schemas
 
