@@ -806,9 +806,24 @@ still 0/22 and 0/32 (decisions up: gate 4/22, screen 7/32 with 7 abstained
 — abstention behavior grows, verdicts not yet). r1 lanes bit-identical →
 composed 56/60 + 56/60 held, no revert (`evals/results/v19/`).
 STOP RULE TRIGGERED: gate/screen task unmoved by three data rounds →
-training exhausted, no r3i. r3h adopted as the final checkpoint (strictly
+no more same-dose rounds (r3i reopened only under the new distillation
+mechanism, see below). r3h adopted as the checkpoint at the time (strictly
 no-worse, v2 gains); further gains need an abstention-aware objective
 or harder data, not more doses.
+
+`r3i` (2026-10-10, d3-distillation — the approved new mechanism, not
+another dose): SFT continuation from r3h (LR 2e-5, 2 epochs, 32s),
+mix 699 rows weight 1 (19 d3-ABSTAIN rows over constructed silences,
+agreement 19/24, truth ABSTAIN by construction, disagreements dropped;
+80 signed v2; 200 gate SUP/CON replay; 400 anchors; same shelving;
+eval-ids excluded). Eval-loss deltas all negative, no ABORT. Measured
+live on CPU: v2 classify 18/26 → 22/26, gate/screen task still 0/22
+and 0/32 (screen dec 7→11, abstention behavior keeps growing). r1 lanes
+bit-identical → composed 56/60 + 56/60 held, no revert
+(`evals/results/v20/`). r3i adopted (strictly no-worse, v2 gains).
+STOP DEFINITIVO: gate task en 0 tras el mecanismo nuevo ⇒ training
+agotado de verdad, no hay r3j. (Incidente en el camino: OOM por el
+bridge d3 ocupando VRAM — se apagó el bridge y el run salió limpio.)
 
 Open gaps (4 r1 misses, each dispositioned): the r1 classify EN case is
 RESOLVED by r3f (12/12 — `other` training worked); remaining: 2 gate
