@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "test": "npm run typecheck && npm run build && node tests/fase5_t3_contract.mjs && node tests/fase5_t4_envelope.mjs && node tests/fase5_t5_capabilities.mjs && node tests/fase5_t6_contract_gaps.mjs && node tests/redact.mjs && node tests/escalations.mjs && node tests/policy_engine.mjs && node evals/run.mjs && node evals/run.mjs --corpus r1 && bash tests/test_tools_offline.sh",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
     "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
