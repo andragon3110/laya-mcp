@@ -434,7 +434,10 @@ export class GliclassClient {
       const item = m ? items[Number(m[1])] : null;
       const text = typeof item?.text === "string" ? item.text : (typeof state === "string" ? state : null);
       if (typeof text !== "string" || text === "") continue; // omit -> handler abstains
-      const labels = Object.keys(questions[key]?.criteria ?? {}).filter((l) => l !== "other" && l !== "manual_review");
+      // `other` passes through: the catalog carries it as an explicit class
+      // (classify-other-lane: measured +1 ES, EN accepted miss). `manual_review`
+      // stays excluded — operator escalation, never a model choice.
+      const labels = Object.keys(questions[key]?.criteria ?? {}).filter((l) => l !== "manual_review");
       if (labels.length === 0) continue;
       const { top, latencyMs: ms } = await this.postLogged("classify", key, text, labels, opts);
       latencyMs += ms;
