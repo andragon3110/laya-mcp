@@ -8,10 +8,14 @@
   <img src="https://img.shields.io/badge/python-3.10%2B-yellow" alt="python 3.10+">
   <img src="https://img.shields.io/badge/node-20%2B-brightgreen" alt="node 20+">
   <img src="https://img.shields.io/badge/AI-local%20%7C%20%240%20%7C%20multilingual-purple" alt="local, free, multilingual">
-  <img src="https://img.shields.io/badge/status-paused-lightgrey" alt="status paused">
+  <img src="https://img.shields.io/badge/status-gliclass_track_active-blue" alt="status: gliclass track active">
 </p>
 
-> ⏸️ **PAUSED — This project is on hold.**
+> 🔬 **GLiClass track ACTIVE (Oct 2026) — Laya baseline verdict below unchanged.**
+>
+> A finetuned GLiClass track (r3a, local, CPU) now measures composed **56/60 decision, 55/60 task** on the 60-case r1 gold set (48 over r3a lanes + 12 find, qwen) — scored live twice with identical numbers. r3a **owns rerank (12/12)**; gate/screen run **assistive with honest abstention**, not autonomous. Evidence: `EVALUATION.md` §13, `evals/results/v12/`, `odd/tasks/r3a-lanes.md`, `odd/tasks/classify-other-lane.md`.
+>
+> ⏸️ **PAUSED — Laya-judge track (verdict stands).**
 >
 > laya-mcp had a good idea (local, typed judgment calls for coding agents), but the underlying models are not at the required level yet. After 8 build phases plus 4 independent live-measurement spikes (GPU), we found:
 >

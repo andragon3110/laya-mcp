@@ -734,3 +734,48 @@ absent), `compileall` pass. Known environmental states, unchanged:
 need bash, no lint script exists. No tests deleted or weakened; zero
 functional changes in `src/` (the Fase 7 diff adds only `evals/`,
 `tests/`, `evals/results/v1/`, and this document).
+## 13. GLiClass r3a track (Oct 2026, live CPU)
+
+The Laya-track verdicts above stand. This section records the separate
+finetuned-GLiClass track: checkpoint `run-20261009T055724Z-r3a` (local,
+CPU, served by `py/gliclass_server.py` on `:8770`), measured live over the
+60-case r1 gold set (48 over the four r3a lanes + 12 find via qwen).
+Full method and per-task close-out in `odd/tasks/r3a-lanes.md`;
+the `other`-lane follow-up in `odd/tasks/classify-other-lane.md`.
+
+Composed system (r3a lanes + qwen find), decision / task:
+
+| Lane | Decision | Task |
+|---|---|---|
+| classify r3a | 12/12 | 11/12 (10/12 before the `other`-lane fix) |
+| gate r3a | 10/12 | 10/12 |
+| screen r3a | 10/12 | 10/12 (1 abstain, by design) |
+| rerank r3a | 12/12 | 12/12 — owns rerank |
+| find qwen | 12/12 | 12/12 (parked, F7 scope) |
+| **Composed** | **56/60** | **55/60** (54/60 as published in `v12`) |
+
+Method: per-primitive request builders over POST /predict (classify as-is;
+gate one POST per claim; screen text + 3 labels; rerank query-as-text vs
+candidate labels), argmax adjudication inside the real handlers, raw
+scores/margins preserved per row. Gate routing OFF (ABSTAIN golds score
+SUPPORTED ~0.98: thresholds dead, training avenue exhausted); screen
+τ=0.2 from 580 held-out validation rows (never tuned on r1); fixed
+argmax→band magnitudes at public policy centers. Checkpoint pin lives
+lane-side (run-dir + path + computed sha256 in the manifest); the server
+reports revision unpinned by honesty contract, never invented.
+
+Per-version notes: `v5`–`v10` round-1 live matrix over several backends
+(branches `review/c4v5`…`c4v10`); `v11` the four r3a lanes + versioned
+smoke (`evals/smoke-r3a-lanes.mjs`) + composed table; `v12` validated
+screen-margin routing; `v13` confirmation re-measure (scores identical —
+deterministic on CPU); `v14` (held in `/tmp/v14`, same backend and data)
+the `other`-lane fix, task 54/60 → 55/60 with exactly one case changed
+in 48 and zero regressions.
+
+Open gaps (5 misses, each dispositioned): 1 classify EN (lane-structural,
+needs `other` training data), 2 gate ABSTAIN→SUPPORTED (needs
+abstention-aware training objective), 1 screen confident (accepted),
+1 screen abstained (excluded, monitored). Data-collection templates for
+the trainable gaps in `odd/tasks/phase2-data-templates.md`; first draft
+batch (20, signed 2026-10-10, promoted to `evals/corpus-v2/`) in `odd/tasks/phase2-draft-cases.md`.
+Until then gate/screen are assistive (abstention-first), not autonomous.

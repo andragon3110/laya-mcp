@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "declaration": true,
     "sourceMap": true,
-    "resolveJsonModule": true,
+    "types": ["node"],
     "lib": ["ES2022"]
   },
   "include": ["src/**/*"],
