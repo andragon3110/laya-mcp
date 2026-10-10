@@ -19,7 +19,7 @@ against server sources (ports/envs); the gliclass bring-up was boot-verified
 ## Bring-up (verified: gliclass)
 
 ```bash
-GLICLASS_MODEL=/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint \
+GLICLASS_MODEL=/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T185106Z-r3g/checkpoint \
   py/.venv-r1/bin/python py/gliclass_server.py
 # ready check: curl -s http://127.0.0.1:8770/ready
 # model loads lazily on first POST /predict (~7s CPU for the 557M checkpoint)

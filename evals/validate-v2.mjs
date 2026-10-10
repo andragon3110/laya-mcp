@@ -1,7 +1,7 @@
 /**
  * Phase-2 validation baseline (pre-training, READ-ONLY measurement).
  *
- * Runs the signed v2 split (20 cases: 10 classify + 4 gate + 6 screen)
+ * Runs the signed v2 split (60 cases: 26 classify + 12 gate + 22 screen)
  * through the live gliclass(r3a) lanes and records the baseline a future
  * micro-train must beat. Modeled on evals/smoke-r3a-lanes.mjs --matrix:
  * same lane clients, same scoreIndependentDecision, same row shape.
@@ -117,9 +117,9 @@ fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(
   path.join(outDir, "metrics.json"),
   JSON.stringify({
-    generated: "phase-2 validation BASELINE (pre-training, read-only): signed v2 batch-1 (20) over live gliclass(r3a)",
+    generated: "phase-2 validation (read-only): signed v2 batches 1+2 (60) over live gliclass",
     backend: "gliclass(r3a) :8770",
-    corpus: "v2-batch-1",
+    corpus: "v2-batch-1+2",
     timeout_ms: LANE_CALL_TIMEOUT_MS,
     summary,
     lanes: Object.fromEntries(LANES.map((lane) => [lane, { summary: summary[lane], rows: laneRows[lane] }])),

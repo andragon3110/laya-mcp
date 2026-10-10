@@ -784,6 +784,18 @@ Measured live on CPU: v2 classify task 2/10 → 3/10 (gate/screen still
 composed 56/60 decision, 56/60 task (`evals/results/v17/`). r3f promoted
 to the recommended checkpoint and the advertised track numbers.
 
+`r3g` (2026-10-10, batches 1+2): SFT continuation from r3f (LR 2e-5,
+2 epochs, 46s, VRAM 2.8GB), mix 660 rows weight 1 (60 signed v2:
+26 classify-other + 12 gate-ABSTAIN + 22 screen-suspicious; 200 gate
+SUP/CON replay; 400 anchors; same shelving; eval-ids excluded).
+Eval-loss deltas tiny (full −0.001, gate +0.013, no ABORT, spike < 0.3).
+Measured live on CPU: v2 classify task 3/10 → 5/10 on the batch-1 subset
+(11/16 on batch 2; 16/26 overall), gate/screen task still 0/12 and 0/22
+but several ABSTAIN golds collapsed toward the abstention region
+(SUPPORTED 0.98 → 0.26/0.36 on three cases — signal, not yet decisions).
+r1 lanes bit-identical to r3f → composed 56/60 + 56/60 held, no revert
+(`evals/results/v18/`). r3g promoted to the recommended checkpoint.
+
 Open gaps (4 r1 misses, each dispositioned): the r1 classify EN case is
 RESOLVED by r3f (12/12 — `other` training worked); remaining: 2 gate
 ABSTAIN→SUPPORTED (needs abstention-aware training objective),
