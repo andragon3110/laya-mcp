@@ -10,8 +10,8 @@
  * are mirrored as schema maximums (checked both ways).
  *
  * Part B (live list, stub backend): a stub Laya HTTP server answers
- * GET /live + GET /ready so tools/list advertises 12 tools (10 + T5
- * laya_capabilities + laya_escalations; gliner down so no pii);
+ * GET /live + GET /ready so tools/list advertises 13 tools (10 + T5
+ * laya_capabilities + laya_escalations + laya_redact; gliner down so no pii);
  * every wire entry must carry outputSchema + annotations, which also proves
  * the payload passes the SDK's own ListToolsResultSchema validation inside
  * client.listTools().
@@ -452,15 +452,15 @@ try {
   // while the watcher still probes) precedes the steady 11-tool list.
   while (Date.now() < deadline) {
     const res = await client.listTools();
-    if (res.tools.length === 12) {
+    if (res.tools.length === 13) {
       tools = res.tools;
       break;
     }
     await new Promise((r) => setTimeout(r, 300));
   }
-  assert.equal(tools.length, 12, `12 tools advertised with stub laya up, gliner down (got ${tools.length})`);
+  assert.equal(tools.length, 13, `13 tools advertised with stub laya up, gliner down (got ${tools.length})`);
   passed++;
-  console.log("ok - tools/list advertises 12 tools against stub backend (fase-5 T5: 10 + laya_capabilities + laya_escalations)");
+  console.log("ok - tools/list advertises 13 tools against stub backend (fase-5 T5: 10 + laya_capabilities + laya_escalations + laya_redact)");
   for (const t of tools) {
     assert.equal(t.outputSchema?.type, "object", `${t.name} wire outputSchema type`);
     assert.ok(

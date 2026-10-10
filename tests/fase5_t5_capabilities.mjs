@@ -264,9 +264,9 @@ await check("servableTools mirrors the list advertisement (pii iff gliner)", () 
   assert.deepEqual(names(servableTools(false)), [
     "laya_screen", "laya_verify", "laya_find", "laya_rerank", "laya_classify",
     "laya_decide", "laya_compare", "laya_extract", "laya_review", "laya_gate",
-    "laya_capabilities", "laya_escalations",
+    "laya_capabilities", "laya_escalations", "laya_redact",
   ]);
-  assert.deepEqual(names(servableTools(true)).length, 13);
+  assert.deepEqual(names(servableTools(true)).length, 14);
   assert.ok(names(servableTools(true)).includes("laya_pii"), "pii served when gliner ready");
   for (const t of Object.keys(TOOL_PRIMITIVES)) {
     assert.ok(["noul", "choice", "score", "spans"].includes(TOOL_PRIMITIVES[t]), `${t} primitive known`);
@@ -432,8 +432,8 @@ const DEAD_PORT = 9;
 
 try {
   await withServer({ layaPort, glinerPort }, async (client) => {
-    await check("live list advertises 13 tools (11+pii+capabilities+escalations, SDK-validated)", async () => {
-      const tools = await waitForList(client, 13, "both backends up");
+    await check("live list advertises 14 tools (11+pii+capabilities+escalations+redact, SDK-validated)", async () => {
+      const tools = await waitForList(client, 14, "both backends up");
       const cap = tools.find((t) => t.name === "laya_capabilities");
       assert.ok(cap, "capabilities advertised");
       assert.equal(cap.outputSchema?.type, "object");
@@ -441,7 +441,7 @@ try {
     });
     await check("live capabilities: real models/policies/features, observe mode, structured==text", async () => {
       const res = await client.callTool({ name: "laya_capabilities", arguments: {} });
-      const parsed = checkCapabilitiesEnvelope(res, { expectTools: 13, expectGlinerReachable: true });
+      const parsed = checkCapabilitiesEnvelope(res, { expectTools: 14, expectGlinerReachable: true });
       assert.deepStrictEqual(parsed.gliner.models, STUB_GLINER_MODELS, "gliner models verbatim");
       assert.equal(parsed.gliner.ready, true);
       // Explicit schema fit on top of the SDK's own -32602 validation.
@@ -459,18 +459,18 @@ try {
 
   await withServer({ layaPort, glinerPort: DEAD_PORT }, async (client) => {
     await check("gliner down: capabilities succeeds, pii absent, reachable:false", async () => {
-      const tools = await waitForList(client, 12, "laya up, gliner down");
+      const tools = await waitForList(client, 13, "laya up, gliner down");
       assert.ok(!tools.some((t) => t.name === "laya_pii"), "pii not advertised");
       const res = await client.callTool({ name: "laya_capabilities", arguments: {} });
-      checkCapabilitiesEnvelope(res, { expectTools: 12, expectGlinerReachable: false });
+      checkCapabilitiesEnvelope(res, { expectTools: 13, expectGlinerReachable: false });
       assert.deepStrictEqual(JSON.parse(res.content[0].text).gliner.models, [], "gliner models [] when down");
     });
   });
 
   await withServer({ layaPort: DEAD_PORT, glinerPort }, async (client) => {
     await check("laya down: list advertises ONLY the backend-independent tools (T5 exemption + escalations)", async () => {
-      const tools = await waitForList(client, 2, "laya down");
-      assert.deepStrictEqual(tools.map((t) => t.name), ["laya_capabilities", "laya_escalations"]);
+      const tools = await waitForList(client, 3, "laya down");
+      assert.deepStrictEqual(tools.map((t) => t.name), ["laya_capabilities", "laya_escalations", "laya_redact"]);
       assert.equal(tools[0].outputSchema?.type, "object", "exempted entry carries its schema");
     });
     await check("laya down: capabilities call fails isError with the diagnosis", async () => {

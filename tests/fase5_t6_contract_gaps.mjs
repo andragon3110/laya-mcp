@@ -12,7 +12,7 @@
  *                          (Part A2): NEGATIVES the handlers never emit --
  *                          nested bad enums, null-vs-object swaps, dropped
  *                          nested required keys, array/object confusions --
- *                          two per tool for all 13 tools (capabilities + escalations incl).
+ *                          two per tool for all 14 tools (capabilities + escalations + redact incl).
  *   MCP contract ......... T3 proves tools/list publishes outputSchema +
  *                          annotations (SDK-validated); T5 proves the
  *                          capabilities list/call contract incl. the laya-down
@@ -78,6 +78,7 @@ import { reviewTool } from "../dist/tools/review.js";
 import { gateTool } from "../dist/tools/gate.js";
 import { piiTool } from "../dist/tools/pii.js";
 import { capabilitiesTool } from "../dist/tools/capabilities.js";
+import { redactTool } from "../dist/tools/redact.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.join(HERE, "..", "dist", "index.js");
@@ -406,6 +407,19 @@ const FIXTURES = [
       ["features missing four of five flags", (o) => ({ ...o, features: { top_k: {} } })],
     ],
   },
+  {
+    tool: redactTool,
+    validOutput: {
+      redacted: "token [REDACTED:secret] here",
+      spans_redacted: 1,
+      spans_dropped: 0,
+      strategy: "label",
+    },
+    negatives: [
+      ["redacted null (handler always emits the string)", (o) => ({ ...o, redacted: null })],
+      ["spans_redacted string (handler always emits the count)", (o) => ({ ...o, spans_redacted: "1" })],
+    ],
+  },
 ];
 
 const ENVELOPE_KEYS = new Set(Object.keys(envelopeMetadataProperties()));
@@ -572,6 +586,10 @@ const VALID_CALLS = [
   { name: "laya_gate", args: { request: "fix", diff: "+line", claims: ["tests pass"] } },
   { name: "laya_pii", args: { text: "hello world" } },
   { name: "laya_capabilities", args: {} },
+  {
+    name: "laya_redact",
+    args: { text: "token sk-abc123 here", findings: [{ start: 6, end: 15, entity_type: "secret" }] },
+  },
 ];
 
 // Per judgment tool: args the builders reject BEFORE any backend round-trip.
@@ -607,6 +625,8 @@ const INVALID_CALLS = [
   { name: "laya_pii", args: { text: "x".repeat(50001) }, vocabulary: /input_too_large/ },
   // Non-judgment tool: unknown actions reject before any store touch (no backend needed).
   { name: "laya_escalations", args: { action: "nope" }, vocabulary: /invalid_argument/ },
+  // Pure transform: empty findings reject before any slicing (no backend needed).
+  { name: "laya_redact", args: { text: "abc", findings: [] }, vocabulary: /invalid_argument/ },
 ];
 
 const { laya, gliner } = stubBackends();
@@ -631,12 +651,12 @@ try {
   const deadline = Date.now() + 20000;
   for (;;) {
     const listed = await client.listTools();
-    if (listed.tools.length === 13) break;
-    assert.ok(Date.now() < deadline, `13 tools advertised (got ${listed.tools.length})`);
+    if (listed.tools.length === 14) break;
+    assert.ok(Date.now() < deadline, `14 tools advertised (got ${listed.tools.length})`);
     await new Promise((r) => setTimeout(r, 300));
   }
 
-  // Part B1: old-client back-compat sweep over all 12 tools. Each success
+  // Part B1: old-client back-compat sweep over all 14 tools. Each success
   // through client.callTool ALSO re-proves outputSchema fit: the SDK client
   // validates structuredContent itself and would reject with -32602.
   const byName = Object.fromEntries(FIXTURES.map((f) => [f.tool.name, f.validOutput]));

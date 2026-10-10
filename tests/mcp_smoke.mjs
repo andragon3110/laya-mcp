@@ -58,8 +58,8 @@ await client.connect(transport);
 try {
   // Settle loop (race fix): retry tools/list until the backend-backed set
   // shows up (laya_extract present) or the wait budget ends. With the
-  // backends up the first poll flips the list from 1 to 11/12 tools; with
-  // everything down the list stays at 1 and the asserts below FAIL by design.
+  // backends up the first poll flips the list from 3 to 13/14 tools; with
+  // everything down the list stays at 3 and the asserts below FAIL by design.
   let tools = [];
   {
     const deadline = Date.now() + TOOL_WAIT_S * 1000;

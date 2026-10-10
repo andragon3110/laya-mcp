@@ -6,7 +6,7 @@
  * backed by a local Laya instance reachable via HTTP at LAYA_URL, plus one
  * optional tool (laya_pii) backed by the GLiNER sidecar at GLINER_URL,
  * plus the always-advertised meta tool laya_capabilities (live discovery)
- * (13 tools total with the sidecar up, 12 without it; 2 when Laya is down).
+ * (14 tools total with the sidecar up, 13 without it; 3 when Laya is down).
  *
  * Behaviour contract:
  *   - If the laya-server (Python) is NOT reachable, `tools/list` advertises
@@ -50,6 +50,7 @@ import { gateTool, handleGate } from "./tools/gate.js";
 import { piiTool, handlePii } from "./tools/pii.js";
 import { capabilitiesTool, handleCapabilities } from "./tools/capabilities.js";
 import { escalationsTool, handleEscalations } from "./tools/escalations.js";
+import { redactTool, handleRedact } from "./tools/redact.js";
 
 // T5: enforced per tool call in runTool (src/tool.ts); logged here at startup.
 // Per-tool budgets (if ever needed) belong to T6.
@@ -91,6 +92,7 @@ const HANDLERS: Record<
   laya_pii: handlePii,
   laya_capabilities: handleCapabilities,
   laya_escalations: handleEscalations,
+  laya_redact: handleRedact,
 };
 
 const client = new LayaClient();
@@ -140,7 +142,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   // with the backend diagnosis). This keeps the agent from attempting
   // judgment calls that would just fail, without hiding the server itself.
   if (!health.current().ready) {
-    return { tools: [toListEntry(capabilitiesTool), toListEntry(escalationsTool)] };
+    return { tools: [toListEntry(capabilitiesTool), toListEntry(escalationsTool), toListEntry(redactTool)] };
   }
   const tools = [...BASE_TOOLS];
   if (ctx.glinerReady()) {
@@ -148,6 +150,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   }
   tools.push(capabilitiesTool);
   tools.push(escalationsTool);
+  tools.push(redactTool);
   return {
     tools: tools.map((t) => toListEntry(t)),
   };
