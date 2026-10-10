@@ -29,3 +29,8 @@ nuevas (vs 20 de r3f) atacando los 3 gaps medidos.
 - r1 56/60 + 56/60 idéntico a r3f: sin reversión. v18 publicado.
 - Promovido (track r3g, OPERATOR, README, §13). Batería verde.
 - :8770 sirve r3g; r3f y r3a intactos.
+
+## RDD fc6a0d33 (2026-10-10)
+- Inspect: monolith + r3g promotion, start offered
+  (lineage `review-5be5171415bb636f`). Human DECLINED (candidate-scoped).
+- No review invoked, no authority created.
