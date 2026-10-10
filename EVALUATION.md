@@ -770,12 +770,26 @@ smoke (`evals/smoke-r3a-lanes.mjs`) + composed table; `v12` validated
 screen-margin routing; `v13` confirmation re-measure (scores identical —
 deterministic on CPU); `v14` (held in `/tmp/v14`, same backend and data)
 the `other`-lane fix, task 54/60 → 55/60 with exactly one case changed
-in 48 and zero regressions.
+in 48 and zero regressions; `v16` the r3a re-measure on current source
+(live CPU 2026-10-10, 56/60 + 55/60, `evals/results/v16/`).
 
-Open gaps (5 misses, each dispositioned): 1 classify EN (lane-structural,
-needs `other` training data), 2 gate ABSTAIN→SUPPORTED (needs
-abstention-aware training objective), 1 screen confident (accepted),
-1 screen abstained (excluded, monitored). Data-collection templates for
+`r3f` (2026-10-10, train-now with batch 1): SFT continuation from r3a
+(LR 2e-5, 2 epochs, 34s, VRAM 2.7GB, RTX 3050), mix 620 rows weight 1
+(20 signed v2: 10 classify-other + 4 gate-ABSTAIN + 6 screen-suspicious;
+200 gate SUP/CON replay; 400 classify/rerank/find/screen anchors;
+abstain/screen-slice/boilerplate/hardneg shelved; eval-ids excluded).
+Eval-loss deltas all negative (full −0.034, no ABORT, spike 0.07).
+Measured live on CPU: v2 classify task 2/10 → 3/10 (gate/screen still
+0/4, 0/6); r1 lanes classify 12/12 task (was 11/12), rest identical →
+composed 56/60 decision, 56/60 task (`evals/results/v17/`). r3f promoted
+to the recommended checkpoint and the advertised track numbers.
+
+Open gaps (4 r1 misses, each dispositioned): the r1 classify EN case is
+RESOLVED by r3f (12/12 — `other` training worked); remaining: 2 gate
+ABSTAIN→SUPPORTED (needs abstention-aware training objective),
+1 screen confident (accepted), 1 screen abstained (excluded, monitored).
+v2 other-negatives still miss 7/10 — lote-2 data territory, not a lane
+regression. Data-collection templates for
 the trainable gaps in `odd/tasks/phase2-data-templates.md`; first draft
 batch (20, signed 2026-10-10, promoted to `evals/corpus-v2/`) in `odd/tasks/phase2-draft-cases.md`.
 Until then gate/screen are assistive (abstention-first), not autonomous.

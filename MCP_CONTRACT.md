@@ -125,11 +125,11 @@ Notes:
   `<repo>/var/escalations.jsonl` (gitignored runtime state, never
   committed). Unknown action/id/field rejects `invalid_argument` (isError).
   Needs no backend: always advertised alongside capabilities (down-list is
-  `[laya_capabilities, laya_escalations]`, `src/index.ts`). First
+  `[laya_capabilities, laya_escalations, laya_redact]`, `src/index.ts`). First
   non-readonly tool — announced in `annotations`, not smuggled.
 - `measured` (OPTIONAL `laya_capabilities` key, never required) publishes
-  the versioned r3a track numbers agents route on (`MEASURED_TRACK` code
-  truth, pinned by contract tests): 56/60 decision, 55/60 task, per-lane
+  the versioned r3f track numbers agents route on (`MEASURED_TRACK` code
+  truth, pinned by contract tests): 56/60 decision, 56/60 task, per-lane
   strings, method, assistive standing, `EVALUATION.md` §13 pointer.
 - `laya_redact` (tool 14, `src/tools/redact.ts`) deterministically redacts
   caller-supplied spans (e.g. from `laya_pii`/`laya_extract`) before

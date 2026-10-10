@@ -489,9 +489,9 @@ await check("measured track numbers: optional, pinned, every lane string", () =>
   const out = capabilitiesTool.outputSchema;
   assert.ok(out.properties?.measured !== undefined, "measured described");
   assert.ok(!out.required.includes("measured"), "measured optional (stored outputs keep validating)");
-  assert.equal(MEASURED_TRACK.track, "gliclass-r3a");
+  assert.equal(MEASURED_TRACK.track, "gliclass-r3f");
   assert.equal(MEASURED_TRACK.composed.decision, "56/60");
-  assert.equal(MEASURED_TRACK.composed.task, "55/60");
+  assert.equal(MEASURED_TRACK.composed.task, "56/60");
   for (const lane of ["classify", "gate", "screen", "rerank", "find"]) {
     const l = MEASURED_TRACK.lanes[lane];
     assert.match(l.decision, /^\d+\/\d+$/, `${lane} decision scored`);

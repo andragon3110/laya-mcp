@@ -13,7 +13,7 @@
 
 > 🔬 **GLiClass track ACTIVE (Oct 2026) — Laya baseline verdict below unchanged.**
 >
-> A finetuned GLiClass track (r3a, local, CPU) now measures composed **56/60 decision, 55/60 task** on the 60-case r1 gold set (48 over r3a lanes + 12 find, qwen) — scored live twice with identical numbers. r3a **owns rerank (12/12)**; gate/screen run **assistive with honest abstention**, not autonomous. Evidence: `EVALUATION.md` §13, `evals/results/v12/`, `odd/tasks/r3a-lanes.md`, `odd/tasks/classify-other-lane.md`.
+> A finetuned GLiClass track (r3f, local, CPU) now measures composed **56/60 decision, 56/60 task** on the 60-case r1 gold set (48 over r3f lanes + 12 find, qwen) — r3a measured 56/60 + 55/60 twice identically before promotion. r3f **owns rerank (12/12)**; gate/screen run **assistive with honest abstention**, not autonomous. Evidence: `EVALUATION.md` §13, `evals/results/v16/`, `evals/results/v17/`, `odd/tasks/r3a-lanes.md`, `odd/tasks/classify-other-lane.md`.
 >
 > ⏸️ **PAUSED — Laya-judge track (verdict stands).**
 >

@@ -165,26 +165,28 @@ export function buildFeatures(): Record<string, unknown> {
 
 /**
  * Measured track numbers (self-reported eval results, versioned with the code).
- * r3a GLiClass track, r1 corpus, live CPU — see EVALUATION.md §13 for method
- * and per-version notes. Strings, not floats: agents route on them, they are
+ * r3f GLiClass track (promoted from r3a 2026-10-10; r3a history in §13),
+ * r1 corpus, live CPU — see EVALUATION.md §13 for method and per-version
+ * notes. Strings, not floats: agents route on them, they are
  * not probabilities. Updated by hand when a new measured track lands; the
  * test pins every lane string so stale numbers fail loudly.
  */
 export const MEASURED_TRACK = {
-  track: "gliclass-r3a",
+  track: "gliclass-r3f",
   date: "2026-10-10",
-  corpus: "r1 (60 golds: 48 over r3a lanes + 12 find)",
-  backend: "run-20261009T055724Z-r3a checkpoint, CPU",
-  composed: { decision: "56/60", task: "55/60" },
+  corpus: "r1 (60 golds: 48 over r3f lanes + 12 find)",
+  backend: "run-20261010T183117Z-r3f checkpoint, CPU",
+  composed: { decision: "56/60", task: "56/60" },
   lanes: {
-    classify: { decision: "12/12", task: "11/12" },
+    classify: { decision: "12/12", task: "12/12" },
     gate: { decision: "10/12", task: "10/12" },
     screen: { decision: "10/12", task: "10/12", abstained: 1 },
     rerank: { decision: "12/12", task: "12/12" },
     find: { decision: "12/12", task: "12/12", lane: "qwen (parked)" },
   },
   method:
-    "live POST /predict per primitive, argmax adjudication; screen tau=0.2 " +
+    "live POST /predict per gliclass lane, argmax adjudication; find lanes " +
+    "from stored qwen/gte manifests (unchanged, parked); screen tau=0.2 " +
     "from 580 validation rows (never r1); gate routing OFF; fixed magnitudes " +
     "at public policy centers; raw margins preserved per row",
   standing: "assistive with honest abstention, not autonomous (gate/screen)",

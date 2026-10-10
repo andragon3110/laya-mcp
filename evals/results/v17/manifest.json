@@ -1,0 +1,373 @@
+{
+  "generated": "r3a-lanes G4 reproducibility manifest (LIVE backend gliclass(r3a); absolutes + method, no improvement claims, no promotion)",
+  "date": "2026-10-10T18:34:18.720Z",
+  "commit": "69fd18dd2b43cdb08a4a35181576438247f44e40",
+  "commit_short": "69fd18d",
+  "model": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+  "model_note": "live backend model inventory name at :8770 (verbatim probe; the r3a checkpoint path when served locally)",
+  "model_revision": null,
+  "model_revision_source": "unpinned",
+  "model_revision_note": "the gliclass sidecar reports no revision pin (revision null + unpinned, never invented); the checkpoint pin lives in the r3a block (run-dir + path + computed sha256)",
+  "tokenizer": "unknown",
+  "tokenizer_note": "explicit unknown: no tool or probe exposes a tokenizer",
+  "device": "cpu",
+  "device_note": "probed LIVE from GET /ready (or the explicit unknown string when the backend reported no device)",
+  "backend": {
+    "mode": "live",
+    "live": true,
+    "reachable": true,
+    "baseUrl": "http://127.0.0.1:8770",
+    "lane_env": "GLICLASS_MODEL=/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261009T055724Z-r3a/checkpoint (server env; from_pretrained accepts the local path verbatim)",
+    "ready": true,
+    "device": "cpu",
+    "models": [
+      {
+        "name": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+        "repo": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu"
+      }
+    ],
+    "model": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+    "revisions": {
+      "laya": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "LAYA_MODEL_REVISION"
+      },
+      "gliner": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GLINER_MODEL_REVISION"
+      },
+      "rerank": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "RERANK_MODEL_REVISION"
+      },
+      "d1": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "D1_MODEL_REVISION"
+      },
+      "gliclass": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GLICLASS_MODEL_REVISION"
+      },
+      "policylm": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "POLICYLM_MODEL_REVISION"
+      },
+      "promptguard": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "PROMPTGUARD_MODEL_REVISION"
+      },
+      "gte": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GTE_MODEL_REVISION"
+      }
+    },
+    "probes": {
+      "classifyxgliclass": {
+        "baseUrl": "http://127.0.0.1:8770",
+        "service": "gliclass-server",
+        "reachable": true,
+        "ready": true,
+        "ready_reason": "ready",
+        "device": "cpu",
+        "models": [
+          {
+            "name": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+            "repo": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu"
+          }
+        ],
+        "model": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+        "probe_status": {
+          "ready": 200,
+          "models": 200
+        }
+      },
+      "gatexgliclass": {
+        "baseUrl": "http://127.0.0.1:8770",
+        "service": "gliclass-server",
+        "reachable": true,
+        "ready": true,
+        "ready_reason": "ready",
+        "device": "cpu",
+        "models": [
+          {
+            "name": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+            "repo": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu"
+          }
+        ],
+        "model": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+        "probe_status": {
+          "ready": 200,
+          "models": 200
+        }
+      },
+      "screenxgliclass": {
+        "baseUrl": "http://127.0.0.1:8770",
+        "service": "gliclass-server",
+        "reachable": true,
+        "ready": true,
+        "ready_reason": "ready",
+        "device": "cpu",
+        "models": [
+          {
+            "name": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+            "repo": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu"
+          }
+        ],
+        "model": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+        "probe_status": {
+          "ready": 200,
+          "models": 200
+        }
+      },
+      "rerankxgliclass": {
+        "baseUrl": "http://127.0.0.1:8770",
+        "service": "gliclass-server",
+        "reachable": true,
+        "ready": true,
+        "ready_reason": "ready",
+        "device": "cpu",
+        "models": [
+          {
+            "name": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+            "repo": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu"
+          }
+        ],
+        "model": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint",
+        "probe_status": {
+          "ready": 200,
+          "models": 200
+        }
+      }
+    },
+    "note": "r3a checkpoint served through the production gliclass sidecar (py/gliclass_server.py, unchanged: S1-S4 need no server change); gate fan-out = one POST per claim lane-side; omission lives lane-side (server always returns scores)"
+  },
+  "backend_revisions": {
+    "laya": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "LAYA_MODEL_REVISION"
+    },
+    "gliner": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLINER_MODEL_REVISION"
+    },
+    "rerank": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "RERANK_MODEL_REVISION"
+    },
+    "d1": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "D1_MODEL_REVISION"
+    },
+    "gliclass": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLICLASS_MODEL_REVISION"
+    },
+    "policylm": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "POLICYLM_MODEL_REVISION"
+    },
+    "promptguard": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "PROMPTGUARD_MODEL_REVISION"
+    },
+    "gte": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GTE_MODEL_REVISION"
+    }
+  },
+  "backend_revisions_note": "per-backend revision pins (env pins win, else backend-reported, else unpinned null; a hash is never invented)",
+  "policy": [
+    {
+      "name": "classify",
+      "version": "1.0.0"
+    },
+    {
+      "name": "code-review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "compare",
+      "version": "1.0.0"
+    },
+    {
+      "name": "decide",
+      "version": "1.0.0"
+    },
+    {
+      "name": "extract",
+      "version": "1.0.0"
+    },
+    {
+      "name": "find",
+      "version": "1.0.0"
+    },
+    {
+      "name": "gate",
+      "version": "1.0.0"
+    },
+    {
+      "name": "normal",
+      "version": "1.0.0"
+    },
+    {
+      "name": "pii",
+      "version": "1.0.0"
+    },
+    {
+      "name": "rerank",
+      "version": "1.0.0"
+    },
+    {
+      "name": "review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "screen",
+      "version": "1.0.0"
+    },
+    {
+      "name": "security",
+      "version": "1.0.0"
+    },
+    {
+      "name": "verify",
+      "version": "1.0.0"
+    }
+  ],
+  "policy_note": "live registry truth (availability-independent); 14 entries",
+  "schema_version": "1.0.0",
+  "software": {
+    "node": "v26.7.0",
+    "platform": "linux",
+    "arch": "x64",
+    "package_version": "0.4.0"
+  },
+  "hardware": {
+    "arch": "x64",
+    "cpus": 22,
+    "cpu_model": "Intel(R) Core(TM) Ultra 9 185H",
+    "totalmem_mb": 23443
+  },
+  "config": {
+    "backend": "gliclass(r3a)",
+    "corpus": "r1",
+    "lanes": [
+      "classify",
+      "gate",
+      "screen",
+      "rerank"
+    ],
+    "timeout_ms": 600000,
+    "lane_env": "GLICLASS_MODEL=/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261009T055724Z-r3a/checkpoint",
+    "run_env": {
+      "GLICLASS_MODEL": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261009T055724Z-r3a/checkpoint"
+    },
+    "started": "2026-10-10T18:33:53.430Z",
+    "finished": "2026-10-10T18:34:18.720Z"
+  },
+  "mode": {
+    "mcp": "observe",
+    "mcp_note": "the MCP layer only observes and reports judgments; it never acts, under every policy mode",
+    "policy": "observe (default)",
+    "policy_note": "effective global policy-decision mode resolution input (verbatim env or default)"
+  },
+  "method": "r3a-lanes FULL matrix: per-case wall (performance.now round trip) + backend-reported latencyMs summed over the predict calls of that case. Routing (validation-seeded, never r1-tuned): gate OFF (dead: ABSTAIN golds confidently SUPPORTED) ; screen tau=0.2 (raw-margin omit → handler ESCALATE); argmax otherwise; fixed argmax->band magnitudes at public policy centers (gate 0.9/0.1 vs claimVerified 0.8; screen 0.92/0.5/0.1 vs 0.75/0.25; gate rubric 2/2/0.95 + screen substance/relevance 0.9/0.9 documented lane constants). Per-case rows carry raw gliclass scores + margins for threshold design; verdicts never read them. No cross-machine comparison.",
+  "gold_corpus": {
+    "independent": 48,
+    "oracle_stub": 0,
+    "total": 48,
+    "per_suite": [
+      {
+        "suite": "classify",
+        "total": 12,
+        "independent": 12,
+        "oracle_stub": 0
+      },
+      {
+        "suite": "gate",
+        "total": 12,
+        "independent": 12,
+        "oracle_stub": 0
+      },
+      {
+        "suite": "screen",
+        "total": 12,
+        "independent": 12,
+        "oracle_stub": 0
+      },
+      {
+        "suite": "rerank",
+        "total": 12,
+        "independent": 12,
+        "oracle_stub": 0
+      }
+    ]
+  },
+  "gold_corpus_note": "r1-only run: all 48 golds are human-fixed independent truth (spike-grade: the live backend is judged against them); stub answers are ignored by the lane (live deps forward real questions)",
+  "honesty": [
+    "absolutes only; no cross-machine comparison; no improvement claimed (no baseline exists); no promotion verdict (parent G5)",
+    "thresholds OFF and untouched (no m, no tau); wrong_confident taus remain reporting slices, never prod cutoffs",
+    "gate rubric + screen substance/relevance are documented lane constants, not tuned values (GLiClass has no such notions)",
+    "find column reused from evals/results/v8 (qwen) + v9 (gte) manifests (read-only; those servers never re-run here)",
+    "checkpoint bytes stay out of git (F7 rule); pinned by computed sha256 + run-dir + path only"
+  ],
+  "links": {
+    "metrics": {
+      "suites": null
+    },
+    "composed": {
+      "table": null
+    }
+  },
+  "server_reported_revisions": {
+    "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T183117Z-r3f/checkpoint": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "loaded": true
+    }
+  },
+  "r3a": {
+    "run_dir": "run-20261009T055724Z-r3a",
+    "checkpoint": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261009T055724Z-r3a/checkpoint",
+    "safetensors_sha256": "94f725c49e4edf237d34fef85ad3719dbc36f34ac66f7846f86363dc61bd86ea",
+    "safetensors_note": "sha256 of model.safetensors, computed at matrix time via streaming read (never invented)",
+    "thresholds": "OFF: pure argmax + omit-on-ABSTAIN/null (gate m=0/tau=0 equivalent; screen no threshold); NOT tuned here and NEVER on r1",
+    "adjudication": "classify unchanged; gate one POST per claim (evidence || claim, 3 labels) -> claim/refute noul pair; screen text + 3 labels -> injection noul; rerank query-as-text + candidate texts -> noul order; see evals/lanes-r1.mjs GLICLASS_* constants"
+  }
+}
