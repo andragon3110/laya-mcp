@@ -30,3 +30,8 @@ Usuario: continuar sin verificar por tarea; una sola batería final de tests.
 ## No test-first (motivo)
 T1 es infra de tests, T2 es prosa pasiva: sin behavior nuevo, sin RED
 significativo. La verificación es la batería final T3.
+
+## Batería final (2026-10-10, `npm test`, exit 0)
+- typecheck ok, build ok, T3 64, T4 23, T5 15, T6 55, redact 7/7,
+  escalations 5/5, policy 49, stub 98/98, r1 158/158, offline sh OK.
+- Sin fallout. Commits: 303d999 (npm test), c44c1d4 (conteos).
