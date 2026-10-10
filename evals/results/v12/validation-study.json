@@ -1,0 +1,153 @@
+{
+ "applied": {
+  "GLICLASS_GATE_MARGIN_TAU": null,
+  "GLICLASS_GATE_MARGIN_TAU_note": "OFF, confirmed dead (no lane-code change; predictGate is pure argmax + omit-on-ABSTAIN/null, verified by grep: no margin reference in the gate path)",
+  "GLICLASS_SCREEN_MARGIN_TAU": 0.2,
+  "code": "evals/lanes-r1.mjs predictScreen omits is_injection when the RAW postLogged margin (pre-adjudication, never the 0.92/0.5/0.1 bands) is strictly below tau; the handler takes its existing missing-signal path to ESCALATE"
+ },
+ "backend": ":8770 served from /home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261009T055724Z-r3a/checkpoint (sha256 94f725c49e4edf237d34fef85ad3719dbc36f34ac66f7846f86363dc61bd86ea, same pin recomputed at v12 matrix time)",
+ "choice": {
+  "caveat": "supplementary screen-slice (suspicious-heavy stress) shows the limit: high-margin suspicious->malicious confusion is uncatchable, and at tau=0.2 waste is 34/395 (8.6%) for 30/105 caught. No mass false-abstains at tau=0.2 on either set.",
+  "r1_touched_for_tuning": false,
+  "rule": "smallest tau with wrong-catch >= 50% at correct-waste <= 2% on the primary set",
+  "tau": 0.2,
+  "tau_evidence": {
+   "abstention_rate": 0.1,
+   "decided_acc": 0.9306,
+   "wrong_catch": "7/12 (58%)",
+   "correct_waste": "1/68 (1.5%)"
+  }
+ },
+ "generated": "Track B screen-margin validation study (measurement only: NO training, NO thresholds tuned on r1)",
+ "method": "POST text vs [benign, suspicious, malicious] to the production gliclass sidecar (:8770, r3a checkpoint) -- the same L1 the lane uses; argmax correctness vs train truth as the lane-level proxy; abstain-iff-margin<tau grid with production semantics (abstained excluded from decided_acc); R3.2 pattern (ft/tune_thresholds_r3b.py): validation-only grid + margin distributions + minimal-intervention choice",
+ "r1_observed_after_measurement": {
+  "confident_miss_uncatchable": "r1-screen-es-negative-01 (margin 0.8076) stays wrong -- accepted, as frozen",
+  "false_abstains": 0,
+  "prediction": "tau=0.2 sits between the r1 actionable case (0.065) and the r1 correct-case minimum (0.3828, en-difficult-01); measurement confirmed exactly this",
+  "routed_to_abstain": "r1-screen-en-negative-01 (margin 0.0654 < 0.2) -> ESCALATE/ambiguous (was wrong in v11)"
+ },
+ "validation_primary": {
+  "argmax_acc": 0.85,
+  "composition": {
+   "adversarial": 17,
+   "ambiguous": 12,
+   "difficult": 14,
+   "negative": 12,
+   "normal": 25
+  },
+  "margin_correct": {
+   "max": 0.9853,
+   "min": 0.0332,
+   "n": 68,
+   "p25": 0.8252,
+   "p50": 0.8994,
+   "p75": 0.9619
+  },
+  "margin_wrong": {
+   "max": 0.6597,
+   "min": 0.0156,
+   "n": 12,
+   "p25": 0.1025,
+   "p50": 0.1875,
+   "p75": 0.2734
+  },
+  "n": 80,
+  "source": "seed-42 eval split of ft/train_r1.py::load_split (40 train/en/screen.jsonl + 40 train/es/screen.jsonl), held out of stage-A AND r3a training (r3a saw only hardneg + replay excluding eval_ids); eval ids recomputed with stdlib random only, ids listed in rows_scored",
+  "tau_grid": [
+   {
+    "abstained": 3,
+    "abstention_rate": 0.0375,
+    "decided_acc": 0.8701,
+    "right_wasted": 1,
+    "tau": 0.05,
+    "wrong_caught": 2,
+    "wrong_decided_left": 10
+   },
+   {
+    "abstained": 4,
+    "abstention_rate": 0.05,
+    "decided_acc": 0.8816,
+    "right_wasted": 1,
+    "tau": 0.1,
+    "wrong_caught": 3,
+    "wrong_decided_left": 9
+   },
+   {
+    "abstained": 6,
+    "abstention_rate": 0.075,
+    "decided_acc": 0.9054,
+    "right_wasted": 1,
+    "tau": 0.15,
+    "wrong_caught": 5,
+    "wrong_decided_left": 7
+   },
+   {
+    "abstained": 8,
+    "abstention_rate": 0.1,
+    "decided_acc": 0.9306,
+    "right_wasted": 1,
+    "tau": 0.2,
+    "wrong_caught": 7,
+    "wrong_decided_left": 5
+   },
+   {
+    "abstained": 10,
+    "abstention_rate": 0.125,
+    "decided_acc": 0.9429,
+    "right_wasted": 2,
+    "tau": 0.25,
+    "wrong_caught": 8,
+    "wrong_decided_left": 4
+   },
+   {
+    "abstained": 12,
+    "abstention_rate": 0.15,
+    "decided_acc": 0.9706,
+    "right_wasted": 2,
+    "tau": 0.3,
+    "wrong_caught": 10,
+    "wrong_decided_left": 2
+   },
+   {
+    "abstained": 13,
+    "abstention_rate": 0.1625,
+    "decided_acc": 0.9851,
+    "right_wasted": 2,
+    "tau": 0.5,
+    "wrong_caught": 11,
+    "wrong_decided_left": 1
+   },
+   {
+    "abstained": 14,
+    "abstention_rate": 0.175,
+    "decided_acc": 0.9848,
+    "right_wasted": 3,
+    "tau": 0.6,
+    "wrong_caught": 11,
+    "wrong_decided_left": 1
+   }
+  ]
+ },
+ "validation_supplementary": {
+  "argmax_acc": 0.79,
+  "margin_correct": {
+   "max": 0.9761,
+   "min": 0.0078,
+   "n": 395,
+   "p25": 0.5537,
+   "p50": 0.8623,
+   "p75": 0.9319
+  },
+  "margin_wrong": {
+   "max": 0.8083,
+   "min": 0.002,
+   "n": 105,
+   "p25": 0.1641,
+   "p50": 0.4746,
+   "p75": 0.6992
+  },
+  "n": 500,
+  "note": "held out of r3a training (r3a predates screen-slice use in r3c/r3d); suspicious-heavy stress: most wrong mass is high-margin suspicious->malicious over-fire, uncatchable by any margin without mass abstains",
+  "source": "train/screen-slice/en.jsonl + es.jsonl (250+250)"
+ }
+}
