@@ -1,0 +1,61 @@
+{
+  "config": {
+    "backend": "policylm",
+    "corpus": "r1",
+    "lanes": [
+      "screen"
+    ],
+    "timeout_ms": 600000,
+    "lane_env": "LAYA_BENCH_SCREEN_URL=http://127.0.0.1:8771 (lane fixed port :8771)",
+    "run_env": {
+      "LAYA_BENCH_SCREEN_URL": "http://127.0.0.1:8771"
+    },
+    "started": "2026-10-09T02:10:06.716Z",
+    "finished": "2026-10-09T02:10:20.606Z"
+  },
+  "method": "T6b FULL live matrix latency pass: per-case wall (performance.now round trip) + backend-reported latencyMs summed over the predict calls of that case; overhead = wall - reported where separable (judge lanes). No thresholds, no cross-machine comparison.",
+  "primitives": {
+    "screen": {
+      "laneBackend": "policylm",
+      "baseUrl": "http://127.0.0.1:8771",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "task": {
+        "n": 12,
+        "correct": 2,
+        "accuracy": 0.16666666666666666
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 1,
+        "accuracy": 0.16666666666666666
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 1,
+        "accuracy": 0.16666666666666666
+      },
+      "abstained": 12,
+      "wall_ms_total": 13860.4,
+      "wall_ms_mean": 1155,
+      "reported_latency_ms_total": 13826.4,
+      "reported_latency_ms_mean": 1152.2
+    }
+  },
+  "note": "driver per-case walls are the latency record (bench.mjs --live covers stub-canonical reps + rerank sweep; see laya anomaly note)."
+}

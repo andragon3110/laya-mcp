@@ -1,0 +1,234 @@
+{
+  "config": {
+    "backend": "laya",
+    "corpus": "r1",
+    "lanes": [
+      "classify",
+      "screen",
+      "gate",
+      "rerank",
+      "find"
+    ],
+    "timeout_ms": 600000,
+    "lane_env": "LAYA_URL + LAYA_BENCH_CLASSIFY/SCREEN/GATE/RERANK/FIND_URL=http://127.0.0.1:8765",
+    "run_env": {
+      "LAYA_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_CLASSIFY_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_SCREEN_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_GATE_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_RERANK_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_FIND_URL": "http://127.0.0.1:8765"
+    },
+    "started": "2026-10-09T02:07:02.225Z",
+    "finished": "2026-10-09T02:07:27.558Z"
+  },
+  "method": "T6b FULL live matrix latency pass: per-case wall (performance.now round trip) + backend-reported latencyMs summed over the predict calls of that case; overhead = wall - reported where separable (judge lanes). No thresholds, no cross-machine comparison.",
+  "primitives": {
+    "classify": {
+      "laneBackend": "laya",
+      "baseUrl": "http://127.0.0.1:8765",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 12,
+        "correct": 8,
+        "accuracy": 0.6666666666666666
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 3,
+        "accuracy": 0.5
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "abstained": 0,
+      "wall_ms_total": 3176.2,
+      "wall_ms_mean": 264.7,
+      "reported_latency_ms_total": 3133.5,
+      "reported_latency_ms_mean": 261.1
+    },
+    "screen": {
+      "laneBackend": "laya",
+      "baseUrl": "http://127.0.0.1:8765",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 6,
+        "accuracy": 0.5
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 3,
+        "accuracy": 0.5
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 3,
+        "accuracy": 0.5
+      },
+      "task": {
+        "n": 12,
+        "correct": 4,
+        "accuracy": 0.3333333333333333
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 2,
+        "accuracy": 0.3333333333333333
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 2,
+        "accuracy": 0.3333333333333333
+      },
+      "abstained": 0,
+      "wall_ms_total": 5745.4,
+      "wall_ms_mean": 478.8,
+      "reported_latency_ms_total": 5707.1,
+      "reported_latency_ms_mean": 475.6
+    },
+    "gate": {
+      "laneBackend": "laya",
+      "baseUrl": "http://127.0.0.1:8765",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 3,
+        "accuracy": 0.25
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 1,
+        "accuracy": 0.16666666666666666
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 2,
+        "accuracy": 0.3333333333333333
+      },
+      "task": {
+        "n": 12,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "abstained": 0,
+      "wall_ms_total": 8289.8,
+      "wall_ms_mean": 690.8,
+      "reported_latency_ms_total": 8257.6,
+      "reported_latency_ms_mean": 688.1
+    },
+    "rerank": {
+      "laneBackend": "laya",
+      "baseUrl": "http://127.0.0.1:8765",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 12,
+        "correct": 6,
+        "accuracy": 0.5
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 2,
+        "accuracy": 0.3333333333333333
+      },
+      "abstained": 0,
+      "wall_ms_total": 4778.7,
+      "wall_ms_mean": 398.2,
+      "reported_latency_ms_total": 4738.3,
+      "reported_latency_ms_mean": 394.9
+    },
+    "find": {
+      "laneBackend": "laya",
+      "baseUrl": "http://127.0.0.1:8765",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 9,
+        "accuracy": 0.75
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "task": {
+        "n": 12,
+        "correct": 9,
+        "accuracy": 0.75
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666
+      },
+      "abstained": 2,
+      "wall_ms_total": 3263.4,
+      "wall_ms_mean": 272,
+      "reported_latency_ms_total": 3227.4,
+      "reported_latency_ms_mean": 269
+    }
+  },
+  "note": "driver per-case walls are the latency record (bench.mjs --live covers stub-canonical reps + rerank sweep; see laya anomaly note)."
+}

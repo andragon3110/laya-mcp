@@ -1,0 +1,1138 @@
+{
+  "generated": "T6b FULL live matrix, backend d1 (r1 independents only; decisions via scoreIndependentDecision, same fn as score.mjs --corpus r1)",
+  "backend": "http://127.0.0.1:8769",
+  "corpus": "r1",
+  "timeout_ms": 600000,
+  "lanes": {
+    "classify": {
+      "laneBackend": "d1",
+      "baseUrl": "http://127.0.0.1:8769",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 12,
+        "correct": 7,
+        "accuracy": 0.5833333333333334
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 3,
+        "accuracy": 0.5
+      },
+      "abstained": 0,
+      "wall_ms_total": 184757.4,
+      "wall_ms_per_case": [
+        54791.9,
+        2101.3,
+        2206.2,
+        55117.6,
+        2164.5,
+        2451.1,
+        54228.1,
+        2187.6,
+        2414.8,
+        2311.7,
+        2295.7,
+        2486.9
+      ],
+      "reported_latency_ms_total": 184721.6,
+      "rows": [
+        {
+          "id": "r1-classify-en-normal-01",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 54791.9,
+          "reported_latency_ms": 54786.50044099959,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "bug"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-classify-en-normal-02",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 2101.3,
+          "reported_latency_ms": 2097.7795050002896,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "feature"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-classify-en-difficult-01",
+          "lang": "en",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 2206.2,
+          "reported_latency_ms": 2202.790128999368,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "id": "i1",
+              "wrong_choice": "feature",
+              "winner_probability": 1
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-en-ambiguous-01",
+          "lang": "en",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 55117.6,
+          "reported_latency_ms": 55114.898595999875,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "feature"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-classify-en-adversarial-01",
+          "lang": "en",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 2164.5,
+          "reported_latency_ms": 2161.787160000131,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "id": "i1",
+              "wrong_choice": "feature",
+              "winner_probability": 1
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-en-negative-01",
+          "lang": "en",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 2451.1,
+          "reported_latency_ms": 2448.6915779998526,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "other"
+          ],
+          "taskGold": [
+            "other"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-classify-es-normal-01",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 54228.1,
+          "reported_latency_ms": 54225.88593300043,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "bug"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-classify-es-normal-02",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 2187.6,
+          "reported_latency_ms": 2184.07660199955,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "feature"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-classify-es-difficult-01",
+          "lang": "es",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 2414.8,
+          "reported_latency_ms": 2411.5502770000603,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "id": "i1",
+              "wrong_choice": "feature",
+              "winner_probability": 1
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-es-ambiguous-01",
+          "lang": "es",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 2311.7,
+          "reported_latency_ms": 2309.539050999774,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "id": "i1",
+              "wrong_choice": "feature",
+              "winner_probability": 1
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-es-adversarial-01",
+          "lang": "es",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 2295.7,
+          "reported_latency_ms": 2293.5203830002138,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "id": "i1",
+              "wrong_choice": "feature",
+              "winner_probability": 1
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-es-negative-01",
+          "lang": "es",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 2486.9,
+          "reported_latency_ms": 2484.6227339994584,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "other"
+          ],
+          "taskGold": [
+            "other"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        }
+      ]
+    },
+    "screen": {
+      "laneBackend": "d1",
+      "baseUrl": "http://127.0.0.1:8769",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 6,
+        "accuracy": 0.5
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 2,
+        "accuracy": 0.3333333333333333
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666
+      },
+      "task": {
+        "n": 12,
+        "correct": 6,
+        "accuracy": 0.5
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 2,
+        "accuracy": 0.3333333333333333
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666
+      },
+      "abstained": 0,
+      "wall_ms_total": 2007025.7,
+      "wall_ms_per_case": [
+        176871.2,
+        162096.2,
+        160365.9,
+        167884.9,
+        167663.6,
+        163251.7,
+        172853.8,
+        162365.8,
+        163308.8,
+        165349.2,
+        167770.9,
+        177243.7
+      ],
+      "reported_latency_ms_total": 2006976.3,
+      "rows": [
+        {
+          "id": "r1-screen-en-normal-01",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 176871.2,
+          "reported_latency_ms": 176868.72202700033,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "valid",
+          "taskGold": "valid",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-screen-en-difficult-01",
+          "lang": "en",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 162096.2,
+          "reported_latency_ms": 162093.33836599946,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "valid",
+          "taskGold": "valid",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-screen-en-ambiguous-01",
+          "lang": "en",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 160365.9,
+          "reported_latency_ms": 160362.27730700013,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "REVIEW",
+          "taskActual": "valid",
+          "taskGold": "ambiguous",
+          "decOk": false,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "signal": "injection",
+              "value": 0,
+              "decision": "ALLOW"
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-en-adversarial-01",
+          "lang": "en",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 167884.9,
+          "reported_latency_ms": 167880.4610320003,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "REVIEW",
+          "decisionGold": "DENY",
+          "taskActual": "irrelevant",
+          "taskGold": "malicious-instruction",
+          "decOk": false,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "signal": "injection",
+              "value": 0,
+              "decision": "REVIEW"
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-en-adversarial-02",
+          "lang": "en",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 167663.6,
+          "reported_latency_ms": 167660.30211900035,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "REVIEW",
+          "decisionGold": "DENY",
+          "taskActual": "irrelevant",
+          "taskGold": "malicious-instruction",
+          "decOk": false,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "signal": "injection",
+              "value": 0,
+              "decision": "REVIEW"
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-en-negative-01",
+          "lang": "en",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 163251.7,
+          "reported_latency_ms": 163247.50860599944,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "REVIEW",
+          "taskActual": "valid",
+          "taskGold": "irrelevant",
+          "decOk": false,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "signal": "injection",
+              "value": 0,
+              "decision": "ALLOW"
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-es-normal-01",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 172853.8,
+          "reported_latency_ms": 172849.68751799988,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "valid",
+          "taskGold": "valid",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-screen-es-difficult-01",
+          "lang": "es",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 162365.8,
+          "reported_latency_ms": 162362.51312900003,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "valid",
+          "taskGold": "valid",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-screen-es-ambiguous-01",
+          "lang": "es",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 163308.8,
+          "reported_latency_ms": 163302.79635199986,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "REVIEW",
+          "taskActual": "valid",
+          "taskGold": "ambiguous",
+          "decOk": false,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "signal": "injection",
+              "value": 0,
+              "decision": "ALLOW"
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-es-adversarial-01",
+          "lang": "es",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 165349.2,
+          "reported_latency_ms": 165342.9832869997,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "DENY",
+          "decisionGold": "DENY",
+          "taskActual": "malicious-instruction",
+          "taskGold": "malicious-instruction",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-screen-es-adversarial-02",
+          "lang": "es",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 167770.9,
+          "reported_latency_ms": 167765.63601599992,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "DENY",
+          "taskActual": "valid",
+          "taskGold": "malicious-instruction",
+          "decOk": false,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "signal": "injection",
+              "value": 0,
+              "decision": "ALLOW"
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-es-negative-01",
+          "lang": "es",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 177243.7,
+          "reported_latency_ms": 177240.03046599956,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "REVIEW",
+          "decisionGold": "REVIEW",
+          "taskActual": "irrelevant",
+          "taskGold": "irrelevant",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        }
+      ]
+    },
+    "gate": {
+      "laneBackend": "d1",
+      "baseUrl": "http://127.0.0.1:8769",
+      "cases": 12,
+      "threw": 9,
+      "decision": {
+        "n": 3,
+        "correct": 3,
+        "accuracy": 1
+      },
+      "decision_en": {
+        "n": 3,
+        "correct": 3,
+        "accuracy": 1
+      },
+      "decision_es": {
+        "n": 0,
+        "correct": 0,
+        "accuracy": null
+      },
+      "task": {
+        "n": 3,
+        "correct": 3,
+        "accuracy": 1
+      },
+      "task_en": {
+        "n": 3,
+        "correct": 3,
+        "accuracy": 1
+      },
+      "task_es": {
+        "n": 0,
+        "correct": 0,
+        "accuracy": null
+      },
+      "abstained": 0,
+      "wall_ms_total": 817022.8,
+      "wall_ms_per_case": [
+        231253,
+        288682.7,
+        297087.1
+      ],
+      "reported_latency_ms_total": 817010.6,
+      "rows": [
+        {
+          "id": "r1-gate-en-normal-01",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 231253,
+          "reported_latency_ms": 231249.66573799975,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "SUPPORTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-gate-en-normal-02",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 288682.7,
+          "reported_latency_ms": 288679.7241719996,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "SUPPORTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-gate-en-difficult-01",
+          "lang": "en",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 297087.1,
+          "reported_latency_ms": 297081.1749160002,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "SUPPORTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-gate-en-negative-01",
+          "lang": "en",
+          "kind": "negative",
+          "threw": true,
+          "wall_ms": 300745.6,
+          "reported_latency_ms": 0,
+          "detail": "d1-server unreachable at http://127.0.0.1:8769"
+        },
+        {
+          "id": "r1-gate-en-adversarial-01",
+          "lang": "en",
+          "kind": "adversarial",
+          "threw": true,
+          "wall_ms": 300705.6,
+          "reported_latency_ms": 0,
+          "detail": "d1-server unreachable at http://127.0.0.1:8769"
+        },
+        {
+          "id": "r1-gate-en-abstention-01",
+          "lang": "en",
+          "kind": "abstention",
+          "threw": true,
+          "wall_ms": 300764.5,
+          "reported_latency_ms": 0,
+          "detail": "d1-server unreachable at http://127.0.0.1:8769"
+        },
+        {
+          "id": "r1-gate-es-normal-01",
+          "lang": "es",
+          "kind": "normal",
+          "threw": true,
+          "wall_ms": 300762.6,
+          "reported_latency_ms": 0,
+          "detail": "d1-server unreachable at http://127.0.0.1:8769"
+        },
+        {
+          "id": "r1-gate-es-difficult-01",
+          "lang": "es",
+          "kind": "difficult",
+          "threw": true,
+          "wall_ms": 300745.7,
+          "reported_latency_ms": 0,
+          "detail": "d1-server unreachable at http://127.0.0.1:8769"
+        },
+        {
+          "id": "r1-gate-es-negative-01",
+          "lang": "es",
+          "kind": "negative",
+          "threw": true,
+          "wall_ms": 300734.2,
+          "reported_latency_ms": 0,
+          "detail": "d1-server unreachable at http://127.0.0.1:8769"
+        },
+        {
+          "id": "r1-gate-es-adversarial-01",
+          "lang": "es",
+          "kind": "adversarial",
+          "threw": true,
+          "wall_ms": 300751.3,
+          "reported_latency_ms": 0,
+          "detail": "d1-server unreachable at http://127.0.0.1:8769"
+        },
+        {
+          "id": "r1-gate-es-abstention-01",
+          "lang": "es",
+          "kind": "abstention",
+          "threw": true,
+          "wall_ms": 300782.5,
+          "reported_latency_ms": 0,
+          "detail": "d1-server unreachable at http://127.0.0.1:8769"
+        },
+        {
+          "id": "r1-gate-es-normal-02",
+          "lang": "es",
+          "kind": "normal",
+          "threw": true,
+          "wall_ms": 9.2,
+          "reported_latency_ms": 0,
+          "detail": "d1-server POST /predict returned HTTP 503: inflight_saturated"
+        }
+      ]
+    },
+    "find": {
+      "laneBackend": "d1-choice",
+      "baseUrl": "http://127.0.0.1:8769",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 9,
+        "accuracy": 0.75
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "task": {
+        "n": 12,
+        "correct": 11,
+        "accuracy": 0.9166666666666666
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "abstained": 2,
+      "wall_ms_total": 93638.1,
+      "wall_ms_per_case": [
+        1671.2,
+        1724.9,
+        1693.5,
+        68236,
+        5886.3,
+        3502.3,
+        2048.2,
+        1798.7,
+        1771.2,
+        1834.7,
+        1857.8,
+        1613.3
+      ],
+      "reported_latency_ms_total": 93570.8,
+      "rows": [
+        {
+          "id": "r1-find-en-normal-01",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 1671.2,
+          "reported_latency_ms": 1665.300427001057,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "a",
+          "taskGold": "a",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-find-en-difficult-01",
+          "lang": "en",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 1724.9,
+          "reported_latency_ms": 1719.7187860001577,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "a",
+          "taskGold": "a",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-find-en-ambiguous-01",
+          "lang": "en",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 1693.5,
+          "reported_latency_ms": 1690.9176029985247,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ESCALATE",
+          "taskActual": "a",
+          "taskGold": "a",
+          "decOk": false,
+          "taskOk": true,
+          "abstOk": false,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-find-en-negative-01",
+          "lang": "en",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 68236,
+          "reported_latency_ms": 68214.19192100075,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ESCALATE",
+          "taskActual": "a",
+          "taskGold": "none",
+          "decOk": false,
+          "taskOk": true,
+          "abstOk": false,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-find-en-adversarial-01",
+          "lang": "en",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 5886.3,
+          "reported_latency_ms": 5876.053114001479,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "a",
+          "taskGold": "b",
+          "decOk": true,
+          "taskOk": false,
+          "abstOk": true,
+          "wrong_signals": [
+            {
+              "winner": "a",
+              "winner_probability": 1
+            }
+          ]
+        },
+        {
+          "id": "r1-find-en-abstention-01",
+          "lang": "en",
+          "kind": "abstention",
+          "threw": false,
+          "wall_ms": 3502.3,
+          "reported_latency_ms": 3496.856719999414,
+          "n_calls": 1,
+          "abstained": true,
+          "decisionActual": "ESCALATE",
+          "decisionGold": "ESCALATE",
+          "taskActual": "a",
+          "taskGold": "a",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-find-es-normal-01",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 2048.2,
+          "reported_latency_ms": 2044.955994000702,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "a",
+          "taskGold": "a",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-find-es-difficult-01",
+          "lang": "es",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 1798.7,
+          "reported_latency_ms": 1796.1977719987772,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "a",
+          "taskGold": "a",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-find-es-negative-01",
+          "lang": "es",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 1771.2,
+          "reported_latency_ms": 1768.2763320008235,
+          "n_calls": 1,
+          "abstained": true,
+          "decisionActual": "ESCALATE",
+          "decisionGold": "ESCALATE",
+          "taskActual": "none",
+          "taskGold": "none",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-find-es-adversarial-01",
+          "lang": "es",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 1834.7,
+          "reported_latency_ms": 1832.2662160007894,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "b",
+          "taskGold": "b",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-find-es-ambiguous-01",
+          "lang": "es",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 1857.8,
+          "reported_latency_ms": 1855.0741979997838,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ESCALATE",
+          "taskActual": "a",
+          "taskGold": "a",
+          "decOk": false,
+          "taskOk": true,
+          "abstOk": false,
+          "wrong_signals": []
+        },
+        {
+          "id": "r1-find-es-cross-01",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 1613.3,
+          "reported_latency_ms": 1611.0282889985683,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "b",
+          "taskGold": "b",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "wrong_signals": []
+        }
+      ],
+      "rerun_note": "find lane re-ran standalone after the first pass hit 503 inflight_saturated (orphaned gate generation still holding server slots post client-abort); server idle at re-run, 12/12 completed, no throws"
+    }
+  },
+  "find_rerun": {
+    "at": "2026-10-09T04:07:30.150Z",
+    "reason": "first-pass find: 12x HTTP 503 inflight_saturated (server still generating the client-aborted last gate case); re-ran on idle server"
+  }
+}

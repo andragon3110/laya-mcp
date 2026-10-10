@@ -1,0 +1,847 @@
+{
+  "generated": "fase-7 T5+spike reproducibility manifest (LIVE backend http://127.0.0.1:8765; absolutes + method, no improvement claims)",
+  "date": "2026-10-09T04:09:50.020Z",
+  "commit": "e86c7871742975e1162262ac4b8189d04eeb0310",
+  "commit_short": "e86c787",
+  "model": "english",
+  "model_note": "live backend model inventory name at http://127.0.0.1:8765 (verbatim probe; \"name unreported\" when the backend sent none)",
+  "model_revision": null,
+  "model_revision_source": "unpinned",
+  "model_revision_note": "operator pin (LAYA_MODEL_REVISION) wins, else the backend-reported revision, else the honest null (cf. capabilities revision_source unpinned; a hash is never invented)",
+  "tokenizer": "unknown",
+  "tokenizer_note": "explicit unknown: laya_capabilities exposes name/repo/loaded/revision/device/circuit per model, never a tokenizer",
+  "device": "cpu",
+  "device_note": "probed LIVE from GET /ready (or the explicit unknown string when the backend reported no device)",
+  "backend": {
+    "mode": "live",
+    "live": true,
+    "reachable": true,
+    "baseUrl": "http://127.0.0.1:8765",
+    "lane_env": "LAYA_URL + LAYA_BENCH_CLASSIFY/SCREEN/GATE/RERANK/FIND_URL=http://127.0.0.1:8765",
+    "ready": true,
+    "device": "cpu",
+    "models": [
+      {
+        "name": "english",
+        "repo": "convaiinnovations/laya",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "multilingual",
+        "repo": "convaiinnovations/laya-multilingual",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "typed-decisions",
+        "repo": "convaiinnovations/laya-typed-decisions",
+        "loaded": false,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "english",
+        "repo": "convaiinnovations/laya",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "multilingual",
+        "repo": "convaiinnovations/laya-multilingual",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "typed-decisions",
+        "repo": "convaiinnovations/laya-typed-decisions",
+        "loaded": false,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "english",
+        "repo": "convaiinnovations/laya",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "multilingual",
+        "repo": "convaiinnovations/laya-multilingual",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "typed-decisions",
+        "repo": "convaiinnovations/laya-typed-decisions",
+        "loaded": false,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "english",
+        "repo": "convaiinnovations/laya",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "multilingual",
+        "repo": "convaiinnovations/laya-multilingual",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "typed-decisions",
+        "repo": "convaiinnovations/laya-typed-decisions",
+        "loaded": false,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "english",
+        "repo": "convaiinnovations/laya",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "multilingual",
+        "repo": "convaiinnovations/laya-multilingual",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "typed-decisions",
+        "repo": "convaiinnovations/laya-typed-decisions",
+        "loaded": false,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      }
+    ],
+    "model": "english",
+    "model_revision": null,
+    "model_revision_source": "unpinned",
+    "revisions": {
+      "laya": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "LAYA_MODEL_REVISION"
+      },
+      "gliner": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GLINER_MODEL_REVISION"
+      },
+      "rerank": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "RERANK_MODEL_REVISION"
+      },
+      "d1": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "D1_MODEL_REVISION"
+      },
+      "gliclass": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GLICLASS_MODEL_REVISION"
+      },
+      "policylm": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "POLICYLM_MODEL_REVISION"
+      },
+      "promptguard": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "PROMPTGUARD_MODEL_REVISION"
+      },
+      "gte": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GTE_MODEL_REVISION"
+      }
+    },
+    "probes": {
+      "classifyxlaya": {
+        "baseUrl": "http://127.0.0.1:8765",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "english",
+        "models": [
+          {
+            "name": "english",
+            "repo": "convaiinnovations/laya",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "multilingual",
+            "repo": "convaiinnovations/laya-multilingual",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "typed-decisions",
+            "repo": "convaiinnovations/laya-typed-decisions",
+            "loaded": false,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "screenxlaya": {
+        "baseUrl": "http://127.0.0.1:8765",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "english",
+        "models": [
+          {
+            "name": "english",
+            "repo": "convaiinnovations/laya",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "multilingual",
+            "repo": "convaiinnovations/laya-multilingual",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "typed-decisions",
+            "repo": "convaiinnovations/laya-typed-decisions",
+            "loaded": false,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "gatexlaya": {
+        "baseUrl": "http://127.0.0.1:8765",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "english",
+        "models": [
+          {
+            "name": "english",
+            "repo": "convaiinnovations/laya",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "multilingual",
+            "repo": "convaiinnovations/laya-multilingual",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "typed-decisions",
+            "repo": "convaiinnovations/laya-typed-decisions",
+            "loaded": false,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "rerankxlaya": {
+        "baseUrl": "http://127.0.0.1:8765",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "english",
+        "models": [
+          {
+            "name": "english",
+            "repo": "convaiinnovations/laya",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "multilingual",
+            "repo": "convaiinnovations/laya-multilingual",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "typed-decisions",
+            "repo": "convaiinnovations/laya-typed-decisions",
+            "loaded": false,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "findxlaya": {
+        "baseUrl": "http://127.0.0.1:8765",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "english",
+        "models": [
+          {
+            "name": "english",
+            "repo": "convaiinnovations/laya",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "multilingual",
+            "repo": "convaiinnovations/laya-multilingual",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "typed-decisions",
+            "repo": "convaiinnovations/laya-typed-decisions",
+            "loaded": false,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      }
+    },
+    "note": "T6b FULL live matrix via documented lanes (evals/lanes-r1.mjs), corpus r1 (60 independents); mismatches vs oracle-stub golds on non-r1 cases n/a (r1-only run)"
+  },
+  "backend_revisions": {
+    "laya": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "LAYA_MODEL_REVISION"
+    },
+    "gliner": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLINER_MODEL_REVISION"
+    },
+    "rerank": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "RERANK_MODEL_REVISION"
+    },
+    "d1": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "D1_MODEL_REVISION"
+    },
+    "gliclass": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLICLASS_MODEL_REVISION"
+    },
+    "policylm": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "POLICYLM_MODEL_REVISION"
+    },
+    "promptguard": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "PROMPTGUARD_MODEL_REVISION"
+    },
+    "gte": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GTE_MODEL_REVISION"
+    }
+  },
+  "backend_revisions_note": "per-backend revision pins (env pins win, else backend-reported, else unpinned null; a hash is never invented)",
+  "policy": [
+    {
+      "name": "classify",
+      "version": "1.0.0"
+    },
+    {
+      "name": "code-review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "compare",
+      "version": "1.0.0"
+    },
+    {
+      "name": "decide",
+      "version": "1.0.0"
+    },
+    {
+      "name": "extract",
+      "version": "1.0.0"
+    },
+    {
+      "name": "find",
+      "version": "1.0.0"
+    },
+    {
+      "name": "gate",
+      "version": "1.0.0"
+    },
+    {
+      "name": "normal",
+      "version": "1.0.0"
+    },
+    {
+      "name": "pii",
+      "version": "1.0.0"
+    },
+    {
+      "name": "rerank",
+      "version": "1.0.0"
+    },
+    {
+      "name": "review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "screen",
+      "version": "1.0.0"
+    },
+    {
+      "name": "security",
+      "version": "1.0.0"
+    },
+    {
+      "name": "verify",
+      "version": "1.0.0"
+    }
+  ],
+  "policy_note": "live registry truth (availability-independent); 14 entries",
+  "schema_version": "1.0.0",
+  "software": {
+    "node": "v26.7.0",
+    "platform": "linux",
+    "arch": "x64",
+    "package_version": "0.4.0"
+  },
+  "hardware": {
+    "arch": "x64",
+    "cpus": 22,
+    "cpu_model": "Intel(R) Core(TM) Ultra 9 185H",
+    "totalmem_mb": 23443
+  },
+  "config": {
+    "backend": "laya",
+    "corpus": "r1",
+    "lanes": [
+      "classify",
+      "screen",
+      "gate",
+      "rerank",
+      "find"
+    ],
+    "timeout_ms": 600000,
+    "lane_env": "LAYA_URL + LAYA_BENCH_CLASSIFY/SCREEN/GATE/RERANK/FIND_URL=http://127.0.0.1:8765",
+    "run_env": {
+      "LAYA_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_CLASSIFY_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_SCREEN_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_GATE_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_RERANK_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_FIND_URL": "http://127.0.0.1:8765"
+    },
+    "started": "2026-10-09T02:07:02.225Z",
+    "finished": "2026-10-09T02:07:27.558Z"
+  },
+  "mode": {
+    "mcp": "observe",
+    "mcp_note": "the MCP layer only observes and reports judgments; it never acts, under every policy mode",
+    "policy": "observe (default)",
+    "policy_note": "effective global policy-decision mode resolution input (verbatim env or default)"
+  },
+  "method": "T6b FULL live matrix latency pass: per-case wall (performance.now round trip) + backend-reported latencyMs summed over the predict calls of that case; overhead = wall - reported where separable (judge lanes). No thresholds, no cross-machine comparison.",
+  "gold_corpus": {
+    "independent": 10,
+    "oracle_stub": 88,
+    "total": 98,
+    "per_suite": [
+      {
+        "suite": "classify",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "decide",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "verify",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "screen",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "pii",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "extract",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "find",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "rerank",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "review",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "gate",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "compare",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      }
+    ]
+  },
+  "gold_corpus_note": "provenance census (case gold_source wins, else the suite goldSource default): independent golds carry human-fixed truth (spike-grade: a live backend is judged against them), oracle-stub golds were written together with their stub answers (plumbing-grade: live mismatches measure backend-vs-oracle divergence, never backend quality)",
+  "honesty": [
+    "absolutes only; no cross-machine comparison; no improvement claimed (no baseline exists)",
+    "stub ceiling: numbers measure harness + handler plumbing, never backend quality",
+    "thresholds untouched (CERO cambios en src/); wrong_confident taus remain reporting slices, never prod cutoffs"
+  ],
+  "links": {
+    "bench": {
+      "primitives": null,
+      "rerank_rows": null
+    },
+    "metrics": {
+      "suites": null
+    }
+  },
+  "server_reported_revisions": {
+    "english": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "loaded": true
+    },
+    "multilingual": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "loaded": true
+    },
+    "typed-decisions": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "loaded": false
+    }
+  },
+  "t6b": {
+    "backend": "laya",
+    "lane_env": "LAYA_URL + LAYA_BENCH_CLASSIFY/SCREEN/GATE/RERANK/FIND_URL=http://127.0.0.1:8765",
+    "timeout_old_ms": 120000,
+    "timeout_new_ms": 600000,
+    "timeout_note": "raised ONCE, uniformly, at lanePredictFactory (single lane caller) + LANE_CALL_TIMEOUT_MS constant; per-client 120000 defaults retained as fallback; D1_MAX_NEW_TOKENS untouched (256); adjudication frozen",
+    "run_env": {
+      "LAYA_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_CLASSIFY_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_SCREEN_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_GATE_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_RERANK_URL": "http://127.0.0.1:8765",
+      "LAYA_BENCH_FIND_URL": "http://127.0.0.1:8765"
+    },
+    "probes": {
+      "classifyxlaya": {
+        "baseUrl": "http://127.0.0.1:8765",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "english",
+        "models": [
+          {
+            "name": "english",
+            "repo": "convaiinnovations/laya",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "multilingual",
+            "repo": "convaiinnovations/laya-multilingual",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "typed-decisions",
+            "repo": "convaiinnovations/laya-typed-decisions",
+            "loaded": false,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "screenxlaya": {
+        "baseUrl": "http://127.0.0.1:8765",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "english",
+        "models": [
+          {
+            "name": "english",
+            "repo": "convaiinnovations/laya",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "multilingual",
+            "repo": "convaiinnovations/laya-multilingual",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "typed-decisions",
+            "repo": "convaiinnovations/laya-typed-decisions",
+            "loaded": false,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "gatexlaya": {
+        "baseUrl": "http://127.0.0.1:8765",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "english",
+        "models": [
+          {
+            "name": "english",
+            "repo": "convaiinnovations/laya",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "multilingual",
+            "repo": "convaiinnovations/laya-multilingual",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "typed-decisions",
+            "repo": "convaiinnovations/laya-typed-decisions",
+            "loaded": false,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "rerankxlaya": {
+        "baseUrl": "http://127.0.0.1:8765",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "english",
+        "models": [
+          {
+            "name": "english",
+            "repo": "convaiinnovations/laya",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "multilingual",
+            "repo": "convaiinnovations/laya-multilingual",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "typed-decisions",
+            "repo": "convaiinnovations/laya-typed-decisions",
+            "loaded": false,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "findxlaya": {
+        "baseUrl": "http://127.0.0.1:8765",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "english",
+        "models": [
+          {
+            "name": "english",
+            "repo": "convaiinnovations/laya",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "multilingual",
+            "repo": "convaiinnovations/laya-multilingual",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          },
+          {
+            "name": "typed-decisions",
+            "repo": "convaiinnovations/laya-typed-decisions",
+            "loaded": false,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      }
+    },
+    "backend_note": "baseline. venv py/.venv-r1-laya (NEW): laya 0.3.29, torch 2.14.1+cpu, transformers 5.19.0, numpy 2.5.3, fastapi 0.143.0, uvicorn 0.54.0, huggingface_hub 1.33.0, safetensors 0.8.0, pydantic 2.14.0. Checkpoints: convaiinnovations/laya bundle snap 7b928d82 (english root 804MB + multilingual/ 615MB); typed-decisions present on disk (804MB) but NEVER loaded (LAYA_PRELOAD=0, LAYA_MAX_LOADED=2, LAYA_DEVICE=cpu; explicit model= warmup english 2.4s + multilingual 2.1s walls incl. inference, FS-cache hot). Server revisions: honest null/unpinned (offline-safe). Literal harness anchor: score.mjs --live --corpus r1 per focus suite OK (classify 20/21, screen/gate/rerank/find exit 0); bench.mjs --live CRASHED at the rerank sweep e2e (laya-server /predict timed out after 8000ms product budget on CPU pool N=10; 10 primitive rows lost with the crash; read-only chain, out of T6b scope) -- driver per-case walls are the latency record."
+  }
+}

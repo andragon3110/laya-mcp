@@ -1,0 +1,521 @@
+{
+  "generated": "fase-7 T5+spike reproducibility manifest (LIVE backend http://127.0.0.1:8769; absolutes + method, no improvement claims)",
+  "date": "2026-10-09T04:09:50.046Z",
+  "commit": "e86c7871742975e1162262ac4b8189d04eeb0310",
+  "commit_short": "e86c787",
+  "model": "LiquidAI/d1-3B-GGUF",
+  "model_note": "live backend model inventory name at http://127.0.0.1:8769 (verbatim probe; \"name unreported\" when the backend sent none)",
+  "model_revision": null,
+  "model_revision_source": "unpinned",
+  "model_revision_note": "operator pin (LAYA_MODEL_REVISION) wins, else the backend-reported revision, else the honest null (cf. capabilities revision_source unpinned; a hash is never invented)",
+  "tokenizer": "unknown",
+  "tokenizer_note": "explicit unknown: laya_capabilities exposes name/repo/loaded/revision/device/circuit per model, never a tokenizer",
+  "device": "cpu",
+  "device_note": "probed LIVE from GET /ready (or the explicit unknown string when the backend reported no device)",
+  "backend": {
+    "mode": "live",
+    "live": true,
+    "reachable": true,
+    "baseUrl": "http://127.0.0.1:8769",
+    "lane_env": "(lane fixed port :8769; no lane env needed)",
+    "ready": true,
+    "device": "cpu",
+    "models": [
+      {
+        "name": "LiquidAI/d1-3B-GGUF",
+        "repo": "LiquidAI/d1-3B-GGUF",
+        "file": "d1-3B-Q4_K_M.gguf",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "LiquidAI/d1-3B-GGUF",
+        "repo": "LiquidAI/d1-3B-GGUF",
+        "file": "d1-3B-Q4_K_M.gguf",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "LiquidAI/d1-3B-GGUF",
+        "repo": "LiquidAI/d1-3B-GGUF",
+        "file": "d1-3B-Q4_K_M.gguf",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      },
+      {
+        "name": "LiquidAI/d1-3B-GGUF",
+        "repo": "LiquidAI/d1-3B-GGUF",
+        "file": "d1-3B-Q4_K_M.gguf",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu",
+        "circuit": "closed"
+      }
+    ],
+    "model": "LiquidAI/d1-3B-GGUF",
+    "model_revision": null,
+    "model_revision_source": "unpinned",
+    "revisions": {
+      "laya": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "LAYA_MODEL_REVISION"
+      },
+      "gliner": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GLINER_MODEL_REVISION"
+      },
+      "rerank": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "RERANK_MODEL_REVISION"
+      },
+      "d1": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "D1_MODEL_REVISION"
+      },
+      "gliclass": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GLICLASS_MODEL_REVISION"
+      },
+      "policylm": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "POLICYLM_MODEL_REVISION"
+      },
+      "promptguard": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "PROMPTGUARD_MODEL_REVISION"
+      },
+      "gte": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GTE_MODEL_REVISION"
+      }
+    },
+    "probes": {
+      "classifyxd1": {
+        "baseUrl": "http://127.0.0.1:8769",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "LiquidAI/d1-3B-GGUF",
+        "models": [
+          {
+            "name": "LiquidAI/d1-3B-GGUF",
+            "repo": "LiquidAI/d1-3B-GGUF",
+            "file": "d1-3B-Q4_K_M.gguf",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "screenxd1": {
+        "baseUrl": "http://127.0.0.1:8769",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "LiquidAI/d1-3B-GGUF",
+        "models": [
+          {
+            "name": "LiquidAI/d1-3B-GGUF",
+            "repo": "LiquidAI/d1-3B-GGUF",
+            "file": "d1-3B-Q4_K_M.gguf",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "gatexd1": {
+        "baseUrl": "http://127.0.0.1:8769",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "LiquidAI/d1-3B-GGUF",
+        "models": [
+          {
+            "name": "LiquidAI/d1-3B-GGUF",
+            "repo": "LiquidAI/d1-3B-GGUF",
+            "file": "d1-3B-Q4_K_M.gguf",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "findxd1-choice": {
+        "baseUrl": "http://127.0.0.1:8769",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "LiquidAI/d1-3B-GGUF",
+        "models": [
+          {
+            "name": "LiquidAI/d1-3B-GGUF",
+            "repo": "LiquidAI/d1-3B-GGUF",
+            "file": "d1-3B-Q4_K_M.gguf",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      }
+    },
+    "note": "T6b FULL live matrix via documented lanes (evals/lanes-r1.mjs), corpus r1 (60 independents); mismatches vs oracle-stub golds on non-r1 cases n/a (r1-only run)"
+  },
+  "backend_revisions": {
+    "laya": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "LAYA_MODEL_REVISION"
+    },
+    "gliner": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLINER_MODEL_REVISION"
+    },
+    "rerank": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "RERANK_MODEL_REVISION"
+    },
+    "d1": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "D1_MODEL_REVISION"
+    },
+    "gliclass": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLICLASS_MODEL_REVISION"
+    },
+    "policylm": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "POLICYLM_MODEL_REVISION"
+    },
+    "promptguard": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "PROMPTGUARD_MODEL_REVISION"
+    },
+    "gte": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GTE_MODEL_REVISION"
+    }
+  },
+  "backend_revisions_note": "per-backend revision pins (env pins win, else backend-reported, else unpinned null; a hash is never invented)",
+  "policy": [
+    {
+      "name": "classify",
+      "version": "1.0.0"
+    },
+    {
+      "name": "code-review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "compare",
+      "version": "1.0.0"
+    },
+    {
+      "name": "decide",
+      "version": "1.0.0"
+    },
+    {
+      "name": "extract",
+      "version": "1.0.0"
+    },
+    {
+      "name": "find",
+      "version": "1.0.0"
+    },
+    {
+      "name": "gate",
+      "version": "1.0.0"
+    },
+    {
+      "name": "normal",
+      "version": "1.0.0"
+    },
+    {
+      "name": "pii",
+      "version": "1.0.0"
+    },
+    {
+      "name": "rerank",
+      "version": "1.0.0"
+    },
+    {
+      "name": "review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "screen",
+      "version": "1.0.0"
+    },
+    {
+      "name": "security",
+      "version": "1.0.0"
+    },
+    {
+      "name": "verify",
+      "version": "1.0.0"
+    }
+  ],
+  "policy_note": "live registry truth (availability-independent); 14 entries",
+  "schema_version": "1.0.0",
+  "software": {
+    "node": "v26.7.0",
+    "platform": "linux",
+    "arch": "x64",
+    "package_version": "0.4.0"
+  },
+  "hardware": {
+    "arch": "x64",
+    "cpus": 22,
+    "cpu_model": "Intel(R) Core(TM) Ultra 9 185H",
+    "totalmem_mb": 23443
+  },
+  "config": {
+    "backend": "d1",
+    "corpus": "r1",
+    "lanes": [
+      "classify",
+      "screen",
+      "gate",
+      "find"
+    ],
+    "timeout_ms": 600000,
+    "lane_env": "(lane fixed port :8769; no lane env needed)",
+    "run_env": {},
+    "started": "2026-10-09T02:14:42.997Z",
+    "finished": "2026-10-09T04:09:17.637Z"
+  },
+  "mode": {
+    "mcp": "observe",
+    "mcp_note": "the MCP layer only observes and reports judgments; it never acts, under every policy mode",
+    "policy": "observe (default)",
+    "policy_note": "effective global policy-decision mode resolution input (verbatim env or default)"
+  },
+  "method": "T6b FULL live matrix latency pass: per-case wall (performance.now round trip) + backend-reported latencyMs summed over the predict calls of that case; overhead = wall - reported where separable (judge lanes). No thresholds, no cross-machine comparison.",
+  "gold_corpus": {
+    "independent": 10,
+    "oracle_stub": 88,
+    "total": 98,
+    "per_suite": [
+      {
+        "suite": "classify",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "decide",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "verify",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "screen",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "pii",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "extract",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "find",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "rerank",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "review",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "gate",
+        "total": 10,
+        "independent": 2,
+        "oracle_stub": 8
+      },
+      {
+        "suite": "compare",
+        "total": 8,
+        "independent": 0,
+        "oracle_stub": 8
+      }
+    ]
+  },
+  "gold_corpus_note": "provenance census (case gold_source wins, else the suite goldSource default): independent golds carry human-fixed truth (spike-grade: a live backend is judged against them), oracle-stub golds were written together with their stub answers (plumbing-grade: live mismatches measure backend-vs-oracle divergence, never backend quality)",
+  "honesty": [
+    "absolutes only; no cross-machine comparison; no improvement claimed (no baseline exists)",
+    "stub ceiling: numbers measure harness + handler plumbing, never backend quality",
+    "thresholds untouched (CERO cambios en src/); wrong_confident taus remain reporting slices, never prod cutoffs"
+  ],
+  "links": {
+    "bench": {
+      "primitives": null,
+      "rerank_rows": null
+    },
+    "metrics": {
+      "suites": null
+    }
+  },
+  "server_reported_revisions": {
+    "LiquidAI/d1-3B-GGUF": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "loaded": true
+    }
+  },
+  "t6b": {
+    "backend": "d1",
+    "lane_env": "(lane fixed port :8769; no lane env needed)",
+    "timeout_old_ms": 120000,
+    "timeout_new_ms": 600000,
+    "timeout_note": "raised ONCE, uniformly, at lanePredictFactory (single lane caller) + LANE_CALL_TIMEOUT_MS constant; per-client 120000 defaults retained as fallback; D1_MAX_NEW_TOKENS untouched (256); adjudication frozen",
+    "run_env": {},
+    "probes": {
+      "classifyxd1": {
+        "baseUrl": "http://127.0.0.1:8769",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "LiquidAI/d1-3B-GGUF",
+        "models": [
+          {
+            "name": "LiquidAI/d1-3B-GGUF",
+            "repo": "LiquidAI/d1-3B-GGUF",
+            "file": "d1-3B-Q4_K_M.gguf",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "screenxd1": {
+        "baseUrl": "http://127.0.0.1:8769",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "LiquidAI/d1-3B-GGUF",
+        "models": [
+          {
+            "name": "LiquidAI/d1-3B-GGUF",
+            "repo": "LiquidAI/d1-3B-GGUF",
+            "file": "d1-3B-Q4_K_M.gguf",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "gatexd1": {
+        "baseUrl": "http://127.0.0.1:8769",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "LiquidAI/d1-3B-GGUF",
+        "models": [
+          {
+            "name": "LiquidAI/d1-3B-GGUF",
+            "repo": "LiquidAI/d1-3B-GGUF",
+            "file": "d1-3B-Q4_K_M.gguf",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      },
+      "findxd1-choice": {
+        "baseUrl": "http://127.0.0.1:8769",
+        "reachable": true,
+        "ready": true,
+        "device": "cpu",
+        "model": "LiquidAI/d1-3B-GGUF",
+        "models": [
+          {
+            "name": "LiquidAI/d1-3B-GGUF",
+            "repo": "LiquidAI/d1-3B-GGUF",
+            "file": "d1-3B-Q4_K_M.gguf",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu",
+            "circuit": "closed"
+          }
+        ],
+        "error": null
+      }
+    },
+    "backend_note": "classify/screen/gate/find(d1-choice) lanes. Loader (manifest note per sign-off 3): transformers NATIVE GGUF legacy dequant path (arch lfm2 has no native GGUF_ARCHS entry; dequant ~16s), snap bb1e436e, file d1-3B-Q4_K_M.gguf, device cpu, D1_MAX_NEW_TOKENS untouched (256 default, env unset). Choice questions ~2.4s; score generations ~55-60s EACH (screen 3q ~170s/case; gate 5-9q 231-297s or over budget). 8 gate cases exceed the Node fetch 300s header-wait ceiling (undici default, below the 600s lane budget; npm undici unavailable so not raisable without a dependency change -- out of scope): recorded as THREW/timeout DATA per sign-off 1, NOT quality failures. 1 gate + 12 find first-pass 503 inflight_saturated (client-aborted gate generation kept server slots; no server cancel on disconnect): find re-ran standalone on idle server, 12/12 OK; gate partial (3/3 scored, 9 threw) -- systematic caveat: only sub-300s gate cases measurable.",
+    "find_rerun": {
+      "at": "2026-10-09T04:07:30.150Z",
+      "reason": "first-pass find: 12x HTTP 503 inflight_saturated (server still generating the client-aborted last gate case); re-ran on idle server"
+    }
+  }
+}
