@@ -1151,11 +1151,19 @@ def check_mcp_tools_list(timeout_s: float = 30.0) -> Dict[str, Any]:
             dist=str(dist),
             tools=names,
         )
-    degraded = names == ["laya_capabilities"]
+    # Degraded = no judgment tools servable: only the backend-independent
+    # set (capabilities + escalations + redact) is advertised. Exact-match
+    # on ["laya_capabilities"] predates the escalations/redact tools and
+    # misreported the 3-tool down-state as healthy.
+    degraded = bool(names) and set(names) <= {
+        "laya_capabilities",
+        "laya_escalations",
+        "laya_redact",
+    }
     return _ok(
         "mcp-tools-list",
         f"stdio tools/list: {len(names)} tool(s) ({', '.join(names)})"
-        + (" -- backend not ready, only the meta tool is advertised" if degraded else ""),
+        + (" -- backend not ready, only backend-independent tools are advertised" if degraded else ""),
         dist=str(dist),
         tools=names,
         degraded_backend=degraded,

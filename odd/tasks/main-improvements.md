@@ -40,3 +40,18 @@ significativo. La verificación es la batería final T3.
 - Inspect: monolith + improvements (82 files), start offered
   (lineage `review-47d866aad098b2d1`). Human DECLINED (candidate-scoped).
 - No review invoked, no authority created. Main stays tested-unreviewed.
+
+## Barrido total en main (2026-10-10, pedido del usuario)
+- `npm test` exit 0: typecheck, build, T3 64, T4 23, T5 15, T6 55,
+  redact 7/7, escalations 5/5, policy 49, stub 98/98, r1 158/158, offline sh.
+- `node evals/bench.mjs --json` exit 0 (modo stub offline, sin live).
+- 19 suites extra (t2-t7, fase4, fase6, fase7): todas exit 0.
+- Python: smoke LAYA_SKIP ok, opencode 9/9 ok, P0 x3 OK con py/.venv-r1
+  (con el python del sistema fallan por fastapi ausente: usar el venv).
+- `mcp_smoke` exit 1 offline: esperado by design (sin sidecars).
+- `py/doctor.py --no-live` exit 2: ambiental (falta el pip package laya).
+- HALLAZGO + FIX: `test_doctor_t3` 14/15 — `degraded_backend` con
+  exact-match ["laya_capabilities"], anterior a escalations/redact;
+  el down-state real (3 tools) se reportaba sano. Fix: subset de
+  backend-independent. Ahora 15/15 OK. Comparado contra base a2ce4f1
+  (ahí el test se salteaba por falta de dist).
