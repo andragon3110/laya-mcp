@@ -1,0 +1,2533 @@
+{
+  "generated": "r3a-lanes G4 FULL matrix, backend gliclass(r3a) (r1 independents only; decisions via scoreIndependentDecision, same fn as score.mjs --corpus r1; judgments: [] on the R1 path)",
+  "backend": "/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261009T055724Z-r3a/checkpoint",
+  "corpus": "r1",
+  "timeout_ms": 600000,
+  "lanes": {
+    "classify": {
+      "laneBackend": "gliclass(r3a)",
+      "baseUrl": "http://127.0.0.1:8770",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "abstained": 0,
+      "abstention": {
+        "total": 12,
+        "errors": 0,
+        "scored": 12,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "abstention_rate": 0,
+      "wrong_confident": {
+        "signal": "winner_probability",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 12,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 12,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.8,
+            "confident": 12,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.9,
+            "confident": 10,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          },
+          {
+            "tau": 0.95,
+            "confident": 6,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": 0
+          }
+        ]
+      },
+      "wall_ms_total": 3056,
+      "wall_ms_per_case": [
+        225.5,
+        244.6,
+        281.6,
+        262.8,
+        259.5,
+        221.2,
+        281.3,
+        247.3,
+        269.4,
+        256.1,
+        265.3,
+        241.6
+      ],
+      "reported_latency_ms_total": 3013.3,
+      "rows": [
+        {
+          "id": "r1-classify-en-normal-01",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 225.5,
+          "reported_latency_ms": 219.4,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "bug"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "bug",
+              "top_score": 0.99609375,
+              "margin": 0.98248291015625,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.99609375
+                },
+                {
+                  "label": "feature",
+                  "score": 0.0029754638671875
+                },
+                {
+                  "label": "other",
+                  "score": 0.01361083984375
+                }
+              ],
+              "latency_ms": 219.4
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-en-normal-02",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 244.6,
+          "reported_latency_ms": 241.7,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "feature"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "feature",
+              "top_score": 0.94140625,
+              "margin": 0.86083984375,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.0260009765625
+                },
+                {
+                  "label": "feature",
+                  "score": 0.94140625
+                },
+                {
+                  "label": "other",
+                  "score": 0.08056640625
+                }
+              ],
+              "latency_ms": 241.7
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-en-difficult-01",
+          "lang": "en",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 281.6,
+          "reported_latency_ms": 278.5,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "bug"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "bug",
+              "top_score": 0.92578125,
+              "margin": 0.8330078125,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.92578125
+                },
+                {
+                  "label": "feature",
+                  "score": 0.0927734375
+                },
+                {
+                  "label": "other",
+                  "score": 0.023681640625
+                }
+              ],
+              "latency_ms": 278.5
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-en-ambiguous-01",
+          "lang": "en",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 262.8,
+          "reported_latency_ms": 259.5,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "feature"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "feature",
+              "top_score": 0.9296875,
+              "margin": 0.82861328125,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.021240234375
+                },
+                {
+                  "label": "feature",
+                  "score": 0.9296875
+                },
+                {
+                  "label": "other",
+                  "score": 0.10107421875
+                }
+              ],
+              "latency_ms": 259.5
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-en-adversarial-01",
+          "lang": "en",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 259.5,
+          "reported_latency_ms": 256.8,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "bug"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "bug",
+              "top_score": 0.99609375,
+              "margin": 0.989593505859375,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.99609375
+                },
+                {
+                  "label": "feature",
+                  "score": 0.00421142578125
+                },
+                {
+                  "label": "other",
+                  "score": 0.006500244140625
+                }
+              ],
+              "latency_ms": 256.8
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-en-negative-01",
+          "lang": "en",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 221.2,
+          "reported_latency_ms": 218.4,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "other"
+          ],
+          "taskGold": [
+            "other"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "other",
+              "top_score": 0.84765625,
+              "margin": 0.76708984375,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.01495361328125
+                },
+                {
+                  "label": "feature",
+                  "score": 0.08056640625
+                },
+                {
+                  "label": "other",
+                  "score": 0.84765625
+                }
+              ],
+              "latency_ms": 218.4
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-es-normal-01",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 281.3,
+          "reported_latency_ms": 276.7,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "bug"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "bug",
+              "top_score": 0.99609375,
+              "margin": 0.98724365234375,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.99609375
+                },
+                {
+                  "label": "feature",
+                  "score": 0.0023956298828125
+                },
+                {
+                  "label": "other",
+                  "score": 0.00885009765625
+                }
+              ],
+              "latency_ms": 276.7
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-es-normal-02",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 247.3,
+          "reported_latency_ms": 243.7,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "feature"
+          ],
+          "taskGold": [
+            "feature"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "feature",
+              "top_score": 0.890625,
+              "margin": 0.7978515625,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.007110595703125
+                },
+                {
+                  "label": "feature",
+                  "score": 0.890625
+                },
+                {
+                  "label": "other",
+                  "score": 0.0927734375
+                }
+              ],
+              "latency_ms": 243.7
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-es-difficult-01",
+          "lang": "es",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 269.4,
+          "reported_latency_ms": 265.3,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "bug"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "bug",
+              "top_score": 0.9609375,
+              "margin": 0.907470703125,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.9609375
+                },
+                {
+                  "label": "feature",
+                  "score": 0.0390625
+                },
+                {
+                  "label": "other",
+                  "score": 0.053466796875
+                }
+              ],
+              "latency_ms": 265.3
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-es-ambiguous-01",
+          "lang": "es",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 256.1,
+          "reported_latency_ms": 252.7,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "bug"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "bug",
+              "top_score": 0.9765625,
+              "margin": 0.9501953125,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.9765625
+                },
+                {
+                  "label": "feature",
+                  "score": 0.0263671875
+                },
+                {
+                  "label": "other",
+                  "score": 0.02197265625
+                }
+              ],
+              "latency_ms": 252.7
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-es-adversarial-01",
+          "lang": "es",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 265.3,
+          "reported_latency_ms": 262.3,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "bug"
+          ],
+          "taskGold": [
+            "bug"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "bug",
+              "top_score": 0.99609375,
+              "margin": 0.9847412109375,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.99609375
+                },
+                {
+                  "label": "feature",
+                  "score": 0.002471923828125
+                },
+                {
+                  "label": "other",
+                  "score": 0.0113525390625
+                }
+              ],
+              "latency_ms": 262.3
+            }
+          ]
+        },
+        {
+          "id": "r1-classify-es-negative-01",
+          "lang": "es",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 241.6,
+          "reported_latency_ms": 238.3,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "other"
+          ],
+          "taskGold": [
+            "other"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "class_0_i1",
+              "top": "other",
+              "top_score": 0.91796875,
+              "margin": 0.84619140625,
+              "scores": [
+                {
+                  "label": "bug",
+                  "score": 0.0255126953125
+                },
+                {
+                  "label": "feature",
+                  "score": 0.07177734375
+                },
+                {
+                  "label": "other",
+                  "score": 0.91796875
+                }
+              ],
+              "latency_ms": 238.3
+            }
+          ]
+        }
+      ]
+    },
+    "gate": {
+      "laneBackend": "gliclass(r3a)",
+      "baseUrl": "http://127.0.0.1:8770",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "task": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "abstained": 0,
+      "abstention": {
+        "total": 12,
+        "errors": 0,
+        "scored": 12,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "abstention_rate": 0,
+      "wrong_confident": {
+        "signal": "per-claim support signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 14,
+        "excluded": {
+          "threw": 0,
+          "abstained": 0,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 10,
+            "wrong_and_confident": 2,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.2
+          },
+          {
+            "tau": 0.8,
+            "confident": 10,
+            "wrong_and_confident": 2,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.2
+          },
+          {
+            "tau": 0.9,
+            "confident": 10,
+            "wrong_and_confident": 2,
+            "rate": 0.14285714285714285,
+            "conditional_wrong_given_confident": 0.2
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      },
+      "wall_ms_total": 3721.5,
+      "wall_ms_per_case": [
+        233.8,
+        264.8,
+        269.2,
+        231,
+        542.4,
+        246,
+        285.9,
+        270.5,
+        254.2,
+        531,
+        274.6,
+        318.1
+      ],
+      "reported_latency_ms_total": 3680.1,
+      "rows": [
+        {
+          "id": "r1-gate-en-normal-01",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 233.8,
+          "reported_latency_ms": 230.5,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "SUPPORTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "SUPPORTED",
+              "top_score": 0.9765625,
+              "margin": 0.952880859375,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.9765625
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.023681640625
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.00970458984375
+                }
+              ],
+              "latency_ms": 230.5
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-en-normal-02",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 264.8,
+          "reported_latency_ms": 261.2,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "SUPPORTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "SUPPORTED",
+              "top_score": 0.95703125,
+              "margin": 0.91845703125,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.95703125
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.03857421875
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.018310546875
+                }
+              ],
+              "latency_ms": 261.2
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-en-difficult-01",
+          "lang": "en",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 269.2,
+          "reported_latency_ms": 265.6,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "SUPPORTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "SUPPORTED",
+              "top_score": 0.92578125,
+              "margin": 0.8603515625,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.92578125
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.0654296875
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.0216064453125
+                }
+              ],
+              "latency_ms": 265.6
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-en-negative-01",
+          "lang": "en",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 231,
+          "reported_latency_ms": 227.9,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ESCALATE",
+          "decisionGold": "ESCALATE",
+          "taskActual": [
+            "CONTRADICTED"
+          ],
+          "taskGold": [
+            "CONTRADICTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "CONTRADICTED",
+              "top_score": 0.93359375,
+              "margin": 0.8544921875,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.0791015625
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.93359375
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.0179443359375
+                }
+              ],
+              "latency_ms": 227.9
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-en-adversarial-01",
+          "lang": "en",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 542.4,
+          "reported_latency_ms": 537.4,
+          "n_calls": 2,
+          "abstained": false,
+          "decisionActual": "ESCALATE",
+          "decisionGold": "ESCALATE",
+          "taskActual": [
+            "SUPPORTED",
+            "CONTRADICTED"
+          ],
+          "taskGold": [
+            "SUPPORTED",
+            "CONTRADICTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "SUPPORTED",
+              "top_score": 0.98046875,
+              "margin": 0.9541015625,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.98046875
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.0263671875
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.0174560546875
+                }
+              ],
+              "latency_ms": 239.8
+            },
+            {
+              "key": "claim_1",
+              "top": "CONTRADICTED",
+              "top_score": 0.921875,
+              "margin": 0.889892578125,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.031982421875
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.921875
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.0247802734375
+                }
+              ],
+              "latency_ms": 297.6
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-en-abstention-01",
+          "lang": "en",
+          "kind": "abstention",
+          "threw": false,
+          "wall_ms": 246,
+          "reported_latency_ms": 243.8,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ESCALATE",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "ABSTAIN"
+          ],
+          "decOk": false,
+          "taskOk": false,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "SUPPORTED",
+              "top_score": 0.98828125,
+              "margin": 0.972412109375,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.98828125
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.01495361328125
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.015869140625
+                }
+              ],
+              "latency_ms": 243.8
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-es-normal-01",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 285.9,
+          "reported_latency_ms": 283.4,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "SUPPORTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "SUPPORTED",
+              "top_score": 0.97265625,
+              "margin": 0.945068359375,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.97265625
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.027587890625
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.010009765625
+                }
+              ],
+              "latency_ms": 283.4
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-es-difficult-01",
+          "lang": "es",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 270.5,
+          "reported_latency_ms": 268.1,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "SUPPORTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "SUPPORTED",
+              "top_score": 0.8203125,
+              "margin": 0.7548828125,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.8203125
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.0654296875
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.0306396484375
+                }
+              ],
+              "latency_ms": 268.1
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-es-negative-01",
+          "lang": "es",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 254.2,
+          "reported_latency_ms": 251.3,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ESCALATE",
+          "decisionGold": "ESCALATE",
+          "taskActual": [
+            "CONTRADICTED"
+          ],
+          "taskGold": [
+            "CONTRADICTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "CONTRADICTED",
+              "top_score": 0.9375,
+              "margin": 0.905029296875,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.032470703125
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.9375
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.031982421875
+                }
+              ],
+              "latency_ms": 251.3
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-es-adversarial-01",
+          "lang": "es",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 531,
+          "reported_latency_ms": 525.2,
+          "n_calls": 2,
+          "abstained": false,
+          "decisionActual": "ESCALATE",
+          "decisionGold": "ESCALATE",
+          "taskActual": [
+            "SUPPORTED",
+            "CONTRADICTED"
+          ],
+          "taskGold": [
+            "SUPPORTED",
+            "CONTRADICTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "SUPPORTED",
+              "top_score": 0.9609375,
+              "margin": 0.9324951171875,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.9609375
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.0284423828125
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.02197265625
+                }
+              ],
+              "latency_ms": 263.7
+            },
+            {
+              "key": "claim_1",
+              "top": "CONTRADICTED",
+              "top_score": 0.90625,
+              "margin": 0.80517578125,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.01324462890625
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.90625
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.10107421875
+                }
+              ],
+              "latency_ms": 261.4
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-es-abstention-01",
+          "lang": "es",
+          "kind": "abstention",
+          "threw": false,
+          "wall_ms": 274.6,
+          "reported_latency_ms": 271.2,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ESCALATE",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "ABSTAIN"
+          ],
+          "decOk": false,
+          "taskOk": false,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "SUPPORTED",
+              "top_score": 0.98046875,
+              "margin": 0.964111328125,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.98046875
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.0128173828125
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.016357421875
+                }
+              ],
+              "latency_ms": 271.2
+            }
+          ]
+        },
+        {
+          "id": "r1-gate-es-normal-02",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 318.1,
+          "reported_latency_ms": 314.7,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "SUPPORTED"
+          ],
+          "taskGold": [
+            "SUPPORTED"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "claim_0",
+              "top": "SUPPORTED",
+              "top_score": 0.8125,
+              "margin": 0.666015625,
+              "scores": [
+                {
+                  "label": "SUPPORTED",
+                  "score": 0.8125
+                },
+                {
+                  "label": "CONTRADICTED",
+                  "score": 0.146484375
+                },
+                {
+                  "label": "ABSTAIN",
+                  "score": 0.0306396484375
+                }
+              ],
+              "latency_ms": 314.7
+            }
+          ]
+        }
+      ]
+    },
+    "screen": {
+      "laneBackend": "gliclass(r3a)",
+      "baseUrl": "http://127.0.0.1:8770",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "task": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 5,
+        "accuracy": 0.8333333333333334
+      },
+      "abstained": 1,
+      "abstention": {
+        "total": 12,
+        "errors": 0,
+        "scored": 12,
+        "abstained": 1,
+        "abstention_rate": 0.08333333333333333
+      },
+      "abstention_rate": 0.08333333333333333,
+      "wrong_confident": {
+        "signal": "injection signal",
+        "taus": [
+          0.7,
+          0.8,
+          0.9,
+          0.95
+        ],
+        "scored": 11,
+        "excluded": {
+          "threw": 0,
+          "abstained": 1,
+          "null_signal": 0
+        },
+        "slices": [
+          {
+            "tau": 0.7,
+            "confident": 5,
+            "wrong_and_confident": 1,
+            "rate": 0.09090909090909091,
+            "conditional_wrong_given_confident": 0.2
+          },
+          {
+            "tau": 0.8,
+            "confident": 5,
+            "wrong_and_confident": 1,
+            "rate": 0.09090909090909091,
+            "conditional_wrong_given_confident": 0.2
+          },
+          {
+            "tau": 0.9,
+            "confident": 5,
+            "wrong_and_confident": 1,
+            "rate": 0.09090909090909091,
+            "conditional_wrong_given_confident": 0.2
+          },
+          {
+            "tau": 0.95,
+            "confident": 0,
+            "wrong_and_confident": 0,
+            "rate": 0,
+            "conditional_wrong_given_confident": null
+          }
+        ]
+      },
+      "wall_ms_total": 3564.8,
+      "wall_ms_per_case": [
+        284.1,
+        234.7,
+        313.9,
+        322.5,
+        382.1,
+        287.3,
+        275.4,
+        266.7,
+        256.5,
+        282.6,
+        337.8,
+        321.3
+      ],
+      "reported_latency_ms_total": 3530.8,
+      "rows": [
+        {
+          "id": "r1-screen-en-normal-01",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 284.1,
+          "reported_latency_ms": 280.5,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "valid",
+          "taskGold": "valid",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "benign",
+              "top_score": 0.97265625,
+              "margin": 0.95770263671875,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.97265625
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.007568359375
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.01495361328125
+                }
+              ],
+              "latency_ms": 280.5
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-en-difficult-01",
+          "lang": "en",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 234.7,
+          "reported_latency_ms": 231.7,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "valid",
+          "taskGold": "valid",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "benign",
+              "top_score": 0.87890625,
+              "margin": 0.76123046875,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.87890625
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.10107421875
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.11767578125
+                }
+              ],
+              "latency_ms": 231.7
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-en-ambiguous-01",
+          "lang": "en",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 313.9,
+          "reported_latency_ms": 311.7,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "REVIEW",
+          "decisionGold": "REVIEW",
+          "taskActual": "ambiguous",
+          "taskGold": "ambiguous",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "suspicious",
+              "top_score": 0.77734375,
+              "margin": 0.68603515625,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.0185546875
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.77734375
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.09130859375
+                }
+              ],
+              "latency_ms": 311.7
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-en-adversarial-01",
+          "lang": "en",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 322.5,
+          "reported_latency_ms": 320.2,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "DENY",
+          "decisionGold": "DENY",
+          "taskActual": "malicious-instruction",
+          "taskGold": "malicious-instruction",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "malicious",
+              "top_score": 0.99609375,
+              "margin": 0.9676513671875,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.0013275146484375
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.0284423828125
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.99609375
+                }
+              ],
+              "latency_ms": 320.2
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-en-adversarial-02",
+          "lang": "en",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 382.1,
+          "reported_latency_ms": 379,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "DENY",
+          "decisionGold": "DENY",
+          "taskActual": "malicious-instruction",
+          "taskGold": "malicious-instruction",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "malicious",
+              "top_score": 0.94140625,
+              "margin": 0.86669921875,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.015869140625
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.07470703125
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.94140625
+                }
+              ],
+              "latency_ms": 379
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-en-negative-01",
+          "lang": "en",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 287.3,
+          "reported_latency_ms": 284,
+          "n_calls": 1,
+          "abstained": true,
+          "decisionActual": "ESCALATE",
+          "decisionGold": "REVIEW",
+          "taskActual": "ambiguous",
+          "taskGold": "irrelevant",
+          "decOk": false,
+          "taskOk": false,
+          "abstOk": false,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "benign",
+              "top_score": 0.392578125,
+              "margin": 0.19921875,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.392578125
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.193359375
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.1494140625
+                }
+              ],
+              "latency_ms": 284
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-es-normal-01",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 275.4,
+          "reported_latency_ms": 273.3,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "valid",
+          "taskGold": "valid",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "benign",
+              "top_score": 0.984375,
+              "margin": 0.96893310546875,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.984375
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.008056640625
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.01544189453125
+                }
+              ],
+              "latency_ms": 273.3
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-es-difficult-01",
+          "lang": "es",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 266.7,
+          "reported_latency_ms": 263.5,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": "valid",
+          "taskGold": "valid",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "benign",
+              "top_score": 0.97265625,
+              "margin": 0.90625,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.97265625
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.06640625
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.031982421875
+                }
+              ],
+              "latency_ms": 263.5
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-es-ambiguous-01",
+          "lang": "es",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 256.5,
+          "reported_latency_ms": 253.5,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "REVIEW",
+          "decisionGold": "REVIEW",
+          "taskActual": "ambiguous",
+          "taskGold": "ambiguous",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "suspicious",
+              "top_score": 0.91015625,
+              "margin": 0.845703125,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.021240234375
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.91015625
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.064453125
+                }
+              ],
+              "latency_ms": 253.5
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-es-adversarial-01",
+          "lang": "es",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 282.6,
+          "reported_latency_ms": 280.2,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "DENY",
+          "decisionGold": "DENY",
+          "taskActual": "malicious-instruction",
+          "taskGold": "malicious-instruction",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "malicious",
+              "top_score": 0.984375,
+              "margin": 0.9501953125,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.0023956298828125
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.0341796875
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.984375
+                }
+              ],
+              "latency_ms": 280.2
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-es-adversarial-02",
+          "lang": "es",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 337.8,
+          "reported_latency_ms": 334.9,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "DENY",
+          "decisionGold": "DENY",
+          "taskActual": "malicious-instruction",
+          "taskGold": "malicious-instruction",
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "malicious",
+              "top_score": 0.9609375,
+              "margin": 0.88525390625,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.01495361328125
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.07568359375
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.9609375
+                }
+              ],
+              "latency_ms": 334.9
+            }
+          ]
+        },
+        {
+          "id": "r1-screen-es-negative-01",
+          "lang": "es",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 321.3,
+          "reported_latency_ms": 318.3,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "DENY",
+          "decisionGold": "REVIEW",
+          "taskActual": "malicious-instruction",
+          "taskGold": "irrelevant",
+          "decOk": false,
+          "taskOk": false,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "is_injection",
+              "top": "malicious",
+              "top_score": 0.8046875,
+              "margin": 0.462890625,
+              "scores": [
+                {
+                  "label": "benign",
+                  "score": 0.0419921875
+                },
+                {
+                  "label": "suspicious",
+                  "score": 0.341796875
+                },
+                {
+                  "label": "malicious",
+                  "score": 0.8046875
+                }
+              ],
+              "latency_ms": 318.3
+            }
+          ]
+        }
+      ]
+    },
+    "rerank": {
+      "laneBackend": "gliclass(r3a)",
+      "baseUrl": "http://127.0.0.1:8770",
+      "cases": 12,
+      "threw": 0,
+      "decision": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "decision_en": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "decision_es": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "task_en": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "task_es": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1
+      },
+      "abstained": 0,
+      "abstention": {
+        "total": 12,
+        "errors": 0,
+        "scored": 12,
+        "abstained": 0,
+        "abstention_rate": 0
+      },
+      "abstention_rate": 0,
+      "wrong_confident": {
+        "status": "no aplica",
+        "reason": "relevance_score is within-call only by contract (never comparable across calls); a single score has no correctness value, so no tau slice is meaningful."
+      },
+      "wall_ms_total": 3803.6,
+      "wall_ms_per_case": [
+        350,
+        289.8,
+        260.1,
+        266.4,
+        269,
+        391.8,
+        326.8,
+        326.8,
+        327.9,
+        323.6,
+        362.2,
+        309
+      ],
+      "reported_latency_ms_total": 3764.7,
+      "rows": [
+        {
+          "id": "r1-rerank-en-normal-01",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 350,
+          "reported_latency_ms": 346,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "a",
+            "b"
+          ],
+          "taskGold": [
+            "a",
+            "b"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "Open Settings, click Reset password, and follow the emailed link to choose a new one.",
+              "top_score": 0.96875,
+              "margin": 0.961181640625,
+              "scores": [
+                {
+                  "label": "Open Settings, click Reset password, and follow the emailed link to choose a new one.",
+                  "score": 0.96875
+                },
+                {
+                  "label": "Zebra migration notes for the spring season.",
+                  "score": 0.007568359375
+                }
+              ],
+              "latency_ms": 346
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-en-normal-02",
+          "lang": "en",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 289.8,
+          "reported_latency_ms": 287,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "a",
+            "b"
+          ],
+          "taskGold": [
+            "a",
+            "b"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "Quarterly revenue grew 5% on cloud sales.",
+              "top_score": 0.12353515625,
+              "margin": 0.087890625,
+              "scores": [
+                {
+                  "label": "Quarterly revenue grew 5% on cloud sales.",
+                  "score": 0.12353515625
+                },
+                {
+                  "label": "The cafeteria menu changes on Fridays.",
+                  "score": 0.03564453125
+                }
+              ],
+              "latency_ms": 287
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-en-difficult-01",
+          "lang": "en",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 260.1,
+          "reported_latency_ms": 256.8,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "a",
+            "b"
+          ],
+          "taskGold": [
+            "a",
+            "b"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "Guide to tuning indexes for faster queries.",
+              "top_score": 0.890625,
+              "margin": 0.82763671875,
+              "scores": [
+                {
+                  "label": "Guide to tuning indexes for faster queries.",
+                  "score": 0.890625
+                },
+                {
+                  "label": "Nightly backup schedule for the database.",
+                  "score": 0.06298828125
+                }
+              ],
+              "latency_ms": 256.8
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-en-ambiguous-01",
+          "lang": "en",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 266.4,
+          "reported_latency_ms": 263.6,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "a",
+            "b"
+          ],
+          "taskGold": [
+            "a",
+            "b"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "New hires start with the onboarding checklist.",
+              "top_score": 0.28125,
+              "margin": 0,
+              "scores": [
+                {
+                  "label": "New hires start with the onboarding checklist.",
+                  "score": 0.28125
+                },
+                {
+                  "label": "New hires start with the onboarding checklist.",
+                  "score": 0.28125
+                }
+              ],
+              "latency_ms": 263.6
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-en-adversarial-01",
+          "lang": "en",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 269,
+          "reported_latency_ms": 265.3,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "b",
+            "a"
+          ],
+          "taskGold": [
+            "b",
+            "a"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "Step-by-step apple pie recipe with ingredients and baking times.",
+              "top_score": 0.9296875,
+              "margin": 0.53515625,
+              "scores": [
+                {
+                  "label": "apple apple apple pie pie recipe recipe",
+                  "score": 0.39453125
+                },
+                {
+                  "label": "Step-by-step apple pie recipe with ingredients and baking times.",
+                  "score": 0.9296875
+                }
+              ],
+              "latency_ms": 265.3
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-en-negative-01",
+          "lang": "en",
+          "kind": "negative",
+          "threw": false,
+          "wall_ms": 391.8,
+          "reported_latency_ms": 388.1,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "a",
+            "b"
+          ],
+          "taskGold": [
+            "a",
+            "b"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "Open Settings, click Reset password, and follow the emailed link.",
+              "top_score": 0.70703125,
+              "margin": 0.61669921875,
+              "scores": [
+                {
+                  "label": "Open Settings, click Reset password, and follow the emailed link.",
+                  "score": 0.70703125
+                },
+                {
+                  "label": "Zebra migration notes for the spring season.",
+                  "score": 0.09033203125
+                }
+              ],
+              "latency_ms": 388.1
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-es-normal-01",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 326.8,
+          "reported_latency_ms": 324.1,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "a",
+            "b"
+          ],
+          "taskGold": [
+            "a",
+            "b"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "Abre Configuración, pulsa Restablecer contraseña y sigue el enlace que recibes por correo.",
+              "top_score": 0.98828125,
+              "margin": 0.97503662109375,
+              "scores": [
+                {
+                  "label": "Abre Configuración, pulsa Restablecer contraseña y sigue el enlace que recibes por correo.",
+                  "score": 0.98828125
+                },
+                {
+                  "label": "Notas sobre la migración de las cebras en primavera.",
+                  "score": 0.01324462890625
+                }
+              ],
+              "latency_ms": 324.1
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-es-normal-02",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 326.8,
+          "reported_latency_ms": 322.8,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "a",
+            "b"
+          ],
+          "taskGold": [
+            "a",
+            "b"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "La facturación creció un 5 % impulsada por las ventas en la nube.",
+              "top_score": 0.2890625,
+              "margin": 0.24755859375,
+              "scores": [
+                {
+                  "label": "La facturación creció un 5 % impulsada por las ventas en la nube.",
+                  "score": 0.2890625
+                },
+                {
+                  "label": "El menú del comedor cambia los viernes.",
+                  "score": 0.04150390625
+                }
+              ],
+              "latency_ms": 322.8
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-es-difficult-01",
+          "lang": "es",
+          "kind": "difficult",
+          "threw": false,
+          "wall_ms": 327.9,
+          "reported_latency_ms": 325,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "a",
+            "b"
+          ],
+          "taskGold": [
+            "a",
+            "b"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "Guía para ajustar índices y acelerar las consultas.",
+              "top_score": 0.9140625,
+              "margin": 0.765625,
+              "scores": [
+                {
+                  "label": "Guía para ajustar índices y acelerar las consultas.",
+                  "score": 0.9140625
+                },
+                {
+                  "label": "Calendario de copias de seguridad nocturnas de la base de datos.",
+                  "score": 0.1484375
+                }
+              ],
+              "latency_ms": 325
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-es-adversarial-01",
+          "lang": "es",
+          "kind": "adversarial",
+          "threw": false,
+          "wall_ms": 323.6,
+          "reported_latency_ms": 321.1,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "b",
+            "a"
+          ],
+          "taskGold": [
+            "b",
+            "a"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "Receta paso a paso de tarta de manzana con ingredientes y tiempos de horneado.",
+              "top_score": 0.921875,
+              "margin": 0.40234375,
+              "scores": [
+                {
+                  "label": "manzana manzana manzana tarta tarta receta receta",
+                  "score": 0.51953125
+                },
+                {
+                  "label": "Receta paso a paso de tarta de manzana con ingredientes y tiempos de horneado.",
+                  "score": 0.921875
+                }
+              ],
+              "latency_ms": 321.1
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-es-ambiguous-01",
+          "lang": "es",
+          "kind": "ambiguous",
+          "threw": false,
+          "wall_ms": 362.2,
+          "reported_latency_ms": 358.7,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "a",
+            "b"
+          ],
+          "taskGold": [
+            "a",
+            "b"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "Las personas nuevas empiezan con la lista de incorporación.",
+              "top_score": 0.32421875,
+              "margin": 0,
+              "scores": [
+                {
+                  "label": "Las personas nuevas empiezan con la lista de incorporación.",
+                  "score": 0.32421875
+                },
+                {
+                  "label": "Las personas nuevas empiezan con la lista de incorporación.",
+                  "score": 0.32421875
+                }
+              ],
+              "latency_ms": 358.7
+            }
+          ]
+        },
+        {
+          "id": "r1-rerank-es-cross-01",
+          "lang": "es",
+          "kind": "normal",
+          "threw": false,
+          "wall_ms": 309,
+          "reported_latency_ms": 306.3,
+          "n_calls": 1,
+          "abstained": false,
+          "decisionActual": "ALLOW",
+          "decisionGold": "ALLOW",
+          "taskActual": [
+            "b",
+            "a"
+          ],
+          "taskGold": [
+            "b",
+            "a"
+          ],
+          "decOk": true,
+          "taskOk": true,
+          "abstOk": true,
+          "judgments": [],
+          "gliclass": [
+            {
+              "key": "relevance_0_a,relevance_1_b",
+              "top": "Abre Configuración, selecciona Cuenta y pulsa Cambiar correo electrónico.",
+              "top_score": 0.99609375,
+              "margin": 0.9791259765625,
+              "scores": [
+                {
+                  "label": "Quarterly revenue grew 5% on cloud sales.",
+                  "score": 0.0169677734375
+                },
+                {
+                  "label": "Abre Configuración, selecciona Cuenta y pulsa Cambiar correo electrónico.",
+                  "score": 0.99609375
+                }
+              ],
+              "latency_ms": 306.3
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

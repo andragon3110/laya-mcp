@@ -165,17 +165,17 @@ export function buildFeatures(): Record<string, unknown> {
 
 /**
  * Measured track numbers (self-reported eval results, versioned with the code).
- * r3g GLiClass track (promoted from r3f 2026-10-10; history in §13),
+ * r3h GLiClass track (promoted from r3g 2026-10-10; history in §13),
  * r1 corpus, live CPU — see EVALUATION.md §13 for method and per-version
  * notes. Strings, not floats: agents route on them, they are
  * not probabilities. Updated by hand when a new measured track lands; the
  * test pins every lane string so stale numbers fail loudly.
  */
 export const MEASURED_TRACK = {
-  track: "gliclass-r3g",
+  track: "gliclass-r3h",
   date: "2026-10-10",
-  corpus: "r1 (60 golds: 48 over r3g lanes + 12 find)",
-  backend: "run-20261010T185106Z-r3g checkpoint, CPU",
+  corpus: "r1 (60 golds: 48 over r3h lanes + 12 find)",
+  backend: "run-20261010T190431Z-r3h checkpoint, CPU",
   composed: { decision: "56/60", task: "56/60" },
   lanes: {
     classify: { decision: "12/12", task: "12/12" },

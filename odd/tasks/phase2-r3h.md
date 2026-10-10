@@ -18,3 +18,11 @@ parada: si r3h no mueve gate/screen task, training agotado (no hay r3i).
 - :8770 en r3g hasta el swap.
 
 ## Sin verificación intermedia (orden vigente); matrices al cierre.
+
+## Adopción r3h + STOP (2026-10-10)
+- Train limpio (680 filas, 34s, sin ABORT; deltas ~flat).
+- v2-80: classify 16/26→18/26; gate/screen task 0 (dec arriba).
+- r1 56/60 + 56/60 idéntico: sin revertir. v19 publicado. Batería verde.
+- STOP RULE: gate/screen task inmóviles en 3 rounds ⇒ training agotado,
+  no hay r3i. r3h adoptado como checkpoint final.
+- :8770 sirve r3h; r3g/r3f/r3a intactos.
