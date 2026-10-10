@@ -26,3 +26,8 @@ offsets y recién llamar a redact. Tres llamadas donde una alcanzaría.
 Propuesta en firme para aprobación. Construir = feature con test-first
 (detect+redact tienen runner determinista offline con stub GLiNER si se
 provee; si no, test-first parcial + live tapado por diseño).
+
+## RDD 73335f4e (2026-10-10)
+- Inspect: monolith + scope doc, start offered
+  (lineage `review-1dab041082c8a8df`). Human DECLINED (candidate-scoped).
+- No review invoked, no authority created.
