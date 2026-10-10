@@ -45,14 +45,18 @@ plus the Fase 6 additions (`tests/fase6_t3_trace_metrics.mjs`,
   builder vocabulary, never raw throws). `outputSchema` is therefore an
   announcement for clients, not a server-side gate.
 
-## 3. Tools (12)
+## 3. Tools (13)
 
-All 12 tools carry read-only annotations
+Twelve tools carry read-only annotations
 (`{readOnlyHint: true, destructiveHint: false, idempotentHint: true}`,
 shared `READONLY_TOOL_ANNOTATIONS` in `src/tool.ts:53-57`;
 `openWorldHint` deliberately omitted — the tools reach a local HTTP
-backend and the server claims nothing about world scope). Every tool is
-read-only inference: no side effects, no mutation.
+backend and the server claims nothing about world scope). Every judgment tool is
+read-only inference: no side effects, no mutation. The thirteenth tool,
+`laya_escalations`, is the announced exception: a local abstention sink
+(append-only JSONL, `log`/`list`/`ack`) with
+`{readOnlyHint: false, destructiveHint: false, idempotentHint: false}`
+(`src/tools/escalations.ts`).
 
 `input_required` / `output_required` below are the literal `required`
 arrays from the shipped schemas (dumped from `dist/`); optional inputs
@@ -72,7 +76,8 @@ are listed where they exist. Primitives come from `TOOL_PRIMITIVES`
 | `laya_review` | `score` | required: `request`, `diff`; optional: `tests` | `rubric`, `decision`, `latency_ms`, `evidence`, `abstention` |
 | `laya_gate` | `score` | required: `request`, `diff`, `claims`; optional: `evidence`, `context`, `risk` | `review`, `claims`, `decision`, `context`, `risk`, `latency_ms`, `evidence`, `abstention` |
 | `laya_pii` | `spans` | required: `text`; optional: `extra_types`, `risk` (`low`/`normal`/`high`, default `normal`; moves only the non-secret branch). Served only while the GLiNER sidecar is live-ready. | `pipeline`, `findings`, `counts`, `secrets_found`, `decision`, `latency_ms`, `recommendation`, `evidence`, `abstention` |
-| `laya_capabilities` | none (`null`) | optional: `timeout_ms` (integer, 100–30000, default 2000) | `models`, `backend`, `gliner`, `primitives`, `tools`, `policies`, `features`, `mode`, `schema_version`, `latency_ms` — plus OPTIONAL (never required) `modes`, `metrics` (Fase 6, §10) |
+| `laya_capabilities` | none (`null`) | optional: `timeout_ms` (integer, 100–30000, default 2000) | `models`, `backend`, `gliner`, `primitives`, `tools`, `policies`, `features`, `mode`, `schema_version`, `latency_ms` — plus OPTIONAL (never required) `modes`, `metrics` (Fase 6, §10), `measured` (r3a track, §3.1) |
+| `laya_escalations` | none (`null`) | required: `action` (`log`\|`list`\|`ack`); per-action fields, all optional except the action | `action`, `ok` — plus per-action `escalation_id`, `escalation`, `escalations`, `status`, `open`, `acked`, `store` (§3.1) |
 
 Notes:
 
@@ -102,6 +107,26 @@ Notes:
   plus GLiNER reachability and a recovery hint.
 - When laya-server is up but GLiNER is down, `laya_pii` is absent from
   the list and `gliner.reachable` is `false` in the capabilities report.
+
+### 3.1 `laya_escalations` + measured track numbers
+
+- `laya_escalations` (tool 13, `src/tools/escalations.ts`) is the abstention
+  sink: judgment tools say ESCALATE/abstain instead of guessing, and this
+  tool files those moments. `log {primitive, tool, decision, reason,
+  case_id?, context?}` appends one `logged` event and returns its id
+  (`esc-NNNN` from the logged-count); `list {status?, limit?}` triages the
+  queue (`open` default); `ack {escalation_id, verdict, reviewer?, note?}`
+  appends an `acknowledged` event (later acks supersede; history stays).
+  Store: append-only JSONL at `LAYA_ESCALATIONS_FILE`, else
+  `<repo>/var/escalations.jsonl` (gitignored runtime state, never
+  committed). Unknown action/id/field rejects `invalid_argument` (isError).
+  Needs no backend: always advertised alongside capabilities (down-list is
+  `[laya_capabilities, laya_escalations]`, `src/index.ts`). First
+  non-readonly tool — announced in `annotations`, not smuggled.
+- `measured` (OPTIONAL `laya_capabilities` key, never required) publishes
+  the versioned r3a track numbers agents route on (`MEASURED_TRACK` code
+  truth, pinned by contract tests): 56/60 decision, 55/60 task, per-lane
+  strings, method, assistive standing, `EVALUATION.md` §13 pointer.
 
 ## 4. Schemas
 

@@ -24,7 +24,7 @@
 
 <p align="center">
   <b>Give your coding agent judgment calls instead of vibes.</b><br>
-  Twelve MCP tools backed by local decision models — deterministic
+  Thirteen MCP tools: twelve backed by local decision models — deterministic
   evidence-plus-policy judgments (uncalibrated signals, never probabilities;
   see `EVALUATION.md` §6) your code can branch on, sort by, and gate with.
   <br><br>
@@ -589,7 +589,7 @@ $HOME/laya-mcp/doctor.sh --benchmark  # live `node evals/bench.mjs --json`, else
 $HOME/laya-mcp/doctor.sh                                          # full diagnostic first
 $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke.py    # Laya end-to-end
 $HOME/laya-mcp/.venv/bin/python $HOME/laya-mcp/tests/smoke_gliner.py  # GLiNER end-to-end (needs sidecar)
-cd $HOME/laya-mcp && npm run inspect                              # MCP inspector: 12 tools with sidecar (11 without; 1 with Laya down)
+cd $HOME/laya-mcp && npm run inspect                              # MCP inspector: 13 tools with sidecar (12 without; 2 with Laya down)
 cd $HOME/laya-mcp && .venv/bin/python tests/test_opencode_v2.py  # config-layer unit tests (no models needed)
 ```
 (On Windows git-bash the venv lives at `.venv/Scripts` instead of `.venv/bin`.)
