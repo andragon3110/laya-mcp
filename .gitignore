@@ -18,3 +18,6 @@ __pycache__/
 examples/*.local.json
 .engram/
 .serena/
+
+# Runtime state (escalation queue, never committed)
+/var/

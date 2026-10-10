@@ -10,8 +10,8 @@
  * are mirrored as schema maximums (checked both ways).
  *
  * Part B (live list, stub backend): a stub Laya HTTP server answers
- * GET /live + GET /ready so tools/list advertises 11 tools (10 + T5
- * laya_capabilities; gliner down so no pii);
+ * GET /live + GET /ready so tools/list advertises 12 tools (10 + T5
+ * laya_capabilities + laya_escalations; gliner down so no pii);
  * every wire entry must carry outputSchema + annotations, which also proves
  * the payload passes the SDK's own ListToolsResultSchema validation inside
  * client.listTools().
@@ -452,15 +452,15 @@ try {
   // while the watcher still probes) precedes the steady 11-tool list.
   while (Date.now() < deadline) {
     const res = await client.listTools();
-    if (res.tools.length === 11) {
+    if (res.tools.length === 12) {
       tools = res.tools;
       break;
     }
     await new Promise((r) => setTimeout(r, 300));
   }
-  assert.equal(tools.length, 11, `11 tools advertised with stub laya up, gliner down (got ${tools.length})`);
+  assert.equal(tools.length, 12, `12 tools advertised with stub laya up, gliner down (got ${tools.length})`);
   passed++;
-  console.log("ok - tools/list advertises 11 tools against stub backend (fase-5 T5: 10 + laya_capabilities)");
+  console.log("ok - tools/list advertises 12 tools against stub backend (fase-5 T5: 10 + laya_capabilities + laya_escalations)");
   for (const t of tools) {
     assert.equal(t.outputSchema?.type, "object", `${t.name} wire outputSchema type`);
     assert.ok(
@@ -470,11 +470,18 @@ try {
     for (const k of t.outputSchema.required) {
       assert.ok(t.outputSchema.properties?.[k] !== undefined, `${t.name} wire required '${k}' in properties`);
     }
-    assert.equal(t.annotations?.readOnlyHint, true, `${t.name} wire annotations.readOnlyHint`);
+    // laya_escalations is the announced exception: a local abstention sink
+    // (append-only JSONL), honestly annotated readOnlyHint:false.
+    if (t.name === "laya_escalations") {
+      assert.equal(t.annotations?.readOnlyHint, false, `${t.name} announces non-readonly`);
+      assert.equal(t.annotations?.destructiveHint, false, `${t.name} never destructive`);
+    } else {
+      assert.equal(t.annotations?.readOnlyHint, true, `${t.name} wire annotations.readOnlyHint`);
+    }
     assert.equal(t.inputSchema?.type, "object", `${t.name} wire inputSchema type`);
   }
   passed++;
-  console.log("ok - every wire tool carries outputSchema + read-only annotations (SDK-validated)");
+  console.log("ok - every wire tool carries outputSchema + honest annotations (SDK-validated)");
 } finally {
   await client.close();
   stub.close();
