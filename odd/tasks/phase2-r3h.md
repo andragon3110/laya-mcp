@@ -1,0 +1,20 @@
+# phase2-r3h — batch 3 firmado (20/20) → corpus-v2 (80) → train r3h → validar
+
+## Why
+Lote 3 firmado tal cual el 2026-10-10. Último round de datos con regla de
+parada: si r3h no mueve gate/screen task, training agotado (no hay r3i).
+
+## Scope (frozen)
+- T1: extender `evals/corpus-v2/{gate,screen}.mjs` con batch 3
+  (classify 26, gate 22, screen 32 = 80). Golds idénticos a lo firmado.
+- T2: `ft/gen_v2_r3f.mjs` → conteos 26/22/32 + rerun → 80 filas.
+- T3: `ft/train_r3h.py` (continuación r3g, misma receta): mix 80 v2 +
+  200 gate replay + 400 anchors = 680, peso 1, LR 2e-5, 2 epochs, ABORT 0.3.
+- T4: validar v2-80 (criterio: gate/screen task > 0) + piso r1 56/56.
+  Adopción: solo si piso held; si v2 no se mueve, se adopta igual solo si
+  no hay regresión en ningún agregado (si hay regresión → revertir a r3g).
+  Regla de parada: gate/screen task en 0 tras r3h ⇒ no hay r3i.
+- PROHIBIDO: train/abstain/, weight >1, push, más golds, reviews.
+- :8770 en r3g hasta el swap.
+
+## Sin verificación intermedia (orden vigente); matrices al cierre.
