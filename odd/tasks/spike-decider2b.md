@@ -41,3 +41,9 @@ encaja local/$0): NO se cumple → 5º veredicto, sin adopción.
 Avenida futura (no ejecutada, training cerrado): destilar sus
 other-aciertos como teacher. Restart: `strands-decider serve
 StrandsAgents/strands-decider-2B-hobson-v21 --port 8001` (venv-ft).
+
+## RDD 12013924 (2026-10-10)
+- Inspect: monolith + spike, start offered
+  (lineage `review-1d225de08203e9f9`). Human granted; START blocked in
+  preflight: `lens_context_budget_exceeded`, no authority, stop.
+- Expected: monolith never fits; slice chain remains the only review path.
