@@ -27,3 +27,8 @@ Stop original refería a más dosis de lo mismo — esto es otra avenida.
 - r1 56/60 + 56/60 idéntico: sin revertir. v20 publicado. Batería verde.
 - Gate en 0 tras mecanismo nuevo ⇒ STOP DEFINITIVO, no hay r3j.
 - r3i adoptado (strictly no-worse). :8770 sirve r3i; r3h/r3g/r3f/r3a intactos.
+
+## RDD 4b4ec572 (2026-10-10)
+- Inspect: monolith + r3i promotion, start offered
+  (lineage `review-9a7b07c611ca95e0`). Human granted; START blocked in
+  preflight: `lens_context_budget_exceeded`, no authority, stop.
