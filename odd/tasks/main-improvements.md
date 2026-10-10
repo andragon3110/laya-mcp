@@ -55,3 +55,8 @@ significativo. La verificación es la batería final T3.
   el down-state real (3 tools) se reportaba sano. Fix: subset de
   backend-independent. Ahora 15/15 OK. Comparado contra base a2ce4f1
   (ahí el test se salteaba por falta de dist).
+
+## RDD e4c1c3a5 (2026-10-10)
+- Inspect: monolith + doctor fix (82 files), start offered
+  (lineage `review-653d7dc6fef290d7`). Human DECLINED (candidate-scoped).
+- No review invoked, no authority created.
