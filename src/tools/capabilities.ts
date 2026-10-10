@@ -81,6 +81,7 @@ import { reviewTool } from "./review.js";
 import { gateTool } from "./gate.js";
 import { piiTool } from "./pii.js";
 import { escalationsTool } from "./escalations.js";
+import { redactTool } from "./redact.js";
 import { FIND_PRUNE_METHOD } from "./find.js";
 import { RERANK_PRUNE_METHOD } from "./rerank.js";
 
@@ -207,13 +208,14 @@ function summarizeTool(t: ToolDefinition): Record<string, unknown> {
  */
 /**
  * Currently servable tools: the 10 laya tools (the caller already proved
- * laya-server is up) + pii only while gliner is live-ready + the two meta
- * tools. laya_escalations needs no backend (local file sink), so it is
- * servable exactly like capabilities -- including with laya down.
+ * laya-server is up) + pii only while gliner is live-ready + the three meta
+ * tools. laya_escalations/laya_redact need no backend (local file sink /
+ * pure transform), so they are servable exactly like capabilities --
+ * including with laya down.
  */
 export function servableTools(glinerReady: boolean): ToolDefinition[] {
   const layaTools = JUDGMENT_TOOLS.filter((t) => t.name !== "laya_pii");
-  return [...layaTools, ...(glinerReady ? [piiTool] : []), capabilitiesTool, escalationsTool];
+  return [...layaTools, ...(glinerReady ? [piiTool] : []), capabilitiesTool, escalationsTool, redactTool];
 }
 
 function validateTimeoutMs(raw: unknown): number {
