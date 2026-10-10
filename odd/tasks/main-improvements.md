@@ -35,3 +35,8 @@ significativo. La verificación es la batería final T3.
 - typecheck ok, build ok, T3 64, T4 23, T5 15, T6 55, redact 7/7,
   escalations 5/5, policy 49, stub 98/98, r1 158/158, offline sh OK.
 - Sin fallout. Commits: 303d999 (npm test), c44c1d4 (conteos).
+
+## RDD d7d2e2d4 (2026-10-10)
+- Inspect: monolith + improvements (82 files), start offered
+  (lineage `review-47d866aad098b2d1`). Human DECLINED (candidate-scoped).
+- No review invoked, no authority created. Main stays tested-unreviewed.
