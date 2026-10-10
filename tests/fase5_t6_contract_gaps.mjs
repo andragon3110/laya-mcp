@@ -12,7 +12,7 @@
  *                          (Part A2): NEGATIVES the handlers never emit --
  *                          nested bad enums, null-vs-object swaps, dropped
  *                          nested required keys, array/object confusions --
- *                          two per tool for all 12 tools (capabilities incl).
+ *                          two per tool for all 13 tools (capabilities + escalations incl).
  *   MCP contract ......... T3 proves tools/list publishes outputSchema +
  *                          annotations (SDK-validated); T5 proves the
  *                          capabilities list/call contract incl. the laya-down
@@ -23,7 +23,7 @@
  *                          for laya_capabilities -- each live success through
  *                          the real SDK client ALSO proves outputSchema fit
  *                          (the client itself rejects mismatches with
- *                          -32602). GAP HERE (Part B1): the 12-tool sweep in
+ *                          -32602). GAP HERE (Part B1): the 13-tool sweep in
  *                          ONE place, read through an OLD-client lens (see
  *                          backward compat).
  *   backward compat ...... GAP HERE (Parts A1 + B1): an old client reads ONLY
@@ -34,7 +34,7 @@
  *                          the nine known envelope keys -- no surprise keys).
  *                          Live (B1) every tool's parsed text still carries
  *                          every handler-era key and adds ONLY those nine.
- *                          List-sin-Laya == [laya_capabilities] is T5 Part C
+ *                          List-sin-Laya == [laya_capabilities, laya_escalations] is T5 Part C
  *                          + tests/test_tools_offline.sh (updated in 1383c9e,
  *                          expectation already correct -- no edit needed).
  *   invalid input ........ GAP HERE (Part B2): per judgment tool, malformed
@@ -396,6 +396,10 @@ const FIXTURES = [
       // carries modes{supported, effective, default}. Full valid value
       // (the modes schema requires those three); live assertions check it.
       modes: { supported: ["observe", "shadow", "enforce"], effective: "observe", default: "observe" },
+      // Measured r3a track numbers (same treatment): the live report carries
+      // measured{track, date, corpus, composed, lanes, method, standing}.
+      // Type-valid baseline; live assertions check it in fase5_t5.
+      measured: {},
     },
     negatives: [
       ["mode write (observe-only enum)", (o) => ({ ...o, mode: "write" })],
@@ -601,6 +605,8 @@ const INVALID_CALLS = [
     vocabulary: /risk must be one of/,
   },
   { name: "laya_pii", args: { text: "x".repeat(50001) }, vocabulary: /input_too_large/ },
+  // Non-judgment tool: unknown actions reject before any store touch (no backend needed).
+  { name: "laya_escalations", args: { action: "nope" }, vocabulary: /invalid_argument/ },
 ];
 
 const { laya, gliner } = stubBackends();
@@ -625,8 +631,8 @@ try {
   const deadline = Date.now() + 20000;
   for (;;) {
     const listed = await client.listTools();
-    if (listed.tools.length === 12) break;
-    assert.ok(Date.now() < deadline, `12 tools advertised (got ${listed.tools.length})`);
+    if (listed.tools.length === 13) break;
+    assert.ok(Date.now() < deadline, `13 tools advertised (got ${listed.tools.length})`);
     await new Promise((r) => setTimeout(r, 300));
   }
 

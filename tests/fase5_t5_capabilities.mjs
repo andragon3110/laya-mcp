@@ -38,6 +38,7 @@ import {
   pruningTools,
   servableTools,
   CAPABILITIES_DEFAULT_TIMEOUT_MS,
+  MEASURED_TRACK,
 } from "../dist/tools/capabilities.js";
 import { FIND_PRUNE_METHOD } from "../dist/tools/find.js";
 import { RERANK_PRUNE_METHOD } from "../dist/tools/rerank.js";
@@ -263,9 +264,9 @@ await check("servableTools mirrors the list advertisement (pii iff gliner)", () 
   assert.deepEqual(names(servableTools(false)), [
     "laya_screen", "laya_verify", "laya_find", "laya_rerank", "laya_classify",
     "laya_decide", "laya_compare", "laya_extract", "laya_review", "laya_gate",
-    "laya_capabilities",
+    "laya_capabilities", "laya_escalations",
   ]);
-  assert.deepEqual(names(servableTools(true)).length, 12);
+  assert.deepEqual(names(servableTools(true)).length, 13);
   assert.ok(names(servableTools(true)).includes("laya_pii"), "pii served when gliner ready");
   for (const t of Object.keys(TOOL_PRIMITIVES)) {
     assert.ok(["noul", "choice", "score", "spans"].includes(TOOL_PRIMITIVES[t]), `${t} primitive known`);
@@ -431,8 +432,8 @@ const DEAD_PORT = 9;
 
 try {
   await withServer({ layaPort, glinerPort }, async (client) => {
-    await check("live list advertises 12 tools (11+pii+capabilities, SDK-validated)", async () => {
-      const tools = await waitForList(client, 12, "both backends up");
+    await check("live list advertises 13 tools (11+pii+capabilities+escalations, SDK-validated)", async () => {
+      const tools = await waitForList(client, 13, "both backends up");
       const cap = tools.find((t) => t.name === "laya_capabilities");
       assert.ok(cap, "capabilities advertised");
       assert.equal(cap.outputSchema?.type, "object");
@@ -440,7 +441,7 @@ try {
     });
     await check("live capabilities: real models/policies/features, observe mode, structured==text", async () => {
       const res = await client.callTool({ name: "laya_capabilities", arguments: {} });
-      const parsed = checkCapabilitiesEnvelope(res, { expectTools: 12, expectGlinerReachable: true });
+      const parsed = checkCapabilitiesEnvelope(res, { expectTools: 13, expectGlinerReachable: true });
       assert.deepStrictEqual(parsed.gliner.models, STUB_GLINER_MODELS, "gliner models verbatim");
       assert.equal(parsed.gliner.ready, true);
       // Explicit schema fit on top of the SDK's own -32602 validation.
@@ -458,18 +459,18 @@ try {
 
   await withServer({ layaPort, glinerPort: DEAD_PORT }, async (client) => {
     await check("gliner down: capabilities succeeds, pii absent, reachable:false", async () => {
-      const tools = await waitForList(client, 11, "laya up, gliner down");
+      const tools = await waitForList(client, 12, "laya up, gliner down");
       assert.ok(!tools.some((t) => t.name === "laya_pii"), "pii not advertised");
       const res = await client.callTool({ name: "laya_capabilities", arguments: {} });
-      checkCapabilitiesEnvelope(res, { expectTools: 11, expectGlinerReachable: false });
+      checkCapabilitiesEnvelope(res, { expectTools: 12, expectGlinerReachable: false });
       assert.deepStrictEqual(JSON.parse(res.content[0].text).gliner.models, [], "gliner models [] when down");
     });
   });
 
   await withServer({ layaPort: DEAD_PORT, glinerPort }, async (client) => {
-    await check("laya down: list advertises ONLY laya_capabilities (T5 exemption)", async () => {
-      const tools = await waitForList(client, 1, "laya down");
-      assert.deepStrictEqual(tools.map((t) => t.name), ["laya_capabilities"]);
+    await check("laya down: list advertises ONLY the backend-independent tools (T5 exemption + escalations)", async () => {
+      const tools = await waitForList(client, 2, "laya down");
+      assert.deepStrictEqual(tools.map((t) => t.name), ["laya_capabilities", "laya_escalations"]);
       assert.equal(tools[0].outputSchema?.type, "object", "exempted entry carries its schema");
     });
     await check("laya down: capabilities call fails isError with the diagnosis", async () => {
@@ -483,5 +484,20 @@ try {
   laya.close();
   gliner.close();
 }
+
+await check("measured track numbers: optional, pinned, every lane string", () => {
+  const out = capabilitiesTool.outputSchema;
+  assert.ok(out.properties?.measured !== undefined, "measured described");
+  assert.ok(!out.required.includes("measured"), "measured optional (stored outputs keep validating)");
+  assert.equal(MEASURED_TRACK.track, "gliclass-r3a");
+  assert.equal(MEASURED_TRACK.composed.decision, "56/60");
+  assert.equal(MEASURED_TRACK.composed.task, "55/60");
+  for (const lane of ["classify", "gate", "screen", "rerank", "find"]) {
+    const l = MEASURED_TRACK.lanes[lane];
+    assert.match(l.decision, /^\d+\/\d+$/, `${lane} decision scored`);
+    assert.match(l.task, /^\d+\/\d+$/, `${lane} task scored`);
+  }
+  assert.equal(MEASURED_TRACK.lanes.rerank.decision, "12/12", "rerank owns");
+});
 
 console.log(`\nT5 CAPABILITIES: ${passed} checks passed.`);

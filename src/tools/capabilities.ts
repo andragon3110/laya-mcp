@@ -80,6 +80,7 @@ import { extractTool } from "./extract.js";
 import { reviewTool } from "./review.js";
 import { gateTool } from "./gate.js";
 import { piiTool } from "./pii.js";
+import { escalationsTool } from "./escalations.js";
 import { FIND_PRUNE_METHOD } from "./find.js";
 import { RERANK_PRUNE_METHOD } from "./rerank.js";
 
@@ -160,6 +161,34 @@ export function buildFeatures(): Record<string, unknown> {
   };
 }
 
+/**
+ * Measured track numbers (self-reported eval results, versioned with the code).
+ * r3a GLiClass track, r1 corpus, live CPU — see EVALUATION.md §13 for method
+ * and per-version notes. Strings, not floats: agents route on them, they are
+ * not probabilities. Updated by hand when a new measured track lands; the
+ * test pins every lane string so stale numbers fail loudly.
+ */
+export const MEASURED_TRACK = {
+  track: "gliclass-r3a",
+  date: "2026-10-10",
+  corpus: "r1 (60 golds: 48 over r3a lanes + 12 find)",
+  backend: "run-20261009T055724Z-r3a checkpoint, CPU",
+  composed: { decision: "56/60", task: "55/60" },
+  lanes: {
+    classify: { decision: "12/12", task: "11/12" },
+    gate: { decision: "10/12", task: "10/12" },
+    screen: { decision: "10/12", task: "10/12", abstained: 1 },
+    rerank: { decision: "12/12", task: "12/12" },
+    find: { decision: "12/12", task: "12/12", lane: "qwen (parked)" },
+  },
+  method:
+    "live POST /predict per primitive, argmax adjudication; screen tau=0.2 " +
+    "from 580 validation rows (never r1); gate routing OFF; fixed magnitudes " +
+    "at public policy centers; raw margins preserved per row",
+  standing: "assistive with honest abstention, not autonomous (gate/screen)",
+  evidence: "EVALUATION.md §13, evals/results/v12/, /tmp/v13, /tmp/v14",
+};
+
 /** One-line tool summary: full schemas stay on tools/list, this is the digest. */
 function summarizeTool(t: ToolDefinition): Record<string, unknown> {
   return {
@@ -176,9 +205,15 @@ function summarizeTool(t: ToolDefinition): Record<string, unknown> {
  * laya-server is up) + pii only while gliner is live-ready + this tool.
  * Mirrors the tools/list advertisement for the same backend state.
  */
+/**
+ * Currently servable tools: the 10 laya tools (the caller already proved
+ * laya-server is up) + pii only while gliner is live-ready + the two meta
+ * tools. laya_escalations needs no backend (local file sink), so it is
+ * servable exactly like capabilities -- including with laya down.
+ */
 export function servableTools(glinerReady: boolean): ToolDefinition[] {
   const layaTools = JUDGMENT_TOOLS.filter((t) => t.name !== "laya_pii");
-  return [...layaTools, ...(glinerReady ? [piiTool] : []), capabilitiesTool];
+  return [...layaTools, ...(glinerReady ? [piiTool] : []), capabilitiesTool, escalationsTool];
 }
 
 function validateTimeoutMs(raw: unknown): number {
@@ -242,7 +277,8 @@ export const capabilitiesTool: ToolDefinition = {
     "(GET /models), readiness (GET /ready), GLiNER sidecar state, judgment primitives, currently servable tools " +
     "with summarized output contracts, the full policy registry, and real feature flags (top_k, pruning, " +
     "two-stage, structured, revision). Observe mode: the MCP layer only observes backend state and reports " +
-    "judgments; it never executes actions, applies changes, or mutates anything. Probed live on every call " +
+    "judgments; it never executes actions, applies changes, or mutates anything. Also reports measured " +
+    "r1 track numbers (self-reported eval results, see EVALUATION.md §13). Probed live on every call " +
     "with a timeout (default 2000ms via timeout_ms); the background watcher snapshot is never used. Always " +
     "advertised, even when laya-server is down -- a call then fails with isError carrying the backend diagnosis.",
   inputSchema: {
@@ -389,6 +425,13 @@ export const capabilitiesTool: ToolDefinition = {
           "model_load stats. Numeric/categorical aggregates only -- no argument content, no free text. " +
           "Exact shape is documented in metrics.ts (getMetricsSnapshot).",
       },
+      measured: {
+        type: "object",
+        description:
+          "Self-reported measured track numbers (OPTIONAL -- never required so stored outputs keep " +
+          "validating): versioned r1 lane scores agents can route on (MEASURED_TRACK code truth). " +
+          "Strings, not probabilities; see EVALUATION.md §13.",
+      },
       schema_version: {
         type: "string",
         description: "Envelope contract version (ENVELOPE_SCHEMA_VERSION).",
@@ -496,6 +539,8 @@ export async function handleCapabilities(
     // justification as required: a new tool would add list surface for a
     // read that discovery already serves).
     metrics: getMetricsSnapshot(),
+    // Measured r3a track numbers (code truth, pinned by contract tests).
+    measured: MEASURED_TRACK,
     schema_version: ENVELOPE_SCHEMA_VERSION,
     latency_ms: Date.now() - started,
   };
