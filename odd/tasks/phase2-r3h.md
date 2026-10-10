@@ -31,3 +31,9 @@ parada: si r3h no mueve gate/screen task, training agotado (no hay r3i).
 - Inspect: monolith + r3h promotion, start offered
   (lineage `review-244c6b1ba2d63423`). Human DECLINED (candidate-scoped).
 - No review invoked, no authority created.
+
+## Cierre training (2026-10-10, orden del usuario)
+- Loop cerrado: r3h final sirviendo (recomendado), r3g/r3f/r3a intactos.
+- venv-ft queda (torch cu128, reutilizable). artifacts-ft/ excluido de git
+  (GBs, reproducible). Sidecars apagados; restart en OPERATOR.md.
+- Sin r3i por regla de parada. Oro restante: lote 4+ solo si se pide.
