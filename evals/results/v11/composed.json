@@ -1,0 +1,134 @@
+{
+  "generated": "r3a-lanes G4 composed-system table (computed from manifests, not tuned): r3a lanes classify/gate/rerank/screen + qwen/gte find (F7 scope)",
+  "rows": [
+    {
+      "primitive": "classify",
+      "lane": "gliclass(r3a)",
+      "source": "evals/results/v11",
+      "decision": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "abstained": 0,
+      "threw": 0
+    },
+    {
+      "primitive": "gate",
+      "lane": "gliclass(r3a)",
+      "source": "evals/results/v11",
+      "decision": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "task": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "abstained": 0,
+      "threw": 0
+    },
+    {
+      "primitive": "rerank",
+      "lane": "gliclass(r3a)",
+      "source": "evals/results/v11",
+      "decision": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "abstained": 0,
+      "threw": 0
+    },
+    {
+      "primitive": "screen",
+      "lane": "gliclass(r3a)",
+      "source": "evals/results/v11",
+      "decision": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "task": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "abstained": 0,
+      "threw": 0
+    },
+    {
+      "primitive": "find",
+      "lane": "qwen",
+      "source": "evals/results/v8",
+      "decision": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "abstained": 5,
+      "threw": 0
+    },
+    {
+      "primitive": "find",
+      "lane": "gte",
+      "source": "evals/results/v9",
+      "decision": {
+        "n": 12,
+        "correct": 11,
+        "accuracy": 0.9166666666666666
+      },
+      "task": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "abstained": 6,
+      "threw": 0
+    }
+  ],
+  "totals": {
+    "r3a+qwen-find": {
+      "decision": {
+        "n": 60,
+        "correct": 56,
+        "accuracy": 0.9333333333333333
+      },
+      "task": {
+        "n": 60,
+        "correct": 54,
+        "accuracy": 0.9
+      }
+    },
+    "r3a+gte-find": {
+      "decision": {
+        "n": 60,
+        "correct": 55,
+        "accuracy": 0.9166666666666666
+      },
+      "task": {
+        "n": 60,
+        "correct": 54,
+        "accuracy": 0.9
+      }
+    }
+  },
+  "promotion_note": "measurement only: no promotion verdict here (parent G5 decides Fase-2 from these numbers)"
+}

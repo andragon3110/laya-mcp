@@ -10,9 +10,9 @@
  *
  * Lane coverage:
  *   classify <- { laya, d1, gliclass }
- *   screen   <- { laya, d1, policylm }
- *   gate     <- { laya, d1 }
- *   rerank   <- { laya, qwen, gte }
+ *   screen   <- { laya, d1, policylm, gliclass }
+ *   gate     <- { laya, d1, gliclass }
+ *   rerank   <- { laya, qwen, gte, gliclass }
  *   find     <- { laya, qwen, gte, d1-choice }
  *
  * Ports (CPU sidecars): laya :8765 (lane wired, weights NOT downloaded --
@@ -53,6 +53,31 @@
  *   relevance notion), so the handler's missing-signal path abstains --
  *   expect ESCALATE on policylm screen lanes even for clean texts until
  *   T6b decides how to complete the other two legs (parent sign-off).
+ * - r3a-lanes (gliclass gate/screen/rerank): per-primitive request builders
+ *   over the same POST /predict (classify unchanged: item text vs criteria
+ *   keys, argmax -> {choice, probabilities}); gate fans out one POST per
+ *   claim (text = evidence + " || " + claim, labels [SUPPORTED,
+ *   CONTRADICTED, ABSTAIN]) and maps the 3-way argmax to the d1-style
+ *   claim/refute noul pair (SUPPORTED -> 0.9/0.1, CONTRADICTED -> 0.1/0.9,
+ *   ABSTAIN-win or null -> OMIT both keys so the handler emits its ABSTAIN
+ *   verdict + gate_missing_signal ESCALATE); screen posts text vs [benign,
+ *   suspicious, malicious] and maps the argmax to the injection noul
+ *   (malicious -> 0.92, suspicious -> 0.5, benign -> 0.1) while the
+ *   substance/relevance legs the 3-way cannot judge ride a documented
+ *   constant-firm prior (0.9/0.9) and a missing injection answer is omitted
+ *   (policylm template: handler ESCALATEs); rerank posts query-as-text vs
+ *   candidate texts as labels and maps raw scores back to {noul} answers
+ *   in question-key order (qwen/gte template: score order, input-order
+ *   ties via the handler's stable sort, unscored ids omitted -> sorted
+ *   last + escalate). Fixed magnitudes sit at the PUBLIC policy band
+ *   centers (gate claimVerified 0.8, screen block/review 0.75/0.25), chosen
+ *   a priori, never from r1 outcomes: the first measurement replicates
+ *   argmax behavior with abstention-routing thresholds OFF (no margin m,
+ *   no tau; tuning them is Fase-2 business on validation data, never on
+ *   r1). The gate rubric (correctness 2 / spec_match 2 / safe_to_apply
+ *   0.95) is likewise a documented lane constant: GLiClass has no
+ *   rubric/safety notion and the r1 gate diffs are uniformly low-risk, so
+ *   decisions are driven purely by claim routing here.
  */
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -70,9 +95,9 @@ const repoRoot = path.join(here, "..");
 /** Lane -> capable backends (T6b matrix rows). */
 export const LANES = {
   classify: ["laya", "d1", "gliclass"],
-  screen: ["laya", "d1", "policylm"],
-  gate: ["laya", "d1"],
-  rerank: ["laya", "qwen", "gte"],
+  screen: ["laya", "d1", "policylm", "gliclass"],
+  gate: ["laya", "d1", "gliclass"],
+  rerank: ["laya", "qwen", "gte", "gliclass"],
   find: ["laya", "qwen", "gte", "d1-choice"],
 };
 
@@ -253,10 +278,64 @@ export class D1Client {
   }
 }
 
+/**
+ * r3a-lanes (L1 request builders): per-primitive GLiClass label sets.
+ * Gate fans out one POST per claim (text = evidence + " || " + claim);
+ * screen posts the raw text; rerank posts the query as text with the shown
+ * candidate texts as labels (index-aligned back to question keys, so
+ * duplicate texts tie instead of misrouting).
+ */
+export const GLICLASS_GATE_LABELS = ["SUPPORTED", "CONTRADICTED", "ABSTAIN"];
+export const GLICLASS_SCREEN_LABELS = ["benign", "suspicious", "malicious"];
+
+/**
+ * r3a-lanes (L2 adjudication): fixed argmax->handler-band magnitudes.
+ * Chosen a priori from the PUBLIC policy bands (gate claimVerified 0.8;
+ * screen block/review 0.75/0.25), never from r1 outcomes -- the first
+ * measurement replicates argmax behavior with routing thresholds OFF.
+ * The gate rubric + screen substance/relevance legs are documented lane
+ * constants (GLiClass has no rubric/safety/substance notion); a missing
+ * model answer OMITS the key so the handler takes its missing-signal path.
+ */
+export const GLICLASS_GATE_ARGMAX = {
+  SUPPORTED: { claim: 0.9, refute: 0.1 },
+  CONTRADICTED: { claim: 0.1, refute: 0.9 },
+};
+export const GLICLASS_GATE_RUBRIC = { correctness: 2, spec_match: 2, safe_to_apply: 0.95 };
+export const GLICLASS_SCREEN_ARGMAX = { malicious: 0.92, suspicious: 0.5, benign: 0.1 };
+export const GLICLASS_SCREEN_PRIOR = { has_substance: 0.9, is_relevant: 0.9 };
+
+/**
+ * r3a-lanes Track B (routing-delta measurement, NEVER tuned on r1):
+ * abstention-routing thresholds over RAW POST margins (top_score minus
+ * runner-up, computed in postLogged BEFORE any adjudication magnitude is
+ * applied -- G5: routing reads raw margins, never the fixed 0.92/0.5/0.1
+ * or 0.9/0.1 bands). null/OFF = pure-argmax behavior (v11 baseline).
+ * - GLICLASS_GATE_MARGIN_TAU = null (OFF, confirmed dead: ABSTAIN golds
+ *   score SUPPORTED 0.988/0.977 -- confidently wrong, no margin separates
+ *   them; only argmax-ABSTAIN training or acceptance helps. Gate stays
+ *   pure argmax + omit-on-ABSTAIN/null.)
+ * - GLICLASS_SCREEN_MARGIN_TAU = 0.2 (validated on train-distribution
+ *   data ONLY: seed-42 eval-split screen rows n=80, held out of stage-A
+ *   and r3a training -- 7/12 wrong caught at 1/68 correct wasted,
+ *   abstention rate 0.10, decided_acc 0.931 vs 0.850 argmax baseline;
+ *   rule: smallest tau with wrong-catch >= 50% at correct-waste <= 2%.
+ *   Caveat: screen-slice n=500 (suspicious-heavy stress) shows the limit
+ *   -- high-margin suspicious->malicious confusion is uncatchable and at
+ *   tau=0.2 waste is 34/395 (8.6%) for 30/105 caught. Evidence lives in
+ *   evals/results/v12/validation-study.json; r1 NEVER touched for tuning.)
+ * When the margin is below tau the lane OMITS is_injection (existing
+ * policylm-template path: the handler takes its missing-signal road to
+ * ESCALATE, never a guess).
+ */
+export const GLICLASS_GATE_MARGIN_TAU = null;
+export const GLICLASS_SCREEN_MARGIN_TAU = 0.2;
+
 /** Thin fetch wrapper over gliclass-server POST /predict (classify lane). */
 export class GliclassClient {
   constructor(baseUrl = BACKEND_DEFAULT_URLS.gliclass) {
     this.baseUrl = String(baseUrl).replace(/\/$/, "");
+    this.callLog = []; // per-predict POST evidence (reset on each predict entry)
   }
 
   async scoreLabels(text, labels, { timeoutMs = 120000 } = {}) {
@@ -287,18 +366,66 @@ export class GliclassClient {
   }
 
   /**
-   * predict(state, questions) for classify-shaped calls: per class_<i>_<id>
-   * question, score the item text against the criteria keys and take the
-   * argmax -> {choice, probabilities} (choice-argmax adjudication; v1 has
-   * no tie detection so first-max wins ties, same as the stated-choice
-   * pin). Non-classify calls throw an explicit unavailable error (screen
-   * /gate/find wiring is NOT this backend's call).
+   * predict(state, questions) routed by question shape (r3a-lanes L1/L2):
+   * class_ keys -> classify (unchanged argmax flow); claim keys and
+   * correctness -> gate fan-out; is_injection -> screen; relevance_ keys
+   * -> rerank. Empty
+   * question dicts answer {} (the handler abstains on nothing asked); any
+   * other shape throws an explicit unavailable error. Gate thresholds OFF
+   * (pure 3-way argmax + omit-on-ABSTAIN/null, dead per production facts);
+   * screen carries its validated Track B tau (GLICLASS_SCREEN_MARGIN_TAU,
+   * raw-margin omit -> handler ESCALATEs; tuned on validation, never r1).
+   * Every POST is
+   * appended to this.callLog (reset per predict) for matrix-row evidence.
    */
   async predict(state, questions, opts) {
-    const keys = Object.keys(questions ?? {}).filter((k) => k.startsWith("class_"));
+    const keys = Object.keys(questions ?? {});
+    this.callLog = [];
     if (keys.length === 0) {
-      throw new Error("gliclass lane unavailable: only classify-shaped calls served (class_<i>_<id> questions); use the d1/policylm lanes for other primitives");
+      return { answers: {}, confidence: {}, routing: {}, model: "gliclass", latencyMs: 0, usage: {} };
     }
+    if (keys.some((k) => k.startsWith("class_"))) return this.predictClassify(state, questions, opts);
+    if (keys.some((k) => k.startsWith("relevance_"))) return this.predictRerank(state, questions, opts);
+    if (Object.hasOwn(questions, "is_injection")) return this.predictScreen(state, questions, opts);
+    if (Object.hasOwn(questions, "correctness") || keys.some((k) => /^claim_\d+$/.test(k))) {
+      return this.predictGate(state, questions, opts);
+    }
+    throw new Error("gliclass lane unavailable: unrecognized question shape (serves class_*/claim_*/is_injection/relevance_* questions)");
+  }
+
+  /** First-max argmax over POST scores (ties keep label order). Null when
+   *  no entry carries a numeric score (omit path, never a guess). */
+  argmax(scores) {
+    let top = null;
+    for (const s of scores ?? []) {
+      if (!s || typeof s.label !== "string" || typeof s.score !== "number") continue;
+      if (top === null || s.score > top.score) top = s;
+    }
+    return top;
+  }
+
+  async postLogged(lane, key, text, labels, opts) {
+    const { scores, latencyMs } = await this.scoreLabels(text, labels, opts);
+    const top = this.argmax(scores);
+    const rest = scores.filter((s) => s && s !== top && typeof s?.score === "number").map((s) => s.score);
+    this.callLog.push({
+      lane, key, labels: [...labels],
+      scores: scores.map((s) => ({ label: s?.label ?? null, score: typeof s?.score === "number" ? s.score : null })),
+      top: top?.label ?? null, top_score: top?.score ?? null,
+      margin: top === null || rest.length === 0 ? null : top.score - Math.max(...rest),
+      latencyMs,
+    });
+    return { scores, top, latencyMs };
+  }
+
+  /**
+   * Classify-shaped calls (UNCHANGED flow): per class_<i>_<id> question,
+   * score the item text against the criteria keys and take the argmax ->
+   * {choice, probabilities} (choice-argmax adjudication; v1 has no tie
+   * detection so first-max wins ties, same as the stated-choice pin).
+   */
+  async predictClassify(state, questions, opts) {
+    const keys = Object.keys(questions ?? {}).filter((k) => k.startsWith("class_"));
     const items = Array.isArray(state?.items) ? state.items : [];
     const answers = {};
     let latencyMs = 0;
@@ -309,16 +436,110 @@ export class GliclassClient {
       if (typeof text !== "string" || text === "") continue; // omit -> handler abstains
       const labels = Object.keys(questions[key]?.criteria ?? {}).filter((l) => l !== "other" && l !== "manual_review");
       if (labels.length === 0) continue;
-      const { scores, latencyMs: ms } = await this.scoreLabels(text, labels, opts);
+      const { top, latencyMs: ms } = await this.postLogged("classify", key, text, labels, opts);
       latencyMs += ms;
-      let top = null;
-      for (const s of scores) {
-        if (s && typeof s.label === "string" && typeof s.score === "number" && (top === null || s.score > top.score)) top = s;
-      }
       if (top === null) continue;
+      const { scores } = this.callLog[this.callLog.length - 1];
       const probabilities = {};
-      for (const s of scores) probabilities[s.label] = s.score;
+      for (const s of scores) { if (typeof s.label === "string" && typeof s.score === "number") probabilities[s.label] = s.score; }
       answers[key] = { choice: top.label, probabilities };
+    }
+    return { answers, confidence: {}, routing: {}, model: "gliclass", latencyMs, usage: {} };
+  }
+
+  /**
+   * Gate fan-out (d1-gate template): one POST per claim, text = evidence +
+   * " || " + claim. The 3-way argmax maps to the claim/refute noul pair;
+   * ABSTAIN-win or a null answer OMITS both keys so the handler emits its
+   * ABSTAIN verdict (emission hook) and the policy escalates on the missing
+   * signal. Rubric legs ride the documented lane constant (no rubric notion
+   * in GLiClass; r1 diffs uniformly low-risk).
+   */
+  async predictGate(state, questions, opts) {
+    const claims = Array.isArray(state?.claims) ? state.claims : [];
+    const evidence = typeof state?.evidence === "string" ? state.evidence : "";
+    const answers = {};
+    let latencyMs = 0;
+    if (Object.hasOwn(questions, "correctness")) answers.correctness = { score: GLICLASS_GATE_RUBRIC.correctness };
+    if (Object.hasOwn(questions, "spec_match")) answers.spec_match = { score: GLICLASS_GATE_RUBRIC.spec_match };
+    if (Object.hasOwn(questions, "safe_to_apply")) answers.safe_to_apply = { noul: GLICLASS_GATE_RUBRIC.safe_to_apply };
+    for (let i = 0; i < claims.length; i++) {
+      const claimKey = `claim_${i}`;
+      const refuteKey = `refute_${i}`;
+      if (!Object.hasOwn(questions, claimKey) && !Object.hasOwn(questions, refuteKey)) continue;
+      const { top, latencyMs: ms } = await this.postLogged(
+        "gate", claimKey, `${evidence} || ${String(claims[i] ?? "")}`, GLICLASS_GATE_LABELS, opts);
+      latencyMs += ms;
+      if (top === null || top.label === "ABSTAIN") continue; // omit -> handler ABSTAIN verdict
+      const pair = GLICLASS_GATE_ARGMAX[top.label] ?? null;
+      if (pair === null) continue;
+      if (Object.hasOwn(questions, claimKey)) answers[claimKey] = { noul: pair.claim };
+      if (Object.hasOwn(questions, refuteKey)) answers[refuteKey] = { noul: pair.refute };
+    }
+    return { answers, confidence: {}, routing: {}, model: "gliclass", latencyMs, usage: {} };
+  }
+
+  /**
+   * Screen (policylm template): text vs [benign, suspicious, malicious];
+   * the argmax maps to the injection noul. Substance/relevance ride the
+   * documented constant-firm prior (no such notion in a 3-way safety
+   * classifier; filler-text misses are the known lane limitation). A null
+   * answer omits is_injection so the handler takes its missing-signal path
+   * (ESCALATE, never a guess).
+   */
+  async predictScreen(state, questions, opts) {
+    const message = typeof state?.text === "string" ? state.text : (typeof state === "string" ? state : null);
+    const answers = {};
+    let latencyMs = 0;
+    if (Object.hasOwn(questions, "has_substance")) answers.has_substance = { noul: GLICLASS_SCREEN_PRIOR.has_substance };
+    if (Object.hasOwn(questions, "is_relevant")) answers.is_relevant = { noul: GLICLASS_SCREEN_PRIOR.is_relevant };
+    if (typeof message === "string" && message !== "" && Object.hasOwn(questions, "is_injection")) {
+      const { top, latencyMs: ms } = await this.postLogged("screen", "is_injection", message, GLICLASS_SCREEN_LABELS, opts);
+      latencyMs += ms;
+      // Track B routing: RAW margin (postLogged, pre-adjudication) below
+      // tau -> omit is_injection so the handler ESCALATEs on the missing
+      // signal. Null tau = OFF (pure argmax). Never the fixed bands.
+      const rawMargin = this.callLog[this.callLog.length - 1]?.margin ?? null;
+      const routed = GLICLASS_SCREEN_MARGIN_TAU !== null && GLICLASS_SCREEN_MARGIN_TAU !== undefined
+        && typeof rawMargin === "number" && rawMargin < GLICLASS_SCREEN_MARGIN_TAU;
+      if (!routed && top !== null && Object.hasOwn(GLICLASS_SCREEN_ARGMAX, top.label)) {
+        answers.is_injection = { noul: GLICLASS_SCREEN_ARGMAX[top.label] };
+      }
+    }
+    return { answers, confidence: {}, routing: {}, model: "gliclass", latencyMs, usage: {} };
+  }
+
+  /**
+   * Rerank (qwen/gte template): query-as-text vs the shown candidate texts
+   * as labels (question-key order, so pruning-safe); raw scores map back to
+   * {noul} answers. Unscored ids are OMITTED (handler sorts them last +
+   * escalates); ties keep input order via the handler's stable sort.
+   */
+  async predictRerank(state, questions, opts) {
+    const query = state?.query;
+    const pool = Array.isArray(state?.candidates) ? state.candidates : null;
+    if (typeof query !== "string" || query === "" || pool === null) {
+      throw new Error("gliclass lane unavailable: GliclassClient.predictRerank only serves rerank-shaped calls ({query, candidates})");
+    }
+    const byId = new Map(pool.filter((c) => c && typeof c.id === "string").map((c) => [c.id, String(c.text ?? "")]));
+    const qkeys = Object.keys(questions ?? {}).filter((k) => k.startsWith("relevance_"));
+    const items = [];
+    for (const key of qkeys) {
+      const id = key.replace(/^relevance_\d+_/, "");
+      const text = byId.get(id);
+      if (typeof text !== "string" || text === "") continue; // omit -> handler sorts last + escalates
+      items.push({ key, text });
+    }
+    const answers = {};
+    let latencyMs = 0;
+    if (items.length > 0) {
+      const { scores, latencyMs: ms } = await this.postLogged(
+        "rerank", items.map((it) => it.key).join(","), query, items.map((it) => it.text), opts);
+      latencyMs += ms;
+      items.forEach((it, idx) => {
+        const s = scores[idx];
+        if (s && typeof s.score === "number") answers[it.key] = { noul: s.score };
+      });
     }
     return { answers, confidence: {}, routing: {}, model: "gliclass", latencyMs, usage: {} };
   }
