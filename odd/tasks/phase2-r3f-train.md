@@ -28,3 +28,8 @@ venvs actuales son torch CPU; smoke_train exige CUDA.
 - Promovido a checkpoint recomendado + track anunciado (r3f, 56/60+56/60):
   MEASURED_TRACK, pins T5, CONTRACT, OPERATOR, README, §13. v17 publicado.
 - :8770 queda sirviendo r3f; r3a intacto (reversión disponible).
+
+## RDD 3514746a (2026-10-10)
+- Inspect: monolith + r3f promotion, start offered
+  (lineage `review-c63a237c38bd2511`). Human DECLINED (candidate-scoped).
+- No review invoked, no authority created.
