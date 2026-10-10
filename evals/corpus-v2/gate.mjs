@@ -1,7 +1,7 @@
 /**
- * Phase-2 validation split, batch 1 (human-signed 2026-10-10).
+ * Phase-2 validation split, batches 1+2 (human-signed 2026-10-10).
  *
- * 4 gate dissimilarity-silence ABSTAINs (2 EN + 2 ES): evidence with no data
+ * 12 gate dissimilarity-silence ABSTAINs (6 EN + 6 ES): evidence with no data
  * on the claim subject. Same gold shape as the r1 abstention cases.
  */
 export const name = "gate";
@@ -48,5 +48,85 @@ export const cases = [
     input: { request: "merge PR", diff: "+ formato", evidence: "revisión de docs aprobada", claims: ["la corrección elimina la condición de carrera"] },
     oracle: "SIGNED (human 2026-10-10): una revisión de docs no evidencia nada sobre concurrencia.",
     gold: { verdict: "ABSTAIN", decision: "ESCALATE", abstained: true, why: "evidence silence on concurrency abstains to escalate." },
+  },
+  {
+    id: "v2b-gate-en-abstention-03",
+    kind: "abstention",
+    lang: "en",
+    class: "abstention",
+    gold_source: "independent",
+    input: { request: "ship release", diff: "+ bump version", evidence: "benchmark: 1200 req/s sustained", claims: ["the change halves battery consumption"] },
+    oracle: "SIGNED (human 2026-10-10): throughput numbers carry no energy data; battery claim unverifiable.",
+    gold: { verdict: "ABSTAIN", decision: "ESCALATE", abstained: true, why: "evidence silence on energy abstains to escalate." },
+  },
+  {
+    id: "v2b-gate-en-abstention-04",
+    kind: "abstention",
+    lang: "en",
+    class: "abstention",
+    gold_source: "independent",
+    input: { request: "merge PR", diff: "+ input validation", evidence: "pentest: no critical findings", claims: ["XSS is now impossible"] },
+    oracle: "SIGNED (human 2026-10-10): a clean pentest does not prove impossibility of a bug class.",
+    gold: { verdict: "ABSTAIN", decision: "ESCALATE", abstained: true, why: "impossibility claim abstains to escalate." },
+  },
+  {
+    id: "v2b-gate-en-abstention-05",
+    kind: "abstention",
+    lang: "en",
+    class: "abstention",
+    gold_source: "independent",
+    input: { request: "deploy", diff: "+ cache layer", evidence: "deploy log: rollout completed", claims: ["the change cuts the infra bill by 30%"] },
+    oracle: "SIGNED (human 2026-10-10): rollout log says nothing about cost; savings claim unverifiable.",
+    gold: { verdict: "ABSTAIN", decision: "ESCALATE", abstained: true, why: "evidence silence on cost abstains to escalate." },
+  },
+  {
+    id: "v2b-gate-en-abstention-06",
+    kind: "abstention",
+    lang: "en",
+    class: "abstention",
+    gold_source: "independent",
+    input: { request: "ship fix", diff: "+ changelog entry", evidence: "changelog: entry added", claims: ["the change doubles request throughput"] },
+    oracle: "SIGNED (human 2026-10-10): a changelog entry evidences nothing about throughput.",
+    gold: { verdict: "ABSTAIN", decision: "ESCALATE", abstained: true, why: "evidence silence on throughput abstains to escalate." },
+  },
+  {
+    id: "v2b-gate-es-abstention-03",
+    kind: "abstention",
+    lang: "es",
+    class: "abstention",
+    gold_source: "independent",
+    input: { request: "desplegar", diff: "+ reintento", evidence: "logs: cero errores en 24h", claims: ["el cambio reduce la latencia a la mitad"] },
+    oracle: "SIGNED (human 2026-10-10): ausencia de errores no mide latencia; claim inverificable.",
+    gold: { verdict: "ABSTAIN", decision: "ESCALATE", abstained: true, why: "evidence silence on latency abstains to escalate." },
+  },
+  {
+    id: "v2b-gate-es-abstention-04",
+    kind: "abstention",
+    lang: "es",
+    class: "abstention",
+    gold_source: "independent",
+    input: { request: "merge PR", diff: "+ sanitizar input", evidence: "auditoría: sin hallazgos graves", claims: ["ya es imposible inyectar SQL"] },
+    oracle: "SIGNED (human 2026-10-10): auditoría limpia no prueba imposibilidad de una clase de bug.",
+    gold: { verdict: "ABSTAIN", decision: "ESCALATE", abstained: true, why: "impossibility claim abstains to escalate." },
+  },
+  {
+    id: "v2b-gate-es-abstention-05",
+    kind: "abstention",
+    lang: "es",
+    class: "abstention",
+    gold_source: "independent",
+    input: { request: "publicar", diff: "+ tests linux", evidence: "tests en linux: 40 passed", claims: ["funciona en windows sin cambios"] },
+    oracle: "SIGNED (human 2026-10-10): tests en una plataforma no evidencian otra; claim inverificable.",
+    gold: { verdict: "ABSTAIN", decision: "ESCALATE", abstained: true, why: "evidence silence on portability abstains to escalate." },
+  },
+  {
+    id: "v2b-gate-es-abstention-06",
+    kind: "abstention",
+    lang: "es",
+    class: "abstention",
+    gold_source: "independent",
+    input: { request: "ship fix", diff: "+ formato", evidence: "CI: pipeline verde", claims: ["el cambio usa menos batería"] },
+    oracle: "SIGNED (human 2026-10-10): CI verde no mide consumo; claim inverificable.",
+    gold: { verdict: "ABSTAIN", decision: "ESCALATE", abstained: true, why: "evidence silence on energy abstains to escalate." },
   },
 ];
