@@ -57,11 +57,15 @@ import {
   abstentionStats,
   binaryMetrics,
   decisionAccuracy,
+  goldVerdictList,
+  langOf,
   meanRanking,
   rankingMetrics,
+  scoreIndependentDecision,
   wrongConfident,
 } from "./metrics.mjs";
 import { isLiveEnabled, makeLiveDeps, connectLiveBackend, resolveLiveBackend } from "./live-client.mjs";
+import { isR1Enabled, r1CasesFor } from "./corpus-index.mjs";
 
 const SUITES = [classify, decide, verify, screen, pii, extract, find, rerank, review, gate, compare];
 
@@ -90,8 +94,7 @@ const stubDeps = { fakeClient, makePiiCtx };
 const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const goldLabels = (gold) =>
   gold.classifications !== undefined ? gold.classifications : gold.classification !== undefined ? [gold.classification] : null;
-const goldVerdicts = (gold) =>
-  gold.verdicts !== undefined ? gold.verdicts : gold.verdict !== undefined ? [gold.verdict] : null;
+const goldVerdicts = (gold) => goldVerdictList(gold);
 
 /**
  * Per-suite task extraction: { taskActual, taskGold, hasTask, judgments }
@@ -187,18 +190,54 @@ function extractJudgments(suiteName, body, gold) {
 
 const FAMILY = { rerank: "ranking", review: "agreement", gate: "agreement" };
 
+/**
+ * benchmark-ronda1 T4: per-language split (EN vs ES, counts + rates) over
+ * per-case correctness flags. `rows` carry { lang, decOk, taskOk, hasTask }.
+ * Case `lang` wins, suite default (English) otherwise.
+ */
+function langSplits(rows) {
+  const acc = (flags) => ({ n: flags.length, correct: flags.filter(Boolean).length, accuracy: flags.length === 0 ? null : flags.filter(Boolean).length / flags.length });
+  const out = {};
+  for (const lang of ["en", "es"]) {
+    const sub = rows.filter((r) => r.lang === lang);
+    const task = sub.filter((r) => r.hasTask);
+    out[lang] = { n: sub.length, decision: acc(sub.map((r) => r.decOk)), task: task.length === 0 ? null : acc(task.map((r) => r.taskOk)) };
+  }
+  return out;
+}
+
 async function scoreSuite(suite, deps) {
   const rows = [];
   for (const c of suite.cases) {
     const capture = {};
+    const lang = langOf(c, suite.lang ?? "en");
     try {
       const body = await suite.invoke(deps, c.input, c.stub, capture);
       if (c.expectError) {
-        rows.push({ id: c.id, threw: false, unexpectedPass: true, gold: c.gold });
+        rows.push({ id: c.id, lang, threw: false, unexpectedPass: true, gold: c.gold });
+      } else if (c.r1 === true) {
+        // R1 independent golds: decoupled decision scoring only (no signal
+        // values exist; winner_probability etc. stay stub-only, so the live
+        // backend is judged on decisions, never on signal magnitudes).
+        const s = scoreIndependentDecision(suite.name, body, c.gold);
+        rows.push({
+          id: c.id, lang, r1: true, threw: false,
+          abstained: body.abstention.abstained === true,
+          decisionActual: body.decision.decision,
+          decisionGold: c.gold.decision,
+          taskActual: s.taskActual,
+          taskGold: s.taskGold,
+          hasTask: s.taskGold !== null && s.taskGold !== undefined,
+          decOk: s.decisionOk,
+          taskOk: s.taskOk,
+          abstOk: s.abstainedOk,
+          judgments: [], // no signals on R1: excluded from wrong_confident by construction
+        });
       } else {
         const ext = extractJudgments(suite.name, body, c.gold);
         rows.push({
           id: c.id,
+          lang,
           threw: false,
           abstained: body.abstention.abstained === true,
           decisionActual: body.decision.decision,
@@ -207,7 +246,7 @@ async function scoreSuite(suite, deps) {
         });
       }
     } catch (err) {
-      rows.push({ id: c.id, threw: true, expectedThrow: c.expectError !== undefined && String(err?.message ?? err).includes(c.expectError) });
+      rows.push({ id: c.id, lang, threw: true, expectedThrow: c.expectError !== undefined && String(err?.message ?? err).includes(c.expectError) });
     }
   }
   const usable = rows.filter((r) => !r.threw && !r.unexpectedPass);
@@ -221,6 +260,16 @@ async function scoreSuite(suite, deps) {
     decision: decisionAccuracy(usable.filter((r) => r.decisionGold !== undefined).map((r) => ({ actual: r.decisionGold, predicted: r.decisionActual }))),
   };
   const judged = usable.filter((r) => !r.abstained && r.decisionGold !== undefined);
+  // benchmark-ronda1 T4: EN/ES slices (counts + rates) over decision + task
+  // correctness; case lang wins, suite default otherwise.
+  out.lang = langSplits(
+    usable.filter((r) => r.decisionGold !== undefined).map((r) => ({
+      lang: r.lang ?? "en",
+      decOk: r.decOk !== undefined ? r.decOk : r.decisionActual === r.decisionGold,
+      taskOk: r.taskOk !== undefined ? r.taskOk : eq(r.taskActual, r.taskGold),
+      hasTask: r.hasTask !== undefined ? r.hasTask : r.taskGold !== null && r.taskGold !== undefined,
+    })),
+  );
   if (family === "ranking") {
     const ranked = usable.filter((r) => !r.abstained && Array.isArray(r.taskGold));
     out.ranking = {
@@ -249,6 +298,28 @@ async function scoreSuite(suite, deps) {
 const args = process.argv.slice(2);
 const asJson = args.includes("--json");
 
+if (args.includes("--help") || args.includes("-h")) {
+  console.log([
+    "usage: node evals/score.mjs [suite] [--json] [--out <path>] [--live] [--corpus r1]",
+    "  suite        optional suite name filter (default: all 11).",
+    "  --json       machine-readable report on stdout (default shape unchanged).",
+    "  --out <path> save the report (default artifacts/evals-t4-metrics.json).",
+    "  --live       opt-in: judge through the probed backend (refuses exit 2 when unreachable).",
+    "  --corpus r1  opt-in: merge the 60 R1 independent cases (env LAYA_CORPUS=r1 equivalent).",
+  ].join("\n"));
+  process.exit(0);
+}
+
+/* benchmark-ronda1 T4: opt-in R1 merge (default off; stub numbers unchanged).
+ * Module namespaces are read-only, so merged suites are local wrappers. */
+const wantR1 = isR1Enabled(args, process.env);
+const SUITES_EFF = wantR1
+  ? SUITES.map((s) => {
+    const extra = r1CasesFor(s.name);
+    return extra.length === 0 ? s : { name: s.name, primitive: s.primitive, lang: s.lang, invoke: s.invoke, check: s.check, cases: [...s.cases, ...extra] };
+  })
+  : SUITES;
+
 /* T4 live adapter (harness-spike-ready): stub default; --live / LAYA_EVAL_LIVE=1
  * routes judge calls to the probed backend. Live without a reachable backend
  * refuses (exit 2) instead of silently measuring the stub as backend output. */
@@ -269,6 +340,11 @@ if (wantLive) {
 const rest = [];
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--json") continue;
+  if (args[i] === "--corpus") {
+    i++; // opt-in flag + value: never a suite filter
+    continue;
+  }
+  if (args[i].startsWith("--corpus=")) continue;
   if (args[i] === "--out") {
     i++;
     continue;
@@ -278,9 +354,9 @@ for (let i = 0; i < args.length; i++) {
 }
 const filter = rest[0];
 const outIdx = args.indexOf("--out");
-const selected = filter ? SUITES.filter((s) => s.name === filter) : SUITES;
+const selected = filter ? SUITES_EFF.filter((s) => s.name === filter) : SUITES_EFF;
 if (selected.length === 0) {
-  console.error(`unknown suite "${filter}"; known: ${SUITES.map((s) => s.name).join(", ")}`);
+  console.error(`unknown suite "${filter}"; known: ${SUITES_EFF.map((s) => s.name).join(", ")}`);
   process.exit(2);
 }
 
@@ -291,6 +367,7 @@ const report = {
   backend,
   taus: WRONG_CONFIDENT_TAUS,
   taus_note: "reporting slices only; NEVER production thresholds (see evals/calibration.md)",
+  ...(wantR1 ? { corpus: "r1", corpus_note: "opt-in R1 merge: 60 independent cases scored on DECISION fields only (no signal values required)" } : {}),
   suites: [],
 };
 for (const suite of selected) report.suites.push(await scoreSuite(suite, deps));

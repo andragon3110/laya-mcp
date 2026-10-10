@@ -122,6 +122,13 @@ export function hardwareInfo() {
 export async function buildManifest({ bench = null, metrics = null, backend = null } = {}) {
   const git = gitCommit();
   const live = backend?.live === true && backend?.reachable === true;
+  // benchmark-ronda1 T4: per-backend revision pins (same vocabulary as the
+  // LAYA/RERANK pins; unpinned honest nulls). The live probe already carries
+  // `revisions`; stub runs resolve env pins-or-null here so the record shape
+  // is identical with and without a backend.
+  const { resolveBackendRevisions } = await import("./live-client.mjs");
+  const revisions = backend?.revisions ?? resolveBackendRevisions();
+  const backendRecord = backend ?? { mode: "stub", live: false, reachable: false, note: "stub default: no backend probed", revisions };
   return {
     generated: live
       ? `fase-7 T5+spike reproducibility manifest (LIVE backend ${backend.baseUrl}; absolutes + method, no improvement claims)`
@@ -145,7 +152,9 @@ export async function buildManifest({ bench = null, metrics = null, backend = nu
     device_note: live
       ? "probed LIVE from GET /ready (or the explicit unknown string when the backend reported no device)"
       : "capabilities reports backend.device / models[].device probed LIVE; nothing was probed in this run",
-    backend: backend ?? { mode: "stub", live: false, reachable: false, note: "stub default: no backend probed" },
+    backend: backendRecord,
+    backend_revisions: revisions,
+    backend_revisions_note: "per-backend revision pins (env pins win, else backend-reported, else unpinned null; a hash is never invented)",
     policy: listPolicies(),
     policy_note: "live registry truth (availability-independent); 14 entries",
     schema_version: ENVELOPE_SCHEMA_VERSION,

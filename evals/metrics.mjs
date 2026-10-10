@@ -148,8 +148,7 @@ export function scoreAgreement(pairs) {
  * @returns per tau { tau, scored, confident, wrong_and_confident, rate,
  *   conditional_wrong_given_confident } where rate is the JOINT rate
  *   P(wrong AND signal >= tau) over scored items.
- */
-export function wrongConfident(items, taus = WRONG_CONFIDENT_TAUS) {
+ */export function wrongConfident(items, taus = WRONG_CONFIDENT_TAUS) {
   const scored = items.filter((it) => !it.threw && !it.abstained && typeof it.signal === "number");
   const excluded = {
     threw: items.filter((it) => it.threw).length,
@@ -171,4 +170,106 @@ export function wrongConfident(items, taus = WRONG_CONFIDENT_TAUS) {
       };
     }),
   };
+}
+
+/**
+ * benchmark-ronda1 T4: language tag resolution. Case `lang` wins, else the
+ * suite default (suites carry no lang tag today, so English is assumed and
+ * documented at the call site), else "en". Pure helper, no thresholds.
+ */
+export function langOf(c, suiteFallback = "en") {
+  const l = String(c?.lang ?? suiteFallback ?? "en").toLowerCase();
+  return l === "es" ? "es" : "en";
+}
+
+/**
+ * benchmark-ronda1 T4: gold verdict list normalization. Accepts EITHER the
+ * singular `verdict` or the adversarial `verdicts` array (both shapes carry
+ * the same truth); singular expands to a 1-list. Returns null when the gold
+ * defines no verdict (limit throws never reach here).
+ */
+export function goldVerdictList(gold) {
+  if (Array.isArray(gold?.verdicts)) return gold.verdicts;
+  if (gold?.verdict !== undefined) return [gold.verdict];
+  return null;
+}
+
+/**
+ * benchmark-ronda1 T4: decoupled independent-gold scoring. Compares DECISION
+ * fields only (label/decision/verdict/order/winner/exists/abstained) against
+ * human-fixed golds WITHOUT requiring stub-oracle signal values:
+ * winner_probability, nouls, and rubric scores are never read here, so live
+ * mismatches on signals alone can never count as decision errors.
+ *
+ * Normalizations (T3 review pins, preserved as-is):
+ * - screen golds missing `abstained` default to false;
+ * - gate accepts singular `verdict` or array `verdicts`;
+ * - rerank tie-by-irrelevance keeps input order ALLOW (exact order match);
+ *   find ties ESCALATE (the v1 pin asymmetry is preserved, not "fixed");
+ * - classify needs no abstention class (plain label equality).
+ * - find abstained ties (ambiguous exact tie, lone-candidate pool, honest
+ *   none): scores decision + abstained ONLY, never winner (taskOk is forced
+ *   true so a live winner value on an abstained tie is not an error).
+ *
+ * @returns { decisionOk, abstainedOk, taskOk, overall, taskActual, taskGold }
+ */
+export function scoreIndependentDecision(suiteName, body, gold) {
+  const g = gold ?? {};
+  const decisionOk = body?.decision?.decision === g.decision;
+  const goldAbstained = g.abstained ?? false;
+  // Gate normalization: the missing-signal path reports an ABSTAIN verdict +
+  // ESCALATE without setting the top-level abstention flag (same shape as the
+  // suite's own abstention case, which omits the flag). Verdict-level ABSTAIN
+  // agreement therefore satisfies abstention even when the flags differ.
+  let abstainedOk = (body?.abstention?.abstained === true) === (goldAbstained === true);
+  if (!abstainedOk && (suiteName === "gate" || suiteName === "verify")) {
+    const want = goldVerdictList(g) ?? [];
+    const got = ((suiteName === "gate" ? body?.claims : body?.verdicts) ?? []).map((v) => v.verdict);
+    if (want.includes("ABSTAIN") && got.includes("ABSTAIN")) abstainedOk = true;
+  }
+  let taskActual = null;
+  let taskGold = null;
+  let taskOk = true;
+  switch (suiteName) {
+    case "classify": {
+      const pred = (body?.classifications ?? []).map((c) => c.classification);
+      const want = g.classifications !== undefined ? g.classifications : g.classification !== undefined ? [g.classification] : null;
+      taskActual = pred;
+      taskGold = want;
+      taskOk = want === null ? true : JSON.stringify(pred.slice(0, want.length)) === JSON.stringify(want);
+      break;
+    }
+    case "screen":
+      taskActual = body?.assessment ?? null;
+      taskGold = g.assessment ?? null;
+      taskOk = taskGold === null || taskActual === taskGold;
+      break;
+    case "gate":
+    case "verify": {
+      const rows = suiteName === "gate" ? (body?.claims ?? []) : (body?.verdicts ?? []);
+      const want = goldVerdictList(g);
+      taskActual = rows.map((v) => v.verdict);
+      taskGold = want;
+      taskOk = want === null ? true : JSON.stringify(taskActual) === JSON.stringify(want);
+      break;
+    }
+    case "rerank":
+      taskActual = (body?.ranked ?? []).map((r) => r.id);
+      taskGold = Array.isArray(g.order) ? g.order : null;
+      taskOk = taskGold === null ? true : JSON.stringify(taskActual) === JSON.stringify(taskGold);
+      break;
+    case "find":
+      taskActual = body?.winner ?? null;
+      taskGold = g.winner ?? null;
+      if (goldAbstained === true) {
+        taskOk = true; // abstained ties: decision + abstained judge, never winner
+      } else {
+        taskOk = taskGold === null || taskActual === taskGold;
+        if (taskOk && g.exists !== undefined && body && "exists" in body) taskOk = body.exists === g.exists;
+      }
+      break;
+    default:
+      taskOk = true;
+  }
+  return { decisionOk, abstainedOk, taskOk, overall: decisionOk && abstainedOk && taskOk, taskActual, taskGold };
 }

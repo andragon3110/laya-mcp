@@ -70,8 +70,30 @@ export const LIVE_CLIENT_DEFAULTS = {
   glinerRevisionEnv: "GLINER_MODEL_REVISION",
   /** Operator revision pin for the rerank sidecar (evidence vocabulary). */
   rerankRevisionEnv: "RERANK_MODEL_REVISION",
+  /** Per-backend revision pins (evidence vocabulary; operator pin wins,
+   * blank counts as unset, else the honest unpinned null). */
+  d1RevisionEnv: "D1_MODEL_REVISION",
+  gliclassRevisionEnv: "GLICLASS_MODEL_REVISION",
+  policylmRevisionEnv: "POLICYLM_MODEL_REVISION",
+  promptguardRevisionEnv: "PROMPTGUARD_MODEL_REVISION",
+  gteRevisionEnv: "GTE_MODEL_REVISION",
   /** Per-probe budget for the live /ready + /models calls (ms). */
   probeTimeoutMs: 1500,
+  /**
+   * T6a per-primitive bench lane URL envs. Each lane reads its own env
+   * first, then falls back to the shared primitive env (LAYA_URL for
+   * judge lanes, RERANK_URL for ordering lanes), then the shared default.
+   * Same opt-in/probe/refusal vocabulary as the rest of this module:
+   * nothing here activates a backend, it only resolves where a lane
+   * would dial when the T6b matrix opts in.
+   */
+  benchLaneUrls: {
+    classify: { env: "LAYA_BENCH_CLASSIFY_URL", fallbackEnv: "LAYA_URL", fallbackDefault: "http://127.0.0.1:8765" },
+    screen: { env: "LAYA_BENCH_SCREEN_URL", fallbackEnv: "LAYA_URL", fallbackDefault: "http://127.0.0.1:8765" },
+    gate: { env: "LAYA_BENCH_GATE_URL", fallbackEnv: "LAYA_URL", fallbackDefault: "http://127.0.0.1:8765" },
+    rerank: { env: "LAYA_BENCH_RERANK_URL", fallbackEnv: "RERANK_URL", fallbackDefault: "http://127.0.0.1:8768" },
+    find: { env: "LAYA_BENCH_FIND_URL", fallbackEnv: "RERANK_URL", fallbackDefault: "http://127.0.0.1:8768" },
+  },
 };
 
 const TRUTHY = new Set(["1", "true", "yes", "on"]);
@@ -102,6 +124,98 @@ export function resolveLiveGlinerUrl(env = process.env) {
 export function resolveLiveRerankUrl(env = process.env) {
   const raw = env[LIVE_CLIENT_DEFAULTS.rerankUrlEnv] ?? LIVE_CLIENT_DEFAULTS.rerankDefaultUrl;
   return String(raw).replace(/\/$/, "");
+}
+
+/**
+ * T6a: per-primitive bench lane URL resolution. Lane env wins verbatim,
+ * else the shared primitive env (LAYA_URL / RERANK_URL), else the shared
+ * default; slash-trimmed. Unknown lanes throw (never a silent default).
+ */
+export function resolveLaneBaseUrl(lane, env = process.env) {
+  const spec = LIVE_CLIENT_DEFAULTS.benchLaneUrls[lane];
+  if (!spec) {
+    throw new Error(`unknown bench lane ${JSON.stringify(String(lane))} (known: ${Object.keys(LIVE_CLIENT_DEFAULTS.benchLaneUrls).join(", ")})`);
+  }
+  const raw = env[spec.env] ?? env[spec.fallbackEnv] ?? spec.fallbackDefault;
+  return String(raw).replace(/\/$/, "");
+}
+
+/**
+ * T6a: generic sidecar probe (GET /ready + /models in parallel against
+ * baseUrl). Never throws. Returns the reachable descriptor, or the
+ * exit-2-style refusal record when down: { reachable: false, exitCode: 2,
+ * error, note } -- the caller refuses the lane run, never silently
+ * measures a stub as backend output. Same honesty vocabulary as
+ * resolveLiveRerank.
+ */
+export async function probeSidecar({ baseUrl, service = "sidecar", note = null, timeoutMs = LIVE_CLIENT_DEFAULTS.probeTimeoutMs, fetchImpl = fetch } = {}) {
+  const [ready, models] = await Promise.all([
+    probeJson(`${baseUrl}/ready`, { timeoutMs, fetchImpl }),
+    probeJson(`${baseUrl}/models`, { timeoutMs, fetchImpl }),
+  ]);
+  const modelList = ready.ok || models.ok ? (Array.isArray(models.body?.models) ? models.body.models : []) : [];
+  if (!ready.ok && !models.ok) {
+    return {
+      baseUrl,
+      service,
+      reachable: false,
+      exitCode: 2,
+      error: ready.error ?? models.error ?? `GET /ready -> ${ready.status ?? "no response"}`,
+      note: note ?? `${service} unreachable at ${baseUrl}`,
+    };
+  }
+  const loaded = modelList.filter((m) => m?.loaded === true);
+  const first = loaded[0] ?? modelList[0] ?? null;
+  return {
+    baseUrl,
+    service,
+    reachable: true,
+    ready: ready.body?.ready === true,
+    ready_reason: typeof ready.body?.reason === "string" ? ready.body.reason : (typeof ready.body?.status === "string" ? ready.body.status : null),
+    device: typeof ready.body?.device === "string" ? ready.body.device : `unknown (${service} backend did not report a device)`,
+    models: modelList,
+    model: typeof first?.name === "string" ? first.name : `${service} backend (name unreported)`,
+    probe_status: { ready: ready.status, models: models.status },
+  };
+}
+
+/**
+ * Per-backend revision pins in the src/evidence.ts vocabulary. Operator env
+ * pin wins (blank counts as unset), else the first non-null backend model
+ * revision for backends that report an inventory, else the honest unpinned
+ * null (a hash is never invented). Backends without a probed inventory
+ * (D1/GLiCLASS/PolicyLM/PromptGuard/GTE have no harness probe yet) resolve
+ * from their env pin or the honest null. Returns { <key>: { revision,
+ * revision_source, env } } for manifest backend records.
+ */
+export function resolveBackendRevisions({ env = process.env, models = [] } = {}) {
+  const pin = (envVar) => {
+    const v = String(env[envVar] ?? "").trim();
+    return v !== "" ? { revision: v, revision_source: `env:${envVar}`, env: envVar } : null;
+  };
+  const fromModels = () => {
+    for (const m of models) {
+      if (m && typeof m.revision === "string" && m.revision.trim() !== "") {
+        return { revision: m.revision, revision_source: "backend" };
+      }
+    }
+    return { revision: null, revision_source: "unpinned" };
+  };
+  const backends = [
+    ["laya", LIVE_CLIENT_DEFAULTS.revisionEnv, true],
+    ["gliner", LIVE_CLIENT_DEFAULTS.glinerRevisionEnv, false],
+    ["rerank", LIVE_CLIENT_DEFAULTS.rerankRevisionEnv, false],
+    ["d1", LIVE_CLIENT_DEFAULTS.d1RevisionEnv, false],
+    ["gliclass", LIVE_CLIENT_DEFAULTS.gliclassRevisionEnv, false],
+    ["policylm", LIVE_CLIENT_DEFAULTS.policylmRevisionEnv, false],
+    ["promptguard", LIVE_CLIENT_DEFAULTS.promptguardRevisionEnv, false],
+    ["gte", LIVE_CLIENT_DEFAULTS.gteRevisionEnv, false],
+  ];
+  const out = {};
+  for (const [key, envVar, hasInventory] of backends) {
+    out[key] = pin(envVar) ?? (hasInventory ? { ...fromModels(), env: envVar } : { revision: null, revision_source: "unpinned", env: envVar });
+  }
+  return out;
 }
 
 /**
@@ -192,7 +306,7 @@ export async function resolveLiveRerank({ env = process.env, timeoutMs = LIVE_CL
  */
 export async function resolveLiveBackend({ argv = process.argv.slice(2), env = process.env, timeoutMs = LIVE_CLIENT_DEFAULTS.probeTimeoutMs, fetchImpl = fetch } = {}) {
   if (!isLiveEnabled(argv, env)) {
-    return { mode: "stub", live: false, reachable: false, note: "stub default: live backend only after --live / LAYA_EVAL_LIVE=1" };
+    return { mode: "stub", live: false, reachable: false, note: "stub default: live backend only after --live / LAYA_EVAL_LIVE=1", revisions: resolveBackendRevisions({ env }) };
   }
   const baseUrl = resolveLiveBaseUrl(env);
   const glinerUrl = resolveLiveGlinerUrl(env);
@@ -214,6 +328,7 @@ export async function resolveLiveBackend({ argv = process.argv.slice(2), env = p
       rerank,
       error: ready.error ?? models.error ?? `GET /ready -> ${ready.status ?? "no response"}`,
       note: "live requested but the backend is unreachable; run the stub default (no flag) or start laya-server",
+      revisions: resolveBackendRevisions({ env }),
     };
   }
   const { revision, revision_source } = resolveLiveRevision({ env, models: modelList });
@@ -234,6 +349,7 @@ export async function resolveLiveBackend({ argv = process.argv.slice(2), env = p
     model: typeof first?.name === "string" ? first.name : "live-backend (name unreported)",
     model_revision: revision,
     model_revision_source: revision_source,
+    revisions: resolveBackendRevisions({ env, models: modelList }),
     tokenizer: "unknown",
     probe_status: { ready: ready.status, models: models.status },
   };

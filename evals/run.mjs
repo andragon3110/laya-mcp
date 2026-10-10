@@ -89,15 +89,40 @@ async function runCase(suite, c) {
 
 const args = process.argv.slice(2);
 const asJson = args.includes("--json");
-const filter = args.find((a) => a !== "--json" && !a.startsWith("-"));
+const filter = (() => {
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--corpus") { i++; continue; } // opt-in flag + value: never a suite filter
+    if (args[i].startsWith("--corpus=")) continue;
+    if (args[i] !== "--json" && !args[i].startsWith("-")) return args[i];
+  }
+  return undefined;
+})();
 const selected = filter ? SUITES.filter((s) => s.name === filter) : SUITES;
+/* benchmark-ronda1 T4: opt-in R1 merge (env LAYA_CORPUS=r1 or --corpus r1;
+ * default off so the stub run stays byte-identical at 98/98). Module
+ * namespaces are read-only, so merged suites are local wrappers. */
+let corpusTag = null;
+let effective = selected;
+try {
+  const { isR1Enabled, r1CasesFor } = await import("./corpus-index.mjs");
+  if (isR1Enabled(args, process.env)) {
+    corpusTag = "r1";
+    effective = selected.map((s) => {
+      const extra = r1CasesFor(s.name);
+      return extra.length === 0 ? s : { name: s.name, primitive: s.primitive, invoke: s.invoke, check: s.check, cases: [...s.cases, ...extra] };
+    });
+  }
+} catch {
+  /* corpus-index absent: stub corpus unchanged */
+}
 if (selected.length === 0) {
   console.error(`unknown suite "${filter}"; known: ${SUITES.map((s) => s.name).join(", ")}`);
   process.exit(2);
 }
 
 const report = { suites: [], total: 0, passed: 0, failed: 0 };
-for (const suite of selected) {
+if (corpusTag !== null) report.corpus = corpusTag;
+for (const suite of effective) {
   const suiteRep = { suite: suite.name, primitive: suite.primitive, cases: [] };
   for (const c of suite.cases) {
     const r = await runCase(suite, c);
