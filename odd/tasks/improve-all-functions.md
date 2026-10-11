@@ -362,3 +362,18 @@ OUT: push/PR/merge (decisión del usuario), re-entrenar sin mecanismo nuevo,
   - `ok - rerank x gliclass / r1-rerank-en-normal-01: decision=ALLOW abstained=false task=["a","b"] wall_ms=639.4 reported_latency_ms=633.3 (device=cpu)`
 - Find: PARKED, not a new live number. `:8768` DOWN (`curl :8768/ready` unreachable). Stored manifests read-only: v8 (qwen, `:8768`) find decision 12/12 task 12/12 abstained 5 threw 0; v9 (gte, `:8773`) find decision 11/12 task 12/12 abstained 6 threw 0.
 - Verification: `npm run typecheck` → exit 0; `git status --short` shows only this doc file modified. No commit.
+
+## Progress bring-up-laya (2026-10-11) — laya-server :8765 live, :8770 untouched
+- Date: 2026-10-11T01:34:11Z (server start) → ready at uptime ~42s (no preload retry, no VRAM overflow, no `LAYA_MAX_LOADED=1` fallback needed).
+- Venv used: `py/.venv-r1-laya/bin/python` (repo venv; fastapi + torch 2.14.1+cpu + laya 0.3.29 SDK all present, so per instructions no fallback to `~/laya-mcp/.venv` and no pip install).
+- Env (canonical): `LAYA_HOST=127.0.0.1 LAYA_PORT=8765 LAYA_DEVICE=auto LAYA_PRELOAD=1`, detached via `nohup ... > /tmp/laya-8765.log 2>&1 &` (pid 1160077). No code edited, no checkpoints touched.
+- Device: effective CPU (repo venv torch is CPU-only build, `cuda.is_available() False`; server reports `device: auto`). GPU RTX 3050 6GB left free (nvidia-smi showed 5 MiB used at bring-up). HF cache had all 3 `convaiinnovations/laya*` repos, all resolved locally (`Fetching 5 files ... 100%` from cache).
+- Loaded: `["english", "multilingual", "typed-decisions"]`, `failed: []`, `circuit: closed`, `load_attempts: 0`. Log note (non-blocking): laya SDK `RuntimeWarning` about one checkpoint shipping an invalid temperature (`choice:11+ ... -> 0.5`, confidence on affected entries uncalibrated) — recorded, not acted on.
+- Wall time to ready: ~42s (`/ready` shows `uptime_seconds: 41.93` with `ready: true` on first successful poll).
+- Log path: `/tmp/laya-8765.log`.
+- Focused checks (curl outputs):
+  - `GET /live` → `{"alive":true,"service":"laya-server","version":"0.4.0","uptime_seconds":44.03}`
+  - `GET /ready` → `{"status":"ready","ready":true,"reason":null,"loaded":["english","multilingual","typed-decisions"],"failed":[],"device":"auto","versions":{"server":"0.4.0","laya_sdk":"0.3.29"},"circuit":"closed","load_attempts":0,"retry_after_seconds":0.0}`
+  - `GET /models` → all 3 models `loaded: true`, each `revision: null, revision_source: unpinned` (honest unpinned, per T10), `circuit: closed`.
+- `:8770` gliclass NOT touched: verified still UP (`{"alive": true, "service": "gliclass-server", "version": "0.1.0"}`), no restart, no request sent to it.
+- Verification: `curl /live` → exit 0 alive true; `curl /ready` → exit 0 ready true; `curl /models` → exit 0 3/3 loaded. No commit.
