@@ -242,12 +242,21 @@ Notes:
     a type/enum; newly rejecting a previously valid input.
   - Any single breaking flag forces `major`, even combined with additive
     flags; only-additive (or empty) change sets are `minor`.
-- **Policies:** 14 entries, all at `1.0.0` (`listPolicies()` from
-  `src/policy/loader.ts`): `classify`, `code-review`, `compare`,
-  `decide`, `extract`, `find`, `gate`, `normal`, `pii`, `rerank`,
-  `review`, `screen`, `security`, `verify`. Every decision records
-  `policy` + `policy_version` both top-level and inside
-  `decision.policy`.
+- **Policies:** 15 entries across 14 names (`listPolicies()` from
+  `src/policy/loader.ts`): every policy at `1.0.0` (`classify`,
+  `code-review`, `compare`, `decide`, `extract`, `find`, `gate`,
+  `normal`, `pii`, `rerank`, `review`, `screen`, `security`, `verify`)
+  plus `screen@1.1.0` (S5 pre-filter rule, minor-additive). Every
+  decision records `policy` + `policy_version` both top-level and
+  inside `decision.policy`.
+- **`screen@1.1.0` (minor, additive):** registered alongside the
+  byte-identical `screen@1.0.0`, which stays the judge-path default.
+  Its one new rule: a present shield-small pre-filter signal at or
+  above the 0.99 firm cut short-circuits to `DENY` with reason code
+  `screen_shield_prefilter` (policy `{screen, 1.1.0}`) without calling
+  the judge; below firm or absent shield it judges exactly as 1.0.0
+  (same cuts, same codes). Output schemas unchanged (`decision` enum
+  untouched; `reason_codes` has always been free strings).
 - **`model_revision` honesty:** resolved by
   `resolveEnvelopeRevision` (`src/envelope.ts:194-211`) from the
   operator env pin (`LAYA_MODEL_REVISION` for Laya tools,
@@ -402,10 +411,22 @@ Minor (additive, old clients keep working):
 3. **`laya_signal` values** in `laya_pii` findings are now real judge
    signals where available (still `["number", "null"]` per the schema;
    `null` + `pipeline.laya_note` reason when unjudged).
+4. **`screen@1.1.0` pre-filter rule:** firm shield INJECTION
+   (`detector_score >= 0.99`) DENYs as `screen_shield_prefilter`
+   before the judge. The firm cut is a measured-on-20 operating point
+   (S4 transfer in `odd/tasks/spike-guards.md`: measured attacks at or
+   above 0.9996, measured benigns at or below 0.0013) -- never a
+   probability, never calibrated -- with a `SHIELD_FIRM_SCORE` env
+   override (missing / non-finite falls back without throwing); risk
+   never moves it. The P1 judge cuts (0.75/0.25/0.4) and every 1.0.0
+   reason code are untouched, and `screen@1.0.0` stays the judge-path
+   default. Shield unreachable / SAFE / below-firm runs the unchanged
+   1.0.0 judge with the shield outcome noted in evidence metadata
+   (never silent, never a failure).
 
 Major (previously-valid inputs now rejected):
 
-4. **Claim caps tightened** for the two-questions-per-claim budget
+5. **Claim caps tightened** for the two-questions-per-claim budget
    (support + refutation probes): `laya_verify` 64 -> 32 claims,
    `laya_gate` 61 -> 30 claims (`src/limits.ts`). Calls with 33-64 /
    31-61 claims that succeeded before now fail `input_too_large`
