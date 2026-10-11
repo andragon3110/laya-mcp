@@ -377,3 +377,21 @@ OUT: push/PR/merge (decisión del usuario), re-entrenar sin mecanismo nuevo,
   - `GET /models` → all 3 models `loaded: true`, each `revision: null, revision_source: unpinned` (honest unpinned, per T10), `circuit: closed`.
 - `:8770` gliclass NOT touched: verified still UP (`{"alive": true, "service": "gliclass-server", "version": "0.1.0"}`), no restart, no request sent to it.
 - Verification: `curl /live` → exit 0 alive true; `curl /ready` → exit 0 ready true; `curl /models` → exit 0 3/3 loaded. No commit.
+
+## Progress bring-up-qwen-gliner (2026-10-11) — qwen-rerank :8768 (cuda) plus gliner :8766 (cpu) live, :8765 plus :8770 untouched
+- Date: 2026-10-11T01:35Z (qwen start) → qwen ready ~01:46Z; gliner start 01:47:20Z → ready ~01:48Z (first smoke). No commit.
+- Venvs: both run on `/home/andragon/laya-mcp/.venv/bin/python` (torch 2.14.0+cu130, cuda available, fastapi + transformers + gliner2 all present, no pip install). Repo venvs (`py/.venv-r1`, `py/.venv-r1-laya`) are CPU-only torch builds without gliner2, so they cannot serve cuda-qwen or gliner at all; `py/.venv-r1-policylm` lacks fastapi. Recorded as the reason for the non-repo venv.
+- Qwen (`Qwen/Qwen3-Reranker-0.6B`, device cuda via `RERANK_DEVICE=auto` default): `RERANK_HOST=127.0.0.1 RERANK_PORT=8768 nohup ... py/qwen_rerank_server.py > /tmp/qwen-8768.log 2>&1 &`. No OOM on CUDA (VRAM 5 MiB → 2572 MiB), so no cpu retry was needed.
+- Qwen warm-up gotcha (operator note): `GET /ready` is a NON-warming snapshot by contract, so 10 min of polling it never loads the model (`not loaded yet (no load attempted)`, 60 polls). The load was triggered by one `POST /rerank` warm-up (2 candidates), which returned the correct ranking (`a 0.9978 > b 0.00006`) with `latency_ms: 39516.9` (load + first score on cuda). Wall start → ready ~11 min, of which ~10 min was idle polling of the non-warming endpoint; actual load + first inference ~40 s.
+- Gliner (`fastino/gliner2.5-multi-v1`, device cpu per VRAM note): `GLINER_HOST=127.0.0.1 GLINER_PORT=8766 GLINER_DEVICE=cpu nohup ... py/gliner_server.py > /tmp/gliner-8766.log 2>&1 &`. Start → ready ~44 s (first `POST /extract_entities` served end-to-end, `latency_ms: 2912.5` including CPU load from local HF cache).
+- Gliner Spanish smoke (`POST /extract_entities`, ES labels): `María García vive en Madrid y su correo es maria.garcia@example.com` → persona `María García` 0.9990 [0,12], lugar `Madrid` 0.9995 [21,27], email `maria.garcia@example.com` 0.9961 [43,67]. 3/3 exact spans, live extraction confirmed.
+- Log paths: `/tmp/qwen-8768.log` (tail: Qwen2TokenizerFast note + `max_length`-padding UserWarning, load/score only), `/tmp/gliner-8766.log` (tail: gliner2 extractor-type note + legacy `extra_special_tokens` compat note + `torch.jit.script` 3.14 FutureWarning + sdpa→eager fallback RuntimeWarning; all non-blocking).
+- Focused checks (curl outputs):
+  - `GET :8768/live` → `{"alive":true,"service":"qwen-rerank-server","version":"0.1.0"}`
+  - `GET :8768/ready` → `{"status":"ready","ready":true,"loaded":["Qwen/Qwen3-Reranker-0.6B"],"device":"cuda","circuit":"closed","load_attempts":0}`
+  - `GET :8768/models` → 1/1 loaded, `device: cuda`, `revision: null, revision_source: unpinned` (honest unpinned, per T10)
+  - `GET :8766/live` → `{"alive":true,"service":"gliner-server","version":"0.1.0"}`
+  - `GET :8766/ready` → `{"status":"ready","ready":true,"loaded":["fastino/gliner2.5-multi-v1"],"device":"cpu","circuit":"closed","load_attempts":0}`
+  - `GET :8766/models` → 1/1 loaded, `device: cpu`, `revision: null, revision_source: unpinned`
+- Untouched: `:8765` laya (`alive true`, uptime continuous ~837 s at check) plus `:8770` gliclass (`alive true`, uptime continuous ~16990 s at check) — no restart, no request sent to either. No code edited, no checkpoints touched.
+- Verification: `curl /live` + `/ready` + `/models` on both ports → exit 0, both ready true. No commit.
