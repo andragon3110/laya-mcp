@@ -388,4 +388,110 @@ await check("e2e double call is byte-identical (determinism, pruned or not)", as
   assert.equal(await mk({ top_k: 2 }), await mk({ top_k: 2 }));
 });
 
+// --------------------------------------------- T4 consolidation (no semantics change) ---
+// Pins, in one place, the ambiguity contract the eval suite relies on:
+// tie / weak-at-baseline / silence (-as-empty-dict, -as-missing-answer)
+// resolve to authoritative ESCALATE (winner value kept verbatim, decision
+// wins); rogue ids echo verbatim per the no-allow-list contract, so a firm
+// rogue ALLOW must never be mistaken for a real-candidate win (grounding
+// membership gates use); pruning dropped is always counted, never silent.
+await check("T4-consolidation: exact tie at uniform baseline -> authoritative ESCALATE, never ALLOW", async () => {
+  const body = JSON.parse(
+    await handleFind(
+      fakeClient({ exists: { choice: "a", probabilities: { a: 0.5, b: 0.5 } } }),
+      { query: "database", candidates: [{ id: "a", text: "A" }, { id: "b", text: "B" }] },
+    ),
+  );
+  assert.equal(body.winner, "a", "winner value kept verbatim");
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /tie/);
+  assert.equal(body.decision.decision, "ESCALATE", "authoritative: do not act on the winner");
+  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+  assert.deepEqual(body.decision.policy, { name: "find", version: "1.0.0" });
+});
+
+await check("T4-consolidation: weak winner AT the uniform baseline (top == 1/N, unique) -> ESCALATE", async () => {
+  const body = JSON.parse(
+    await handleFind(
+      fakeClient({ exists: { choice: "a", probabilities: { a: 0.5, b: 0.3, none: 0.2 } } }),
+      { query: "q", candidates: [{ id: "a", text: "A" }, { id: "b", text: "B" }] },
+    ),
+  );
+  assert.equal(body.winner, "a", "winner value kept verbatim");
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /weak winner/);
+  assert.equal(body.decision.decision, "ESCALATE", "at-baseline is not above-baseline: never ALLOW");
+  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+});
+
+await check("T4-consolidation: silence as empty distribution -> ESCALATE with winner_probability null", async () => {
+  const body = JSON.parse(
+    await handleFind(
+      fakeClient({ exists: { choice: "a", probabilities: {} } }),
+      { query: "q", candidates: [{ id: "a", text: "A" }, { id: "b", text: "B" }] },
+    ),
+  );
+  assert.equal(body.winner, "a", "winner value kept verbatim");
+  assert.equal(body.winner_probability, null);
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /empty distribution/);
+  assert.equal(body.decision.decision, "ESCALATE", "silence never resolves to ALLOW");
+});
+
+await check("T4-consolidation: silence as missing judge answer -> none path -> ESCALATE", async () => {
+  const body = JSON.parse(
+    await handleFind(fakeClient({}), {
+      query: "q",
+      candidates: [{ id: "a", text: "A" }, { id: "b", text: "B" }],
+    }),
+  );
+  assert.equal(body.winner, "none");
+  assert.equal(body.exists, false);
+  assert.equal(body.abstention.abstained, true);
+  assert.equal(body.decision.decision, "ESCALATE");
+  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+});
+
+await check("T4-consolidation: rogue id echoes verbatim; firm rogue ALLOW is token-only, never a real win", async () => {
+  const pool = [{ id: "a", text: "A" }, { id: "b", text: "B" }];
+  const body = JSON.parse(
+    await handleFind(
+      fakeClient({ exists: { choice: "zzz", probabilities: { zzz: 0.9, none: 0.1 } } }),
+      { query: "database", candidates: pool },
+    ),
+  );
+  assert.equal(body.winner, "zzz", "no id allow-list: the judge token echoes verbatim (eval find-adversarial-01)");
+  assert.equal(body.decision.decision, "ALLOW", "firm unique above-baseline token allows per unchanged semantics");
+  assert.ok(!pool.some((c) => c.id === body.winner), "rogue token is outside the pool: callers must ground membership before use, never treat as a real-candidate ALLOW");
+});
+
+await check("T4-consolidation: rogue id with tied shares -> authoritative ESCALATE, never ALLOW", async () => {
+  const body = JSON.parse(
+    await handleFind(
+      fakeClient({ exists: { choice: "zzz", probabilities: { zzz: 0.45, a: 0.45, none: 0.1 } } }),
+      { query: "database", candidates: [{ id: "a", text: "A" }, { id: "b", text: "B" }] },
+    ),
+  );
+  assert.equal(body.winner, "zzz", "winner value kept verbatim");
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /tie/);
+  assert.equal(body.decision.decision, "ESCALATE", "ambiguity wins over the echoed token");
+});
+
+await check("T4-consolidation: pruning dropped is counted, never silent (kept + dropped == pool)", async () => {
+  const built = buildFindQuestionsWithInfo({ query: "apple red", candidates: pool10, top_k: 3 });
+  assert.equal(built.pruned, true);
+  assert.equal(built.pruning.kept + built.pruning.dropped, pool10.length, "every pool member accounted for");
+  assert.deepEqual(built.pruning, { kept: 3, dropped: 7, method: FIND_PRUNE_METHOD });
+  assert.equal(nonNoneKeys(criteriaOf(built)).length, 3, "judge sent kept + none only");
+  const body = JSON.parse(
+    await handleFind(
+      fakeClient({ exists: { choice: "a", probabilities: { a: 0.8, b: 0.1, none: 0.1 } } }),
+      { query: "apple red", candidates: pool10, top_k: 3 },
+    ),
+  );
+  assert.deepEqual(body.pruning, { kept: 3, dropped: 7, method: FIND_PRUNE_METHOD });
+  assert.deepEqual(body.evidence.metadata?.pruning, { kept: 3, dropped: 7, method: FIND_PRUNE_METHOD });
+});
+
 console.log(`\nFase-4 T4 find primitives: ${passed} checks passed (no server, no LLM involved).`);

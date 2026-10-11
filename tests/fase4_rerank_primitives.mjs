@@ -426,6 +426,77 @@ await check("e2e double call is byte-identical (determinism, pruned or not)", as
   assert.equal(await mkp(), await mkp());
 });
 
+// ------------------------------------------- T4 consolidation (no semantics change) ---
+// Pins the rank-only contract in one place: null scores sort last keeping
+// input order; truncated_ids reports when any JUDGED candidate was cut;
+// pre-filter rank never leaks into relevance_score; top_k defaults keep
+// legacy behaviour (whole pool to the judge, input order, preScore 0).
+await check("T4-consolidation: several nulls sort last keeping input order (firm desc first)", async () => {
+  const body = JSON.parse(
+    await handleRerank(
+      fakeClient({ relevance_0_a: { noul: 0.3 }, relevance_2_c: { noul: 0.9 } }),
+      { query: "q", candidates: [{ id: "a", text: "A" }, { id: "b", text: "B" }, { id: "c", text: "C" }, { id: "d", text: "D" }] },
+    ),
+  );
+  assert.deepEqual(body.ranked.map((r) => r.id), ["c", "a", "b", "d"], "firm desc, then missing keeps input order");
+  assert.deepEqual(body.ranked.map((r) => r.rank), [1, 2, 3, 4]);
+  assert.equal(body.ranked[2].relevance_score, null);
+  assert.equal(body.ranked[3].relevance_score, null);
+  assert.equal(body.decision.decision, "ESCALATE", "missing signals abstain (authoritative)");
+});
+
+await check("T4-consolidation: truncated_ids reported when any judged candidate was cut", async () => {
+  const cut = JSON.parse(
+    await handleRerank(
+      fakeClient({ relevance_0_long: { noul: 0.8 }, relevance_1_ok: { noul: 0.2 } }),
+      { query: "q", candidates: [{ id: "long", text: "x".repeat(2500) }, { id: "ok", text: "short" }] },
+    ),
+  );
+  assert.equal(cut.truncated, true);
+  assert.deepEqual(cut.truncated_ids, ["long"]);
+  assert.equal(captured.state.candidates[0].text.length, 2000, "judge state carries the cut text");
+  const clean = JSON.parse(
+    await handleRerank(
+      fakeClient({ relevance_0_a: { noul: 0.8 }, relevance_1_b: { noul: 0.2 } }),
+      { query: "q", candidates: [{ id: "a", text: "A" }, { id: "b", text: "B" }] },
+    ),
+  );
+  assert.equal(clean.truncated, false);
+  assert.deepEqual(clean.truncated_ids, []);
+});
+
+await check("T4-consolidation: pre-filter rank never leaks into relevance_score (judge order wins)", async () => {
+  const pool = [
+    { id: "low", text: "banana" },
+    { id: "top", text: "apple red harvest" },
+    { id: "mid", text: "apple green" },
+    { id: "out1", text: "cherry" },
+    { id: "out2", text: "date palm" },
+  ];
+  const body = JSON.parse(
+    await handleRerank(fakeClient({ relevance_0_top: { noul: 0.4 }, relevance_1_mid: { noul: 0.9 } }), {
+      query: "apple red harvest",
+      candidates: pool,
+      top_k: 2,
+    }),
+  );
+  assert.deepEqual(body.ranked.map((r) => r.id), ["mid", "top"], "FINAL order is the judge's, not the pre-filter's");
+  assert.deepEqual(body.ranked.map((r) => r.relevance_score), [0.9, 0.4], "scores are the judge noul verbatim");
+  assert.equal(body.evidence.signals.length, 2, "dropped rows contribute no signal (reported, never missing)");
+  assert.equal(body.decision.decision, "ALLOW");
+});
+
+await check("T4-consolidation: top_k default preserves legacy (whole pool, input order, preScore 0)", () => {
+  assert.deepEqual(resolveRerankSelection({}), { topK: 64 });
+  const pool = [{ id: "a", text: "A" }, { id: "b", text: "B" }, { id: "c", text: "C" }];
+  const built = buildRerankQuestionsWithInfo({ query: "q", candidates: pool });
+  assert.deepEqual(keysOf(built), ["relevance_0_a", "relevance_1_b", "relevance_2_c"], "legacy keys index the input pool");
+  assert.equal(built.pruned, false);
+  assert.deepEqual(built.pruning, { kept: 3, dropped: 0, method: RERANK_PRUNE_METHOD });
+  const { shown } = selectRerankCandidates(pool, "q", { topK: 64 });
+  assert.ok(shown.every((c) => c.preScore === 0), "legacy path scores nothing into relevance_score");
+});
+
 console.log(`\nFase-4 T5 rerank primitives: ${passed} checks passed (no server, no LLM involved).`);
 
 // ------------------------------------------------------------------ eval ---
