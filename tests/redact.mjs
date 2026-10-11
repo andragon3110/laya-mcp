@@ -145,4 +145,83 @@ await check("live: advertised with backends down + round-trip", async () => {
   }
 });
 
+// ---------------- Part C: detect mode (v2, auto-detect) ----------------
+await check("schemas declare detect input and detection output", () => {
+  const det = redactTool.inputSchema?.properties?.detect;
+  assert.ok(det, "detect declared");
+  assert.deepStrictEqual(det?.properties?.source?.enum, ["auto", "pii", "entities"]);
+  assert.ok(redactTool.outputSchema?.properties?.detection, "detection declared");
+  assert.ok(redactTool.inputSchema?.required?.includes("text"), "text still required");
+});
+
+await check("detect+findings conflict rejects invalid_argument", async () => {
+  await assert.rejects(
+    handleRedact(null, {
+      text: "token sk-abc123 here",
+      findings: [{ start: 6, end: 15, entity_type: "secret" }],
+      detect: { source: "auto" },
+    }, null),
+    /invalid_argument/,
+  );
+});
+
+await check("detect unknown source rejects invalid_argument", async () => {
+  await assert.rejects(
+    handleRedact(null, { text: "token here", detect: { source: "nope" } }, null),
+    /invalid_argument/,
+  );
+});
+
+await check("detect without backend fails with backend diagnosis (not invalid_argument)", async () => {
+  await assert.rejects(
+    handleRedact(null, { text: "token here", detect: { source: "auto" } }, null),
+    (err) => err instanceof Error && !/invalid_argument/.test(err.message) && /gliner|backend|sidecar/i.test(err.message),
+  );
+});
+
+await check("mapGlinerFindings maps producer spans to redact findings", async () => {
+  const { mapGlinerFindings } = await import("../dist/tools/redact.js");
+  assert.deepStrictEqual(
+    mapGlinerFindings([{ text: "ann@example.com", start: 5, end: 20, type: "email", confidence: 0.9 }]),
+    [{ start: 5, end: 20, entity_type: "email" }],
+  );
+  assert.deepStrictEqual(mapGlinerFindings([]), []);
+});
+
+await check("detect pii redacts producer spans with fake ctx", async () => {
+  const fake = {
+    glinerReady: () => true,
+    gliner: {
+      piiScan: async () => ({ findings: [{ text: "sk-abc123", start: 6, end: 15, type: "secret", confidence: 1 }] }),
+    },
+  };
+  const out = JSON.parse(await handleRedact(null,
+    { text: "token sk-abc123 here", detect: { source: "pii" } }, fake));
+  assert.equal(out.redacted, "token [REDACTED:secret] here");
+  assert.deepStrictEqual(out.detection, { spans_found: 1, producer: "gliner-pii" });
+});
+
+await check("detect entities fans out caller types with fake ctx", async () => {
+  const fake = {
+    glinerReady: () => true,
+    gliner: {
+      extractEntities: async () => ({ spansByType: {
+        email: [{ text: "a@b.c", start: 0, end: 5, confidence: 1 }],
+      } }),
+    },
+  };
+  const out = JSON.parse(await handleRedact(null,
+    { text: "a@b.c ok", detect: { source: "entities", entity_types: ["email"] } }, fake));
+  assert.equal(out.redacted, "[REDACTED:email] ok");
+  assert.deepStrictEqual(out.detection, { spans_found: 1, producer: "gliner-entities" });
+});
+
+await check("v1 calls never emit detection", async () => {
+  const out = JSON.parse(await handleRedact(null, {
+    text: "token sk-abc123 here",
+    findings: [{ start: 6, end: 15, entity_type: "secret" }],
+  }, null));
+  assert.ok(!("detection" in out), "no detection key on v1 path");
+});
+
 console.log(`redact: ${passed} checks passed`);

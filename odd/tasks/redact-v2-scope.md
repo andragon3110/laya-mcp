@@ -31,3 +31,9 @@ provee; si no, test-first parcial + live tapado por diseño).
 - Inspect: monolith + scope doc, start offered
   (lineage `review-1dab041082c8a8df`). Human DECLINED (candidate-scoped).
 - No review invoked, no authority created.
+
+## Construido (2026-10-10)
+Scope cerrado: auto + límites pii + metadata. Test-first (RED observado,
+GREEN 15/15: validación, conflicto, down-path, mapping, positivos con ctx
+simulado, v1 sin detection). Archivos: src/tools/redact.ts,
+tests/redact.mjs, MCP_CONTRACT §3. Detect vive solo con sidecar GLiNER.

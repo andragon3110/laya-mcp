@@ -81,7 +81,7 @@ are listed where they exist. Primitives come from `TOOL_PRIMITIVES`
 | `laya_pii` | `spans` | required: `text`; optional: `extra_types`, `risk` (`low`/`normal`/`high`, default `normal`; moves only the non-secret branch). Served only while the GLiNER sidecar is live-ready. | `pipeline`, `findings`, `counts`, `secrets_found`, `decision`, `latency_ms`, `recommendation`, `evidence`, `abstention` |
 | `laya_capabilities` | none (`null`) | optional: `timeout_ms` (integer, 100–30000, default 2000) | `models`, `backend`, `gliner`, `primitives`, `tools`, `policies`, `features`, `mode`, `schema_version`, `latency_ms` — plus OPTIONAL (never required) `modes`, `metrics` (Fase 6, §10), `measured` (r3a track, §3.1) |
 | `laya_escalations` | none (`null`) | required: `action` (`log`\|`list`\|`ack`); per-action fields, all optional except the action | `action`, `ok` — plus per-action `escalation_id`, `escalation`, `escalations`, `status`, `open`, `acked`, `store` (§3.1) |
-| `laya_redact` | none (`null`) | required: `text`, `findings [{start, end, entity_type?}]`; optional: `strategy` (`label` default, `placeholder`) | `redacted`, `spans_redacted`, `spans_dropped`, `strategy` (§3.1) |
+| `laya_redact` | none (`null`) | required: `text`; `findings [{start, end, entity_type?}]` xor `detect {source auto\|pii\|entities, extra_types?, entity_types?}`; optional: `strategy` (`label` default, `placeholder`) | `redacted`, `spans_redacted`, `spans_dropped`, `strategy` (+ `detection {spans_found, producer}` on detect calls) (§3.1) |
 
 Notes:
 
@@ -137,7 +137,12 @@ Notes:
   `[REDACTED:<type>]`) and `placeholder` (`[REDACTED]`); offsets are Unicode
   code points (matches the GLiNER producer; emoji-safe, pinned by test);
   overlaps resolve earliest-wins/longest-wins-ties; empty findings and
-  malformed spans reject `invalid_argument`. Pure transform, no backend:
+  malformed spans reject `invalid_argument`. `detect` mode (v2) resolves
+  spans via the GLiNER sidecar in the same call (`pii` via piiScan,
+  `entities` via extractEntities with caller `entity_types`, `auto` picks
+  pii; mutually exclusive with `findings`; without the sidecar fails
+  isError) and reports `detection` (never on v1 calls). Pure transform,
+  no backend:
   always advertised alongside capabilities (down-list is `[laya_capabilities,
   laya_escalations, laya_redact]`).
 
