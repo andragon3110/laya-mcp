@@ -508,4 +508,93 @@ await check("screen T2 relevance is display-only and never changes decision", as
   assert.equal(low.decision.decision, "ALLOW");
 });
 
+// ------------------------------------------------------------------ pii T7 ---
+// T7 hardening (evaluation-only, no policy change): category is a display
+// label, the policy branches only on secret membership; weak-type-only
+// findings abstain; the Laya judge is advisory-only and its null degrade
+// never fails the scan. Every finding stays finding_status "candidate".
+await check("pii T7 policy branches only on secret membership (category display-only)", async () => {
+  // Same finding_count=1 in every arm: only the secret arm DENYs. The
+  // credential/identifier/pii/unknown arms abstain instead -- the display
+  // label never moves the decision, secret membership does.
+  const secret = JSON.parse(
+    await handlePii(fakeJudgeClient(), { text: "key sk-123" }, fakePiiCtx([span("api_key", "sk-123")])),
+  );
+  assert.equal(secret.findings[0].category, "secret");
+  assert.equal(secret.secrets_found, 1);
+  assert.equal(secret.decision.decision, "DENY");
+  for (const [type, category] of [
+    ["private_key", "credential"],
+    ["passport", "identifier"],
+    ["email", "pii"],
+    ["starship_class", "unknown"],
+  ]) {
+    const body = JSON.parse(
+      await handlePii(fakeJudgeClient(), { text: `t-${type}` }, fakePiiCtx([span(type, `t-${type}`)])),
+    );
+    assert.equal(body.findings[0].category, category, `${type} displays as ${category}`);
+    assert.equal(body.secrets_found, 0, `${type} is not secret member`);
+    assert.notEqual(body.decision.decision, "DENY", `${category} display never DENYs alone`);
+    assert.equal(body.findings[0].finding_status, "candidate");
+  }
+});
+
+await check("pii T7 weak-type-only mix abstains (no secret anywhere, never DENY)", async () => {
+  const body = JSON.parse(
+    await handlePii(
+      fakeJudgeClient(),
+      { text: "mixed weak" },
+      fakePiiCtx([span("private_key", "k"), span("passport", "p"), span("email", "e")]),
+    ),
+  );
+  assert.deepEqual(body.findings.map((f) => f.category), ["credential", "identifier", "pii"]);
+  assert.equal(body.secrets_found, 0);
+  assert.equal(body.abstention.abstained, true);
+  assert.equal(body.decision.decision, "ESCALATE");
+  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+  assert.ok(body.findings.every((f) => f.finding_status === "candidate"));
+});
+
+await check("pii T7 judge doubt is advisory-only (low signal on secret still DENYs)", async () => {
+  const body = JSON.parse(
+    await handlePii(fakeJudgeClient(0.05), { text: "key sk-123" }, fakePiiCtx([span("api_key", "sk-123")])),
+  );
+  assert.equal(body.findings[0].laya_signal, 0.05);
+  assert.equal(body.pipeline.laya_judged, true);
+  assert.equal(body.findings[0].category, "secret");
+  assert.equal(body.findings[0].finding_status, "candidate");
+  assert.equal(body.decision.decision, "DENY");
+  assert.deepEqual(body.decision.reason_codes, ["pii_secret_block"]);
+});
+
+await check("pii T7 judge outage degrades to null without failing secret scan", async () => {
+  const { BackendUnavailableError } = await import("../dist/client.js");
+  const downClient = { predict: async () => { throw new BackendUnavailableError("judge down (T7 pin)"); } };
+  const body = JSON.parse(
+    await handlePii(downClient, { text: "key sk-123" }, fakePiiCtx([span("api_key", "sk-123")])),
+  );
+  assert.deepEqual(body.findings.map((f) => f.laya_signal), [null]);
+  assert.equal(body.pipeline.laya_judged, false);
+  assert.ok(typeof body.pipeline.laya_note === "string" && /unavailable|degrade/i.test(body.pipeline.laya_note));
+  assert.equal(body.findings[0].finding_status, "candidate");
+  assert.equal(body.secrets_found, 1);
+  assert.equal(body.decision.decision, "DENY");
+  assert.deepEqual(body.decision.reason_codes, ["pii_secret_block"]);
+});
+
+await check("pii T7 judge outage on weak-only still abstains (null never invents ALLOW)", async () => {
+  const { BackendUnavailableError } = await import("../dist/client.js");
+  const downClient = { predict: async () => { throw new BackendUnavailableError("judge down (T7 pin)"); } };
+  const body = JSON.parse(
+    await handlePii(downClient, { text: "a@b.c" }, fakePiiCtx([span("email", "a@b.c")])),
+  );
+  assert.deepEqual(body.findings.map((f) => f.laya_signal), [null]);
+  assert.equal(body.pipeline.laya_judged, false);
+  assert.equal(body.findings[0].category, "pii");
+  assert.equal(body.findings[0].finding_status, "candidate");
+  assert.equal(body.abstention.abstained, true);
+  assert.equal(body.decision.decision, "ESCALATE");
+  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+});
+
 console.log(`\nT6 screen/pii/rest: ${passed} checks passed (no server, no LLM involved).`);

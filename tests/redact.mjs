@@ -224,4 +224,102 @@ await check("v1 calls never emit detection", async () => {
   assert.ok(!("detection" in out), "no detection key on v1 path");
 });
 
+// ---------------- Part D: T7 overlap/dropped/unicode/exclusivity hardening ---
+// T7 pins the v1 contract without changing it: earliest-wins longest-wins
+// ties, kept+dropped accounting, code-point offsets, label fallback, and
+// the findings/detect mutual exclusion. No threshold or schema changed.
+await check("T7 overlap chain drops deterministically with kept+dropped counted", async () => {
+  const out = JSON.parse(await handleRedact(null, {
+    text: "abcdefghijkl",
+    findings: [
+      { start: 0, end: 10, entity_type: "big" },
+      { start: 2, end: 4, entity_type: "inner1" },
+      { start: 5, end: 7, entity_type: "inner2" },
+    ],
+  }, null));
+  assert.equal(out.redacted, "[REDACTED:big]kl");
+  assert.equal(out.spans_redacted, 1);
+  assert.equal(out.spans_dropped, 2);
+  assert.equal(out.spans_redacted + out.spans_dropped, 3);
+});
+
+await check("T7 tie longest-wins with dropped counted", async () => {
+  const out = JSON.parse(await handleRedact(null, {
+    text: "abcdefghij",
+    findings: [
+      { start: 2, end: 5, entity_type: "short" },
+      { start: 2, end: 8, entity_type: "long" },
+    ],
+  }, null));
+  assert.equal(out.redacted, "ab[REDACTED:long]ij");
+  assert.equal(out.spans_redacted, 1);
+  assert.equal(out.spans_dropped, 1);
+});
+
+await check("T7 label without entity_type falls back to placeholder marker", async () => {
+  const missing = JSON.parse(await handleRedact(null, {
+    text: "abcdef",
+    findings: [{ start: 0, end: 3 }],
+  }, null));
+  assert.equal(missing.redacted, "[REDACTED]def");
+  const blank = JSON.parse(await handleRedact(null, {
+    text: "abcdef",
+    findings: [{ start: 0, end: 3, entity_type: "   " }],
+  }, null));
+  assert.equal(blank.redacted, "[REDACTED]def");
+  assert.equal(missing.spans_redacted, 1);
+  assert.equal(missing.spans_dropped, 0);
+});
+
+await check("T7 astral emoji overlap stays code-point exact with dropped counted", async () => {
+  // "a\u{1F600}b\u{1F600}c": code points a=0 emoji=1 b=2 emoji=3 c=4.
+  const single = JSON.parse(await handleRedact(null, {
+    text: "a\u{1F600}b\u{1F600}c",
+    findings: [{ start: 1, end: 2, entity_type: "emoji" }],
+  }, null));
+  assert.equal(single.redacted, "a[REDACTED:emoji]b\u{1F600}c");
+  assert.equal(single.spans_redacted, 1);
+  assert.equal(single.spans_dropped, 0);
+  const overlap = JSON.parse(await handleRedact(null, {
+    text: "a\u{1F600}b\u{1F600}c",
+    findings: [
+      { start: 0, end: 3, entity_type: "big" },
+      { start: 1, end: 2, entity_type: "emoji" },
+    ],
+  }, null));
+  assert.equal(overlap.redacted, "[REDACTED:big]\u{1F600}c");
+  assert.equal(overlap.spans_redacted, 1);
+  assert.equal(overlap.spans_dropped, 1);
+});
+
+await check("T7 missing/empty findings without detect reject invalid_argument", async () => {
+  await assert.rejects(handleRedact(null, { text: "abc" }, null), /invalid_argument/);
+  await assert.rejects(handleRedact(null, { text: "abc", findings: null }, null), /invalid_argument/);
+  await assert.rejects(handleRedact(null, { text: "abc", findings: [] }, null), /invalid_argument/);
+  assert.throws(() => redactText("abc", [], "label"), /invalid_argument/);
+});
+
+await check("T7 placeholder overlap counts dropped, entities+findings still exclusive", async () => {
+  const out = JSON.parse(await handleRedact(null, {
+    text: "abcdefghij",
+    strategy: "placeholder",
+    findings: [
+      { start: 2, end: 8, entity_type: "a" },
+      { start: 4, end: 6, entity_type: "b" },
+    ],
+  }, null));
+  assert.equal(out.redacted, "ab[REDACTED]ij");
+  assert.equal(out.spans_redacted, 1);
+  assert.equal(out.spans_dropped, 1);
+  assert.ok(!("detection" in out), "no detection key on placeholder v1 path");
+  await assert.rejects(
+    handleRedact(null, {
+      text: "a@b.c ok",
+      findings: [{ start: 0, end: 5, entity_type: "email" }],
+      detect: { source: "entities", entity_types: ["email"] },
+    }, null),
+    /invalid_argument/,
+  );
+});
+
 console.log(`redact: ${passed} checks passed`);
