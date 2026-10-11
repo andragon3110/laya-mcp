@@ -324,4 +324,49 @@ await check("gate/verify T3-regression: evidence-missing claims escalate via pol
   }
 });
 
+// ------------------------------------------- T6 review grounding (append-only) ---
+// T6 pins review as rubric evidence-only plus the engine decision: the four
+// 0-2 scores are advisory ({score} objects), safe_to_apply is a raw signal
+// ({signal}, never a probability, never an authorization), and the
+// ALLOW/REVIEW/ESCALATE exit is policy-owned. No threshold moved, no schema
+// or cap changed, no grounding semantic touched.
+await check("T6 review: missing safe_to_apply abstains -> ESCALATE, never ALLOW", async () => {
+  const body = JSON.parse(await handleReview(fakeClient(reviewAnswers({ safe: null })), { request: "r", diff: "d" }));
+  assert.deepEqual(body.rubric.safe_to_apply, { signal: null });
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /missing safe_to_apply signal/);
+  assert.equal(body.decision.decision, "ESCALATE");
+  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+  assert.deepEqual(body.decision.policy, { name: "review", version: "1.0.0" });
+});
+
+await check("T6 review: mid-band safe flows to REVIEW via policy, never forced ESCALATE by evidence", async () => {
+  const body = JSON.parse(await handleReview(fakeClient(reviewAnswers({ safe: 0.7 })), { request: "r", diff: "d" }));
+  assert.equal(body.abstention.abstained, false, "mid-band safety is firm REVIEW evidence, not ambiguity");
+  assert.equal(body.decision.decision, "REVIEW");
+  assert.deepEqual(body.decision.reason_codes, ["review_needs_review"]);
+  assert.deepEqual(body.decision.policy, { name: "review", version: "1.0.0" });
+});
+
+await check("T6 review: rubric scores stay audit-only (same band whatever the scores)", async () => {
+  const mk = (correctness) =>
+    handleReview(
+      fakeClient(reviewAnswers({ correctness, safe: 0.7 })),
+      { request: "r", diff: "d" },
+    ).then((s) => JSON.parse(s));
+  const low = await mk(0);
+  const high = await mk(2);
+  for (const body of [low, high]) {
+    assert.deepEqual(body.rubric.correctness, { score: body.rubric.correctness.score });
+    assert.deepEqual(body.rubric.safe_to_apply, { signal: 0.7 }, "safe_to_apply is a {signal} object, never a bare number");
+    assert.equal(body.decision.decision, "REVIEW", "scores advise; only the safety signal moves the band");
+    assert.deepEqual(body.decision.reason_codes, ["review_needs_review"]);
+  }
+  const dumped = JSON.stringify(high);
+  assert.ok(!("action" in high), "no authorization: legacy action must stay gone");
+  assert.ok(!("probability" in high), "signal is never a probability");
+  assert.ok(!dumped.includes("authoriz"), "review never authorizes anything by itself");
+  noLegacyKeys(high, "review");
+});
+
 console.log(`\nT5 review/gate/verify: ${passed} checks passed (no server, no LLM involved).`);

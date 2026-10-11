@@ -187,6 +187,134 @@ await check("§7-extract-fields: 65 fields rejected with input_too_large (limit 
   );
 });
 
+// ------------------------------------------- T6 extract grounding (append-only) ---
+// T6 pins the grounded-value invariant without touching thresholds, schemas,
+// caps, judge routing, or grounding semantics: a judge choice maps to an
+// exact document span or to null/not_found (never synthesized); the entities
+// path forces the typed-decisions judge; auto fallback carries a note;
+// truncation/filtering is reported in dropped, never silent.
+const t6EntityCtx = (spansByType) => ({
+  glinerReady: () => true,
+  gliner: { extractEntities: async () => ({ spansByType, latencyMs: 1 }) },
+});
+
+await check("T6-extract-hallucinated: m99 resolves to null/not_found, never synthesized", async () => {
+  const body = JSON.parse(
+    await handleExtract(
+      fakeClient({ extract_0_f: { choice: "m99", probabilities: { m99: 0.9, none: 0.1 } } }),
+      { document: "price $29 total", fields: [{ id: "f", description: "F", pattern: "\\$\\d+" }], source: "regex" },
+    ),
+  );
+  assert.equal(body.results[0].value, null, "hallucinated key is not a value");
+  assert.equal(body.results[0].status, "not_found");
+  assert.ok(!("start" in body.results[0]) && !("end" in body.results[0]), "no offsets on not_found");
+  assert.equal(body.abstention.abstained, false, "candidates existed: firm not_found, no abstention");
+  assert.equal(body.decision.decision, "ALLOW");
+  assert.deepEqual(body.decision.reason_codes, ["extract_values_allow"]);
+});
+
+await check("T6-extract-mismatch: sidecar span/doc mismatch resolves to null/not_found, no offsets", async () => {
+  const lying = { persona: [{ text: "Ximena", start: 0, end: 6, confidence: 0.95, type: "persona" }] };
+  const body = JSON.parse(
+    await handleExtract(
+      fakeClient({ extract_0_persona: { choice: "g0", probabilities: { g0: 0.9, none: 0.1 } } }),
+      { document: "Ana, Luis, Marta", fields: [{ id: "persona", description: "Nombre" }], source: "entities" },
+      t6EntityCtx(lying),
+    ),
+  );
+  assert.equal(body.results[0].value, null, "mismatched span never trusted blindly");
+  assert.equal(body.results[0].status, "not_found");
+  assert.ok(!("start" in body.results[0]) && !("end" in body.results[0]), "no offsets on ungrounded span");
+});
+
+await check("T6-extract-invalid-pattern: invalid regex is invalid-pattern abstain -> ESCALATE, never extracted", async () => {
+  const body = JSON.parse(
+    await handleExtract(
+      fakeClient({ extract_0_f: { choice: "m0", probabilities: { m0: 0.9 } } }),
+      { document: "price 29", fields: [{ id: "f", description: "F", pattern: "[unclosed" }], source: "regex" },
+    ),
+  );
+  assert.equal(body.results[0].value, null);
+  assert.equal(body.results[0].status, "not_found", "never false extracted");
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /invalid pattern/, "V-05 stays loud");
+  assert.equal(body.evidence.signals[0]?.metadata?.invalid_pattern, true);
+  assert.equal(body.decision.decision, "ESCALATE");
+  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+});
+
+await check("T6-extract-ceilings: top_k/max_candidates above ceiling reject input_too_large (defaults stay legacy 20)", async () => {
+  const field = { id: "f", description: "F", pattern: "x+" };
+  throwsInputTooLarge(() => buildRegexQuestionsWithInfo({ document: "d", fields: [field], top_k: 21 }), "top_k", 20, 21);
+  throwsInputTooLarge(
+    () => buildRegexQuestionsWithInfo({ document: "d", fields: [field], max_candidates: 64 }),
+    "max_candidates",
+    20,
+    64,
+  );
+  await assert.rejects(
+    handleExtract(fakeClient({}), { document: "d", fields: [field], source: "regex", top_k: 21 }),
+    /input_too_large/,
+  );
+  await assert.rejects(
+    handleExtract(fakeClient({}), { document: "d", fields: [field], source: "regex", max_candidates: 64 }),
+    /input_too_large/,
+  );
+});
+
+await check("T6-extract-routing: entities force typed-decisions judge; auto fallback notes regex", async () => {
+  let judgeOpts = null;
+  const capture = {
+    predict: async (_args, questions, _timeoutMs, opts) => {
+      judgeOpts = opts ?? null;
+      void questions;
+      return { answers: { extract_0_persona: { choice: "g0", probabilities: { g0: 0.9 } } }, confidence: {}, routing: {}, model: "t6-test", latencyMs: 0, usage: {} };
+    },
+  };
+  const spans = { persona: [{ text: "Ana", start: 0, end: 3, confidence: 0.9, type: "persona" }] };
+  const ent2 = JSON.parse(
+    await handleExtract(capture, { document: "Ana", fields: [{ id: "persona", description: "N" }], source: "entities" }, t6EntityCtx(spans)),
+  );
+  assert.deepEqual(judgeOpts, { model: "typed-decisions" }, "entities path forces the typed-decisions judge");
+  assert.equal(ent2.source, "entities");
+  assert.equal(ent2.results[0].value, "Ana");
+  const fb = JSON.parse(
+    await handleExtract(
+      fakeClient({ extract_0_f: { choice: "none", probabilities: { none: 1 } } }),
+      { document: "", fields: [{ id: "f", description: "F", pattern: "x+" }], source: "auto" },
+      { glinerReady: () => false },
+    ),
+  );
+  assert.equal(fb.source, "regex", "sidecar down: auto falls back to regex");
+  assert.match(fb.fallback ?? "", /GLiNER sidecar unreachable/, "fallback carries a note, never silent");
+});
+
+await check("T6-extract-truncation: over-cap and min_gliner_score filtering counted in dropped", async () => {
+  const doc25 = Array.from({ length: 25 }, (_, i) => `val${i}`).join(" ");
+  const built = buildRegexQuestionsWithInfo({ document: doc25, fields: [{ id: "f", description: "F", pattern: "val\\d+" }] });
+  assert.equal(Object.keys(built.questions.extract_0_f.criteria).length, 21, "20 shown + none");
+  assert.equal(built.truncated, true);
+  assert.equal(built.dropped, 5, "over-cap matches counted, never silent");
+  const spans = {
+    persona: [
+      { text: "Ana", start: 0, end: 3, confidence: 0.3, type: "persona" },
+      { text: "Luis", start: 5, end: 9, confidence: 0.9, type: "persona" },
+      { text: "Marta", start: 11, end: 16, confidence: 0.7, type: "persona" },
+    ],
+  };
+  const body = JSON.parse(
+    await handleExtract(
+      fakeClient({ extract_0_persona: { choice: "g1", probabilities: { g1: 0.8, none: 0.2 } } }),
+      { document: "Ana, Luis, Marta", fields: [{ id: "persona", description: "Nombre" }], source: "entities", min_gliner_score: 0.5 },
+      t6EntityCtx(spans),
+    ),
+  );
+  assert.equal(body.results[0].value, "Marta", "Ana (0.3) filtered before sorting");
+  assert.equal(body.truncated, true);
+  assert.equal(body.dropped, 1, "below-cut spans counted in dropped");
+  assert.equal(body.decision.decision, "ALLOW");
+});
+
 // =============================================================== §7 FIND ===
 await check("§7-find-uno: single candidate, firm 0.9 -> ESCALATE on the 1/N weak-winner baseline", async () => {
   const body = JSON.parse(
