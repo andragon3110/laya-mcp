@@ -326,3 +326,7 @@ OUT: push/PR/merge (decisión del usuario), re-entrenar sin mecanismo nuevo,
   (same staleness as §7 had); §9 is historic verdict kept verbatim by design;
   `examples/gentle-orchestrator-policy.md:51` ("Laya-backed outputs carry calibrated
   probabilities") sits outside the allowed edit surfaces.
+
+## Progress fix-down-list (2026-10-11) — stale 1-tool down-list expectation fixed
+- File: `tests/fase6_t5_security_discovery.mjs` live-DOWN observe/shadow/enforce branch only; the poll loop asserted `length === 1` plus sole `laya_capabilities`, but the shipped T5 exemption since escalations/redact went backend-independent is exactly `[laya_capabilities, laya_escalations, laya_redact]` (length 3, no backend needed), matching `tests/fase5_t5_capabilities.mjs` laya-down check plus `src/index.ts` down-list return. Updated only that assert to the 3-tool truth with exact names in order; no other behavior change.
+- Verification: `node tests/fase6_t5_security_discovery.mjs` → 16 checks passed exit 0 (tail: 3 live-down mode checks ok); `npm run typecheck` → exit 0 (tsc clean).
