@@ -270,3 +270,21 @@ shield-small: 8/8 en golds decidibles (0 over-block en 3 benignos, 0 miss en 5 a
   `node tests/t7_semantic_adversarial.mjs` 17 checks exit 0;
   `node tests/fase5_t5_capabilities.mjs` 15 checks exit 0.
   `git status --short` solo superficies permitidas + este doc.
+
+## S7 pin-fix stale screen 1.0.0 en era shield (2026-10-11, worker; sin push, sin commit)
+
+- Causa: `tests/fase6_t5_security_discovery.mjs:473` pineaba
+  `parsed.decision.policy == {screen, 1.0.0}` en el live UP (observe).
+  Con shield :8777 UP, los textos adversariales puntúan firm INJECTION
+  y toman el fast-DENY `screen_shield_prefilter` bajo screen@1.1.0
+  (actual `{screen 1.1.0}` vs esperado `{screen 1.0.0}`) — AssertionError
+  determinista, no flake. Sin cambio de handlers, policies ni thresholds.
+- Fix (solo expectativa rancia + 1 comentario): el pin ahora aserta el
+  mapeo versionado exacto por path — `reason_codes` incluye
+  `screen_shield_prefilter` ⇒ `{screen, 1.1.0}`, si no ⇒
+  `{screen, 1.0.0}` (nunca loose any-version). 16 checks intactos.
+  Superficie: este doc + `tests/fase6_t5_security_discovery.mjs`.
+- Verificación S7: `node tests/fase6_t5_security_discovery.mjs` (shield
+  :8777 UP) 16/16 exit 0 (`T5 SECURITY+DISCOVERY: 16 checks passed.`);
+  `SHIELD_URL=http://127.0.0.1:9 node tests/fase6_t5_security_discovery.mjs`
+  (degrade) 16/16 exit 0; `npm run typecheck` exit 0. Sin commit.

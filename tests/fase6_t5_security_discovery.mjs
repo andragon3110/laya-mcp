@@ -470,7 +470,9 @@ await withClient({}, async (client) => {
       const parsed = JSON.parse(res.content[0].text);
       assert.deepStrictEqual(res.structuredContent, parsed, "structured == text");
       assert.equal(parsed.decision.decision, cleanParsed.decision.decision, "decision identical to the clean call");
-      assert.deepEqual(parsed.decision.policy, { name: "screen", version: "1.0.0" }, "policy identity pinned");
+      // Shield era: judge path stays screen@1.0.0, fast-DENY shield path carries screen@1.1.0.
+      const isShieldFastDeny = (parsed.decision.reason_codes ?? []).includes("screen_shield_prefilter");
+      assert.deepEqual(parsed.decision.policy, isShieldFastDeny ? { name: "screen", version: "1.1.0" } : { name: "screen", version: "1.0.0" }, "policy identity pinned per path (judge 1.0.0 vs shield fast-DENY 1.1.0)");
       assert.equal(parsed.effective_mode, "observe", "mode intact (env-only, never _meta/args)");
       assert.equal(parsed.trace_id, ADV_META.trace_id, "real trace id still correlates through the attack");
     }
