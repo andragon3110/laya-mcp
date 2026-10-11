@@ -395,3 +395,43 @@ OUT: push/PR/merge (decisión del usuario), re-entrenar sin mecanismo nuevo,
   - `GET :8766/models` → 1/1 loaded, `device: cpu`, `revision: null, revision_source: unpinned`
 - Untouched: `:8765` laya (`alive true`, uptime continuous ~837 s at check) plus `:8770` gliclass (`alive true`, uptime continuous ~16990 s at check) — no restart, no request sent to either. No code edited, no checkpoints touched.
 - Verification: `curl /live` + `/ready` + `/models` on both ports → exit 0, both ready true. No commit.
+
+## Progress live-proof (2026-10-11) — all 14 MCP tools live plus score plus bench
+- Build first: `npm run build` → exit 0 (tsc clean), so `dist/` matches `src/`. No servers started/stopped, no training, no thresholds moved (`src/policy/thresholds.ts` untouched), no versioned results (`manifest --save` never run, `evals/results/` untouched). No commit. `git status` shows only this doc file modified; `var/` absent from repo (escalations log went to a `/tmp` store file).
+- Method: one canonical call per tool through its real `dist/` handler (`/tmp/live-proof.mjs`, env `LAYA_URL=:8765 GLINER_URL=:8766 RERANK_URL=:8768`). Per-tool table records decision + reported `latency_ms` + abstention only (ids beyond that never recorded). Wall clock measured alongside, never conflated with reported.
+- Per-tool table (second warmed pass; first cold pass matched on all non-throwing tools):
+  | tool | canonical input | decision | latency_ms | wall_ms | abstained | notes (ids only) |
+  |------|-----------------|----------|------------|---------|-----------|------------------|
+  | laya_screen | benign ops + override+exfil in one text | THREW | n/a | n/a | n/a | `timed out after 8000ms` (client-side; cold first call) |
+  | laya_verify | 1 supported + 1 contradicted claim, shared evidence | THREW | n/a | n/a | n/a | `timed out after 8000ms` |
+  | laya_find | 2 candidates, Laya judge | ALLOW | 5017 | 5071 | false | winner a |
+  | laya_rerank | 2 candidates, Qwen sidecar as judge | ALLOW | 123.9 | 141 | false | order [a, b] |
+  | laya_classify | 1 item, bug/feature | ALLOW | 4562.2 | 4585 | false | item i1 |
+  | laya_decide | 2 options | ALLOW | 3653.4 | 3674 | false | — |
+  | laya_compare | 2 passages (restatement) | ALLOW | 3645.4 | 3658 | false | relation same_fact |
+  | laya_extract | 1 regex field + 1 entity field, source auto (gliner live) | THREW | n/a | n/a | n/a | `timed out after 8000ms` (entities path: gliner ok, typed-decisions judge cold) |
+  | laya_review | 1 small diff + tests | ESCALATE | 7432.4 | 7470 | false | — |
+  | laya_gate | 1 claim with evidence | THREW | n/a | n/a | n/a | `timed out after 8000ms` |
+  | laya_pii | 1 text with email (gliner live + Laya judge) | ESCALATE | 7669.2 | 7711 | true | — |
+  | laya_redact | caller findings, label strategy | ok (no decision field) | n/a (local) | 2 | n/a | deterministic string-replace, no backend |
+  | laya_escalations | log then list (`LAYA_ESCALATIONS_FILE=/tmp/…`) | ok / ok | n/a (local) | 5 / 1 | n/a | log id esc-0001, list ok |
+  | laya_capabilities | default `{}` | ok (inventory, no decision) | 85 | 86 | n/a | live probes laya+gliner |
+- Live score (`node evals/score.mjs --live --json --out /tmp/score-live.json`, exit 0; saved untracked to `/tmp` only): 122 corpus cases, Laya-judge lane for ALL suites (score.mjs wires `makeLiveDeps({client, gliner})` with no Qwen adapter, so rerank/find scored through the Laya judge, not the Qwen sidecar — Qwen exercised only in the per-tool rerank row above). Golds stay stub oracles: mismatches = backend-vs-oracle divergence, never backend quality.
+  | suite | cases | decision correct/judged | task correct/judged | abstained | threw |
+  |-------|-------|-------------------------|---------------------|-----------|-------|
+  | classify | 18 | 16/17 (0.941) | 10/17 (0.588) | 0 | 1 |
+  | decide | 8 | 3/7 (0.429) | 4/7 (0.571) | 1 | 1 |
+  | verify | 8 | 5/7 (0.714) | 5/7 (0.714) | 1 | 1 |
+  | screen | 18 | 5/12 (0.417) | 6/12 (0.500) | 0 | 6 |
+  | pii | 8 | 4/7 (0.571) | 6/7 (0.857) | 1 | 1 |
+  | extract | 8 | 6/7 (0.857) | 5/7 (0.714) | 2 | 1 |
+  | find | 10 | 7/9 (0.778) | 6/9 (0.667) | 2 | 1 |
+  | rerank | 10 | 8/9 (0.889) | n/a (within-call only) | 1 | 1 |
+  | review | 8 | 3/7 (0.429) | 3/7 (0.429) | 0 | 1 |
+  | gate | 18 | 0/0 (null) | n/a | 0 | 18 |
+  | compare | 8 | 5/7 (0.714) | 4/6 (0.667) | 0 | 1 |
+  | TOTAL | 122 | 62/89 (0.697) | 49/79 (0.620) | 8 | 33 |
+- Bench (`node evals/bench.mjs --live --json`): CRASHED, exit 1, no table produced. Tail: `Error: laya-server /predict timed out after 8000ms at handleRerank (dist/tools/rerank.js:325) at benchRerankSweep (evals/bench.mjs:478) at runBench (723)`. Cause (read-only): bench `--live` wires the rerank sweep judge to the live Laya judge (`judgeFor → live.client`, no Qwen adapter — same gap as score.mjs), so the N=10 e2e row sends a 10-question `/predict` to CPU `:8765`, exceeds the 8s client timeout (1-question calls already take 3.6–7.7s per the per-tool table), and the throw aborts `runBench` before any table prints. Not retried (deterministic bottleneck, retry would just burn another timeout). Wall-vs-reported split therefore comes from the per-tool canonical rows above (e.g. find 5071 wall vs 5017 reported; rerank/Qwen 141 vs 123.9; pii 7711 vs 7669.2): wall ≈ reported + small MCP overhead on every tool.
+- Backend pins (probed, unpinned revisions honest): `:8765` laya CPU (`device: auto`, torch CPU-only), 3/3 loaded (`english` convaiinnovations/laya, `multilingual`, `typed-decisions`; every `revision: null, revision_source: unpinned`), server 0.4.0 / sdk 0.3.29, circuit closed; `:8766` gliner CPU (`fastino/gliner2.5-multi-v1`, rev unpinned); `:8768` qwen CUDA (`Qwen/Qwen3-Reranker-0.6B`, rev unpinned); `:8770` gliclass CPU alive but untouched (not used by this proof; score `--live` never speaks the `:8770` zero-shot protocol).
+- Verdict WORKING live (real-backend decision observed, no throw): `laya_find`, `laya_rerank` (Qwen lane), `laya_classify`, `laya_decide`, `laya_compare`, `laya_review`, `laya_pii`, `laya_redact` (local deterministic), `laya_escalations` (local), `laya_capabilities` (discovery). Verdict ASSISTIVE (no live decision proven here): `laya_screen`, `laya_verify`, `laya_extract` (canonical call timed out AND score threw on part of their cases — backend answers sometimes, too slow for the 8s client on CPU), `laya_gate` (0/18 judged + canonical threw — heaviest call shape: rubric + 2×claims on CPU; never answered live in this proof). No quality claim either way for the four: timeouts measure client budget vs CPU latency, not judge correctness.
+- Verification: `npm run build` → exit 0; per-tool script exit 0 (4 rows THREW client-side, backends never restarted); `node evals/score.mjs --live --json --out /tmp/score-live.json` → exit 0, saved `/tmp/score-live.json`; `node evals/bench.mjs --live --json` → exit 1 with the timeout crash above (reported, not hidden). No commit.
