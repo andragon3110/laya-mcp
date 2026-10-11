@@ -55,8 +55,8 @@ generation, nothing to parse, nothing to hallucinate.
 
 - 🧠 **Laya** ([NandhaKishorM/laya](https://huggingface.co/convaiinnovations/laya),
   Apache 2.0) — `choice` / `score` / `noul` answers from a local
-  checkpoint, trained with RLCD so honest probabilities are the only
-  way to maximize reward. CPU-friendly (no GPU needed); per-call
+  checkpoint, trained with RLCD; outputs are typed signals with explicit decisions,
+  never calibrated probabilities (see `EVALUATION.md` §6). CPU-friendly (no GPU needed); per-call
   latency depends on hardware — the doctor assumes ~200 ms/call on
   CPU as a planning estimate (`py/doctor.py:227`), not a measurement.
   No live latency figure is claimed here; the only timed numbers in

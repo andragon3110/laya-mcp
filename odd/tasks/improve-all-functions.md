@@ -293,3 +293,36 @@ OUT: push/PR/merge (decisión del usuario), re-entrenar sin mecanismo nuevo,
   gains, otherwise NO new rounds.
 - Verification: `npm run typecheck` → exit 0; `git status --short` plus
   `git diff --stat` show docs-only (2 files). No commit.
+
+## Progress T10 (2026-10-11) — reproducibility docs, two stale claims fixed (docs-only, no commit)
+- Docs-only: no functional change, no threshold/policy/limit/schema/training touched;
+  `src/`, `py/`, `evals/` untouched. `npm run typecheck` → exit 0 (tsc clean, tail:
+  `tsc --noEmit` with no errors); `git status --short` → exit 0 (`M MCP_CONTRACT.md`,
+  `M README.md`); `git diff --stat` → exit 0 (2 files, 4 insertions, 3 deletions).
+- Fix 1 (README.md, Laya bullet): the RLCD sentence claiming "honest probabilities
+  are the only way to maximize reward" now reads "trained with RLCD; outputs are
+  typed signals with explicit decisions, never calibrated probabilities
+  (see `EVALUATION.md` §6)" — one claim, consistent with the `EVALUATION.md` §6
+  verdict and the already-correct header (typed answers with deterministic policy
+  decisions, never a calibrated probability). Readback of README "What is this"
+  section confirms.
+- Fix 2 (MCP_CONTRACT.md §7): the backend-down `tools/list` bullet claiming the list
+  returns "only `laya_capabilities`" now reads "exactly `laya_capabilities`,
+  `laya_escalations`, `laya_redact`" — one line, matching the shipped exemption
+  (`src/index.ts` down-list returns all three; README "Optional by design" plus
+  `--mcp` doctor flag already stated 3). Readback of §7 confirms.
+- Honest gaps that REMAIN (no claim fixed here, documented as unmet): revision pins
+  unpinned in practice (`model_revision` honest `null` with `revision_source:
+  "unpinned"` unless the operator sets `LAYA_MODEL_REVISION`/`GLINER_MODEL_REVISION`
+  or the backend supplies one); tokenizer explicitly `unknown` (neither `GET /models`
+  nor `laya_capabilities` exposes one); the paired ±Laya live comparison stays a gated
+  protocol only (`evals/integration.mjs --mode live` refuses) with its five live
+  requirements unmet: (1) opencode-host session to run the 4 tasks twice,
+  (2) gentle-orchestrator skills wired to the hook points, (3) reachable laya-server
+  with real models, (4) pinned model revisions (no honest nulls in a live manifest),
+  (5) LLM provider credentials for the agent loop behind both arms.
+- Residuals outside this task's one-line budget / surfaces, flagged not fixed:
+  MCP_CONTRACT.md §10.5 still says backend down yields "exactly `[laya_capabilities]`"
+  (same staleness as §7 had); §9 is historic verdict kept verbatim by design;
+  `examples/gentle-orchestrator-policy.md:51` ("Laya-backed outputs carry calibrated
+  probabilities") sits outside the allowed edit surfaces.

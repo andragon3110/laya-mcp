@@ -268,7 +268,8 @@ Notes:
   (`SUPPORTED_PROTOCOL_VERSIONS`, `types.js:4`); the text block is never
   emptied, so clients pinned to that version keep reading text.
 - **Backend down (`tools/list` without Laya):** the list returns
-  **only** `laya_capabilities` — never zero tools, never a crash, the
+  **exactly** `laya_capabilities`, `laya_escalations`, `laya_redact` —
+  never zero tools, never a crash, the
   server stays alive. Rationale: with zero tools a host cannot tell
   MCP-dead apart from MCP-alive/backend-down; with the meta tool
   present, the failure surfaces as a call-time `isError` with the
