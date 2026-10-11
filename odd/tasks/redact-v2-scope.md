@@ -37,3 +37,12 @@ Scope cerrado: auto + límites pii + metadata. Test-first (RED observado,
 GREEN 15/15: validación, conflicto, down-path, mapping, positivos con ctx
 simulado, v1 sin detection). Archivos: src/tools/redact.ts,
 tests/redact.mjs, MCP_CONTRACT §3. Detect vive solo con sidecar GLiNER.
+
+## RDD a5839b48 (2026-10-10)
+- Inspect: slice-sized candidate (4 files), start offered
+  (lineage `review-3c1604161ad03b5c`). Human granted; START ok
+  (reviewing, 1 lens reliability, 235 lines).
+- Collect: forecast 1 run pi_host_relay; ack run →
+  `pi-host-relay-transport-failure` (no model for review-reliability).
+  Fresh STATUS reoffers the identical slot; deterministic config failure,
+  no relaunch. Lineage OPEN, awaiting decision (abandon vs other host).
