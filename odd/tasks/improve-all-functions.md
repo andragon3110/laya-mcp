@@ -342,3 +342,23 @@ OUT: push/PR/merge (decisión del usuario), re-entrenar sin mecanismo nuevo,
 ## Progress fix-down-list (2026-10-11) — stale 1-tool down-list expectation fixed
 - File: `tests/fase6_t5_security_discovery.mjs` live-DOWN observe/shadow/enforce branch only; the poll loop asserted `length === 1` plus sole `laya_capabilities`, but the shipped T5 exemption since escalations/redact went backend-independent is exactly `[laya_capabilities, laya_escalations, laya_redact]` (length 3, no backend needed), matching `tests/fase5_t5_capabilities.mjs` laya-down check plus `src/index.ts` down-list return. Updated only that assert to the 3-tool truth with exact names in order; no other behavior change.
 - Verification: `node tests/fase6_t5_security_discovery.mjs` → 16 checks passed exit 0 (tail: 3 live-down mode checks ok); `npm run typecheck` → exit 0 (tsc clean).
+
+## Progress lane-smoke (2026-10-11) — r3i lane-specific smoke live via lane builders (no generic judge)
+- Command (exactly as documented, smoke mode only): `node evals/smoke-r3a-lanes.mjs` → exit 0, `smoke: 4/4 lanes green`. No `--matrix`, no `manifest --save`, no versioned results written. No servers started, no training, no thresholds moved.
+- Backend pin: `run-20261010T210220Z-r3i` CPU. `GET :8770/ready` live: `ready true, device cpu, loaded [".../artifacts-ft/run-20261010T210220Z-r3i/checkpoint"]`. Env default `:8770` used (no `GLICLASS_URL` override).
+- Method (explicit): lane builders, NOT the generic judge, were used. `evals/smoke-r3a-lanes.mjs` drives the 4 lanes through `evals/lanes-r1.mjs` (`connectLane` + `lanePredictFactory(GliclassClient)`), which speaks native gliclass `POST /predict {text, labels} → {scores}` (`GliclassClient.scoreLabels`). The generic judge protocol (`POST /predict {state, questions} → {answers}` on `:8770`) mismatches this box and was not used.
+- Composed decision: 4/4 ALLOW, 0 abstained, 0 threw. Composed task: 4/4 lanes returned their lane task shape (classify `["bug"]`, gate `["SUPPORTED"]`, screen `"valid"`, rerank `["a","b"]`).
+- Full lane table:
+  | lane | case | decision | abstained | task | wall_ms | reported_latency_ms | device |
+  |------|------|----------|-----------|----------------|---------|----------------------|--------|
+  | classify x gliclass | r1-classify-en-normal-01 | ALLOW | false | `["bug"]` | 533 | 522.3 | cpu |
+  | gate x gliclass | r1-gate-en-normal-01 | ALLOW | false | `["SUPPORTED"]` | 498.9 | 492.4 | cpu |
+  | screen x gliclass | r1-screen-en-normal-01 | ALLOW | false | `"valid"` | 568.8 | 563.2 | cpu |
+  | rerank x gliclass | r1-rerank-en-normal-01 | ALLOW | false | `["a","b"]` | 639.4 | 633.3 | cpu |
+- Per-lane strings (verbatim):
+  - `ok - classify x gliclass / r1-classify-en-normal-01: decision=ALLOW abstained=false task=["bug"] wall_ms=533 reported_latency_ms=522.3 (device=cpu)`
+  - `ok - gate x gliclass / r1-gate-en-normal-01: decision=ALLOW abstained=false task=["SUPPORTED"] wall_ms=498.9 reported_latency_ms=492.4 (device=cpu)`
+  - `ok - screen x gliclass / r1-screen-en-normal-01: decision=ALLOW abstained=false task="valid" wall_ms=568.8 reported_latency_ms=563.2 (device=cpu)`
+  - `ok - rerank x gliclass / r1-rerank-en-normal-01: decision=ALLOW abstained=false task=["a","b"] wall_ms=639.4 reported_latency_ms=633.3 (device=cpu)`
+- Find: PARKED, not a new live number. `:8768` DOWN (`curl :8768/ready` unreachable). Stored manifests read-only: v8 (qwen, `:8768`) find decision 12/12 task 12/12 abstained 5 threw 0; v9 (gte, `:8773`) find decision 11/12 task 12/12 abstained 6 threw 0.
+- Verification: `npm run typecheck` → exit 0; `git status --short` shows only this doc file modified. No commit.
