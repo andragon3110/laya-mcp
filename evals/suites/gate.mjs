@@ -166,6 +166,117 @@ export const cases = [
     },
     gold: { verdict: "CONTRADICTED", decision: "ESCALATE", abstained: false, why: "human-fixed evidence contradiction escalates; high safety never rescues it." },
   },
+  {
+    id: "gate-independent-03",
+    kind: "normal",
+    gold_source: "independent",
+    input: { request: "add retry", diff: "+ retry loop", evidence: "tests: 5 passed", claims: ["retry logic covered by tests"] },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): the claim matches passing-test evidence on a low-risk change; any competent backend supports it. The stub signals below only feed the handler what a working backend would return.",
+    stub: {
+      answers: {
+        correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.92 },
+        claim_0: { noul: 0.9 }, refute_0: { noul: 0.1 },
+      },
+    },
+    gold: { verdict: "SUPPORTED", decision: "ALLOW", abstained: false, why: "human-fixed evidence match plus firm safety auto-allows." },
+  },
+  {
+    id: "gate-independent-04",
+    kind: "negative",
+    gold_source: "independent",
+    input: { request: "fix totals", diff: "+ rounding fix", evidence: "tests: 3 failed", claims: ["all tests pass"] },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): the claim contradicts failing-test evidence (3 failed vs all pass); any competent backend refutes it. The stub signals below only feed the handler what a working backend would return.",
+    stub: {
+      answers: {
+        correctness: { score: 1 }, spec_match: { score: 1 }, safe_to_apply: { noul: 0.9 },
+        claim_0: { noul: 0.15 }, refute_0: { noul: 0.91 },
+      },
+    },
+    gold: { verdict: "CONTRADICTED", decision: "ESCALATE", abstained: false, why: "human-fixed evidence contradiction escalates; high safety never rescues it." },
+  },
+  {
+    id: "gate-independent-05",
+    kind: "normal",
+    gold_source: "independent",
+    input: { request: "corregir c\u00e1lculo", diff: "+ ajuste IVA", evidence: "pruebas: 4 pasadas", claims: ["todas las pruebas pasan"] },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): la afirmaci\u00f3n coincide con evidencia de pruebas pasadas en un cambio de bajo riesgo; cualquier backend competente la soporta. The stub signals below only feed the handler what a working backend would return.",
+    stub: {
+      answers: {
+        correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.93 },
+        claim_0: { noul: 0.88 }, refute_0: { noul: 0.12 },
+      },
+    },
+    gold: { verdict: "SUPPORTED", decision: "ALLOW", abstained: false, why: "human-fixed evidence match (ES) plus firm safety auto-allows." },
+  },
+  {
+    id: "gate-independent-06",
+    kind: "negative",
+    gold_source: "independent",
+    input: { request: "corregir c\u00e1lculo", diff: "+ ajuste IVA", evidence: "pruebas: 1 fallida", claims: ["todas las pruebas pasan"] },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): la afirmaci\u00f3n contradice la evidencia (1 fallida vs todas pasan); cualquier backend competente la refuta. The stub signals below only feed the handler what a working backend would return.",
+    stub: {
+      answers: {
+        correctness: { score: 1 }, spec_match: { score: 1 }, safe_to_apply: { noul: 0.9 },
+        claim_0: { noul: 0.18 }, refute_0: { noul: 0.89 },
+      },
+    },
+    gold: { verdict: "CONTRADICTED", decision: "ESCALATE", abstained: false, why: "human-fixed evidence contradiction (ES) escalates; high safety never rescues it." },
+  },
+  {
+    id: "gate-independent-07",
+    kind: "abstention",
+    gold_source: "independent",
+    input: { ...BASE, claims: ["all tests pass"] },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): the backend dropped the claim answer, so the claim is unverifiable from the input alone regardless of passing evidence; the honest verdict is ABSTAIN. The stub below only feeds the handler the missing signal a dropped answer would produce.",
+    stub: {
+      answers: {
+        correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.9 },
+      },
+    },
+    gold: { verdict: "ABSTAIN", decision: "ESCALATE", why: "human-fixed missing claim signal escalates via the missing-signal path." },
+  },
+  {
+    id: "gate-independent-08",
+    kind: "abstention",
+    gold_source: "independent",
+    input: { ...BASE, claims: ["all tests pass"] },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): the backend dropped the refutation answer, so denial cannot be assessed from the input alone; the honest verdict is ABSTAIN. The stub below only feeds the handler the partial signal a dropped refutation would produce.",
+    stub: {
+      answers: {
+        correctness: { score: 2 }, spec_match: { score: 2 }, safe_to_apply: { noul: 0.9 },
+        claim_0: { noul: 0.9 },
+      },
+    },
+    gold: { verdict: "ABSTAIN", decision: "ESCALATE", why: "human-fixed missing refutation signal escalates via the missing-signal path." },
+  },
+  {
+    id: "gate-independent-09",
+    kind: "normal",
+    gold_source: "independent",
+    input: { request: "ship fix", diff: "+ null check", evidence: "tests: 2 passed", claims: ["null path covered by tests"] },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): the claim matches passing-test evidence just above the firm band; any competent backend supports it at the edge. The stub signals below only feed the handler what a working backend would return.",
+    stub: {
+      answers: {
+        correctness: { score: 1 }, spec_match: { score: 1 }, safe_to_apply: { noul: 0.9 },
+        claim_0: { noul: 0.82 }, refute_0: { noul: 0.1 },
+      },
+    },
+    gold: { verdict: "SUPPORTED", decision: "ALLOW", abstained: false, why: "human-fixed edge support (0.82 clears 0.8) plus firm safety auto-allows." },
+  },
+  {
+    id: "gate-independent-10",
+    kind: "negative",
+    gold_source: "independent",
+    input: { request: "ship fix", diff: "+ risky migration", evidence: "tests: 2 failed", claims: ["all tests pass"] },
+    oracle: "INDEPENDENT GOLD (human-fixed truth): the claim contradicts failing-test evidence on a risky change; any competent backend refutes it and low safety agrees. The stub signals below only feed the handler what a working backend would return.",
+    stub: {
+      answers: {
+        correctness: { score: 1 }, spec_match: { score: 1 }, safe_to_apply: { noul: 0.4 },
+        claim_0: { noul: 0.25 }, refute_0: { noul: 0.88 },
+      },
+    },
+    gold: { verdict: "CONTRADICTED", decision: "ESCALATE", abstained: false, why: "human-fixed evidence contradiction escalates; low safety agrees." },
+  },
 ];
 
 export async function invoke(deps, input, stub, capture) {
