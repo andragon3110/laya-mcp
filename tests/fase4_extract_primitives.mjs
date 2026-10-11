@@ -367,3 +367,153 @@ await check("entities empty document with no spans -> ESCALATE", async () => {
 });
 
 console.log(`\nFase-4 T3 extract primitives: ${passed} checks passed (no server, no LLM involved).`);
+
+// --------------------------------- T5 hardening (append-only, display-shape) ---
+// T5 pins for classify + compare WITHOUT touching the extract handler above
+// (no extract assertion weakened or deleted) and without moving any
+// threshold/schema/cap or ranking semantic. Dynamic imports keep the static
+// header of this battery untouched; the appended checks reuse the local
+// fakeClient/check/throwsInputTooLarge helpers and the same scripted style.
+const { classifyTool: t5ClassifyTool, handleClassify: t5HandleClassify } = await import("../dist/tools/classify.js");
+const { compareTool: t5CompareTool, handleCompare: t5HandleCompare } = await import("../dist/tools/compare.js");
+
+await check("T5 classify: 64 items build, 65 items reject, other default injected", () => {
+  const classes = [{ id: "bug", description: "A defect." }];
+  const items64 = Array.from({ length: 64 }, (_, i) => ({ id: `i${i}`, text: "Crash" }));
+  const q64 = t5ClassifyTool.buildQuestions({ purpose: "triage", items: items64, classes });
+  assert.equal(Object.keys(q64).length, 64, "one question per item, at the 64-question budget");
+  throwsInputTooLarge(
+    () => t5ClassifyTool.buildQuestions({ purpose: "triage", items: [...items64, { id: "i64", text: "Crash" }], classes }),
+    "items",
+  );
+  const q1 = t5ClassifyTool.buildQuestions({ purpose: "triage", items: [{ id: "i1", text: "hi" }], classes });
+  assert.equal(q1.class_0_i1.criteria.other, "None of the defined classes fit.", "other default present");
+  const qManual = t5ClassifyTool.buildQuestions({
+    purpose: "triage",
+    items: [{ id: "i1", text: "hi" }],
+    classes: [...classes, { id: "manual_review", description: "M." }],
+  });
+  assert.ok(!("other" in qManual.class_0_i1.criteria), "manual_review suppresses the other default (frozen shape)");
+});
+
+await check("T5 classify: empty distribution -> winner null + ESCALATE; missing answer -> other + null + ESCALATE", async () => {
+  const args = { purpose: "triage", items: [{ id: "i1", text: "Crash on save" }], classes: [{ id: "bug", description: "B." }] };
+  const empty = JSON.parse(
+    await t5HandleClassify(fakeClient({ class_0_i1: { choice: "bug", probabilities: {} } }), args),
+  );
+  assert.equal(empty.classifications[0].classification, "bug");
+  assert.equal(empty.classifications[0].winner_probability, null, "Math.max over [] is null");
+  assert.equal(empty.abstention.abstained, true);
+  assert.match(empty.abstention.reason ?? "", /empty distribution/);
+  assert.equal(empty.decision.decision, "ESCALATE");
+  const missing = JSON.parse(await t5HandleClassify(fakeClient({}), args));
+  assert.equal(missing.classifications[0].classification, "other", "fallback label, unusable");
+  assert.equal(missing.classifications[0].winner_probability, null);
+  assert.equal(missing.abstention.abstained, true);
+  assert.match(missing.abstention.reason ?? "", /missing Router answer/);
+  assert.equal(missing.decision.decision, "ESCALATE");
+});
+
+await check("T5 classify: tied 0.5/0.5 distribution is NOT abstention (no tie band in v1) -> ALLOW", async () => {
+  const body = JSON.parse(
+    await t5HandleClassify(
+      fakeClient({ class_0_i1: { choice: "bug", probabilities: { bug: 0.5, feature: 0.5 } } }),
+      { purpose: "triage", items: [{ id: "i1", text: "Change the button" }], classes: [{ id: "bug", description: "B." }, { id: "feature", description: "F." }] },
+    ),
+  );
+  assert.equal(body.classifications[0].classification, "bug");
+  assert.equal(body.classifications[0].winner_probability, 0.5);
+  assert.equal(body.abstention.abstained, false, "classify abstains only on missing/empty, never on flat");
+  assert.equal(body.decision.decision, "ALLOW");
+});
+
+await check("T5 compare: relation value never gates (same_fact/contradicts/different_facts firm -> ALLOW)", async () => {
+  for (const relation of ["same_fact", "contradicts", "different_facts"]) {
+    const body = JSON.parse(
+      await t5HandleCompare(fakeClient({ overall: { choice: relation, probabilities: { [relation]: 0.85 } } }), {
+        passage_a: "The release passed all 120 tests.",
+        passage_b: "All 120 tests passed.",
+      }),
+    );
+    assert.equal(body.overall.relation, relation, `firm ${relation} is reportable`);
+    assert.equal(body.overall.winner_probability, 0.85);
+    assert.equal(body.abstention.abstained, false);
+    assert.equal(body.decision.decision, "ALLOW", `relation ${relation} never gates`);
+  }
+});
+
+await check("T5 compare: 32 aspects build, 33 aspects reject (cap frozen)", () => {
+  const aspects32 = Array.from({ length: 32 }, (_, i) => `aspect${i}`);
+  const q32 = t5CompareTool.buildQuestions({ passage_a: "a", passage_b: "b", aspects: aspects32 });
+  assert.equal(Object.keys(q32).length, 33, "overall + 32 aspects");
+  throwsInputTooLarge(
+    () => t5CompareTool.buildQuestions({ passage_a: "a", passage_b: "b", aspects: [...aspects32, "extra"] }),
+    "aspects",
+  );
+});
+
+await check("T5 compare: duplicate aspect keys stay distinguishable at builder + evidence level", async () => {
+  const built = t5CompareTool.buildQuestions({ passage_a: "a", passage_b: "b", aspects: ["price", "price"] });
+  assert.deepEqual(Object.keys(built), ["overall", "aspect_0_price", "aspect_1_price"], "index prefix keeps keys distinct");
+  const builtNorm = t5CompareTool.buildQuestions({ passage_a: "a", passage_b: "b", aspects: ["price", "price!"] });
+  assert.deepEqual(Object.keys(builtNorm), ["overall", "aspect_0_price", "aspect_1_price_"], "normalized collisions stay distinct");
+  const body = JSON.parse(
+    await t5HandleCompare(
+      fakeClient({
+        overall: { choice: "same_fact", probabilities: { same_fact: 0.8 } },
+        aspect_0_price: { choice: "same_fact", probabilities: { same_fact: 0.7 } },
+        aspect_1_price: { choice: "contradicts", probabilities: { contradicts: 0.75 } },
+      }),
+      { passage_a: "price $29", passage_b: "price $99", aspects: ["price", "price"] },
+    ),
+  );
+  const questions = body.evidence.signals.map((s) => s.metadata?.question);
+  assert.deepEqual(questions, ["overall", "aspect_0_price", "aspect_1_price"], "evidence keeps both aspects");
+  // Frozen display shape (no schema change this task): both aspects share the
+  // single `price` output key, last-wins. Callers must read evidence for the
+  // per-index judgments; the builder/evidence distinction is the pinned part.
+  assert.equal(body.price.relation, "contradicts", "display price key is last-wins (documented freeze)");
+  assert.equal(body.decision.decision, "ALLOW", "firm duplicate aspects still report");
+  assert.equal(body.abstention.abstained, false);
+});
+
+await check("T5 compare: overall missing abstains (no relation, winner null, ESCALATE)", async () => {
+  const body = JSON.parse(
+    await t5HandleCompare(fakeClient({}), { passage_a: "a", passage_b: "b" }),
+  );
+  assert.ok(!("relation" in body.overall), "no relation without an answer");
+  assert.deepEqual(body.overall.distribution, {});
+  assert.equal(body.overall.winner_probability, null);
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /overall/);
+  assert.equal(body.decision.decision, "ESCALATE");
+});
+
+await check("T5 compare: missing aspect abstains while the firm overall stays reported", async () => {
+  const body = JSON.parse(
+    await t5HandleCompare(
+      fakeClient({ overall: { choice: "same_fact", probabilities: { same_fact: 0.8 } } }),
+      { passage_a: "a", passage_b: "b", aspects: ["date"] },
+    ),
+  );
+  assert.equal(body.overall.relation, "same_fact", "firm overall stays reported but unusable");
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /date/);
+  assert.equal(body.decision.decision, "ESCALATE");
+});
+
+await check("T5 compare: winner_probability null on empty distribution (firm choice still ALLOWs)", async () => {
+  const body = JSON.parse(
+    await t5HandleCompare(fakeClient({ overall: { choice: "same_fact", probabilities: {} } }), {
+      passage_a: "a",
+      passage_b: "b",
+    }),
+  );
+  assert.equal(body.overall.relation, "same_fact");
+  assert.deepEqual(body.overall.distribution, {});
+  assert.equal(body.overall.winner_probability, null, "empty dict -> null, never -Infinity");
+  assert.equal(body.abstention.abstained, false, "empty (not missing) overall does not abstain");
+  assert.equal(body.decision.decision, "ALLOW", "relation value never gates, even with an empty dict");
+});
+
+console.log(`\nFase-4 T3 extract primitives T5 hardening: ${passed} checks passed (no server, no LLM involved).`);
