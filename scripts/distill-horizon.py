@@ -54,7 +54,15 @@ BASE_MODEL = "Horizon-Labs/multilingual-reranker-base"
 TEACHER_URL = "http://127.0.0.1:8768/rerank"
 RUN_ROOT = "/tmp/horizon-distill"
 MAX_LENGTH = 384
-SEED = 20261011
+SEED_S5 = 20261011  # S5 recipe seed (reproducibility anchor)
+SEED_S5B = SEED_S5 + 1  # S5b retry seed (same family, bumped +1)
+SEED = SEED_S5  # default = S5 behavior unless --tie-exclude/--seed set
+TIE_EXCLUDE_DEFAULT = os.getenv("TIE_EXCLUDE", "0") == "1"
+
+
+def is_tie_row(t: dict) -> bool:
+    """Identical-text tie row: candidates equal => order is numeric noise."""
+    return t["pos"] == t["neg"]
 
 # ---------------------------------------------------------------- fixed data
 # Extended 12 (query, gold-pos text, gold-neg text). pos/neg by GOLD order.
@@ -185,6 +193,14 @@ def main() -> None:
     ap.add_argument("--batch", type=int, default=4)
     ap.add_argument("--lr", type=float, default=1e-4)
     ap.add_argument("--run-name", default=f"run-{RUN_TS}-s5")
+    ap.add_argument("--tie-exclude", action="store_true",
+                    default=TIE_EXCLUDE_DEFAULT,
+                    help="exclude identical-text tie rows from Margin-MSE "
+                         "targets (kept as eval-hold only); default off = S5 "
+                         "behavior. Also enabled via TIE_EXCLUDE=1.")
+    ap.add_argument("--seed", type=int, default=None,
+                    help="override RNG seed (default: SEED_S5B when "
+                         "--tie-exclude, else SEED_S5)")
     ap.add_argument("--dry-run", action="store_true",
                     help="build triplets + teacher margins only, no training")
     args = ap.parse_args()
@@ -197,8 +213,12 @@ def main() -> None:
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
+    tie_exclude = bool(args.tie_exclude)
+    seed = args.seed if args.seed is not None else (SEED_S5B if tie_exclude else SEED_S5)
     print(json.dumps({"event": "versions", "peft": peft.__version__,
-                      "run": args.run_name, "seed": SEED,
+                      "run": args.run_name, "seed": seed,
+                      "seed_s5": SEED_S5, "seed_s5b": SEED_S5B,
+                      "tie_exclude": tie_exclude,
                       "torch": torch.__version__}), flush=True)
 
     # ---- 1. fixed triplets + live teacher margins (BEFORE training) ----
@@ -236,19 +256,30 @@ def main() -> None:
     with open(trip_path, "rb") as f:
         trip_sha = hashlib.sha256(f.read()).hexdigest()
 
+    # S5b: identical-text tie rows leave Margin-MSE targets, stay eval-hold.
+    # Default (tie_exclude=False) = exact S5 behavior.
+    tie_hold_ids = [t["id"] for t in unique if is_tie_row(t)]
+    train_set = [t for t in unique if not (tie_exclude and is_tie_row(t))]
+    for t in unique:
+        if tie_exclude and is_tie_row(t):
+            t["target_source"] = "tie_hold_excluded"
+
     # expanded (weighted) training list, deterministic shuffle
     expanded = []
-    for t in unique:
+    for t in train_set:
         expanded += [t["id"]] * t["weight"]
     import random
-    rng = random.Random(SEED)
+    rng = random.Random(seed)
     rng.shuffle(expanded)
     by_id = {t["id"]: t for t in unique}
 
     print(json.dumps({"event": "data_fixed", "unique": len(unique),
+                      "train_unique": len(train_set),
                       "expanded": len(expanded), "triplets_sha256": trip_sha,
                       "gold_fallback_margin": gold_fallback,
                       "teacher_disagree": n_disagree,
+                      "tie_exclude": tie_exclude,
+                      "tie_hold_ids": tie_hold_ids,
                       "disagree_ids": [t["id"] for t in unique
                                        if not t["teacher_agrees_gold"]]},
                      ensure_ascii=False), flush=True)
@@ -257,7 +288,7 @@ def main() -> None:
         return
 
     # ---- 2. student baseline margins (eval-loss BEFORE) ----
-    torch.manual_seed(SEED)
+    torch.manual_seed(seed)
     device = "cpu"
     tok = AutoTokenizer.from_pretrained(BASE_MODEL)
     base = AutoModelForSequenceClassification.from_pretrained(
@@ -274,8 +305,9 @@ def main() -> None:
                     for t in unique}
 
     def eval_loss(margins) -> float:
+        # S5b: eval-loss covers Margin-MSE targets only (tie rows are hold).
         return sum((margins[t["id"]] - t["target_margin"]) ** 2
-                   for t in unique) / len(unique)
+                   for t in train_set) / len(train_set)
 
     loss_before = eval_loss(base_margins)
 
@@ -354,15 +386,25 @@ def main() -> None:
 
     peak_ram_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0
     wall_s = time.time() - t_start
+    tie_hold = {tid: {"base_margin": base_margins[tid],
+                       "tuned_margin": tuned_margins[tid]}
+                for tid in tie_hold_ids} if tie_exclude else {}
+    if tie_exclude:
+        print(json.dumps({"event": "tie_hold", "tie_hold": tie_hold},
+                         ensure_ascii=False), flush=True)
     manifest = {
-        "run": args.run_name, "date_utc": RUN_TS, "seed": SEED,
+        "run": args.run_name, "date_utc": RUN_TS, "seed": seed,
+        "seed_s5": SEED_S5, "seed_s5b": SEED_S5B,
+        "tie_exclude": tie_exclude, "tie_hold_ids": tie_hold_ids,
+        "tie_hold": tie_hold,
         "base": BASE_MODEL, "teacher": "Qwen/Qwen3-Reranker-0.6B live :8768",
         "method": "LoRA", "peft": peft.__version__,
         "lora": {"r": 8, "alpha": 16, "dropout": 0.05,
                  "targets": ["Wqkv", "Wo", "Wi"], "trainable": n_train},
         "hparams": {"epochs": args.epochs, "batch": args.batch, "lr": args.lr,
                     "loss": "Margin-MSE", "device": "cpu", "dtype": "fp32"},
-        "data": {"unique": len(unique), "expanded": len(expanded),
+        "data": {"unique": len(unique), "train_unique": len(train_set),
+                 "expanded": len(expanded),
                  "triplets_sha256": trip_sha,
                  "gold_fallback_margin": gold_fallback,
                  "teacher_disagree": n_disagree},
