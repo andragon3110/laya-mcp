@@ -435,3 +435,39 @@ OUT: push/PR/merge (decisión del usuario), re-entrenar sin mecanismo nuevo,
 - Backend pins (probed, unpinned revisions honest): `:8765` laya CPU (`device: auto`, torch CPU-only), 3/3 loaded (`english` convaiinnovations/laya, `multilingual`, `typed-decisions`; every `revision: null, revision_source: unpinned`), server 0.4.0 / sdk 0.3.29, circuit closed; `:8766` gliner CPU (`fastino/gliner2.5-multi-v1`, rev unpinned); `:8768` qwen CUDA (`Qwen/Qwen3-Reranker-0.6B`, rev unpinned); `:8770` gliclass CPU alive but untouched (not used by this proof; score `--live` never speaks the `:8770` zero-shot protocol).
 - Verdict WORKING live (real-backend decision observed, no throw): `laya_find`, `laya_rerank` (Qwen lane), `laya_classify`, `laya_decide`, `laya_compare`, `laya_review`, `laya_pii`, `laya_redact` (local deterministic), `laya_escalations` (local), `laya_capabilities` (discovery). Verdict ASSISTIVE (no live decision proven here): `laya_screen`, `laya_verify`, `laya_extract` (canonical call timed out AND score threw on part of their cases — backend answers sometimes, too slow for the 8s client on CPU), `laya_gate` (0/18 judged + canonical threw — heaviest call shape: rubric + 2×claims on CPU; never answered live in this proof). No quality claim either way for the four: timeouts measure client budget vs CPU latency, not judge correctness.
 - Verification: `npm run build` → exit 0; per-tool script exit 0 (4 rows THREW client-side, backends never restarted); `node evals/score.mjs --live --json --out /tmp/score-live.json` → exit 0, saved `/tmp/score-live.json`; `node evals/bench.mjs --live --json` → exit 1 with the timeout crash above (reported, not hidden). No commit.
+
+## Progress retry-60s (2026-10-11) — 4 CPU-timed-out tools answer at 60s, live bench wall table complete
+- Budgets (raised for this run only, no code change): `LAYA_TOOL_TIMEOUT_MS=60000 LAYA_TIMEOUT_MS=60000` on every command below. Backends `:8765` CPU laya, `:8766` CPU gliner, `:8768` CUDA qwen all UP throughout, never restarted (ready re-checked before the run; uptimes continuous). No thresholds moved (`src/policy/thresholds.ts` untouched), no versioned results (`manifest --save` never run, `evals/results/` untouched). No commit. Script `/tmp/live-retry-60s.mjs` (same canonical inputs as live-proof), bench JSON saved untracked to `/tmp/bench-live-60s.json` only.
+- Per-tool retry table (one canonical live call each; budget used = wall_ms, all far under 60000):
+  | tool | canonical input | decision | latency_ms (reported) | wall_ms (budget used) | abstained | notes |
+  |------|-----------------|----------|----------------------|------------------------|-----------|-------|
+  | laya_screen | benign ops + override+exfil in one text | DENY | 1109.4 | 1166 | false | injection 0.9302 malicious-instruction → screen_injection_block; relevance 0.0595 display-only as pinned |
+  | laya_verify | 1 supported ($29) + 1 contradicted ($99) claim, shared evidence | REVIEW | 1266.2 | 1274 | false | both INSUFFICIENT_EVIDENCE (supported 0.7621 below firm band, contradicted 0.0818) → verify_unsupported_review; 0 supported / 0 contradicted / 2 insufficient |
+  | laya_extract | 1 regex field + 1 entity field, source auto (gliner live) | ALLOW | 3596.5 | 3840 | false | regex f → "code AB12" [19,28] (0.6277), entity who → "Maria Garcia" [0,12] person (0.661); source entities, dropped 0 |
+  | laya_gate | 1 claim with evidence | REVIEW | 1315.2 | 1322 | false | claim 0.9096 but INSUFFICIENT_EVIDENCE (support-only probe shape), safe_to_apply 0.3763 mid band → gate_review |
+- Zero throws at 60s: 4/4 answered, no exact-error record needed (nothing threw). Prior 8s timeouts were client-budget vs cold-CPU latency, not judge inability — warmed latencies here are 1.1–3.6s reported.
+- Bench live wall table (`node evals/bench.mjs --live --json`, exit 0, 15 reps/primitive, 5 e2e reps; threw null on all 10 rows; reported = backend latencyMs, wall = round trip):
+  | primitive | N | reported_ms | cold_1st_ms | warm_p50 | warm_p95 | ops/s | mem_MB~ |
+  |-----------|---|-------------|-------------|----------|----------|-------|---------|
+  | laya_classify | 1 items | 679.0 | 687.1 | 331.6 | 535.9 | 2.93 | 12.2 |
+  | laya_decide | 2 options | 214.2 | 217.5 | 217.7 | 246.5 | 4.54 | 13.2 |
+  | laya_verify | 1 claims | 458.1 | 461.7 | 441.4 | 459.6 | 2.25 | 12.4 |
+  | laya_screen | 1 call | 710.5 | 713.4 | 663.5 | 717.5 | 1.50 | 12.8 |
+  | laya_pii | 1 text | 161.1 | 164.7 | 159.5 | 177.8 | 6.22 | 12.9 |
+  | laya_extract | 1 fields | 246.5 | 252.8 | 247.3 | 295.0 | 3.98 | 13.8 |
+  | laya_find | 2 candidates | 316.8 | 319.9 | 319.0 | 345.4 | 3.15 | 13.8 |
+  | laya_rerank | 2 candidates | 426.9 | 430.0 | 457.4 | 479.0 | 2.18 | 14.6 |
+  | laya_review | 1 call | 685.7 | 688.7 | 657.2 | 715.7 | 1.50 | 15.1 |
+  | laya_gate | 1 claims | 886.6 | 890.5 | 908.3 | 946.4 | 1.09 | 15.5 |
+  (bench covers 10 primitives; laya_compare has no bench row — documented freeze from T5, unchanged.)
+- Rerank sweep live (Laya-judge e2e, same wiring gap as score.mjs — judge is live `:8765`, not the Qwen sidecar; N>64 projected, transport rejects pools > 64 before pruning):
+  | N | kept/dropped | e2e_wall_p50 | MRR | nDCG | sel_p50 | mem_MB~ |
+  |---|--------------|-------------|-----|------|---------|---------|
+  | 10 | 10/0 | 7530.4 | 1.000 | 0.920 | 0.0005 | 15.3 |
+  | 50 | 10/40 | 7719.8 | 1.000 | 0.797 | 0.0622 | 15.5 |
+  | 100 | 10/90 | n/a (projected) | n/a (sel 1.000/0.803) | — | 0.1117 | 16.1 |
+  | 500 | 10/490 | n/a (projected) | n/a (sel 1.000/0.738) | — | 0.5843 | 16.4 |
+  | 1000 | 10/990 | n/a (projected) | n/a (sel 1.000/0.717) | — | 1.1021 | 16.4 |
+  Prior crash cause resolved by budget: the N=10 10-question `/predict` takes ~7.5s wall on CPU `:8765` (was > 8s client timeout); at 60s it completes. Quality numbers are vs stub-oracle construction gold (stub ceiling), never backend quality.
+- Updated verdict: all 14 tools now WORKING live (real-backend decision observed, no throw at 60s): the 10 from live-proof (`find`, `rerank` Qwen lane, `classify`, `decide`, `compare`, `review`, `pii`, `redact`, `escalations`, `capabilities`) plus the 4 retried here (`screen` DENY, `verify` REVIEW, `extract` ALLOW, `gate` REVIEW). Zero tools remain ASSISTIVE-for-lack-of-live-answer. No quality claim either way for the four: one canonical call each proves reachability + decision shape, not correctness (verify REVIEW on a should-be-supported claim and gate REVIEW on a 0.9096 claim are single-sample observations, not accuracy numbers — accuracy still needs the ≥10-independent T1 scoring against a live judge).
+- Verification: `LAYA_TOOL_TIMEOUT_MS=60000 LAYA_TIMEOUT_MS=60000 node /tmp/live-retry-60s.mjs` → exit 0, 4/4 ok; `LAYA_TOOL_TIMEOUT_MS=60000 LAYA_TIMEOUT_MS=60000 node evals/bench.mjs --live --json > /tmp/bench-live-60s.json` → exit 0 (20565 bytes JSON, stderr empty). No commit.
