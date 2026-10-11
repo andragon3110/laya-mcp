@@ -46,3 +46,11 @@ tests/redact.mjs, MCP_CONTRACT §3. Detect vive solo con sidecar GLiNER.
   `pi-host-relay-transport-failure` (no model for review-reliability).
   Fresh STATUS reoffers the identical slot; deterministic config failure,
   no relaunch. Lineage OPEN, awaiting decision (abandon vs other host).
+
+## RDD 24f9025a (2026-10-10)
+- Inspect: slice-sized candidate (5 files, redact v2 + README vs
+  origin/main), start offered (lineage `review-cf3c2c2efb3503ef`).
+  Human granted; START ok (reviewing, reliability, 269 lines).
+- Collect: forecast 1 run; ack run → transport failure (no model for
+  review-reliability). Fresh STATUS reoffers identical slot;
+  deterministic, no relaunch. Lineage OPEN, awaiting decision.
