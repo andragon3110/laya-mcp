@@ -48,6 +48,8 @@ import { handleClassify } from "../dist/tools/classify.js";
 import { handleDecide } from "../dist/tools/decide.js";
 import { handleCompare } from "../dist/tools/compare.js";
 import { handleExtract } from "../dist/tools/extract.js";
+/* S6 hermeticity pin: judge-path ALLOW pins run with shield down (:9) unless explicitly set; adversarial expectations stay ALLOW. */
+process.env.SHIELD_URL ??= "http://127.0.0.1:9";
 
 const fakeClient = (answers, latencyMs = 7) => ({
   predict: async () => ({ answers, confidence: {}, routing: {}, model: "t7-test", latencyMs, usage: {} }),

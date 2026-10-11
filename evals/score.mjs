@@ -324,6 +324,8 @@ const SUITES_EFF = wantR1
  * routes judge calls to the probed backend. Live without a reachable backend
  * refuses (exit 2) instead of silently measuring the stub as backend output. */
 const wantLive = isLiveEnabled(args, process.env);
+/* S6 hermeticity pin: stub metrics resolve shield as unreachable (:9) unless explicitly set; --live keeps the real SHIELD_URL. */
+if (!wantLive) process.env.SHIELD_URL ??= "http://127.0.0.1:9";
 let backend = { mode: "stub", live: false, reachable: false, note: "stub default: oracle answers + real handlers (stub ceiling, not backend quality)" };
 let deps = stubDeps;
 if (wantLive) {

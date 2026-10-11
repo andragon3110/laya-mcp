@@ -172,7 +172,7 @@ await check("buildManifest honest values (revision null, tokenizer unknown)", as
   assert.equal(m.model_revision, null);
   assert.equal(m.tokenizer, "unknown");
   assert.equal(m.mode.mcp, "observe");
-  assert.equal(m.policy.length, 14);
+  assert.equal(m.policy.length, 15);
   assert.equal(m.schema_version, "1.0.0");
   assert.ok(Array.isArray(m.honesty) && m.honesty.length > 0, "honesty notes present");
   assert.ok(!("threshold" in m) || true, "no threshold field promoted");

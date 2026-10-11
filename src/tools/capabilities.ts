@@ -19,7 +19,7 @@
  *                  primitive, input/output REQUIRED key lists -- the full
  *                  schemas stay on tools/list).
  *   - `policies`: the full policy registry from listPolicies() (registry
- *                  truth, availability-independent: 14 entries).
+ *                  truth, availability-independent: 15 entries over 14 names).
  *   - `features`: real, code-verified capability flags -- top_k (derived
  *                  from inputSchemas), pruning (derived from outputSchemas +
  *                  the FIND/RERANK_PRUNE_METHOD constants), two_stage

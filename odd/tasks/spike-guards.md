@@ -235,3 +235,38 @@ shield-small: 8/8 en golds decidibles (0 over-block en 3 benignos, 0 miss en 5 a
   shield live 17/18 exit 1 (delta documentado arriba); live probe
   benign+ataque por handler real (filas arriba). `git status --short`
   solo superficies permitidas + este doc. Sin commit, sin push.
+
+## S6 hermeticidad stub + pins rancios (2026-10-11, worker; sin push, sin commit)
+
+- Causa: `handleScreen` consulta `SHIELD_URL` (default :8777) best-effort,
+  así que toda batería stub que toca screen dependía de si :8777 estaba
+  UP (shield-up voltea screen-adversarial-02 a 17/18). Sin cambio de
+  handlers, policies ni thresholds.
+- Pin hermético (una línea comentada por sitio, `??=` respeta override
+  explícito; `--live` conserva el `SHIELD_URL` real):
+  `evals/run.mjs` (`process.env.SHIELD_URL ??= "http://127.0.0.1:9"`),
+  `evals/score.mjs` (mismo pin solo cuando `!wantLive`),
+  `tests/t7_semantic_adversarial.mjs` (mismo pin; ALLOWs judge-path en
+  textos evil intactos, nunca se ablanda la expectativa adversarial).
+  `evals/live-client.mjs` leído: sin builder stub compartido (run/score
+  definen el suyo; bench usa `stubClientFactory` y no es superficie
+  permitida), así que se pina exactamente run+score; el path live no se
+  toca. Bench screen canónico es benigno (SAFE→judge en ambos mundos,
+  solo varía wall, nunca asertado).
+- Pins rancios: `tests/fase7_t5_bench_manifest.mjs` `policy.length` 14→15
+  (screen 1.0.0+1.1.0, registry 15-sobre-14 MCP_CONTRACT §6);
+  `src/tools/capabilities.ts` comentario 14 entries→15-over-14-names
+  (solo comentario, runtime dinámico vía `listPolicies`).
+- Distinción 18/18-vs-17/18: stub hermético (default, shield UP) = 18/18
+  judge-path (screen-adversarial-02 ALLOW por el blind-spot pineado);
+  `SHIELD_URL=:8777` explícito = 17/18 con fast-DENY 1.1.0 intencionado
+  en adversarial-02 (prueba de que el pin solo afecta deps stub, no live).
+- Verificación S6: `npm run typecheck` exit 0; `npm run build` exit 0;
+  `node evals/run.mjs screen` (default, shield UP) 18/18 exit 0;
+  `SHIELD_URL=http://127.0.0.1:8777 node evals/run.mjs screen` 17/18
+  exit 1 (`FAIL screen-adversarial-02`); `node evals/score.mjs screen`
+  exit 0 (dec_acc 1.000, guardado en artifacts/ untracked);
+  `node tests/fase7_t5_bench_manifest.mjs` 14 checks exit 0;
+  `node tests/t7_semantic_adversarial.mjs` 17 checks exit 0;
+  `node tests/fase5_t5_capabilities.mjs` 15 checks exit 0.
+  `git status --short` solo superficies permitidas + este doc.
