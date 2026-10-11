@@ -277,3 +277,19 @@ OUT: push/PR/merge (decisión del usuario), re-entrenar sin mecanismo nuevo,
 - Docs: `evals/calibration.md` (+1 section, append-only): T8 pin restating the six guarantees with no calibration math added anywhere.
 - No calibration invented: no ECE, no Brier, no temperature scaling, no reliability diagram computed; taus 0.70/0.80/0.90/0.95 remain reporting-only descriptive slices, never production cutoffs.
 - Verification: `node tests/fase7_t4_metrics.mjs` → 15 checks passed exit 0 (tail: 5 new T8 checks ok); `node evals/score.mjs` → exit 0 (11 suites stub ceiling 1.000, rerank wc n/a, saved untracked `artifacts/evals-t4-metrics.json`); `npm run typecheck` → exit 0 (tsc clean).
+
+## Progress T9 (2026-10-11) — training gate docs (no training ran, STOP en vigor)
+- No training ran: no model, checkpoint, or training-code touched; docs-only.
+  STOP DEFINITIVO a SFT same-dose remains in force; r3i is the last adopted
+  checkpoint with no r3j on the same recipe (confirmed read-only in
+  `odd/tasks/phase2-r3i-distill.md` plus `odd/tasks/r3a-lanes.md`).
+- Docs: `odd/tasks/phase2-train-prep.md` (+1 gated-reopening section,
+  append-only): reopening only with abstention-aware objective (DAC/CAN IDK
+  loss with user-chosen abstention cost, or selective prediction plus error
+  regularization) or hard new d3-distill-style data with agreement measured
+  and disagreements dropped; every run records eval-loss deltas plus live CPU
+  on r1 lanes plus v2 with bit-identical check on untouched lanes plus run-dir
+  path plus sha256 in manifest; promotion only when strictly-no-worse plus v2
+  gains, otherwise NO new rounds.
+- Verification: `npm run typecheck` → exit 0; `git status --short` plus
+  `git diff --stat` show docs-only (2 files). No commit.
