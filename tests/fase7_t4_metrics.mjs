@@ -20,6 +20,7 @@ import {
   scoreAgreement,
   wrongConfident,
 } from "../evals/metrics.mjs";
+import * as metricsNs from "../evals/metrics.mjs";
 
 let passed = 0;
 function check(name, fn) {
@@ -172,6 +173,78 @@ check("wrongConfident hand fixture with exclusions", () => {
 
 check("default taus are the four reporting slices", () => {
   assert.deepEqual(WRONG_CONFIDENT_TAUS, [0.7, 0.8, 0.9, 0.95]);
+});
+
+// --- T8 calibration honesty: joint rate vs conditional rate are distinct.
+// scored=4 (one null-signal + one abstained + one throw excluded, counted).
+// signals: wrong@0.95, right@0.85, wrong@0.75, right@0.5.
+// tau 0.80 -> confident 2 (0.95 wrong, 0.85 right), wrong 1.
+//   rate = 1/4 (JOINT over scored), conditional = 1/2 (over confident).
+// The two denominators differ on purpose; conflating them is an error.
+check("T8: wrongConfident joint rate vs conditional rate denominators", () => {
+  const items = [
+    { correct: false, signal: 0.95, abstained: false, threw: false },
+    { correct: true, signal: 0.85, abstained: false, threw: false },
+    { correct: false, signal: 0.75, abstained: false, threw: false },
+    { correct: true, signal: 0.5, abstained: false, threw: false },
+    { correct: true, signal: null, abstained: false, threw: false },
+    { correct: false, signal: 0.99, abstained: true, threw: false },
+    { correct: false, signal: 0.99, abstained: false, threw: true },
+  ];
+  const m = wrongConfident(items, [0.8]);
+  assert.equal(m.scored, 4);
+  assert.deepEqual(m.excluded, { threw: 1, abstained: 1, null_signal: 1 });
+  const [s80] = m.slices;
+  assert.deepEqual([s80.confident, s80.wrong_and_confident], [2, 1]);
+  assert.ok(approx(s80.rate, 1 / 4), `joint ${s80.rate}`);
+  assert.ok(approx(s80.conditional_wrong_given_confident, 1 / 2), `cond ${s80.conditional_wrong_given_confident}`);
+  assert.notEqual(s80.rate, s80.conditional_wrong_given_confident);
+});
+
+// --- T8: custom taus never mutate the reporting slices. Promoting any tau
+// to a production cutoff is a documented category error, never code.
+check("T8: custom taus leave WRONG_CONFIDENT_TAUS untouched", () => {
+  const m = wrongConfident([{ correct: true, signal: 0.9, abstained: false, threw: false }], [0.5]);
+  assert.deepEqual(m.slices.map((s) => s.tau), [0.5]);
+  assert.deepEqual(WRONG_CONFIDENT_TAUS, [0.7, 0.8, 0.9, 0.95]);
+});
+
+// --- T8: Brier and ECE are absent by verdict, not by omission (see
+// evals/calibration.md). No calibration math exists in evals/metrics.mjs.
+check("T8: Brier and ECE exports do not exist", () => {
+  for (const name of ["brier", "Brier", "ece", "ECE", "expectedCalibrationError", "brierScore"]) {
+    assert.equal(metricsNs[name], undefined, `${name} must stay absent`);
+  }
+});
+
+// --- T8: Decide argmax-only is unmeasurable for calibration through its
+// API. A null selection yields winner_probability null, which is EXCLUDED
+// (counted as null_signal), never scored as 0.
+check("T8: Decide null-signal selections are excluded, never zero-scored", () => {
+  const m = wrongConfident(
+    [
+      { correct: true, signal: 0.9, abstained: false, threw: false },
+      { correct: false, signal: null, abstained: false, threw: false },
+    ],
+    [0.7],
+  );
+  assert.equal(m.scored, 1);
+  assert.deepEqual(m.excluded, { threw: 0, abstained: 0, null_signal: 1 });
+  assert.ok(approx(m.slices[0].rate, 0), `rate ${m.slices[0].rate}`);
+});
+
+// --- T8: rerank stays "no aplica". Its runner judgments are [] (see
+// evals/score.mjs wrongNote); empty input yields honest absence (null
+// rates), never a number that could be read as calibration.
+check("T8: empty judgments (rerank shape) yield null rates, never numbers", () => {
+  const m = wrongConfident([], [0.7, 0.8, 0.9, 0.95]);
+  assert.equal(m.scored, 0);
+  assert.deepEqual(m.excluded, { threw: 0, abstained: 0, null_signal: 0 });
+  for (const s of m.slices) {
+    assert.deepEqual([s.confident, s.wrong_and_confident], [0, 0]);
+    assert.equal(s.rate, null);
+    assert.equal(s.conditional_wrong_given_confident, null);
+  }
 });
 
 console.log(`\nT4 metrics: ${passed} checks passed (pure functions, no backend).`);

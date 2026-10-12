@@ -276,3 +276,68 @@ console.log("|--------------|----------------|------------|------------|--------
 console.log("| 1            | 2              | 1          | 1          | 5 + 9 = 14              |");
 console.log("| 0            | 1              | 1          | 0          | 5                       |");
 console.log("(each stage gets the standard LAYA_TOOL_TIMEOUT_MS budget: worst case ~2x single-call).");
+
+// ------------------------------------------------- T5 hardening (append-only) ---
+// T5 pins, without touching thresholds/schemas/caps/ranking: an abstained
+// (non-string) selection behaves exactly like the null-selection path -- no
+// stage 2, every requirement missing, authoritative ESCALATE -- and the
+// flat-band abstention holds at N=3 (top == 1/3) with winner_probability
+// reporting the raw top share (null on an empty distribution).
+await check("T5: abstained selection (non-string choice) skips stage2, requirements missing, ESCALATE", async () => {
+  const body = JSON.parse(
+    await handleDecide(
+      scriptedClient([{ selected: { choice: 42, probabilities: { a: 0.7, b: 0.3 } } }], [5]),
+      ARGS_AB,
+    ),
+  );
+  assert.equal(calls.length, 1, "no stage 2 without a string selection, by design");
+  assert.equal(body.selected, null);
+  assert.deepEqual(body.requirements, { requirement_0: { signal: null, supported: null } });
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /no option selected/);
+  assert.equal(body.decision.decision, "ESCALATE");
+  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+});
+
+await check("T5: three-option flat distribution abstains at the 1/3 baseline (stage2 still runs)", async () => {
+  const args3 = {
+    decision: "pick a fruit",
+    candidates: [{ id: "a" }, { id: "b" }, { id: "c" }],
+    requirements: ["must be sweet"],
+  };
+  const body = JSON.parse(
+    await handleDecide(
+      scriptedClient(
+        [
+          { selected: { choice: "a", probabilities: { a: 1 / 3, b: 1 / 3, c: 1 / 3 } } },
+          { requirement_0: { noul: 0.95 } },
+        ],
+        [5, 9],
+      ),
+      args3,
+    ),
+  );
+  assert.equal(calls.length, 2, "a pick exists -> stage 2 runs, then the flat band abstains");
+  assert.deepEqual(body.requirements, { requirement_0: { signal: 0.95, supported: true } }, "requirement met, yet...");
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /flat distribution/);
+  assert.equal(body.decision.decision, "ESCALATE");
+});
+
+await check("T5: empty distribution with a pick reports winner_probability null + ESCALATE", async () => {
+  const body = JSON.parse(
+    await handleDecide(
+      scriptedClient([{ selected: { choice: "a", probabilities: {} } }], [5]),
+      { decision: "d", candidates: [{ id: "a" }, { id: "b" }] },
+    ),
+  );
+  assert.equal(calls.length, 1, "no requirements -> single stage");
+  assert.equal(body.selected, "a");
+  assert.deepEqual(body.distribution, {});
+  assert.equal(body.winner_probability, null, "Math.max over [] is null, never -Infinity");
+  assert.equal(body.abstention.abstained, true);
+  assert.match(body.abstention.reason ?? "", /empty distribution/);
+  assert.equal(body.decision.decision, "ESCALATE");
+});
+
+console.log(`\nFase-4 T6 decide two-stage T5 hardening: ${passed} checks passed (no server, no LLM involved).`);

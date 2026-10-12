@@ -1,0 +1,26 @@
+{
+  "doofz/THX-01": {
+    "revision": "bef2e2478be7acd79429324a658558a57552a2e8",
+    "local_path": "/home/andragon/.cache/huggingface/hub/models--doofz--THX-01/snapshots/bef2e2478be7acd79429324a658558a57552a2e8",
+    "status": "ok",
+    "elapsed_s": 25.5
+  },
+  "convaiinnovations/laya-typed-decisions": {
+    "revision": "e929ae5cf69bc34259cd2f95c9e91145b818b1f0",
+    "local_path": "/home/andragon/.cache/huggingface/hub/models--convaiinnovations--laya-typed-decisions/snapshots/e929ae5cf69bc34259cd2f95c9e91145b818b1f0",
+    "status": "ok",
+    "elapsed_s": 1.0
+  },
+  "MoritzLaurer/ModernBERT-large-zeroshot-v2.0": {
+    "revision": "a51e07b524299e309dd2b88d48b0cfa2bd9ec598",
+    "local_path": "/home/andragon/.cache/huggingface/hub/models--MoritzLaurer--ModernBERT-large-zeroshot-v2.0/snapshots/a51e07b524299e309dd2b88d48b0cfa2bd9ec598",
+    "status": "ok",
+    "elapsed_s": 126.2
+  },
+  "knowledgator/gliclass-multilang-ultra": {
+    "revision": "33c3ffec64056b0d37173d2dd90b885ac29b72c3",
+    "local_path": "/home/andragon/.cache/huggingface/hub/models--knowledgator--gliclass-multilang-ultra/snapshots/33c3ffec64056b0d37173d2dd90b885ac29b72c3",
+    "status": "ok",
+    "elapsed_s": 98.5
+  }
+}

@@ -36,7 +36,7 @@
  *
  * Part C (live stub + offline) -- failures + back-compat:
  *   - backend down in EVERY mode (observe/shadow/enforce): tools/list is
- *     exactly [laya_capabilities], a judgment call isError with the
+ *     exactly [laya_capabilities, laya_escalations, laya_redact], a judgment call isError with the
  *     recovery hint, a capabilities call isError with the backend
  *     diagnosis, errors carry no structuredContent;
  *   - absent trace generates fresh W3C-shaped ids on the live envelope
@@ -470,7 +470,9 @@ await withClient({}, async (client) => {
       const parsed = JSON.parse(res.content[0].text);
       assert.deepStrictEqual(res.structuredContent, parsed, "structured == text");
       assert.equal(parsed.decision.decision, cleanParsed.decision.decision, "decision identical to the clean call");
-      assert.deepEqual(parsed.decision.policy, { name: "screen", version: "1.0.0" }, "policy identity pinned");
+      // Shield era: judge path stays screen@1.0.0, fast-DENY shield path carries screen@1.1.0.
+      const isShieldFastDeny = (parsed.decision.reason_codes ?? []).includes("screen_shield_prefilter");
+      assert.deepEqual(parsed.decision.policy, isShieldFastDeny ? { name: "screen", version: "1.1.0" } : { name: "screen", version: "1.0.0" }, "policy identity pinned per path (judge 1.0.0 vs shield fast-DENY 1.1.0)");
       assert.equal(parsed.effective_mode, "observe", "mode intact (env-only, never _meta/args)");
       assert.equal(parsed.trace_id, ADV_META.trace_id, "real trace id still correlates through the attack");
     }
@@ -524,12 +526,13 @@ for (const mode of ["observe", "shadow", "enforce"]) {
   const client = new Client({ name: `t5-down-${mode}`, version: "0" }, { capabilities: {} });
   await client.connect(transport);
   try {
-    await check(`live backend down in ${mode}: list==[capabilities], calls isError, no structuredContent`, async () => {
+    await check(`live backend down in ${mode}: list==[capabilities, escalations, redact], calls isError, no structuredContent`, async () => {
       const deadline = Date.now() + 20000;
       for (;;) {
         const listed = await client.listTools();
-        if (listed.tools.length === 1 && listed.tools[0].name === "laya_capabilities") break;
-        assert.ok(Date.now() < deadline, `${mode}: exactly the exempted tool (got ${listed.tools.length})`);
+        const names = listed.tools.map((t) => t.name);
+        if (names.length === 3 && names[0] === "laya_capabilities" && names[1] === "laya_escalations" && names[2] === "laya_redact") break;
+        assert.ok(Date.now() < deadline, `${mode}: exactly the exempted tools (got ${names.join(",")})`);
         await new Promise((r) => setTimeout(r, 300));
       }
       const screen = await client.callTool({ name: "laya_screen", arguments: { text: "hi", purpose: "t5" } });

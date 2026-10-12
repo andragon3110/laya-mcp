@@ -34,3 +34,17 @@ datos, no tweaks de código. Estado del terreno (2026-10-10):
 - Publicado `evals/results/v16/` (manifest+metrics+composed del run,
   commit 128129c). §13 actualizado sin fabricar nada.
 - T2: `ft/gen_v2_r3f.mjs` → `train/r3f/v2.jsonl` (20 filas, asserts OK).
+
+## Reapertura con gate (2026-10-11) — STOP en vigor
+- STOP DEFINITIVO a SFT same-dose (LR 2e-5 × 2 epochs) sigue en vigor;
+  r3i es el último checkpoint adoptado, sin r3j sobre la misma receta
+  (odd/tasks/phase2-r3i-distill.md, odd/tasks/r3a-lanes.md, T9 de
+  odd/tasks/improve-all-functions.md).
+- Reapertura solo con mecanismo nuevo: (a) objetivo abstention-aware —
+  Deep Abstaining Classifier o Controlled Abstention Networks (pérdida IDK)
+  con costo de abstención elegido por el usuario, o selective prediction +
+  error regularization; (b) o datos duros nuevos estilo d3-distill con
+  agreement medido y disagreements dropeados.
+- Cada run registra: deltas de eval-loss + live CPU en lanes r1 + v2 con
+  check bit-identical en lanes no tocados + run-dir path + sha256 en manifest.
+- Promoción solo si strictly-no-worse + ganancias v2. Si no, NO hay nuevas rondas.

@@ -43,6 +43,8 @@ import * as gate from "./suites/gate.mjs";
 import * as compare from "./suites/compare.mjs";
 
 const SUITES = [classify, decide, verify, screen, pii, extract, find, rerank, review, gate, compare];
+/* S6 hermeticity pin: stub runs resolve shield as unreachable (:9) unless the operator set an explicit SHIELD_URL (explicit :8777 still fast-DENYs). */
+process.env.SHIELD_URL ??= "http://127.0.0.1:9";
 
 /** Deterministic oracle stub: answers come FROM the case oracle (see above). */
 const fakeClient = (answers, capture) => ({

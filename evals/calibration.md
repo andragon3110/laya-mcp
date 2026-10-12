@@ -60,3 +60,34 @@ names; only new analysis uses this vocabulary.
 | classify/decide/verify/screen/pii/extract/find (+compare, future) | accuracy, P/R/F1 on ALLOW polarity, FPR/FNR, abstention_rate, wrong_confident on the primitive signal | Brier/ECE |
 | review/gate | decision accuracy, abstention_rate, wrong_confident (safe / per-claim signal); rubric-score agreement only with future score oracles | Brier/ECE, score agreement on T3 golds (no score oracle) |
 | rerank | MRR/nDCG/MAP/top-k | accuracy, any threshold, wrong_confident, cross-call comparison |
+
+## T8 pin (2026-10-11) — calibration honesty, no math added
+
+No calibration was invented in T8. No probability exists, so none was
+measured. This section pins the verdict above against six concrete
+guarantees (each with a regression test in `tests/fase7_t4_metrics.mjs`):
+
+1. **Exclusions are counted.** `wrongConfident` scores only non-throw,
+   non-abstained, numeric-signal judgments; every exclusion is reported in
+   `excluded` (`threw`, `abstained`, `null_signal`). Denominators never
+   silently shrink.
+2. **Joint vs conditional rates stay distinct.** Each tau slice reports the
+   JOINT rate P(wrong AND signal >= tau) over scored items AND the
+   conditional P(wrong | signal >= tau) over confident items. The two
+   denominators differ on purpose; conflating them is an error.
+3. **Rerank stays "no aplica".** The runner (`evals/score.mjs`) emits
+   `wrong_confident: { status: "no aplica", ... }` for rerank with the
+   within-call-only justification, and its judgments are `[]`. Empty input
+   yields null rates (honest absence), never a number.
+4. **Brier and ECE are absent by verdict, not by omission.** They require
+   calibrated probabilities with ground-truth outcome frequencies; we have
+   neither. `evals/metrics.mjs` exports no `brier`/`ece` symbol, pinned by
+   test — the absence is the verdict, not a gap.
+5. **Promoting any tau to a production cutoff is a category error.**
+   `WRONG_CONFIDENT_TAUS` (0.70/0.80/0.90/0.95) are descriptive reporting
+   slices over oracle-stub runs, unvalidated on real traffic and circular
+   on stub data. Custom taus in calls never mutate the constant.
+6. **Decide argmax-only is unmeasurable for calibration through its API.**
+   A null selection yields `winner_probability` null, which is EXCLUDED
+   (counted as `null_signal`), never scored as 0. No distribution, no
+   calibration slice.

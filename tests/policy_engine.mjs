@@ -391,7 +391,7 @@ check("unknown policy name -> structured policy_not_found", () => {
     assert.equal(err?.code, "policy_not_found");
     assert.equal(err?.detail?.code, "policy_not_found");
     assert.deepEqual(err?.detail?.policy, { name: "nope", version: "1.0.0" });
-    assert.ok(Array.isArray(err?.detail?.available) && err.detail.available.length === 14);
+    assert.ok(Array.isArray(err?.detail?.available) && err.detail.available.length === 15);
     return true;
   });
 });
@@ -406,7 +406,7 @@ check("missing policy/evidence -> input error", () => {
 });
 
 // ------------------------------------------------------------- versioning ---
-check("registry holds 14 policies at 1.0.0 incl. families + 3 named", () => {
+check("registry holds 15 entries over 14 names: screen at 1.0.0+1.1.0 (S5)", () => {
   const names = listPolicies().map((p) => `${p.name}@${p.version}`).sort();
   for (const fam of ["screen", "verify", "find", "rerank", "classify", "decide", "compare", "extract", "review", "gate", "pii"]) {
     assert.ok(names.includes(`${fam}@1.0.0`), `missing ${fam}@1.0.0`);
@@ -414,7 +414,112 @@ check("registry holds 14 policies at 1.0.0 incl. families + 3 named", () => {
   for (const named of ["code-review", "security", "normal"]) {
     assert.ok(names.includes(`${named}@1.0.0`), `missing ${named}@1.0.0`);
   }
-  assert.equal(names.length, 14);
+  assert.ok(names.includes("screen@1.1.0"), "missing screen@1.1.0 (S5 pre-filter)");
+  assert.equal(names.length, 15);
+  assert.equal(new Set(listPolicies().map((p) => p.name)).size, 14, "14 policy names");
+});
+
+// ------------------------------------------- screen@1.1.0 (S5 pre-filter) ---
+// S5 wiring: exactly one new rule -- a present shield signal at or above
+// the firm cut short-circuits to DENY screen_shield_prefilter under
+// {screen, 1.1.0}. Below firm or absent shield, 1.1.0 judges EXACTLY as
+// 1.0.0 (same cuts, same codes). 1.0.0 itself is untouched (judge default).
+function screen11Input(injection, substance, score) {
+  const { evidence, abstention } = screenEv(injection, substance);
+  if (score !== undefined) {
+    evidence.signals.push(
+      E.shieldSignal(score, { label: score >= 0.5 ? "INJECTION" : "SAFE", model: "shield-test" }),
+    );
+  }
+  return { evidence, abstention };
+}
+function ev11(evidence, abstention, context, thresholds) {
+  return evaluate(
+    { evidence, abstention, ...(context !== undefined ? { context } : {}), policy: { name: "screen", version: "1.1.0" } },
+    thresholds ? { thresholds } : undefined,
+  );
+}
+function withFirmEnv(value, fn) {
+  const had = Object.hasOwn(process.env, "SHIELD_FIRM_SCORE");
+  const saved = process.env.SHIELD_FIRM_SCORE;
+  try {
+    if (value === undefined) delete process.env.SHIELD_FIRM_SCORE;
+    else process.env.SHIELD_FIRM_SCORE = value;
+    fn();
+  } finally {
+    if (had) process.env.SHIELD_FIRM_SCORE = saved;
+    else delete process.env.SHIELD_FIRM_SCORE;
+  }
+}
+check("screen@1.1.0 firm shield short-circuits BEFORE the judge (missing-signal exit included)", () => {
+  withFirmEnv(undefined, () => {
+    // Judge inputs are null (judge never ran): only the shield number decides.
+    const { evidence, abstention } = E.screenEvidence(RAW, { injection: null, substance: null, relevance: null, missing: [] });
+    assert.equal(abstention.abstained, false, "fast-path evidence carries no abstention");
+    evidence.signals.push(E.shieldSignal(0.9996, { label: "INJECTION", model: "shield-test" }));
+    const d = ev11(evidence, abstention);
+    assert.equal(d.decision, "DENY");
+    assert.deepEqual(d.reason_codes, ["screen_shield_prefilter"]);
+    assert.deepEqual(d.policy, { name: "screen", version: "1.1.0" });
+  });
+});
+check("screen@1.1.0 firm edge is >= (0.99 fires, 0.9899 falls through to the judge)", () => {
+  withFirmEnv(undefined, () => {
+    const at = screen11Input(0.1, 0.9, 0.99);
+    assert.deepEqual(ev11(at.evidence, at.abstention).reason_codes, ["screen_shield_prefilter"]);
+    const below = screen11Input(0.1, 0.9, 0.9899);
+    const d = ev11(below.evidence, below.abstention);
+    assert.equal(d.decision, "ALLOW");
+    assert.deepEqual(d.reason_codes, ["screen_pass"]);
+    assert.deepEqual(d.policy, { name: "screen", version: "1.1.0" });
+  });
+});
+check("screen@1.1.0 below-firm or absent shield judges exactly as 1.0.0", () => {
+  withFirmEnv(undefined, () => {
+    const vectors = [
+      [0.9, 0.9, "screen_injection_block", "DENY"],
+      [0.75, 0.9, "screen_injection_review", "REVIEW"],
+      [0.1, 0.39, "screen_skip_low_substance", "REVIEW"],
+      [0.1, 0.9, "screen_pass", "ALLOW"],
+    ];
+    for (const [inj, sub, code, dec] of vectors) {
+      for (const score of [0.5, 0.0002, undefined]) {
+        const { evidence, abstention } = screen11Input(inj, sub, score);
+        const d = ev11(evidence, abstention);
+        assert.equal(d.decision, dec, `1.1.0 inj=${inj} sub=${sub} shield=${score}`);
+        assert.deepEqual(d.reason_codes, [code], `1.1.0 code inj=${inj} sub=${sub} shield=${score}`);
+        assert.deepEqual(d.policy, { name: "screen", version: "1.1.0" });
+        const ref = screenEv(inj, sub);
+        assert.deepEqual(ev("screen", ref.evidence, ref.abstention).reason_codes, [code], "1.0.0 parity");
+      }
+    }
+    // Missing-signal exit preserved under 1.1.0 when the shield is absent.
+    const { evidence } = E.screenEvidence(RAW, { injection: null, substance: 0.9, relevance: 0.9, missing: ["is_injection"] });
+    assert.deepEqual(ev11(evidence, noAbs()).reason_codes, ["screen_missing_signal"]);
+  });
+});
+check("screen@1.1.0 abstention precedes even a firm shield (global rule first)", () => {
+  withFirmEnv(undefined, () => {
+    const { evidence, abstention } = E.screenEvidence(RAW, { injection: 0.99, substance: null, relevance: null, missing: ["has_substance", "is_relevant"] });
+    assert.equal(abstention.abstained, true);
+    evidence.signals.push(E.shieldSignal(0.9999, { label: "INJECTION", model: "shield-test" }));
+    const d = ev11(evidence, abstention);
+    assert.equal(d.decision, "ESCALATE");
+    assert.deepEqual(d.reason_codes, ["abstained_evidence"]);
+  });
+});
+check("SHIELD_FIRM_SCORE override moves the cut; missing/invalid falls back to 0.99", () => {
+  const attack = () => screen11Input(0.1, 0.9, 0.9996);
+  withFirmEnv("0.9999", () => {
+    const { evidence, abstention } = attack();
+    assert.deepEqual(ev11(evidence, abstention).reason_codes, ["screen_pass"], "0.9996 below a 0.9999 override judges");
+  });
+  for (const bad of [undefined, "abc", "NaN", "2", "-1"]) {
+    withFirmEnv(bad, () => {
+      const { evidence, abstention } = attack();
+      assert.deepEqual(ev11(evidence, abstention).reason_codes, ["screen_shield_prefilter"], `fallback firm with override=${bad}`);
+    });
+  }
 });
 
 // ------------------------------------------------------------ determinism ---

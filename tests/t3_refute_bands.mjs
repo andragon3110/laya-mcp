@@ -279,4 +279,62 @@ await check("builders: verify 32 claims -> 64 questions ok, 33 throws; gate 30 -
   );
 });
 
+await check("T3-regression: verify isolates positive refutation per claim (SUPPORTED plus CONTRADICTED into DENY)", async () => {
+  const body = JSON.parse(
+    await handleVerify(fakeClient(pairAnswers([[0.95, 0.12], [0.18, 0.93]])), { claims: ["a", "b"], evidence: "e" }),
+  );
+  assert.deepEqual(body.verdicts.map((v) => v.verdict), ["SUPPORTED", "CONTRADICTED"]);
+  assert.deepEqual(body.summary, { supported: 1, insufficient_evidence: 0, contradicted: 1, abstain: 0 });
+  assert.equal(body.abstention.abstained, false);
+  assert.equal(body.decision.decision, "DENY");
+  assert.deepEqual(body.decision.reason_codes, ["verify_contradicted_deny"]);
+});
+
+await check("T3-regression: gate weak support alone never contradicts (safety band decides)", async () => {
+  const body = JSON.parse(
+    await handleGate(fakeClient(gateStub({ safe: 0.93, pairs: [[0.18, 0.12]] })), gateArgs(["a"])),
+  );
+  assert.equal(body.claims[0].verdict, "INSUFFICIENT_EVIDENCE");
+  assert.ok(!body.claims.some((c) => c.verdict === "CONTRADICTED"), "absence must never label a contradiction");
+  assert.equal(body.decision.decision, "ALLOW");
+  assert.deepEqual(body.decision.reason_codes, ["gate_auto_allow"]);
+});
+
+await check("T3-regression: gate both-firm conflicting probes stay INSUFFICIENT (never silent confirm)", async () => {
+  const body = JSON.parse(
+    await handleGate(fakeClient(gateStub({ safe: 0.93, pairs: [[0.95, 0.92]] })), gateArgs(["a"])),
+  );
+  assert.equal(body.claims[0].verdict, "INSUFFICIENT_EVIDENCE");
+  assert.ok(!body.claims.some((c) => c.verdict === "SUPPORTED"), "conflict must never confirm");
+  assert.ok(!body.claims.some((c) => c.verdict === "CONTRADICTED"), "conflict must never contradict");
+  assert.deepEqual(body.decision.reason_codes, ["gate_auto_allow"]);
+});
+
+await check("T3-regression: verify empty claims abstain structurally (no summary, ESCALATE)", async () => {
+  const body = JSON.parse(await handleVerify(fakeClient({}), { claims: [], evidence: "unrelated text" }));
+  assert.deepEqual(body.verdicts, []);
+  assert.ok(!("summary" in body), "empty claims must not return a zero summary");
+  assert.equal(body.abstention.abstained, true);
+  assert.equal(body.decision.decision, "ESCALATE");
+  assert.deepEqual(body.decision.reason_codes, ["abstained_evidence"]);
+});
+
+await check("T3-regression: evidence-missing claims escalate via policy, never false SUPPORTED", () => {
+  const missingRefute = E.verifyEvidence(RAW, { claims: [{ claim: "c", signal: 0.18, verdict: "x", refute: null }] });
+  const dMissing = policyEv("verify", missingRefute.evidence, noAbs());
+  assert.equal(dMissing.decision, "ESCALATE");
+  assert.deepEqual(dMissing.reason_codes, ["verify_missing_signal"]);
+  const missingSupport = E.gateEvidence(RAW, {
+    correctness: 2, spec_match: 2, safe_to_apply: 0.93,
+    claims: [{ claim: "c", signal: null, verdict: "x", refute: 0.12 }],
+  });
+  const dSupport = policyEv("gate", missingSupport.evidence, noAbs());
+  assert.equal(dSupport.decision, "ESCALATE");
+  assert.deepEqual(dSupport.reason_codes, ["gate_missing_signal"]);
+  for (const d of [dMissing, dSupport]) {
+    assert.ok(d.decision === "REVIEW" || d.decision === "ESCALATE", "missing evidence routes to REVIEW or ESCALATE");
+    assert.notEqual(d.decision, "ALLOW");
+  }
+});
+
 console.log(`\nT3 refutation + bands: ${passed} checks passed (no server, no LLM involved).`);

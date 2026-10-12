@@ -24,8 +24,18 @@
  */
 import type { PredictResult } from "./client.js";
 
-/** Where a raw signal came from. */
-export type SignalSource = "laya" | "gliner" | "regex" | "none";
+/**
+ * Where a raw signal came from.
+ *
+ * S5 (spike-guards wiring): `shield` is the shield-small sidecar
+ * pre-filter (ZeroLeaks/shield-small via shield-server :8777). Widening
+ * (not a fallback `none`) because no exhaustive consumer switches on
+ * this union -- the only source-conditional sites compare against
+ * single members (`=== "gliner"`, `?? "laya"`), so no other file
+ * needed a fix (verified at wiring time: evidence.ts + screen.ts +
+ * policies/screen.ts only).
+ */
+export type SignalSource = "laya" | "gliner" | "regex" | "shield" | "none";
 
 /** Which backend question shape produced the signal. */
 export type SignalKind = "noul" | "choice" | "score" | "span";
@@ -51,7 +61,12 @@ export interface Signal {
   distribution?: Record<string, number> | null;
   /** Max of `distribution`. Null when the dict came back empty. */
   winner_probability?: number | null;
-  /** Raw GLiNER span score. No threshold is applied server-side. */
+  /**
+   * Raw detector score. GLiNER span score, or shield-small P(INJECTION)
+   * (within-call only). No threshold is applied server-side -- the
+   * screen@1.1.0 firm cut lives in the policy file (measured-on-20,
+   * never calibrated). Never a confidence or probability.
+   */
   detector_score?: number | null;
   /** Raw 0-2 review/gate rubric number, passed through unchanged. */
   score?: number | null;
@@ -235,6 +250,39 @@ export function relevanceSignal(
     detector: "router",
     metadata: rank === undefined ? { question } : { question, rank },
   });
+}
+
+/**
+ * Raw shield-small pre-filter signal (S5 spike-guards wiring).
+ *
+ * The sidecar number travels as `detector_score` (within-call only,
+ * never confidence/probability), under `detector: "shield"` with
+ * `metadata.shield_prefilter: true` so screen@1.1.0 can locate it.
+ * `source: "shield"` names the sidecar provenance; `model` carries the
+ * sidecar model label when the caller has one, `revision` stays the
+ * honest null (no pin is resolvable -- mirrors the sidecar, whose
+ * /models reports revision null + revision_source "unpinned").
+ * No threshold is applied here.
+ */
+export function shieldSignal(
+  score: number | null | undefined,
+  extra?: { label?: string | null; model?: string | null; metadata?: Record<string, unknown> },
+): Signal {
+  return {
+    source: "shield",
+    kind: "score",
+    candidate: extra?.label ?? null,
+    detector_score: score ?? null,
+    span: null,
+    detector: "shield",
+    model: extra?.model ?? null,
+    revision: null,
+    metadata: {
+      shield_prefilter: true,
+      ...(extra?.label !== undefined ? { label: extra.label } : {}),
+      ...(extra?.metadata ?? {}),
+    },
+  };
 }
 
 /** Raw GLiNER span signal. No threshold is applied server-side. */

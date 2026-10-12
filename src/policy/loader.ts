@@ -15,7 +15,7 @@
 import type { PolicyThresholds } from "./thresholds.js";
 import { thresholdsFromEnv } from "./thresholds.js";
 import type { PolicyDefinition, PolicyRef } from "./types.js";
-import { screenPolicy } from "./policies/screen.js";
+import { screenPolicy, screenPolicy11 } from "./policies/screen.js";
 import { verifyPolicy } from "./policies/verify.js";
 import { findPolicy } from "./policies/find.js";
 import { rerankPolicy } from "./policies/rerank.js";
@@ -32,6 +32,7 @@ import { normalPolicy } from "./policies/normal.js";
 
 const ALL: PolicyDefinition[] = [
   screenPolicy,
+  screenPolicy11,
   verifyPolicy,
   findPolicy,
   rerankPolicy,

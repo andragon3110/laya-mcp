@@ -17,12 +17,12 @@
 >
 > ⏸️ **PAUSED — Laya-judge track (verdict stands).**
 >
-> laya-mcp had a good idea (local, typed judgment calls for coding agents), but the underlying models are not at the required level yet. After 8 build phases plus 4 independent live-measurement spikes (GPU), we found:
+> laya-mcp had a good idea (local, typed judgment calls for coding agents), but the underlying models are not at the required level yet. After 8 build phases plus 6 independent live-measurement spikes, we found:
 >
 > - Model signals are **uncalibrated and often non-discriminative** — no prompt, fusion, routing, or post-hoc fix moved judgments with cutoffs held fixed (formal bound proven, not just observed).
 > - Accuracy **below usable level** on key primitives (gate, screen, classify) measured live.
 > - Upstream weight updates were **README-only** (byte-identical weights); SDK churn changed nothing measurable.
-> - No open alternative beat the baseline: Needle (overconfident), mDeBERTa (worse or vacuous), bge-reranker (exact tie, zero diversity), fresh Laya weights/SDK (no diffs).
+> - No open alternative beat the baseline: Needle (overconfident), mDeBERTa (worse or vacuous), bge-reranker (exact tie, zero diversity), fresh Laya weights/SDK (no diffs), Strands Decider 2B (loses r1 gate/screen, wins v2-classify zero-shot), vllm-sr d3-nano (breaks v2-gate 16/22 zero-shot, loses r1 composed) — all measured live, none adopted (see `EVALUATION.md` §13, `odd/tasks/spike-decider2b.md`, `odd/tasks/spike-d3nano.md`).
 >
 > Evidence: `EVALUATION.md`, `FINAL_REPORT.md`, `evals/results/`. Paused until a genuinely better local decision model appears — the architecture built here (Perception → Evidence → Policy → Decision, fully tested) is ready to resume on top of it.
 
@@ -55,8 +55,8 @@ generation, nothing to parse, nothing to hallucinate.
 
 - 🧠 **Laya** ([NandhaKishorM/laya](https://huggingface.co/convaiinnovations/laya),
   Apache 2.0) — `choice` / `score` / `noul` answers from a local
-  checkpoint, trained with RLCD so honest probabilities are the only
-  way to maximize reward. CPU-friendly (no GPU needed); per-call
+  checkpoint, trained with RLCD; outputs are typed signals with explicit decisions,
+  never calibrated probabilities (see `EVALUATION.md` §6). CPU-friendly (no GPU needed); per-call
   latency depends on hardware — the doctor assumes ~200 ms/call on
   CPU as a planning estimate (`py/doctor.py:227`), not a measurement.
   No live latency figure is claimed here; the only timed numbers in
@@ -76,8 +76,9 @@ generation, nothing to parse, nothing to hallucinate.
 - 💸 **$0, self-hosted, private.** No API keys, no per-token billing, no
   data egress. CPU-friendly.
 - 🔌 **Optional by design.** If the servers are down — or never
-  installed — your agent works exactly as before. Only the
-  `laya_capabilities` discovery tool stays advertised (so hosts can
+  installed — your agent works exactly as before. Only the three
+  backend-independent tools (`laya_capabilities`, `laya_escalations`,
+  `laya_redact` with caller findings) stay advertised (so hosts can
   tell MCP-alive/backend-down apart from MCP-dead),
   zero crashes, zero slowdowns.
 
@@ -198,6 +199,8 @@ get all twelve back.
 | `laya_extract` | Field values as verbatim substrings — via your regex **or** GLiNER spans (`source: auto`, the default). Entity mode returns `[start:end]` offsets and forces the fine-tuned judge. Optional `top_k`/`max_candidates`/`min_gliner_score` narrow the per-field candidates (defaults = legacy first-20); the response reports `truncated` + `dropped`. | Laya `choice` over matches/spans |
 | `laya_review` | Diff scored 0–2 on correctness, spec match, test gap, blast radius + `safe_to_apply`. Call it before declaring any task done. | Laya `score` + `noul` |
 | `laya_gate` | Completion gate: `laya_review` plus every "tests pass"-style claim verified against evidence. Contradicted claims escalate. | combined |
+| `laya_escalations` | Human-reviewable sink for abstentions: `log`/`list`/`ack` escalations to a local JSONL file instead of guessing. Needs no backend. | local file sink |
+| `laya_redact` | Deterministic redaction of spans (caller `findings`, or `detect` auto-detect via the GLiNER sidecar). Unicode code points, overlap-safe. Needs no backend with caller findings. | pure transform |
 | `laya_capabilities` | Live capability discovery: backend model inventory, readiness, GLiNER sidecar state, servable tools, policy registry, feature flags. Always advertised, even when the backend is down. | observe (no judgment) |
 
 Every response carries `latency_ms`, and Laya answers include the
@@ -242,7 +245,8 @@ flowchart LR
 ```
 
 When a backend is unreachable the MCP server degrades instead of
-failing: only `laya_capabilities` (discovery + diagnosis) is advertised if
+failing: only the three backend-independent tools (`laya_capabilities`,
+`laya_escalations`, `laya_redact` with caller findings) are advertised if
 `laya-server` is down; regex fallback (with a note) and a clear error for
 `laya_pii` if the sidecar is down.
 Every call has a hard timeout, so the agent never hangs.
@@ -399,7 +403,7 @@ from code truth; the legacy `mode: "observe"` field is untouched
 ## Evaluation
 
 What `evals/` measures — and what it cannot — is defined in
-[`EVALUATION.md`](EVALUATION.md): 11 suites × 8 cases (88 golds) run
+[`EVALUATION.md`](EVALUATION.md): 11 suites, 98 cases (stub) run
 against the real handlers with deterministic oracle stubs (no live
 backend, no models, no network). Scores confirm harness plumbing
 under the stub ceiling; nothing transfers to backend quality.
@@ -409,7 +413,8 @@ gated protocol only (`EVALUATION.md` §8, `evals/integration.mjs
 --mode live` refuses without its five live requirements).
 
 ```bash
-node evals/run.mjs            # 88-case harness smoke
+npm test                     # full offline battery (typecheck, build, T3-T6, redact, policy, stub 98/98, r1 158/158, offline sh)
+node evals/run.mjs            # 98-case harness smoke
 node evals/score.mjs          # metrics report
 node evals/bench.mjs          # benchmark tables (absolutes)
 node evals/integration.mjs    # stub protocol run (4/4 vs oracle golds)
@@ -486,7 +491,7 @@ zero-shot entity spans, relations, PII/secrets, multi-label
 classification — no regex required. What changes when it's up:
 
 - `laya_extract` uses spans (with offsets) instead of patterns;
-- `laya_pii` appears as the 12th tool;
+- `laya_pii` appears (11th registered tool, first sidecar-gated one);
 - `doctor.sh` gains 4 GLiNER checks including a live Spanish smoke test.
 
 Sidecar down or never installed? `laya_pii` simply isn't advertised and
@@ -577,7 +582,7 @@ Opt-in deep checks (Fase 8; real data only, never invented —
 ```bash
 $HOME/laya-mcp/doctor.sh --models     # live GET /models, or config+disk when down (revisions never invented)
 $HOME/laya-mcp/doctor.sh --policy     # effective LAYA_MODE*/LAYA_POLICY_* env verbatim + validity (registry stays TS-only)
-$HOME/laya-mcp/doctor.sh --mcp        # boot dist/index.js over stdio: initialize + tools/list (backend down honestly yields [laya_capabilities])
+$HOME/laya-mcp/doctor.sh --mcp        # boot dist/index.js over stdio: initialize + tools/list (backend down honestly yields the 3 backend-independent tools)
 $HOME/laya-mcp/doctor.sh --benchmark  # live `node evals/bench.mjs --json`, else the versioned evals/results/v1 run with provenance
 ```
 
@@ -669,7 +674,7 @@ HTTP endpoints, or wrap via your own extension (see Pi docs).
 
 - **Three independent layers**: MCP server (Node stdio) → Python HTTP
   sidecars → local models. Any layer restarts without touching the others.
-- **No silent degradation**: unreachable backend ⇒ zero tools advertised
+- **No silent degradation**: unreachable backend ⇒ only the three backend-independent tools advertised
   (or regex fallback with a note, or a clear error) — never a hang.
 - **Hard timeouts everywhere**; structured `{isError: true}` failures
   with recovery hints.
