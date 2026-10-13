@@ -1,0 +1,24 @@
+{"id": "dist-b4-en-01", "text": "tests: 2 passed || support ticket volume drops by 30%", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-02", "text": "CI: green || mobile signups double", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-03", "text": "lint: clean || logging now meets SOC 2 audit requirements", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-04", "text": "tests: 10 passed || average task completion time is halved", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-05", "text": "docs review: approved || customer churn goes down", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-06", "text": "staging deploy: succeeded || signup conversion lifts 20%", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-07", "text": "unit tests: 40 passed || million-row exports complete without errors", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-08", "text": "lint: clean || email open rates double", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-09", "text": "lint: clean || the log pipeline parses every line correctly", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-10", "text": "tests: 5 passed || search adoption doubles", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-11", "text": "config: value changed || the change satisfies the insurer security questionnaire", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-12", "text": "docs: link added || incident response time improves", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-01", "text": "tests: 4 passed || los tickets de soporte bajan un 25%", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-02", "text": "CI: verde || los clics erróneos se reducen", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-03", "text": "revisión de docs aprobada || la tasa de rebote baja", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-04", "text": "tests: 8 passed || la conciliación contable se acelera", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-05", "text": "tests: 6 passed || se recuperan ventas perdidas", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-06", "text": "lint: verde || todas las URLs generadas son válidas", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-07", "text": "config: valor cambiado || la auditoría multi-región queda sincronizada", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-08", "text": "deploy: exitoso || la entrega de eventos queda garantizada", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-09", "text": "tests: 15 passed || el esquema permite multi-tenant", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-10", "text": "legal: plantilla revisada || la factura cumple la facturación electrónica", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-11", "text": "staging: deploy ok || la activación a 7 días mejora", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-12", "text": "tests: 9 passed || el archivo abre en Excel sin errores", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}

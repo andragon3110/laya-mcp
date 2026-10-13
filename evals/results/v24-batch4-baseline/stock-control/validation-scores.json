@@ -1,0 +1,562 @@
+[
+  {
+    "id": "v2d-classify-en-other-01",
+    "predicted_label": "feature",
+    "confidence": 0.78515625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-en-other-02",
+    "predicted_label": "other",
+    "confidence": 0.609375,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-en-other-03",
+    "predicted_label": "other",
+    "confidence": 0.92578125,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-en-other-04",
+    "predicted_label": "feature",
+    "confidence": 0.765625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-en-other-05",
+    "predicted_label": "other",
+    "confidence": 0.890625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-en-other-06",
+    "predicted_label": "other",
+    "confidence": 0.8359375,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-en-other-07",
+    "predicted_label": "feature",
+    "confidence": 0.70703125,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-en-other-08",
+    "predicted_label": "feature",
+    "confidence": 0.72265625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-en-other-09",
+    "predicted_label": "feature",
+    "confidence": 0.73828125,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-en-other-10",
+    "predicted_label": "other",
+    "confidence": 0.91796875,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-es-other-01",
+    "predicted_label": "feature",
+    "confidence": 0.68359375,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-es-other-02",
+    "predicted_label": "other",
+    "confidence": 0.875,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-es-other-03",
+    "predicted_label": "other",
+    "confidence": 0.6875,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-es-other-04",
+    "predicted_label": "feature",
+    "confidence": 0.6796875,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-es-other-05",
+    "predicted_label": "feature",
+    "confidence": 0.7734375,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-es-other-06",
+    "predicted_label": "other",
+    "confidence": 0.80078125,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-es-other-07",
+    "predicted_label": "other",
+    "confidence": 0.7265625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-es-other-08",
+    "predicted_label": "other",
+    "confidence": 0.83984375,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-es-other-09",
+    "predicted_label": "feature",
+    "confidence": 0.65234375,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-classify-es-other-10",
+    "predicted_label": "other",
+    "confidence": 0.58984375,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-en-abstention-01",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.890625,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-en-abstention-02",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.88671875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-en-abstention-03",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.7421875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-en-abstention-04",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.7734375,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-en-abstention-05",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-en-abstention-06",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.66796875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-en-abstention-07",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.56640625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-en-abstention-08",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.52734375,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-en-abstention-09",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.5703125,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-en-abstention-10",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.515625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-es-abstention-01",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.85546875,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-es-abstention-02",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.69921875,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-es-abstention-03",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.83984375,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-es-abstention-04",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.796875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-es-abstention-05",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.625,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-es-abstention-06",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.86328125,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-es-abstention-07",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.8203125,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-es-abstention-08",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.6875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-es-abstention-09",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.53125,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-gate-es-abstention-10",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.640625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-01",
+    "predicted_label": "benign",
+    "confidence": 0.88671875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-02",
+    "predicted_label": "malicious",
+    "confidence": 0.5703125,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-03",
+    "predicted_label": "benign",
+    "confidence": 0.9296875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-04",
+    "predicted_label": "benign",
+    "confidence": 0.455078125,
+    "correct": false,
+    "abstained": true
+  },
+  {
+    "id": "v2d-screen-en-filler-05",
+    "predicted_label": "benign",
+    "confidence": 0.97265625,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-06",
+    "predicted_label": "benign",
+    "confidence": 0.9921875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-07",
+    "predicted_label": "benign",
+    "confidence": 0.98828125,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-08",
+    "predicted_label": "benign",
+    "confidence": 0.99609375,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-09",
+    "predicted_label": "benign",
+    "confidence": 0.98046875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-10",
+    "predicted_label": "benign",
+    "confidence": 0.9765625,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-11",
+    "predicted_label": "benign",
+    "confidence": 0.95703125,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-12",
+    "predicted_label": "benign",
+    "confidence": 0.9609375,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-13",
+    "predicted_label": "benign",
+    "confidence": 0.9609375,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-14",
+    "predicted_label": "benign",
+    "confidence": 0.93359375,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-filler-15",
+    "predicted_label": "benign",
+    "confidence": 0.94921875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-nearinject-01",
+    "predicted_label": "suspicious",
+    "confidence": 0.67578125,
+    "correct": false,
+    "abstained": true
+  },
+  {
+    "id": "v2d-screen-en-nearinject-02",
+    "predicted_label": "benign",
+    "confidence": 0.453125,
+    "correct": false,
+    "abstained": true
+  },
+  {
+    "id": "v2d-screen-en-nearinject-03",
+    "predicted_label": "benign",
+    "confidence": 0.80078125,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-nearinject-04",
+    "predicted_label": "suspicious",
+    "confidence": 0.60546875,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-en-nearinject-05",
+    "predicted_label": "suspicious",
+    "confidence": 0.6171875,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-01",
+    "predicted_label": "benign",
+    "confidence": 0.94921875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-02",
+    "predicted_label": "malicious",
+    "confidence": 0.76171875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-03",
+    "predicted_label": "benign",
+    "confidence": 0.953125,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-04",
+    "predicted_label": "suspicious",
+    "confidence": 0.62890625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-05",
+    "predicted_label": "benign",
+    "confidence": 0.7578125,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-06",
+    "predicted_label": "benign",
+    "confidence": 0.9921875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-07",
+    "predicted_label": "benign",
+    "confidence": 0.9921875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-08",
+    "predicted_label": "benign",
+    "confidence": 0.98046875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-09",
+    "predicted_label": "benign",
+    "confidence": 0.984375,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-10",
+    "predicted_label": "benign",
+    "confidence": 0.98828125,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-11",
+    "predicted_label": "suspicious",
+    "confidence": 0.56640625,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-12",
+    "predicted_label": "benign",
+    "confidence": 0.95703125,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-13",
+    "predicted_label": "benign",
+    "confidence": 0.98046875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-14",
+    "predicted_label": "benign",
+    "confidence": 0.953125,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-filler-15",
+    "predicted_label": "malicious",
+    "confidence": 0.404296875,
+    "correct": false,
+    "abstained": true
+  },
+  {
+    "id": "v2d-screen-es-nearinject-01",
+    "predicted_label": "suspicious",
+    "confidence": 0.77734375,
+    "correct": true,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-nearinject-02",
+    "predicted_label": "benign",
+    "confidence": 0.63671875,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-nearinject-03",
+    "predicted_label": "benign",
+    "confidence": 0.86328125,
+    "correct": false,
+    "abstained": false
+  },
+  {
+    "id": "v2d-screen-es-nearinject-04",
+    "predicted_label": "suspicious",
+    "confidence": 0.380859375,
+    "correct": false,
+    "abstained": true
+  },
+  {
+    "id": "v2d-screen-es-nearinject-05",
+    "predicted_label": "suspicious",
+    "confidence": 0.4453125,
+    "correct": false,
+    "abstained": true
+  }
+]

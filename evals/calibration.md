@@ -91,3 +91,24 @@ guarantees (each with a regression test in `tests/fase7_t4_metrics.mjs`):
    A null selection yields `winner_probability` null, which is EXCLUDED
    (counted as `null_signal`), never scored as 0. No distribution, no
    calibration slice.
+
+## WS-D tooling (Regulus, 2026-10-12) — `evals/reliability.mjs`
+
+The verdict above still stands for all stub corpora and for r1: no
+probability, no Brier/ECE there, ever. The ONE exception is the Regulus
+validation split, measured with `node evals/reliability.mjs <scores.json>`:
+from per-row `{ predicted_label, confidence, correct }` JSON score files
+(NEVER live model calls) it emits 10-bin reliability diagrams + ECE +
+max-calibration-error + Brier + per-bin counts, with abstained/null-signal
+rows counted in `excluded` (same honesty as `wrongConfident`) and refusal
+(exit 2) on empty or all-excluded input instead of zeros. Self-test proves
+discrimination: synthetic calibrated ECE 0.000 vs overconfident 0.400 vs
+underconfident 0.300 (`--self-test`). ECE/Brier may be claimed on the
+validation split ONLY (never r1, never stub runs), fed by WS-E with r3i and
+regulus-v1 validation scores for the WS-C objective comparison. Single
+temperature T (correctness-logit scaling, NLL fit) is fit on validation via
+`--fit-temperature --fit-data-id <id> [--save-temp <file>]` producing
+`{ T, fit_data_id }`, and applied via `--apply-temperature <temp.json>`;
+every calibrated number is reported with its fit data id. No model is
+certified as calibrated by this plumbing — it only makes miscalibration
+measurable.

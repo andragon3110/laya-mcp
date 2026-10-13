@@ -1,0 +1,113 @@
+{
+  "model": "regulus-v6",
+  "lineage": "r3i",
+  "base_repo": "knowledgator/gliclass-multilang-mini",
+  "lr": 2e-05,
+  "epochs": 2,
+  "abort_bar": 0.3,
+  "weight": 1,
+  "seed": 20261016,
+  "batch_size": 8,
+  "max_length": 1024,
+  "objective": "idk-focal manual torch loop (AbstentionHead + ft.idk_loss.idk_loss base='focal'; no transformers.Trainer: accelerate absent from py/.venv-ft, dependency install unauthorized)",
+  "init_exception": "WS-E v5 round (parent 2026-10-12, approved): init from v2-pinned checkpoint (continuation; r3i still absent); lineage tag stays r3i per naming decision",
+  "abstention_cost": 0.05,
+  "micro_batch_size": 4,
+  "checkpoint": "artifacts-ft/regulus-v2-pinned/checkpoint",
+  "watchdog_secs": 1200,
+  "max_text_chars": 8000,
+  "smoke_only": false,
+  "idk_bias_init": -2.2,
+  "idk_q_init": 0.09975048911968513,
+  "mix": [
+    "artifacts-ft/mix-regulus-v6/kb-b1-nli-core.jsonl",
+    "artifacts-ft/mix-regulus-v6/kb-b2-anli.jsonl",
+    "artifacts-ft/mix-regulus-v6/kb-b3-verify-contrast.jsonl",
+    "artifacts-ft/mix-regulus-v6/kb-b4-fever.jsonl",
+    "artifacts-ft/mix-regulus-v6/kb-b5-screen.jsonl",
+    "artifacts-ft/mix-regulus-v6/kb-b6-classify.jsonl",
+    "artifacts-ft/mix-regulus-v6/kb-b7-silence.jsonl",
+    "artifacts-ft/mix-regulus-v6/batch4-train.jsonl",
+    "artifacts-ft/mix-regulus-v6/anchors-train.jsonl",
+    "artifacts-ft/mix-regulus-v6/gate-v3-train.jsonl"
+  ],
+  "eval_ids": "artifacts-ft/mix-regulus-v6/eval-ids-train.txt",
+  "run_dir": "artifacts-ft\\run-20261013T054525Z-regulus-v6",
+  "forbidden": "weight>1, init-from-base/stock, eval-ids-in-mix, tuning-on-r1",
+  "dry_run": false,
+  "confirm": true,
+  "manifest": [
+    {
+      "file": "artifacts-ft/mix-regulus-v6/kb-b1-nli-core.jsonl",
+      "sha256": "9fbf8afdf5e078f6fe1a3d6cbb90374c3e7132fa69970397d380b32532df1539",
+      "rows": 900,
+      "kept": 900,
+      "dropped_eval_ids": 0
+    },
+    {
+      "file": "artifacts-ft/mix-regulus-v6/kb-b2-anli.jsonl",
+      "sha256": "fa0ce01dc88d3cef302a630158259a86d85f98522a7c88dfa439da99408efeba",
+      "rows": 600,
+      "kept": 600,
+      "dropped_eval_ids": 0
+    },
+    {
+      "file": "artifacts-ft/mix-regulus-v6/kb-b3-verify-contrast.jsonl",
+      "sha256": "e843c01856ba85310d3e623821d2b57137a04214c3e9541dac900ca23ce002cf",
+      "rows": 700,
+      "kept": 700,
+      "dropped_eval_ids": 0
+    },
+    {
+      "file": "artifacts-ft/mix-regulus-v6/kb-b4-fever.jsonl",
+      "sha256": "b89b6bc725769de941966f12261011ac35aabcd9639f0ef9e69e18c4d68ab7fe",
+      "rows": 900,
+      "kept": 900,
+      "dropped_eval_ids": 0
+    },
+    {
+      "file": "artifacts-ft/mix-regulus-v6/kb-b5-screen.jsonl",
+      "sha256": "16eb36ccaab8123969ecfe3a179f6c3165cb7206da8aa22041182ea35bc0ab83",
+      "rows": 760,
+      "kept": 760,
+      "dropped_eval_ids": 0
+    },
+    {
+      "file": "artifacts-ft/mix-regulus-v6/kb-b6-classify.jsonl",
+      "sha256": "640eba32890fdb41db796c738987bba250c7c4bc71f5c136a79d9849973bae41",
+      "rows": 580,
+      "kept": 580,
+      "dropped_eval_ids": 0
+    },
+    {
+      "file": "artifacts-ft/mix-regulus-v6/kb-b7-silence.jsonl",
+      "sha256": "432908de785e6160e6fd97458313581383efce9139f269d5e754427564c5f918",
+      "rows": 102,
+      "kept": 102,
+      "dropped_eval_ids": 0
+    },
+    {
+      "file": "artifacts-ft/mix-regulus-v6/batch4-train.jsonl",
+      "sha256": "40413e7b97995e2773c1e349f3d9c3db77b43ed0caf6e68b0693020bcd04a397",
+      "rows": 104,
+      "kept": 24,
+      "dropped_eval_ids": 80
+    },
+    {
+      "file": "artifacts-ft/mix-regulus-v6/anchors-train.jsonl",
+      "sha256": "2efe240afacd81a57b3a5f0d90cd8dc91353e97725fc5072898bcf202b70f738",
+      "rows": 570,
+      "kept": 570,
+      "dropped_eval_ids": 0
+    },
+    {
+      "file": "artifacts-ft/mix-regulus-v6/gate-v3-train.jsonl",
+      "sha256": "e6ed5790627a883d9c2877ec0811bd09d73902e5ff28157f9774867bf25a8b96",
+      "rows": 50,
+      "kept": 50,
+      "dropped_eval_ids": 0
+    }
+  ],
+  "mix_rows": 5186,
+  "quarantined": []
+}

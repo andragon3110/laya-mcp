@@ -1,7 +1,7 @@
 # MCP Contract — laya-mcp
 
 This document is the typed MCP contract for the `laya-mcp` server:
-protocol version, SDK, the 12 advertised tools with their input/output
+protocol version, SDK, the 14 advertised tools with their input/output
 shapes, the `tools/call` output convention, envelope versioning, and
 compatibility guarantees. Every claim below is verified against the
 shipped code and its contract batteries
@@ -47,16 +47,16 @@ plus the Fase 6 additions (`tests/fase6_t3_trace_metrics.mjs`,
 
 ## 3. Tools (14)
 
-Twelve tools carry read-only annotations
+Thirteen tools carry read-only annotations
 (`{readOnlyHint: true, destructiveHint: false, idempotentHint: true}`,
 shared `READONLY_TOOL_ANNOTATIONS` in `src/tool.ts:53-57`;
 `openWorldHint` deliberately omitted — the tools reach a local HTTP
 backend and the server claims nothing about world scope). Every judgment tool is
-read-only inference: no side effects, no mutation. The thirteenth tool,
-`laya_escalations`, is the announced exception: a local abstention sink
+read-only inference: no side effects, no mutation. The one exception,
+`laya_escalations`, is the announced non-read-only tool: a local abstention sink
 (append-only JSONL, `log`/`list`/`ack`) with
 `{readOnlyHint: false, destructiveHint: false, idempotentHint: false}`
-(`src/tools/escalations.ts`). The fourteenth, `laya_redact`, keeps
+(`src/tools/escalations.ts`). `laya_redact` keeps
 read-only annotations (a pure transform modifies nothing) but is not a
 judgment: it deterministically redacts caller-supplied spans
 (`src/tools/redact.ts`, §3.1).
@@ -364,7 +364,7 @@ working):
    keys (it previously carried the bare handler payload).
 4. Unknown/malformed tool arguments keep resolving to `isError` with
    builder vocabulary (unchanged semantics; now additionally covered by
-   the T6 malformed-args battery for all 12 tools).
+   the T6 malformed-args battery for all 14 tools).
 
 ## 10. Fase 6 additions (also `minor`, also non-breaking)
 

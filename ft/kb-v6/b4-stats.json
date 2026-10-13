@@ -1,0 +1,671 @@
+{
+ "drops": [
+  {
+   "id": "fever-179627",
+   "reason": "denylist-claim"
+  },
+  {
+   "id": "fever-90074",
+   "reason": "denylist-claim"
+  },
+  {
+   "id": "fever-211886",
+   "reason": "denylist-claim"
+  },
+  {
+   "id": "fever-9363#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-205553#es",
+   "reason": "mt-reverify:back-jacc:0.287"
+  },
+  {
+   "id": "fever-218496#es",
+   "reason": "mt-reverify:back-jacc:0.287"
+  },
+  {
+   "id": "fever-38034#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-205752#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-216229#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-195671#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-121803#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-137910#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-139081#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-77152#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-12963#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-57174#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-3140#es",
+   "reason": "denylist:bater\u00eda"
+  },
+  {
+   "id": "fever-216455#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-12281#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-180958#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-21019#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-149877#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-133530#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-139588#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-104779#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-193236#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-42566#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-66071#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-54106#es",
+   "reason": "mt-reverify:back-jacc:0.287"
+  },
+  {
+   "id": "fever-63078#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-194853#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-67795#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-178620#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-36137#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-44322#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-171407#es",
+   "reason": "mt-reverify:back-jacc:0.254"
+  },
+  {
+   "id": "fever-187241#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-100922#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-73398#es",
+   "reason": "mt-reverify:back-jacc:0.285"
+  },
+  {
+   "id": "fever-117720#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-100688#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-3962#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-181084#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-28214#es",
+   "reason": "mt-reverify:back-jacc:0.258"
+  },
+  {
+   "id": "fever-129323#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-132565#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-162162#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-200072#es",
+   "reason": "mt-reverify:back-jacc:0.161"
+  },
+  {
+   "id": "fever-223877#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-226903#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-138463#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-196093#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-108550#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-162177#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-55296#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-215194#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-12288#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-59814#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-184016#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-20534#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-2078#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-106727#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-124285#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-120032#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-159398#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-143590#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-160937#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-196834#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-196885#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-138101#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-789#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-106630#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-144651#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-219634#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-87631#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-204917#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-3405#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-100963#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-125435#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-153264#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-102785#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-124070#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-14714#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-174929#es",
+   "reason": "mt-reverify:back-jacc:0.243"
+  },
+  {
+   "id": "fever-149012#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-93517#es",
+   "reason": "mt-reverify:back-jacc:0.283"
+  },
+  {
+   "id": "fever-220306#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-40729#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-54487#es",
+   "reason": "mt-reverify:back-jacc:0.294"
+  },
+  {
+   "id": "fever-129786#es",
+   "reason": "mt-reverify:back-jacc:0.274"
+  },
+  {
+   "id": "fever-51112#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-216899#es",
+   "reason": "denylist:todos los idiomas"
+  },
+  {
+   "id": "fever-8238#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-43186#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-90564#es",
+   "reason": "denylist:bater\u00eda"
+  },
+  {
+   "id": "fever-145217#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-128444#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-198468#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-163729#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-14054#es",
+   "reason": "mt-reverify:back-jacc:0.295"
+  },
+  {
+   "id": "fever-133809#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-6986#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-140314#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-219218#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-137432#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-45150#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-23621#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-224547#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-109619#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-41489#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-192269#es",
+   "reason": "mt-reverify:back-jacc:0.300"
+  },
+  {
+   "id": "fever-109425#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-222710#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-90547#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-76064#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-142442#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-102148#es",
+   "reason": "mt-reverify:back-jacc:0.296"
+  },
+  {
+   "id": "fever-9875#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-131076#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-52355#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-135072#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-149240#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-105003#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-87901#es",
+   "reason": "mt-reverify:back-jacc:0.239"
+  },
+  {
+   "id": "fever-126073#es",
+   "reason": "denylist:facturaci\u00f3n"
+  },
+  {
+   "id": "fever-214394#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-143258#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-20941#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-90005#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-144805#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-115429#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-160945#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-111529#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-114852#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-156871#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-51951#es",
+   "reason": "mt-reverify:back-jacc:0.294"
+  },
+  {
+   "id": "fever-141941#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-148101#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-96406#es",
+   "reason": "mt-reverify:back-jacc:0.256"
+  },
+  {
+   "id": "fever-183845#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-36568#es",
+   "reason": "denylist:bater\u00eda"
+  },
+  {
+   "id": "fever-146016#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-163535#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-113391#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-63932#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-110688#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-188535#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-142181#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-42453#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-124003#es",
+   "reason": "mt-reverify:back-jacc:0.285"
+  },
+  {
+   "id": "fever-127530#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-199977#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-126703#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-46226#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-40120#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-166354#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-31342#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-111538#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-6330#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-56074#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-228547#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-140696#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-50862#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-172809#es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "fever-217142#es",
+   "reason": "mt-reverify:back-jacc:0.291"
+  }
+ ],
+ "seed": 606104,
+ "license": "CC-BY-SA-3.0",
+ "over_quota_unused": 38,
+ "total": 900,
+ "en": 600,
+ "es": 300,
+ "pairs_mined": 53
+}

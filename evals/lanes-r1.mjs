@@ -9,16 +9,24 @@
  * backend payloads into answer shapes the REAL handlers already judge.
  *
  * Lane coverage:
- *   classify <- { laya, d1, gliclass }
- *   screen   <- { laya, d1, policylm, gliclass }
- *   gate     <- { laya, d1, gliclass }
- *   rerank   <- { laya, qwen, gte, gliclass }
- *   find     <- { laya, qwen, gte, d1-choice }
+ *   classify <- { laya, d1, gliclass, arc, zesyde, thx }
+ *   screen   <- { laya, d1, policylm, gliclass, arc, zesyde, thx }
+ *   gate     <- { laya, d1, gliclass, arc, zesyde, thx }
+ *   rerank   <- { laya, qwen, gte, gliclass, arc, zesyde, thx }
+ *   find     <- { laya, qwen, gte, d1-choice, arc, zesyde, thx }
  *
  * Ports (CPU sidecars): laya :8765 (lane wired, weights NOT downloaded --
  * dry-shape check only, never started here), qwen-rerank :8768, d1 :8769,
  * gliclass :8770, policylm :8771 (runs under py/.venv-r1-policylm, noted
  * not changed), gte :8773.
+ *
+ * bench-ronda3 G1 (R3T3): arc :8774, zesyde :8775, thx :8776 (group venv
+ * py/.venv-r3g1; laya :8765 baseline unmodified). G1 lanes reuse the r3a
+ * L1/L2 methodology verbatim (same POST /predict contract, same
+ * argmax->handler-band magnitudes, same omission routing); see
+ * G1ChoiceClient for the per-model mapping doc. Both G1 routing taus are
+ * OFF (first-measurement pin; the gliclass screen tau does not transfer
+ * across score scales).
  *
  * Opt-in/probe/refusal vocabulary (same as live-client.mjs, never silent
  * stub): each lane probes /ready + /models via probeSidecar and refuses
@@ -94,11 +102,11 @@ const repoRoot = path.join(here, "..");
 
 /** Lane -> capable backends (T6b matrix rows). */
 export const LANES = {
-  classify: ["laya", "d1", "gliclass"],
-  screen: ["laya", "d1", "policylm", "gliclass"],
-  gate: ["laya", "d1", "gliclass"],
-  rerank: ["laya", "qwen", "gte", "gliclass"],
-  find: ["laya", "qwen", "gte", "d1-choice"],
+  classify: ["laya", "d1", "gliclass", "arc", "zesyde", "thx"],
+  screen: ["laya", "d1", "policylm", "gliclass", "arc", "zesyde", "thx"],
+  gate: ["laya", "d1", "gliclass", "arc", "zesyde", "thx"],
+  rerank: ["laya", "qwen", "gte", "gliclass", "arc", "zesyde", "thx"],
+  find: ["laya", "qwen", "gte", "d1-choice", "arc", "zesyde", "thx"],
 };
 
 /** Fixed-port defaults for the non-laya sidecars (T6a scope: only the laya
@@ -110,6 +118,9 @@ export const BACKEND_DEFAULT_URLS = {
   gliclass: "http://127.0.0.1:8770",
   policylm: "http://127.0.0.1:8771",
   gte: "http://127.0.0.1:8773",
+  arc: "http://127.0.0.1:8774",
+  zesyde: "http://127.0.0.1:8775",
+  thx: "http://127.0.0.1:8776",
 };
 
 /** Backend key -> sidecar service name for probe records. */
@@ -120,6 +131,9 @@ const BACKEND_SERVICE = {
   gliclass: "gliclass-server",
   policylm: "policylm-server",
   gte: "gte-server",
+  arc: "arc-decide-server",
+  zesyde: "zesyde-server",
+  thx: "thx-server",
 };
 
 const backendKeyOf = (backend) => (backend === "d1-choice" ? "d1" : backend);
@@ -134,6 +148,37 @@ const backendKeyOf = (backend) => (backend === "d1-choice" ? "d1" : backend);
  * single caller every suite invoke flows through.
  */
 export const LANE_CALL_TIMEOUT_MS = 600000;
+
+/**
+ * bench-ronda3 G1 (R3T3): uniform lane caller budget for the G1 live
+ * matrix. G1 sidecars answer in 31-126ms warm on CPU (spike S2), so every
+ * G1 lane gets the same 60000ms (60s) budget -- the task-mandated CPU
+ * timeout budget, identical for arc/zesyde/thx AND the laya-multilingual
+ * baseline in every table. Same budget for everyone; a timeout is DATA
+ * (recorded per case), never a quality failure. Applied via the optional
+ * lanePredictFactory override (the 600s LANE_CALL_TIMEOUT_MS default above
+ * is untouched, so r1/r3a callers stay byte-identical).
+ */
+export const G1_CALL_TIMEOUT_MS = 60000;
+
+/** G1 backends (bench-ronda3 group 1, one isolated venv py/.venv-r3g1). */
+export const G1_BACKENDS = ["arc", "zesyde", "thx"];
+
+/**
+ * bench-ronda3 G1 Track B: abstention-routing thresholds over RAW POST
+ * margins, NULL/OFF = pure-argmax first measurement (the r3a precedent:
+ * the first measurement replicates argmax behavior with routing OFF;
+ * tuning is Fase-2 work on validation data, NEVER on r1/v2). The screen
+ * tau=0.2 validated for GLiClass score distributions (seed-42 eval-split,
+ * never r1) does NOT transfer to G1 backends -- their margins live on
+ * different scales (arc/thx sharp ~0.99, zesyde soft ~0.43-0.70 on the
+ * smoke probe), so applying it would be tuning-by-proxy. Both G1 taus
+ * stay OFF; per-case rows carry raw scores + margins so Fase-2 can design
+ * per-backend taus from evidence. Omit-on-ABSTAIN/null stays ON (existing
+ * handler missing-signal path: ABSTAIN verdict / ESCALATE, never a guess).
+ */
+export const G1_GATE_MARGIN_TAU = null;
+export const G1_SCREEN_MARGIN_TAU = null;
 
 /**
  * Base URL for a lane x backend. laya lanes honor LAYA_BENCH_*_URL (with
@@ -331,11 +376,17 @@ export const GLICLASS_SCREEN_PRIOR = { has_substance: 0.9, is_relevant: 0.9 };
 export const GLICLASS_GATE_MARGIN_TAU = null;
 export const GLICLASS_SCREEN_MARGIN_TAU = 0.2;
 
-/** Thin fetch wrapper over gliclass-server POST /predict (classify lane). */
+/** Thin fetch wrapper over gliclass-server POST /predict (classify lane).
+ * Subclass hook: G1ChoiceClient overrides the transport + model tag + taus
+ * (see below); scoring never branches on the model string (verified: no
+ * "gliclass" branch in suites/ or dist/tools/). */
 export class GliclassClient {
   constructor(baseUrl = BACKEND_DEFAULT_URLS.gliclass) {
     this.baseUrl = String(baseUrl).replace(/\/$/, "");
     this.callLog = []; // per-predict POST evidence (reset on each predict entry)
+    this.modelTag = "gliclass";
+    this.gateMarginTau = GLICLASS_GATE_MARGIN_TAU;
+    this.screenMarginTau = GLICLASS_SCREEN_MARGIN_TAU;
   }
 
   async scoreLabels(text, labels, { timeoutMs = 120000 } = {}) {
@@ -382,7 +433,7 @@ export class GliclassClient {
     const keys = Object.keys(questions ?? {});
     this.callLog = [];
     if (keys.length === 0) {
-      return { answers: {}, confidence: {}, routing: {}, model: "gliclass", latencyMs: 0, usage: {} };
+      return { answers: {}, confidence: {}, routing: {}, model: this.modelTag, latencyMs: 0, usage: {} };
     }
     if (keys.some((k) => k.startsWith("class_"))) return this.predictClassify(state, questions, opts);
     if (keys.some((k) => k.startsWith("relevance_"))) return this.predictRerank(state, questions, opts);
@@ -447,7 +498,7 @@ export class GliclassClient {
       for (const s of scores) { if (typeof s.label === "string" && typeof s.score === "number") probabilities[s.label] = s.score; }
       answers[key] = { choice: top.label, probabilities };
     }
-    return { answers, confidence: {}, routing: {}, model: "gliclass", latencyMs, usage: {} };
+    return { answers, confidence: {}, routing: {}, model: this.modelTag, latencyMs, usage: {} };
   }
 
   /**
@@ -479,7 +530,7 @@ export class GliclassClient {
       if (Object.hasOwn(questions, claimKey)) answers[claimKey] = { noul: pair.claim };
       if (Object.hasOwn(questions, refuteKey)) answers[refuteKey] = { noul: pair.refute };
     }
-    return { answers, confidence: {}, routing: {}, model: "gliclass", latencyMs, usage: {} };
+    return { answers, confidence: {}, routing: {}, model: this.modelTag, latencyMs, usage: {} };
   }
 
   /**
@@ -503,13 +554,13 @@ export class GliclassClient {
       // tau -> omit is_injection so the handler ESCALATEs on the missing
       // signal. Null tau = OFF (pure argmax). Never the fixed bands.
       const rawMargin = this.callLog[this.callLog.length - 1]?.margin ?? null;
-      const routed = GLICLASS_SCREEN_MARGIN_TAU !== null && GLICLASS_SCREEN_MARGIN_TAU !== undefined
-        && typeof rawMargin === "number" && rawMargin < GLICLASS_SCREEN_MARGIN_TAU;
+      const routed = this.screenMarginTau !== null && this.screenMarginTau !== undefined
+        && typeof rawMargin === "number" && rawMargin < this.screenMarginTau;
       if (!routed && top !== null && Object.hasOwn(GLICLASS_SCREEN_ARGMAX, top.label)) {
         answers.is_injection = { noul: GLICLASS_SCREEN_ARGMAX[top.label] };
       }
     }
-    return { answers, confidence: {}, routing: {}, model: "gliclass", latencyMs, usage: {} };
+    return { answers, confidence: {}, routing: {}, model: this.modelTag, latencyMs, usage: {} };
   }
 
   /**
@@ -544,7 +595,181 @@ export class GliclassClient {
         if (s && typeof s.score === "number") answers[it.key] = { noul: s.score };
       });
     }
-    return { answers, confidence: {}, routing: {}, model: "gliclass", latencyMs, usage: {} };
+    return { answers, confidence: {}, routing: {}, model: this.modelTag, latencyMs, usage: {} };
+  }
+}
+
+/**
+ * bench-ronda3 G1 (R3T3): choice-sidecar lane client for arc / zesyde /
+ * thx. The three G1 sidecars expose the SAME POST /predict {text, labels}
+ * contract as gliclass-server (scores[] + flagged[] + latency_ms, 413 past
+ * ceiling, single-label answered vs an "other" contrast server-side), so
+ * every adjudication path is inherited VERBATIM from GliclassClient -- the
+ * ONLY overrides are the scoring transport (per-model baseUrl + error
+ * prefix + 60s G1 budget default), the model tag, the routing taus (both
+ * OFF: pure-argmax first measurement, see G1_*_MARGIN_TAU), and the find
+ * lane below (GliclassClient has none: find stays qwen/gte/d1 there).
+ *
+ * Per-model lane mapping (S3 methodology, identical L1/L2 for all three;
+ * the models differ only in weights, never in lane semantics):
+ * - classify: item text vs the criteria keys (incl. explicit "other",
+ *   excl. operator-only "manual_review"), first-max argmax ->
+ *   {choice, probabilities} (v1 has no tie detection, same pin as r3a).
+ * - gate: ONE POST PER CLAIM, text = evidence + " || " + claim, labels
+ *   [SUPPORTED, CONTRADICTED, ABSTAIN]; 3-way argmax -> claim/refute noul
+ *   pair (0.9/0.1 or 0.1/0.9, public claimVerified band center, a priori);
+ *   ABSTAIN-win or null OMITS both keys -> handler ABSTAIN verdict +
+ *   gate_missing_signal ESCALATE. Rubric legs ride the documented lane
+ *   constant (2/2/0.95): no G1 backend has a rubric/safety notion.
+ * - screen: text vs [benign, suspicious, malicious]; argmax -> injection
+ *   noul (malicious 0.92 / suspicious 0.5 / benign 0.1, public block/review
+ *   band centers, a priori); substance/relevance ride the constant-firm
+ *   prior (0.9/0.9, no such notion in a 3-way safety classifier); null
+ *   OMITS is_injection -> handler missing-signal ESCALATE. No margin tau
+ *   (G1_SCREEN_MARGIN_TAU = null): the gliclass-validated 0.2 does not
+ *   transfer across score scales.
+ * - rerank: query-as-text vs shown candidate texts as labels
+ *   (question-key order, index-aligned so duplicate texts tie instead of
+ *   misrouting); raw scores -> {noul} answers; unscored ids OMITTED ->
+ *   handler sorts last + escalates; ties keep input order (stable sort).
+ * - find: query-as-text vs shown candidate FULL texts as labels (id->text
+ *   from state.candidates, criteria text as fallback); index-aligned
+ *   scores map back to the exists choice {choice: topId, probabilities:
+ *   id->score} (S4 qwen/gte template: argmax, first-max on ties); "none"
+ *   is never offered as a label (no G1 backend has a none notion) and is
+ *   never invented -- an empty pool or a null answer OMITS exists so the
+ *   handler takes its none-path (ESCALATE). The 1/N weak-winner baseline
+ *   stays inside the handler, never here.
+ * Abstention routing is lane-side key omission throughout, never null
+ * signals. 413/503 from the sidecar surface as explicit lane errors (the
+ * matrix records `threw`, never a stub order).
+ */
+export class G1ChoiceClient extends GliclassClient {
+  constructor(baseUrl, modelTag) {
+    if (!G1_BACKENDS.includes(modelTag)) {
+      throw new Error(`G1ChoiceClient needs a G1 model tag (${G1_BACKENDS.join("/")}), got ${JSON.stringify(modelTag)}`);
+    }
+    super(baseUrl ?? BACKEND_DEFAULT_URLS[modelTag]);
+    this.modelTag = modelTag;
+    this.gateMarginTau = G1_GATE_MARGIN_TAU;
+    this.screenMarginTau = G1_SCREEN_MARGIN_TAU;
+  }
+
+  async scoreLabels(text, labels, { timeoutMs = G1_CALL_TIMEOUT_MS } = {}) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(`${this.baseUrl}/predict`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        signal: ctrl.signal,
+        body: JSON.stringify({ text, labels }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const detail = typeof body?.detail === "string" ? body.detail : (body?.code ?? res.status);
+        throw new Error(`${this.modelTag}-server POST /predict returned HTTP ${res.status}: ${String(detail).slice(0, 200)}`);
+      }
+      if (!Array.isArray(body.scores)) {
+        throw new Error(`${this.modelTag}-server returned invalid payload (missing scores[])`);
+      }
+      return { scores: body.scores, latencyMs: Number(body.latency_ms ?? 0) };
+    } catch (err) {
+      if (err instanceof Error && err.message.startsWith(`${this.modelTag}-server`)) throw err;
+      throw new Error(err?.name === "AbortError" ? `${this.modelTag}-server timed out after ${timeoutMs}ms` : `${this.modelTag}-server unreachable at ${this.baseUrl}`);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async predict(state, questions, opts) {
+    const keys = Object.keys(questions ?? {});
+    if (keys.length === 0) {
+      return { answers: {}, confidence: {}, routing: {}, model: this.modelTag, latencyMs: 0, usage: {} };
+    }
+    if (Object.hasOwn(questions, "exists")) return this.predictFind(state, questions, opts);
+    return super.predict(state, questions, opts);
+  }
+
+  /**
+   * Duplicate-label guard (lane-side; the py servers are out of scope for
+   * this task). The arc backend builds its choice criteria as a dict, so
+   * duplicate labels collapse to ONE option and the server 500s ("no head
+   * for question 'classify' (choice with 1 options)"); zesyde/thx tolerate
+   * them. Exact-duplicate texts are REAL corpus cases (r1 ambiguous ties:
+   * identical bodies must tie with input order kept, never misroute), so
+   * the lane dedupes: unique labels ride ONE POST, scores expand back
+   * index-aligned (duplicates share the score = an exact tie; first-max
+   * argmax keeps input order, the documented tie pin). callLog records the
+   * labels actually sent plus the dedup counts -- never a silent cut.
+   * No-op when labels are already unique (classify/gate/screen paths and
+   * all non-tie rerank/find cases flow through byte-identical to super).
+   */
+  async postLogged(lane, key, text, labels, opts) {
+    const uniq = [...new Set(labels)];
+    if (uniq.length === labels.length) return super.postLogged(lane, key, text, labels, opts);
+    const { scores: uscores, latencyMs } = await this.scoreLabels(text, uniq, opts);
+    const byLabel = new Map();
+    uscores.forEach((s, i) => {
+      const lab = uniq[i];
+      if (typeof s?.score === "number" && !byLabel.has(lab)) byLabel.set(lab, s.score);
+    });
+    const scores = labels.map((lab) => ({ label: lab, score: byLabel.has(lab) ? byLabel.get(lab) : null }));
+    const top = this.argmax(scores);
+    const topIdx = scores.findIndex((s) => s === top);
+    const rest = scores.filter((s, i) => i !== topIdx && typeof s?.score === "number").map((s) => s.score);
+    this.callLog.push({
+      lane, key, labels: [...uniq],
+      dedup: { sent_unique: uniq.length, expanded: labels.length },
+      scores: scores.map((s) => ({ label: s?.label ?? null, score: typeof s?.score === "number" ? s.score : null })),
+      top: top?.label ?? null, top_score: top?.score ?? null,
+      margin: top === null || rest.length === 0 ? null : top.score - Math.max(...rest),
+      latencyMs,
+    });
+    return { scores, top, latencyMs };
+  }
+
+  /**
+   * Find (S4 qwen/gte template, adapted to a choice POST): the shown
+   * candidate full texts ride as labels in criteria order (excluding the
+   * handler-owned "none" criterion, which is a verdict, not a label);
+   * index-aligned scores map back to {choice: topId, probabilities}.
+   * Empty pool / null answer OMITS exists (handler none-path ESCALATEs).
+   */
+  async predictFind(state, questions, opts) {
+    const query = state?.query;
+    const pool = Array.isArray(state?.candidates) ? state.candidates : null;
+    const criteria = questions?.exists?.criteria ?? {};
+    if (typeof query !== "string" || query === "" || pool === null) {
+      throw new Error(`${this.modelTag} lane unavailable: predictFind only serves find-shaped calls ({query, candidates})`);
+    }
+    const byId = new Map(pool.filter((c) => c && typeof c.id === "string").map((c) => [c.id, String(c.text ?? "")]));
+    const items = [];
+    for (const id of Object.keys(criteria)) {
+      if (id === "none") continue; // handler-owned verdict, never a label
+      const text = byId.get(id);
+      const label = (typeof text === "string" && text !== "") ? text : String(criteria[id] ?? "");
+      if (label === "") continue; // omit -> handler none-path
+      items.push({ id, text: label });
+    }
+    const answers = {};
+    let latencyMs = 0;
+    if (items.length > 0) {
+      const { scores, latencyMs: ms } = await this.postLogged(
+        "find", "exists", query, items.map((it) => it.text), opts);
+      latencyMs += ms;
+      const probabilities = {};
+      items.forEach((it, idx) => {
+        const s = scores[idx];
+        if (s && typeof s.score === "number") probabilities[it.id] = s.score;
+      });
+      const top = this.argmax(items.map((it, idx) => {
+        const s = scores[idx];
+        return s && typeof s.score === "number" ? { label: it.id, score: s.score } : null;
+      }).filter(Boolean));
+      if (top !== null) answers.exists = { choice: top.label, probabilities };
+    }
+    return { answers, confidence: {}, routing: {}, model: this.modelTag, latencyMs, usage: {} };
   }
 }
 
@@ -613,12 +838,13 @@ export class PolicylmClient {
  * rides here for every backend (the three in-module judge clients take
  * { timeoutMs } opts; LayaClient/RerankClient take a scalar timeout).
  */
-export function lanePredictFactory(laneClient) {
+export function lanePredictFactory(laneClient, timeoutMsOverride = null) {
+  const budget = timeoutMsOverride ?? LANE_CALL_TIMEOUT_MS;
   const timeoutArg = (laneClient instanceof D1Client
     || laneClient instanceof GliclassClient
     || laneClient instanceof PolicylmClient)
-    ? { timeoutMs: LANE_CALL_TIMEOUT_MS }
-    : LANE_CALL_TIMEOUT_MS;
+    ? { timeoutMs: budget }
+    : budget;
   return (_answers, capture) => ({
     predict: async (args, questions) => {
       if (capture) capture.questions = questions;
@@ -673,6 +899,10 @@ export async function connectLane(lane, backend, { env = process.env, baseUrl = 
   }
   if (key === "gliclass") {
     const client = new GliclassClient(url);
+    return { probe, deps: { fakeClient: lanePredictFactory(client) } };
+  }
+  if (G1_BACKENDS.includes(key)) {
+    const client = new G1ChoiceClient(url, key);
     return { probe, deps: { fakeClient: lanePredictFactory(client) } };
   }
   if (key === "policylm") {

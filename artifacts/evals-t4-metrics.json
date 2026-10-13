@@ -1,5 +1,11 @@
 {
   "generated": "fase-7 T4 (oracle stub + real handlers; stub ceiling, not backend quality)",
+  "backend": {
+    "mode": "stub",
+    "live": false,
+    "reachable": false,
+    "note": "stub default: oracle answers + real handlers (stub ceiling, not backend quality)"
+  },
   "taus": [
     0.7,
     0.8,
@@ -12,27 +18,51 @@
       "suite": "classify",
       "primitive": "laya_classify",
       "family": "binary",
-      "cases": 8,
+      "cases": 18,
       "abstention": {
-        "total": 8,
+        "total": 18,
         "errors": 1,
-        "scored": 7,
+        "scored": 17,
         "abstained": 1,
-        "abstention_rate": 0.14285714285714285
+        "abstention_rate": 0.058823529411764705
       },
       "decision": {
-        "n": 7,
-        "correct": 7,
+        "n": 17,
+        "correct": 17,
         "accuracy": 1
       },
+      "lang": {
+        "en": {
+          "n": 17,
+          "decision": {
+            "n": 17,
+            "correct": 17,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 17,
+            "correct": 17,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
+      },
       "task": {
-        "n": 7,
-        "correct": 7,
+        "n": 17,
+        "correct": 17,
         "accuracy": 1
       },
       "binary_allow_polarity": {
-        "n": 6,
-        "tp": 6,
+        "n": 16,
+        "tp": 16,
         "tn": 0,
         "fp": 0,
         "fn": 0,
@@ -51,7 +81,7 @@
           0.9,
           0.95
         ],
-        "scored": 7,
+        "scored": 17,
         "excluded": {
           "threw": 0,
           "abstained": 1,
@@ -60,14 +90,14 @@
         "slices": [
           {
             "tau": 0.7,
-            "confident": 5,
+            "confident": 15,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
           },
           {
             "tau": 0.8,
-            "confident": 4,
+            "confident": 14,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
@@ -105,6 +135,30 @@
         "n": 7,
         "correct": 7,
         "accuracy": 1
+      },
+      "lang": {
+        "en": {
+          "n": 7,
+          "decision": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
       },
       "task": {
         "n": 7,
@@ -187,6 +241,30 @@
         "correct": 7,
         "accuracy": 1
       },
+      "lang": {
+        "en": {
+          "n": 7,
+          "decision": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
+      },
       "task": {
         "n": 7,
         "correct": 7,
@@ -255,28 +333,52 @@
       "suite": "screen",
       "primitive": "laya_screen",
       "family": "binary",
-      "cases": 8,
+      "cases": 18,
       "abstention": {
-        "total": 8,
+        "total": 18,
         "errors": 1,
-        "scored": 7,
+        "scored": 17,
         "abstained": 1,
-        "abstention_rate": 0.14285714285714285
+        "abstention_rate": 0.058823529411764705
       },
       "decision": {
-        "n": 7,
-        "correct": 7,
+        "n": 17,
+        "correct": 17,
         "accuracy": 1
       },
+      "lang": {
+        "en": {
+          "n": 17,
+          "decision": {
+            "n": 17,
+            "correct": 17,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 17,
+            "correct": 17,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
+      },
       "task": {
-        "n": 7,
-        "correct": 7,
+        "n": 17,
+        "correct": 17,
         "accuracy": 1
       },
       "binary_allow_polarity": {
-        "n": 6,
-        "tp": 2,
-        "tn": 4,
+        "n": 16,
+        "tp": 5,
+        "tn": 11,
         "fp": 0,
         "fn": 0,
         "accuracy": 1,
@@ -294,7 +396,7 @@
           0.9,
           0.95
         ],
-        "scored": 6,
+        "scored": 16,
         "excluded": {
           "threw": 0,
           "abstained": 1,
@@ -303,21 +405,21 @@
         "slices": [
           {
             "tau": 0.7,
-            "confident": 2,
+            "confident": 7,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
           },
           {
             "tau": 0.8,
-            "confident": 1,
+            "confident": 6,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
           },
           {
             "tau": 0.9,
-            "confident": 1,
+            "confident": 6,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
@@ -348,6 +450,30 @@
         "n": 7,
         "correct": 7,
         "accuracy": 1
+      },
+      "lang": {
+        "en": {
+          "n": 7,
+          "decision": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
       },
       "task": {
         "n": 7,
@@ -430,6 +556,30 @@
         "correct": 7,
         "accuracy": 1
       },
+      "lang": {
+        "en": {
+          "n": 7,
+          "decision": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
+      },
       "task": {
         "n": 7,
         "correct": 7,
@@ -498,27 +648,51 @@
       "suite": "find",
       "primitive": "laya_find",
       "family": "binary",
-      "cases": 8,
+      "cases": 10,
       "abstention": {
-        "total": 8,
+        "total": 10,
         "errors": 1,
-        "scored": 7,
+        "scored": 9,
         "abstained": 4,
-        "abstention_rate": 0.5714285714285714
+        "abstention_rate": 0.4444444444444444
       },
       "decision": {
-        "n": 7,
-        "correct": 7,
+        "n": 9,
+        "correct": 9,
         "accuracy": 1
       },
+      "lang": {
+        "en": {
+          "n": 9,
+          "decision": {
+            "n": 9,
+            "correct": 9,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 9,
+            "correct": 9,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
+      },
       "task": {
-        "n": 7,
-        "correct": 7,
+        "n": 9,
+        "correct": 9,
         "accuracy": 1
       },
       "binary_allow_polarity": {
-        "n": 3,
-        "tp": 3,
+        "n": 5,
+        "tp": 5,
         "tn": 0,
         "fp": 0,
         "fn": 0,
@@ -537,7 +711,7 @@
           0.9,
           0.95
         ],
-        "scored": 3,
+        "scored": 5,
         "excluded": {
           "threw": 0,
           "abstained": 4,
@@ -546,14 +720,14 @@
         "slices": [
           {
             "tau": 0.7,
-            "confident": 2,
+            "confident": 4,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
           },
           {
             "tau": 0.8,
-            "confident": 1,
+            "confident": 3,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
@@ -579,21 +753,45 @@
       "suite": "rerank",
       "primitive": "laya_rerank",
       "family": "ranking",
-      "cases": 8,
+      "cases": 10,
       "abstention": {
-        "total": 8,
+        "total": 10,
         "errors": 1,
-        "scored": 7,
+        "scored": 9,
         "abstained": 2,
-        "abstention_rate": 0.2857142857142857
+        "abstention_rate": 0.2222222222222222
       },
       "decision": {
-        "n": 7,
-        "correct": 7,
+        "n": 9,
+        "correct": 9,
         "accuracy": 1
       },
+      "lang": {
+        "en": {
+          "n": 9,
+          "decision": {
+            "n": 9,
+            "correct": 9,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 9,
+            "correct": 9,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
+      },
       "ranking": {
-        "n": 5,
+        "n": 7,
         "excluded_abstained_or_throw": 3,
         "mrr": 1,
         "ndcg": 1,
@@ -624,6 +822,30 @@
         "n": 7,
         "correct": 7,
         "accuracy": 1
+      },
+      "lang": {
+        "en": {
+          "n": 7,
+          "decision": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
       },
       "task": {
         "n": 7,
@@ -684,22 +906,46 @@
       "suite": "gate",
       "primitive": "laya_gate",
       "family": "agreement",
-      "cases": 8,
+      "cases": 18,
       "abstention": {
-        "total": 8,
+        "total": 18,
         "errors": 1,
-        "scored": 7,
+        "scored": 17,
         "abstained": 0,
         "abstention_rate": 0
       },
       "decision": {
-        "n": 7,
-        "correct": 7,
+        "n": 17,
+        "correct": 17,
         "accuracy": 1
       },
+      "lang": {
+        "en": {
+          "n": 17,
+          "decision": {
+            "n": 17,
+            "correct": 17,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 17,
+            "correct": 17,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
+      },
       "task": {
-        "n": 7,
-        "correct": 7,
+        "n": 17,
+        "correct": 17,
         "accuracy": 1
       },
       "score_agreement": {
@@ -714,30 +960,30 @@
           0.9,
           0.95
         ],
-        "scored": 7,
+        "scored": 16,
         "excluded": {
           "threw": 0,
           "abstained": 0,
-          "null_signal": 1
+          "null_signal": 2
         },
         "slices": [
           {
             "tau": 0.7,
-            "confident": 6,
+            "confident": 11,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
           },
           {
             "tau": 0.8,
-            "confident": 6,
+            "confident": 11,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
           },
           {
             "tau": 0.9,
-            "confident": 5,
+            "confident": 8,
             "wrong_and_confident": 0,
             "rate": 0,
             "conditional_wrong_given_confident": 0
@@ -768,6 +1014,30 @@
         "n": 7,
         "correct": 7,
         "accuracy": 1
+      },
+      "lang": {
+        "en": {
+          "n": 7,
+          "decision": {
+            "n": 7,
+            "correct": 7,
+            "accuracy": 1
+          },
+          "task": {
+            "n": 6,
+            "correct": 6,
+            "accuracy": 1
+          }
+        },
+        "es": {
+          "n": 0,
+          "decision": {
+            "n": 0,
+            "correct": 0,
+            "accuracy": null
+          },
+          "task": null
+        }
       },
       "task": {
         "n": 6,

@@ -1,0 +1,69 @@
+{
+  "gen_seed": 31337,
+  "n_new": 50,
+  "composition": {
+    "gate_SUPPORTED": 44,
+    "other_hold": 6,
+    "en": 25,
+    "es": 25
+  },
+  "eval_universe": {
+    "eval_ids": 244,
+    "anchor_ids": 674,
+    "total_ids": 814,
+    "eval_texts": 316
+  },
+  "prior_mix_texts": 644,
+  "id_overlap": [],
+  "exact_text_overlap_eval": [],
+  "exact_text_overlap_mix": [],
+  "denylist_hits": [],
+  "max_jaccard3_vs_eval": 0.1818,
+  "top5_jaccard_vs_eval": [
+    [
+      "v3a-classify-es-other-03",
+      0.1818
+    ],
+    [
+      "v3a-classify-en-other-03",
+      0.1538
+    ],
+    [
+      "v3a-gate-es-sup-06",
+      0.0714
+    ],
+    [
+      "v3a-gate-en-sup-02",
+      0.0714
+    ],
+    [
+      "v3a-gate-en-sup-16",
+      0.0625
+    ]
+  ],
+  "pairs_above_0.5_vs_eval": [],
+  "max_jaccard3_vs_mix": 0.1,
+  "top5_jaccard_vs_mix": [
+    [
+      "v3a-gate-es-sup-06",
+      0.1
+    ],
+    [
+      "v3a-classify-en-other-03",
+      0.0909
+    ],
+    [
+      "v3a-gate-es-sup-21",
+      0.0556
+    ],
+    [
+      "v3a-gate-en-sup-08",
+      0.0435
+    ],
+    [
+      "v3a-gate-es-sup-22",
+      0.0
+    ]
+  ],
+  "pairs_above_0.5_vs_mix": []
+}

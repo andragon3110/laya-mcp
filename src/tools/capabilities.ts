@@ -165,32 +165,32 @@ export function buildFeatures(): Record<string, unknown> {
 
 /**
  * Measured track numbers (self-reported eval results, versioned with the code).
- * r3i GLiClass track (promoted from r3h 2026-10-10; history in §13),
- * r1 corpus, live CPU — see EVALUATION.md §13 for method and per-version
- * notes. Strings, not floats: agents route on them, they are
+ * regulus-v6 GLiClass track (promoted 2026-10-13, parent-measured v29;
+ * history in §13), r1 corpus, live CPU — see EVALUATION.md §13 for method
+ * and per-version notes. Strings, not floats: agents route on them, they are
  * not probabilities. Updated by hand when a new measured track lands; the
  * test pins every lane string so stale numbers fail loudly.
  */
 export const MEASURED_TRACK = {
-  track: "gliclass-r3i",
-  date: "2026-10-10",
-  corpus: "r1 (60 golds: 48 over r3i lanes + 12 find)",
-  backend: "run-20261010T210220Z-r3i checkpoint, CPU",
-  composed: { decision: "56/60", task: "56/60" },
+  track: "gliclass-regulus-v6",
+  date: "2026-10-13",
+  corpus: "r1 (60 golds: 48 over regulus lanes + 12 find)",
+  backend: "run-20261013T054525Z-regulus-v6 checkpoint, CPU",
+  composed: { decision: "54/60", task: "54/60" },
   lanes: {
     classify: { decision: "12/12", task: "12/12" },
-    gate: { decision: "10/12", task: "10/12" },
-    screen: { decision: "10/12", task: "10/12", abstained: 1 },
+    gate: { decision: "10/12", task: "9/12" },
+    screen: { decision: "8/12", task: "9/12" },
     rerank: { decision: "12/12", task: "12/12" },
     find: { decision: "12/12", task: "12/12", lane: "qwen (parked)" },
   },
   method:
-    "live POST /predict per gliclass lane, argmax adjudication; find lanes " +
-    "from stored qwen/gte manifests (unchanged, parked); screen tau=0.2 " +
-    "from 580 validation rows (never r1); gate routing OFF; fixed magnitudes " +
-    "at public policy centers; raw margins preserved per row",
+    "live POST /predict per regulus lane (read-only CPU :8770, single passes), " +
+    "argmax adjudication; find lanes from stored qwen manifests (parked); " +
+    "abstention cost C=0.05 validation-selected; temperature T=4.16 fit " +
+    "v29-validation; gate routing OFF; raw margins preserved per row",
   standing: "assistive with honest abstention, not autonomous (gate/screen)",
-  evidence: "EVALUATION.md §13, evals/results/v12/, /tmp/v13, /tmp/v14",
+  evidence: "EVALUATION.md §13, evals/results/v29-regulus-v6/",
 };
 
 /** One-line tool summary: full schemas stay on tools/list, this is the digest. */

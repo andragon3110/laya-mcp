@@ -834,3 +834,31 @@ regression. Data-collection templates for
 the trainable gaps in `odd/tasks/phase2-data-templates.md`; first draft
 batch (20, signed 2026-10-10, promoted to `evals/corpus-v2/`) in `odd/tasks/phase2-draft-cases.md`.
 Until then gate/screen are assistive (abstention-first), not autonomous.
+
+### 2026-10-13 — regulus-v6 PROMOTED (v29, KB round)
+
+After v20, five KB-scale rounds ran (v21–v28 intermediate, see
+`evals/results/v24-regulus/` through `v28-regulus-v5/`): 4542 new KB rows
+(b1 NLI 900 + b2 ANLI 600 + b3 verify-contrast 700 + b4 FEVER 900 + b5
+screen 760 + b6 classify 580 + b7 silence 102, ES 41.2%) plus lineage refs,
+continuation-init from the v2-pinned checkpoint, per-row IDK-loss loop,
+abstention cost C=0.05 re-selected on validation-80, temperature T=4.16 fit
+on v29-validation (NLL 0.783→0.680, ECE 0.28 raw, no collapse signature).
+Full recipe in `artifacts-ft/mix-regulus-v6/MIX_README.md`, mix provenance
+in `ft/kb-v6/SOURCES.json`.
+
+Parent-measured (served checkpoint read-only CPU `:8770`, single passes):
+
+| Slice | regulus-v6 | vs predecessor |
+|---|---|---|
+| r1 composed (qwen find) | **54/60 + 54/60** | 50+47 → 54+54, every lane up or held |
+| r1 classify / gate / screen / rerank | 12+12 / 10+9 / 8+9 / 12+12 | all up vs v2-pinned on the never-trained r1 slice |
+| v2 classify | 26/26 dec + 24/26 task | held ≥22 bar |
+| v2 gate | 21/22 dec + 16/22 task | dec PASS; task dip sits on a trained-favored slice (v2-pinned lineage trained v2-80 rows; v6 enforced 0 overlap, maxJ3 0.1667) |
+| v2/batch4 screen | 0/32 + 0/40 structural | unchanged for every GLiClass round (substance leg pinned) |
+
+Verdict PROMOTE on unbiased-floor strict dominance; v2-pinned retained as
+reversion in `artifacts-ft/regulus-v2-pinned/`. Champion pinned in
+`artifacts-ft/CHAMPION.json`; `laya_capabilities.measured` reports this
+track (`gliclass-regulus-v6`). Evidence: `evals/results/v29-regulus-v6/`
+(manifest, metrics, validation-scores, temperature).

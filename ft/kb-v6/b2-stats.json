@@ -1,0 +1,7938 @@
+{
+ "drops": [
+  {
+   "id": "anli-a9ae8aaa-2e72-43d0-9da3-3023d73d7d70",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0e0dcbf6-e040-4c69-a46b-2307b1b2dd58",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-45d2366e-4a2e-4ba4-8024-ecd889aea1ef",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0b35fb11-0a07-4e99-a01e-677a355d0632",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-b954941f-281a-4c87-8055-7e4ee6418c34",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e9eec552-7dee-48bb-aee0-c70580acd0ad",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-1e575b65-b1c0-4b77-b24f-448055101373",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-2284eb86-8bed-4d44-b975-fc523cb43069",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1f5caac8-042c-4667-8b4f-49611f1fd4bc",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-2ef3ab7f-491f-4cb7-8ccf-1bd3761dc7fb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-291a4ff0-1ace-4fad-9bce-f44eb3702f79",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-e5aecb74-b8c4-4754-93ab-d4143b008a34",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c1c11200-5482-461a-b426-099d8e3fbbc1",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-0f8fffc1-dca3-4a39-8181-17e6c1f10063",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-153c9fda-f44e-4298-ba85-cb117123a28a",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-a7291b64-f6d1-49a8-a935-ed7dcb1f03ce",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a2468ca8-b0ef-4e26-9d6a-1cc8f6b63df1",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-e3e39d52-693b-49ab-a018-3dbc049ec675",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-971828d7-c232-4ad6-999f-610516aa3c5d",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-158f26da-7407-4ddb-97cf-ff20edf63356",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-0bd48361-9e92-4989-9e2e-95247f79808f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-231c0cad-83e9-4f75-b4bb-258a93057f4d",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-a2078f27-939c-4725-8f82-580e25a2c394",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-e0a6a5ee-589e-41c8-ba9e-34eb8caefbe4",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-dae15593-023e-4948-93d2-60f978ba9344",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-05d5523e-a622-4552-a7a3-a804fe9f41b7",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5b0ce375-63e0-4f94-b891-7f06dea516e2",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4b12acad-0918-4140-9b8d-6b6a7fdd0bbb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8efe67a8-59f7-47fd-9296-c5b8bd726347",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-1395d01a-e0f3-4fd1-b70e-23316ba50202",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d8e0fcf0-9a91-4aa3-9775-5e58736e4d50",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-fcd61e96-34f9-4fe9-abae-8899046ec343",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-a419ecae-49b4-49ea-b8e1-b586eee8f381",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-fa478bb5-55ee-4496-849a-9e2a16bd0950",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c0f183fc-eac2-4314-b869-5049150b40e1",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-e8fb3e89-a4d2-4fba-8d2d-8ecfa85749d6",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-5bfbd9b4-6c4f-4bd7-b691-8b851f83b860",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-86d40048-0754-430b-95be-ee54995d8ac5",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-25add490-a03e-433f-8e7c-dbc873ed61bc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ec73876a-2139-48d9-8ff3-94b6c6475faa",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5a9fe697-ba51-4004-a240-93892f73c814",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-8e79e269-432d-479d-b130-54640aca5015",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-301808ed-8b28-4bcd-b32e-8d6d5c7cd88f",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-3bf23efb-c976-494f-a1e7-cf097c4b2fb6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-75d2113c-52d6-4b43-88a5-c895591e4caf",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d38365d8-110d-4baf-8852-d439c4cb2e44",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-66cac389-7c09-4402-adb6-5a4c62a22b7d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-29c1b05d-74ce-4d3e-8155-a8b0f8d34759",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-9aaa1b46-37be-4682-bd68-86041a96e28e",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-53bae817-7c9b-438e-a88a-1e40ae5ad5ac",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ebbea27a-8dae-43b1-8338-76bc9c74ceb0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-494c969c-a020-43de-8237-5b8f8c4b8bc6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cbc40f5d-4120-4cee-9730-609f15ce8367",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-4e38341f-1467-477c-886a-d813c8114b6f",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-3024d413-3f9e-4842-a6e6-eeb242b95287",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-45cbd11a-b299-41bb-87cc-a10b463b8df5",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a7e04276-8b17-4418-9b97-74b8e641d2e1",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-df8aa2c7-8975-44ab-89f7-f9fb280198dd",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-99e54ee3-5e63-4903-a582-bed188395442",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-b1340729-5f3e-425e-b7ab-63383e8f15be",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-d5b1cc68-dbbd-482b-baf3-6c2be5fe7e16",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-8fa76b7d-623a-4f01-80b2-1341ac846819",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-9c6ffc41-9424-4f72-94b7-76f766bd9019",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-7ae20ba1-402e-4d92-9a72-116bb2602317",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-dda113d5-81ac-476b-9c1f-8787c7eaf978",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-90b0c0c7-2ae1-4f62-9ff7-b250f43e5356",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-f10d1c04-b896-480c-972a-5e6de6c94d57",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-281b7b12-188b-49f3-bf63-da3c1c823501",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-ec6d70c2-87eb-427c-a4f8-f9481d9e7ae8",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-25a41d19-251b-4268-9972-c964a6e6cf74",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-ded51e17-e6aa-444f-a1f0-33f96e997c20",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-eeb296e7-dfb4-4f21-860c-a7d49472012b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-194c234b-ab10-4774-8ab5-37a5c4d6b1bb",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-75244cdb-9132-48d8-8282-7a0fdc2915cf",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f03a27ae-dcd9-4ce8-a566-1b2662e60f4b",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-bcb6987f-1b35-4b0b-a254-05f664977915",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-618ebbc4-2082-4055-88ed-f402564989f9",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c3ebf8c3-1888-4684-a84e-89bdccd572d9",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-460c8f3d-891f-4d18-b95d-362b577f0d94",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-989faa28-58f1-4df6-86d5-f6b1e79b7a14",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-3f77d60c-6822-4450-80ea-bd5dac582657",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-1a911078-953e-4e2b-809b-d15712326f39",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5bc3377b-8da0-450c-b2b0-79255b519416",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-b770fdb9-3d39-48ff-8786-f8133008faa5",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-82afc890-6920-46a5-890c-5bfd5b90f326",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-83b5c8c1-b7f3-452b-ad4b-622583e67318",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-afc784b9-b3c7-46fe-baf7-e6b4e057b8c1",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-e5618bea-91c1-4561-9114-38035ce274ba",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-249fa0df-7970-41a4-9a21-739c49323c73",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-1312e60a-f8b3-4b82-941a-180ea9b94068",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4829c0eb-a188-4f68-a3d6-ea7e383adbd7",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f97c7964-307e-4b0c-9275-da8b50f719b9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-748055af-dc12-4266-ab0f-21bc9b15765c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5baf1b44-bd23-434c-a897-b18995b37d9e",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-cebd6323-4302-4b0b-b646-22be2167f37e",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-ded7cd30-1590-4c5f-824e-2f1d5c70b134",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-7691a5f8-4828-4e28-bff8-9cfd943abda0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c3c14c37-fd19-48f0-b5af-706736181be8",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-fbe48323-a25f-4c3f-ac12-35c941bfede4",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e180feeb-d357-4512-bdfd-23364ff90ae5",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5bd1ccf6-8199-4be1-b439-b9270a3a3164",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-b0cd2d7d-f70d-4621-87ea-e716769bbe67",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-d1ff06b0-30a8-4030-b882-2927138abb97",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-005bf666-15cf-4810-bfd8-7da9960a1e20",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a660ce72-6d16-4cb2-8e21-9c54c56d0a02",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f61262cf-5234-4b8f-8302-ba60fdc20750",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-439ac50e-58ba-479b-a48d-bb19047ee9f2",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-462a5a31-a001-49d2-bf27-9ed3b575c393",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5ccaeb81-6f0b-4f42-a528-a62819a53080",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-30f70f73-bab3-45b3-80d4-4c0201a6be41",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-31cbc12f-04c6-433e-8e2e-1eeb43beb1f3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cd8fa9c9-8398-4ca9-b842-c9dd8c1b6e7c",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-403363ff-a363-4c8b-9c17-aa04877e1622",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e6d33dae-6d92-4e4d-ba72-2f3b2655da6b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-fd684056-f3ef-493e-ac15-e95df7b6dd6e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c5d3154b-ec8a-4f67-9bb5-27b02446d5ce",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-ee054f4b-6f35-4795-bc9b-73e52796f854",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-322e2bce-99df-417f-8c15-0f374b199579",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-2b1c2dff-4d12-4554-a18f-ff51e0215642",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-fc9da001-e9b7-4e33-a1f0-a27e7cfd18dc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0450e379-e070-452f-a1a0-6949b82dc30f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-94d93b9d-89b2-47c0-8870-0a75acb46ab8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-def22a7e-f585-47ee-8a3c-16da936a28ba",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-3a87f6ee-6bd6-4ee4-8ed9-c1179eb2f74c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-b246daaf-dffd-4826-b47e-97ceaab24bc4",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-6d320c93-2bee-4dfc-98ca-f87f7d945146",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-9adcd3a7-978c-4e22-aead-d12782339a96",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-6a28702b-8d63-48a1-94d0-6875b266846d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-bd5bdbfe-c9a0-43d8-8d9b-3b080b0678aa",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-641c5a27-859e-4cb5-9439-c4c5a2d6f959",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-971d4292-acc9-4250-b7a1-88cecd8a2f22",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-bf1b8c2a-2a98-41ea-969e-f90d768ba1ec",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-8ccdcadd-7916-45f9-bdd8-67ee1477ee0f",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-fdc16abf-ce67-4f25-8430-721b02da38bf",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4b26b114-0f7b-45c5-bc17-e6686570eea4",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e6124337-2425-4bbc-8f96-5716b9f7981b",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-6890da12-0003-4951-b8e3-4d30d14ac860",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f9965a9c-7f5d-4d4a-a918-1bbd44c723df",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-929e9e3f-3f3f-462f-b168-812eb22b3fd4",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-848791ab-1b17-4f78-ab87-13bebed53de3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-55efd914-85ea-4b23-bf47-060f9b52f888",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-31cf9a4c-242f-43b6-ad5c-5458ae41ce2d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-eff0fceb-8c0f-4799-8795-aabea29589be",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c8fd7018-eb7f-492e-92b6-f24f95b13c24",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-956db001-a541-47fa-abf8-6437fa0f0652",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-522bee03-986f-4439-ac9c-2ff2f33ac200",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-1e9f3cc1-4f60-4493-8514-b8c69718c40a",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-1d97b195-6ed9-4c16-82ea-817d8a84a539",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-ba05aee5-07df-468e-80ae-24b2da1cf15e",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-d196f67e-00fa-44ad-b62c-1a284cccc4fd",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0e24f6e4-0d43-40b2-a337-f7913cfa0639",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-31eb3898-fe9d-4b72-9d7b-107d2b89758d",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-5795c533-aa1a-4a87-a2a1-bf77ac8bbfdf",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-671fd7e3-f618-46d6-9de5-2ae765dc9864",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-820575cf-4da6-464e-b56e-8d14da278356",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-387c7b37-0354-4650-a5e9-8b770090ae66",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-c695b9b0-33d5-41d4-8add-962728e9cd88",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-e7986b40-412e-49d5-aeca-fbef441a5982",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ca94e7fb-0265-4663-a164-056bd4d89a24",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e7464d0c-a254-4cd7-8381-8d5c83ccc971",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-55aa7156-d862-4001-bdf2-942ecf36480f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d8e61941-47e5-4fcf-8c31-79c2331ccd08",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-50cb6235-29b5-434f-992c-8cc4757958c5",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f6856cf4-83fc-4b83-bdd7-21bce81deacd",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-ae99c72a-2bba-4d3a-9474-241f6228b897",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-607665d5-9a26-49e4-812f-fa06d3f31ec3",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-854705c1-28c6-4c7e-b9b3-9b4401077b92",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-083d2855-423e-4eb6-bbc6-3407265f82c4",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-3496b017-e50d-41fb-938d-8a6fd1176d26",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d8475f0a-10eb-4ddb-ae39-4045a5fac04b",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-74b2393d-fb5b-4537-a953-276011bdb91c",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-1e80f9d7-171a-40cb-837d-29ccca08a66d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-32775795-7cbb-4b2a-ad3d-5e5536f81b9d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5b597d5c-d9ef-495e-b005-135d4db7797e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-950efae6-6097-40f6-be51-f47773fe838a",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-0c423038-0bfd-4c19-9d03-44b3e8eb7343",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c4e58b18-a79b-4041-9e65-da943e45cb2b",
+   "reason": "denylist:spotify"
+  },
+  {
+   "id": "anli-b58996ff-7362-480a-8cb0-689082485c9d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c18b856d-7732-482f-b94b-e9853278ca0c",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-e0f2b66d-d82a-4a0f-8f04-9e0035b5b845",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a25afc53-db91-42ba-a171-030856ba0c34",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-d40a15a8-65f3-4251-911b-aa26d9915f5e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-69f052a9-8f3d-44e3-9dc4-2e8aa7910a31",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-e2309da9-24ae-4935-b2b7-191f04e967f8",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-37846eaa-0e47-4d7f-96b4-a216745bbc07",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-beaa34ab-482d-460e-8b57-01e18e17c6a9",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-e58da1fc-07e3-4bb5-9553-6b3f0a7520e1",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-0b7dddc7-9a3a-4a9d-8c24-5cb17d241068",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ee42a603-f282-418b-b30f-149968a274da",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-2e9f0787-85af-4091-a154-e4f0dbcb2e1f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-468fa83b-32d1-4995-802d-706f0593feb7",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-697896ed-8e76-41c8-8035-f8eb94a47aac",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-381157ce-7b2d-4659-8252-13fe1597feb2",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-1cc50a9f-9eca-4f8e-a1fe-9fd4c7a7fee3",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-ebeb8a22-678e-4b58-a362-b58aa4e5ad8a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1d429fe4-523f-460a-bc67-7626eafe3234",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-1808fdac-38eb-42e9-b021-656aba7e8469",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-cdbc34df-ec25-4c0d-96b2-579aa15129e3",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-55a9be63-0e45-485a-bb03-3b460b1fe055",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-3cfc53f4-4918-4444-b119-31883ac3d856",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-8cc923c4-79bb-46ae-9192-8f5fbe0be6fc",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-370f3157-c073-4afc-bb24-4325195a39ee",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-898c3436-4264-4174-9e2a-fa6a8e89fe01",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-50b04a6e-d1a8-48ad-84e3-9b2e249c76ae",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f8f80a84-fc43-4434-84fc-116aaa6eebd9",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-12eae097-8a07-4aa2-9849-0771f6382d85",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-a24179eb-22cc-4941-8267-fef2896de898",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-6476e162-ac9d-4a08-94a9-b702a0c113dd",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-8d3b3e37-9afe-441f-bb93-d9ec3b640924",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-108fe156-76e3-4282-8f80-37bb76b73c36",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-81c2f2ce-1c15-40c5-a5c8-e636178fb0cf",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-54474689-ef46-4e60-9bb4-12ab8172dd49",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-f500f1ef-bcad-49bd-b676-c389761ffffb",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-6320d095-81cb-4080-be29-a1ec0e776f66",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-7062a8bf-7751-44a3-9b65-3563f114f9ff",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-51a85dfc-da66-4b07-ac19-cb0506851360",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-e2e639d8-dcc5-4356-bf78-ee2e4e2ea2c0",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-57717751-5654-445c-b06f-b01875a9a86a",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-aa686db6-67a8-4e1f-bbde-f67b86997ffb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-96f2466a-bf03-46e9-9520-a860b0cba2e8",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2d834978-8075-46cd-9867-d814976b6865",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-64914ac2-81d9-4535-b012-8106c1532ab6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-58081321-ce74-47c9-90ef-76db0eaae988",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c1c4c2ed-9ca8-4236-9eee-13ae8550e292",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2b9bc80c-9283-445e-a56d-f6ad0e798a36",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-561bbf61-d996-425a-9767-89f5df82d829",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-530540f5-40f4-4bdc-978e-9a18bedff246",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-44585209-d7c6-4835-b13e-fe88e93082c3",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-e5885eb6-d536-47d7-a4ab-ba6bcf815aaf",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-84551e1c-5aa2-4618-8307-aa2cdff5788c",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-7d046563-f346-4ccd-a351-d9ceb29acffa",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-7856bb97-511f-4606-b7c5-5f7625f47666",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-a9b6c6da-8513-4450-9853-cb7bc94658b8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-949c57b6-ea12-476e-b76b-4025be444967",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-d240918b-aed8-4c23-acdd-3b642827bf64",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-55bdf5e9-d410-411c-9949-2b8ba8b23736",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-2f3bf579-40a8-4017-b4e7-4f4b99d17e44",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-81fd1674-c00b-4c01-828b-246eac174ed0",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-92b01ea4-594e-48c4-ab23-a2dbe73a11cf",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-909f872f-7205-4c5a-938d-08524682fae9",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-b041a372-69ae-4ca2-9fb4-ca08c8bb4269",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-3d108dc8-1d7f-4dea-bf60-6a0e0af2be22",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-cb610cfc-840f-48ae-bbc4-fbd03c0bcaf1",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1163d82a-acb9-4742-b08c-be7df9b51b1b",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-ecd7098c-ff87-4c66-aabf-e3a71ec9fc09",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-3560feae-0448-4de2-8a34-1a6d8e0003ff",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-224054d6-a095-4056-bbff-c7f92850d473",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-de83a922-49ba-4a97-a3da-c9f728e6ff9a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9e87e541-c1b6-4844-9c95-c90ecbb45f9d",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-a899cb7f-f5a9-4219-82a4-3c5e9367678c",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-fe5d1d6e-4729-4305-aa46-3a7083f2d9cb",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-4363adc8-96ed-4566-b2b0-f5da9ba6944a",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-e0cd52d4-6dc1-46da-a8d2-ca6674c206dc",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-be1e5c25-45ff-4df9-9074-53bc65f5f271",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-0b06d616-4ed6-43a9-b646-29b1b4d5a057",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-2830a7a8-d02e-45fa-aa8b-2c8edf8dd03b",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-b19912fb-08f0-4de4-b90a-99cc6d488603",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8b3c8898-10c9-4106-bd40-984434b1e70d",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-2c4fb131-586d-46cd-b9fb-bd918a0ef8c3",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-8e6d6a4c-1bd9-4d71-82d8-c7740250c3d4",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7a25b913-0034-4464-ac6b-ca98971f1af4",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-c7d066f5-9010-48c9-908c-05dff7617dea",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-5b45daa6-5bea-4b62-909a-fa444b7dc5cb",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-4890abd3-0aca-4a78-b214-36534ec38337",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7a0225aa-1382-49b7-a4e8-472a32ae4140",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-4ccca9c2-4f1c-4075-8945-7883f93ff8e5",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-b9a0ded8-83da-468a-943c-bb0eb1443259",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-03b5c088-523a-48a4-bf76-fc21e628543e",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-43d2ac0f-2b4a-4494-a503-4eaead4d9d79",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4a815c6d-54a8-4bc4-beb0-129a1f2ac34b",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-8ec8da41-d4c5-4497-a2cb-68a940b2d16a",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-5b47aba0-620a-4b4e-95cd-492c3fd0875c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-f32f8bea-15b3-4408-85f0-793e00a2487c",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-810d18f7-6c2c-44b6-a149-48c325af1a83",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-fe8d911e-c4ff-4812-8a40-807b43bbc659",
+   "reason": "denylist:spotify"
+  },
+  {
+   "id": "anli-553866ce-5105-4025-ba59-50bb16b094be",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8ee1fa7f-7a21-4c9e-a7ff-255ba3660f45",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-ce25d68f-ca38-4531-b183-e3a282ad0465",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-5984a82e-e359-4602-8f3b-fa7e8ff362b2",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-208e2d97-447c-4b26-b9d0-f1ef0647abeb",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-d0b0810e-3047-49d2-8339-095e75ff1b39",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-37798ac6-1382-469a-aaed-8957baf68a02",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f974f4e2-18f9-45c0-9bc9-119810120bc8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5ab8af38-4b71-4559-9a3d-4e636d98cfa4",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-4d1f19ff-fd35-43ba-880f-9ffd63780862",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-0d116eb6-8047-4337-932d-19618a2b0a94",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-d4188923-05c7-4de7-9e41-ede3a364ed4c",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-117f30de-41ef-4e68-a145-9aa9bd64c994",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b8ccc1eb-3e45-407e-98f7-a758c8ac49a7",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-12943c81-7872-4313-a25a-c2d09ccd04b5",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-4604a5bb-21aa-4322-8232-2f2b9359b0da",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-d1d27dde-5b00-4232-8aab-edf33cbef5f3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-dc95f479-e635-47c4-87b5-11b1c46d8df0",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-6d21e49f-4de7-4658-a466-36eabf71c456",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-669dba62-190b-482c-96bb-2419e2d55928",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-d9da80e4-ab8d-4eae-aecc-d55e51008fdf",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6753ba73-9bdf-46c2-b19f-1076a2761ada",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-b4e2f2bd-90b8-49da-bdfe-b5609146f53f",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-ef99b30f-07a2-491a-9e9a-d17ebaf2b36c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-954b4f82-56aa-4e8d-a090-0b1f53a8cb58",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-b0e1822f-d5d7-48db-82fa-3da5a4c11604",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-45ca620d-95a4-4397-8cf1-10bf4f90700b",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-9474c526-6d1f-41f9-bf8f-57202c737d45",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f56b7034-c2b5-47ae-a656-0617c21f0562",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-9ed1f021-e953-403b-b2e1-60fbb41a88cc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-047fb963-adc6-4709-b1f1-e99b15276f89",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-6d57ae6f-c6b7-4319-858f-b2a241b758c9",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-e1f253f2-e418-44ba-841b-cf2de377b322",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-73150bb7-041e-4615-8e83-70f156a7ea77",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2dd34793-ab29-40b2-b78e-7bcd8b9d6d3f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2f6eece8-3205-4245-8e82-4e44060712c1",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cfc3c04d-d44c-4ee4-bf99-410bdb0764c0",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-65205881-ef54-412b-a42e-557c9186a74c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-1a756c69-3c88-48bd-af60-6439b005b7c1",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-7133b079-43a1-4a8f-9adf-ff4c1698067b",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-76be6d65-dc7a-4554-810e-7ec4c1198ae9",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-a02b7e89-17a0-4841-85d3-c50c6d31edbb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-863f382e-2b2a-467c-9f09-364a7a078cce",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-345d7dd2-3412-4a7b-9efe-189105b1e2d7",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-dee1580e-4151-457d-b063-a1a1973b47f4",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-98ef022e-c386-499d-80e9-744115864b74",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-3dfacf8a-6534-4c78-a460-c81f9a2c9237",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f4c043d0-86df-4708-b58e-8e662e560686",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4d7ca8d0-556a-49e7-b743-97723866f8a0",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5f37e0e8-1ee9-4184-a823-907460012be4",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-8c296da3-8eda-43bb-86da-7d5d21a2d2ac",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-876739a8-4229-4e59-a91a-d6fa43788487",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-78bf69db-c8c4-46da-ae97-aed044a59ba7",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-76dcc663-aa9b-40b3-b706-9820b73b6193",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-99b531c3-13ac-4c4d-afbf-db979fa00af3",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-926e8b6b-c4e2-41b6-90a6-76fe33ba151d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d7c3e889-e8bd-4a98-af1c-8d4903af4a05",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d65e453c-edab-4a22-8e20-7b225ef1e88e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a731e62a-2b0d-4722-8cf0-021517b04cfc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3c2645ce-b5b1-415a-aa8c-e97720d74a6a",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-b0227c46-a733-49bc-92f0-e9dbc3e25dbe",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-9bb2e957-c356-4f75-bf81-f1b20453c172",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-14bf7517-7fcf-437c-ab1e-1ed8be44c7aa",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-d95792b5-9302-4548-9d74-899096708f59",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-80678637-f39d-4251-b0fb-c9aafaf50593",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-48999c2d-dd0f-4a5d-8c7f-3d16404b2ca2",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-b5de923f-313f-4ad0-9419-b3cc2a9c628f",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-00eedd56-6cca-4056-a0fb-b396ea44024d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-1817812b-91d0-41e1-8f8f-e144cbbd51d5",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-6180915a-4241-4a2b-adb4-84ad6864d19f",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-a37d60a1-eb24-48cc-b21b-adba095d7955",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2b042bce-d05d-4e1d-9927-d262e06f3528",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-4cf7671b-852d-4501-9207-ab990762adbd",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-51fd49b3-f10a-4359-8df3-03196c17b1c1",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-88c87f49-063b-4d2c-bb3c-cbb751113fa1",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c4a4de51-b15f-4f05-b87b-8927522ddbd4",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a45d3df7-664b-44e6-a048-766a61120e89",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-6dc7b724-f1be-4984-9a77-b396bc48cea4",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c571006a-2643-4570-a69d-73da2521ddd2",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-1b3a6e24-e45e-4240-8f06-5087af76adef",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-93e5f784-8ad9-4c33-90df-b069e9580da4",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-da604f24-fbc0-455b-b660-3fe3d7f4910f",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-a4391f91-ed46-44d4-8a2e-f524cd617ed4",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-678db3e9-2df3-4dcc-861b-f3ce268bd151",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-8ecf0590-92f9-43b8-8e9c-d924a6e1092d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a0e885f5-d1b5-4bac-880d-c7258ad1db45",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-46bda5f4-b80b-4bb0-8070-273ec7c6ef2e",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-5edeae8a-4de0-4d3d-939c-1379b1068c91",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-f5860c8b-6bcb-4335-ae85-18d1f7200db2",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1829d96b-d7c1-486b-b970-59f9b90233a3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-64d36d3c-ed03-40e2-96c1-96265b51ea8f",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-4bc379e7-53c1-408e-8155-793f0e56a28a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-df658d9f-f706-4624-91ba-97d9866c2fe1",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-079e4d48-918d-46cf-8d6c-1c73f25f7bdd",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e69d4c6d-06f4-4f5d-ae85-b589758d683b",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-3b1f93dc-e2e7-4509-aedc-49334bb30368",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-150da7b7-5a5f-4a2d-bc47-4cce397c2522",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ecc57fbd-b037-4547-8205-18496cd3bd86",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-faeefc3e-07e0-4b1a-9bb6-9efc13665dcb",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-6564ed31-d889-4edc-a135-a05559a26624",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-53101445-c45f-404e-a6be-a1f0fdc7e754",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-bc30f8e4-686c-46bf-a867-8bace26250d3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3146ac67-c6d0-4381-9c64-bb07adf57956",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-ce4ed85d-898a-4ff9-a967-9941b5fc1910",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-d9e58fe7-5d44-4480-902f-1524d08319c4",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-177d71cb-52d1-47f6-9057-2194c23808ed",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-db6e799d-4cd5-459e-b046-bfdd21e60090",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-fbac0af7-20b9-4f88-b6c9-6f617fccbe4b",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-daf50dec-23d9-4df2-a689-e12174636661",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-05706f0c-2fae-4f35-b35d-d57cc9ce4132",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-0d82360b-29f1-4c25-b5cb-2bed12b7f782",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-32676c64-e92b-4eec-a5d6-c953d820f0e9",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-bf1e509d-636e-483f-8eb4-192f04e527ee",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-1656cb7a-901d-4457-980b-1301fda46851",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-dc1639c3-d8bc-474f-bdfc-e56d2ee84049",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-abf4683b-5045-4eb8-a1d4-86f99695729b",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-0ea6d9b2-e067-4a44-9451-19be833ba89c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-be62e838-555c-4967-bd61-893a0424c3e6",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-5bb07e1a-b859-4386-af47-80148a94f79a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-51fb2f92-c1d5-4762-aee9-a7e88a1f9018",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8414fa3e-4fb0-403b-bb54-093fe98e1991",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-354b2b44-2cc5-4392-9e62-275b39be2a2f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-64503ef7-f40c-4884-84d2-de985dddfbab",
+   "reason": "denylist:loading"
+  },
+  {
+   "id": "anli-55e71baf-1d00-4a63-95b2-c5754f083e91",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-fe376586-0f28-49f2-8854-0b3829eb54c9",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-26c9fab1-c6be-4bac-af70-d86ed0b9a6cf",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-54883a9c-887a-4981-a203-14f5fba1f38b",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-dec49b19-ac3d-43fe-8121-f2836f19c1dc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d02271a7-ad4e-4e6d-98e0-092f32af6103",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-eed8d060-7117-4711-ae54-8210974079de",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-76dff850-7b91-4d8b-b55a-9f3a9fd49ada",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-e604b028-6a14-4820-b12a-2c0d0f169a02",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2bd77ccc-5112-464d-a20f-49adb7ff82d1",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-2eafbd71-612a-4b4f-8e3b-5aa6aec4a55e",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-48a28dfd-3070-4896-b391-32f237f9c526",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-98b4a3d5-fe41-427e-91fb-5b6015ef40b2",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-e9171357-e61b-42fc-99b3-a3b428d31442",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-7ad74fb2-723a-43e6-a40b-eb6c3d390e2c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5c68f170-8912-436e-bbc8-6404de6403ab",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-fdd0a2e4-b4cd-4b18-8e94-97c81af712f1",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-6b7e1791-028d-4dba-9096-1135320d89b3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-be0899f0-653a-4f8e-b8e6-d345031c6c40",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-a56f187f-27d9-4d13-8dc5-c43c5617d00d",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-34b658ed-9868-4c99-ae45-3f434200dbe4",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-d2b0264a-f8f8-4d2e-ae85-d938617cb15e",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-7f8dfebb-d25b-467d-a74f-f6e6da4f8832",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-80268813-5c9d-4172-8a54-5f1a96012a6f",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-3db0d7aa-d7e1-4009-8561-c41a2ac9963e",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-033fbd73-0515-4fc2-a5e2-0cea0260048f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9a032816-3492-4ad2-878f-70025ddfab86",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-617739c5-27bd-445c-acfe-beea5745df66",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-daaf0213-9e03-4534-8545-045394bf8ac9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c9a72f0e-8334-42da-a57a-a1e47fbdeb41",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-82fc68e3-04a2-4379-b5b0-da8a81d28e97",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-80004be8-6ee9-473e-8186-e5728c13315e",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-637460d6-b7ae-4427-8332-aaaf771a6785",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-16c0be64-6d0a-4a5c-8fbf-ca3578eacd10",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-3cdf8242-2d23-4f8f-a427-d1445ee66bcf",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-bcee6aa1-217a-41e3-bdde-8dd055f3fc1d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-adaab621-25b5-45f2-b8d3-5a499655490c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f4f3e082-ec4b-4b64-8845-17d4442c81ee",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e4ec16df-b5a6-4160-8850-1abba670a6fa",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-f40cd749-5691-485d-bbd3-561845d5e64d",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-55bac89c-bccb-4488-91b4-5059dfa1a13e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c20dbb8b-6da7-40c5-a4c5-9c6d6511c506",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-4709e08e-6686-495d-a56d-ac8ff832e2c8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-95da7d01-0c73-4dba-a09e-03b06f890fe7",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-7198cb04-0d7f-489d-8910-5c3d55503709",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-f3e00599-85b9-4e97-a1f4-4ca38c9c5d54",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-fe14b320-f46b-44de-8f7d-3cf3414a0db3",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4db55cb0-49e1-4e84-a84e-9fc780b938c8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ef0b6ee0-e9c8-44d9-ad5b-4f53218fcbd5",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-81082c07-9a5e-47d1-9c47-c9d0cd0b9689",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-96447cf9-ed47-48cd-8aa5-9e36ae921983",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-23a873ee-2b55-466e-aa7b-539c23c740d9",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-b66be12b-2c09-49ca-81c7-a82471492758",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-d856010c-c2b9-4654-8a49-faa9cc9e8c50",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-728a7da5-b2c6-4d1e-97cc-d0afa3c1aa73",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-8193cd41-9220-4066-a903-81c3c2964a90",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-6e179532-8ce7-40aa-bf1e-1da5a2cf1237",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-bd9023e4-fbb4-419b-8fbb-fb1be0a5ecdd",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-ff380e65-0cb1-425f-9059-d9359b930bba",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-ddd4f84b-9b62-4eb4-965b-ded55abc92f6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d6249dd7-91be-49e1-b424-285f8f2b5267",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7c5cd3a9-1088-47b4-b245-f47c4ae58ad0",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-cccaf7eb-a458-4910-873e-5bd23a3ac24a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6caba771-fe98-4413-a224-c2ee63db244e",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-9c54bdac-c913-4310-9c64-ef8ef104258c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7e8f67c8-072f-4863-a27c-a7c1b1f30a1d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1fd12396-4fc4-4a6a-b744-ee747142334f",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-a6121e91-5976-4d25-b770-cd15246c1682",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-e9bb5971-e871-4ee3-b931-a3223c83feb0",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-2d3c8fa5-c5c5-42c7-9489-b5adb979df73",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6d5625fe-a52e-41df-ac90-f0712aaf636d",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-ff385eaf-7e81-484a-9177-6cb7fbccb9c1",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-3d28c432-bb0b-4cf2-8202-be097829335d",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-414ccf8f-3efb-45e7-8358-a0af963d655d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8967905b-a381-4614-aeca-cacf2a5bc906",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-95d57ba6-4f40-4615-bb12-e92b8ba39be0",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-b3b811d6-25c1-450a-aa78-7e1e86e6ccf6",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ead0a454-c485-4868-b6b8-15a9c8c8b991",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-d63b7fb0-8522-47a9-a2d4-b8a1f7e00794",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-10df3d5e-fbae-4136-9494-2ebb5c7996cb",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-7be11c70-e9ed-484f-878a-ba93f739df70",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-32bb178f-be24-4119-9371-28e0b39deb94",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-569a6866-b7b3-42e5-9de3-9ca837bce58b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f1742400-1ea2-4ffb-aea6-708860ea1151",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4fbf5f9b-14c4-49ca-8519-1036b77db26b",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-c3307704-dbcc-4769-9da1-b54421d2de1b",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c86f7389-3fbf-4199-ae1c-a458dc2a0bce",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cb71e0f0-8008-414f-bdd9-379937b90f19",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-fd246456-e679-41a6-a3f5-49b2d8b26913",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c4e2103c-0d76-4785-800e-7ef4664b663e",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-695a6a4c-8f1a-43ae-8a0b-936a3a836d3f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-cc6a96ad-f9ef-4d27-a523-0e63bce5c877",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-7ce47513-2f33-4119-8765-744ff6d18220",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-7f64cf6c-9415-45f0-9d9a-e7612d57fce7",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-a71c11be-f2bb-4a3a-a6b2-0e2254a0d61f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-0a09bf1c-f9a7-4f23-ac56-af9190b161c1",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-21ea9f47-ca38-40e8-ab88-7500104e5a6d",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-715b8fe6-4d79-40c8-bfcd-c2be87f62f05",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-e9008d84-19ae-47df-8f00-8634b81355b9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-fac4a8c0-b3d6-4c45-bbd8-39f02dbe8188",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a208030c-3d06-401b-8d26-43e83ed51c0b",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-087af09d-2b06-4e3b-92ab-89d0faaecdc7",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-3a3456d3-866d-44df-ab48-afda2eb2d00a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c8d1ea9e-9c7b-41dd-895e-65035c9adb38",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9455d9d3-bdd2-4901-9f8b-6ab06ee60e9e",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-03ada384-b01b-4f9d-8814-ab7bec79b85c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-d69d47cc-e3eb-48eb-8183-fc41be525660",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-800884f5-bcc5-42ae-b54d-24bfe016d58d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-fed4fc98-cd33-4919-b6e1-05e6de163a06",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-7bc8a775-fbe1-4166-a244-59601122c66f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c32e8006-2022-4532-8ae9-7aaa20d6dcca",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-56e1d610-6bb4-41f2-b28f-4f5bad6971f7",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7c29f1c2-e82b-4105-a683-29ec9b789529",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-69047764-e042-404e-a2dd-5e3ecdd5e1cd",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4aa4a080-f4a4-4770-9acd-e755c9bc56bd",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-94a1c81c-eb7f-40f3-95e3-f311406d8778",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-b89816f0-0fed-4195-bdce-bba534acb766",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-20d7e97a-8c6d-4d60-9931-9d86da13413a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9187edf4-b018-4f82-839a-47ffc5a45201",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-4dbb662d-22ab-4b73-9a8c-a92304da7b0f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-f1bb5f6e-69fb-4c70-9b12-160126652f53",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0b6933d9-c99d-4e3e-ad7c-2d37a1eba572",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-95d26ab2-9295-4bc1-8716-8b73b4653f6b",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-8cc9f0aa-6e5a-4c30-8a59-07732dc83173",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-00de6d19-7aee-4d9d-8460-256453f29220",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-04b256bf-4dc8-4b95-ac18-e59fdf2994f9",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-a388ccf5-8fda-4301-bbcb-96cdd7fc955c",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-4746679b-1867-49c4-82d6-ed83308823f6",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-2df95e1b-2b02-421e-90ce-5e8efe8fca35",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-bf1c11c9-8e9d-4dc3-a1fc-232be89cbdcd",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-475ca347-a4da-4561-bcd3-7309facfff95",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-d5816fbd-dd5b-40e3-b2cb-744d8b7e3a01",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-253b1d0d-dc15-4ed1-8d01-750688b0b935",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-acd7a5b9-6ac9-40a7-b944-0aa0a93435c7",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0025c9a2-6525-4fa0-9d04-cc1543c3522f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-fe88a451-b594-4df0-933c-0cbce55d756c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-f425c42f-08d0-4ce0-8304-9410eaf3f44c",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-aa8f9ab4-cb88-4ac9-99a2-c711e68317f2",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d5ab3a79-aea8-49cd-86c8-84de3d625cce",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-af5a54b9-4998-4d28-9435-481c08d8c16c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-10eba5a0-e25e-403c-a595-232658be16e0",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-e674682e-81b8-45a8-b386-4978cb85fd70",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-81466c72-5bfe-4d58-9786-0ecc1b37af47",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-69f0ad64-c83c-4e0a-ad28-3c6bbc50c77f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-93b77b5b-e270-4690-9471-93604ed39c14",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6824b1ec-2405-4caf-923b-e91d71645f22",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d590f162-92ee-4337-b083-acfb9d48ac0c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-4dd50929-0807-47aa-8560-900832d8b601",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-fd47c7a7-d300-4162-a953-f36d6300fa4a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e9d0da87-93d9-4821-aff3-ebadf9e25f5f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-bc6063d6-0adb-4134-b91f-5723aea2a6e8",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-24d01517-e93a-47bf-b165-53090df125c5",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-e2cbb91d-bfca-407f-9002-8a3ba6cc541f",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-c929df77-5c70-4064-a0b6-04ef76caad8d",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-4df124a5-343d-4593-8d3a-d03be57306eb",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-dd142467-7d5a-4021-8b38-cb065aecbacd",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-58af2660-a508-4ce5-b272-8269a74a4c74",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c5974e4a-5c92-432d-9081-a1dbe97261cc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-09e0b7a8-3312-4853-aed7-254681503dec",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4c8c994a-6830-4a45-9392-6be278619310",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cbf520cb-4fe7-412e-99a8-73932b47f4f3",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-1ed99640-20f6-4d37-8473-01093afa79c1",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-22290a5a-5b74-4f59-84b1-c427b1cee4c2",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-1cf89112-ee06-4b95-81fa-62620b1aa4d4",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-d201c69a-babd-4d83-aa79-d9db26cc7998",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-928e5e46-fd31-47a0-ae4d-21f2d6bd2c3e",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-738afc3d-f3b5-4207-90be-49fee8b5a260",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-21a1d98a-b53e-4d62-abeb-51c6606773b3",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-9d268be8-bfc6-4b72-9abf-e85ee0e0c69d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4a875af2-9213-461c-8b50-affe34ddf79d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f16efa95-f3ab-41c7-90ec-d34038111808",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8c25a2f2-b222-4694-8733-b23ccb377316",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ab24f343-376e-4fa9-8d90-f3d9406eca9f",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-10add752-c5a5-4a23-bcf2-ccc3aae9bfde",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-850bc088-2374-4e67-bafd-ae01661b9cff",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a39142ed-4766-4106-89e1-39ec38cb2692",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1df1c84a-5a27-4ee0-ab87-f6c76a4b6be1",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-dbf5444a-5419-4ad3-8a63-a927e0ccf53c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6e4203b9-dbfd-4640-aad4-8a5b1d4a7101",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-140a8176-8e99-460d-a108-1be2de59535c",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-433626a7-ab2c-43ec-a77d-f0c6db052122",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-f051b41e-de39-49a4-bdcc-a19e42c4cfbf",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-9aa484c3-74ec-46f7-a8e9-58cbd5acbbc8",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-2c2cf2b5-60ea-47ec-9db0-c75f154a246b",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-4f53cb42-197f-4cf1-9082-63446b8153d2",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f2add1bd-80b4-4421-8395-43d4d8eb4921",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-04c83865-7c66-459f-a233-471ac6ada009",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-7c3748a7-0434-4133-9d15-2dd00cb9e215",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9d9c29e1-a365-4246-9f9e-c2b497a648e1",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-292729b4-cc38-4e15-bc56-253fe597dd67",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-37110672-bb10-4f22-99ba-37937c14ef67",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-75df85a1-0aa2-4fe5-a1d7-adfc7ad1e4ec",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-55ab1815-2ae3-40f2-8340-a3daffd8d1a5",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-8ac15a65-c9a7-4909-a2aa-6d36ca391df4",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-56342982-562b-48d6-a359-1a1a3c0bab50",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-80dfacb3-2674-4221-9b10-ae4262302583",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-1b38f4bb-c6c7-422c-9873-5eff1d116cc7",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-ce820a9a-1f26-480f-b8b9-f7951947c463",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-53560849-64a2-41d6-aa9d-9ab1b7f4a919",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-80d9ba85-8f19-40ee-bbc2-452b173ef935",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-acfa4f6b-4cd5-47c7-851a-89710681289b",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-190a4af7-91d7-4256-b00e-c5d27f6776a9",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-50702e29-ae24-443c-b0b9-f871a90f0d64",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cf5331cb-ea13-43fb-a9a9-2b5caf106e11",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-44c5e9c0-5bbc-4ffb-a6ff-a618672c2cd9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-6626064e-2985-4193-8d0a-b61eb2b07d23",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c13628ee-1e8f-44e2-b4a3-93e4e47a0e46",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e065bbec-0257-47b9-9ef3-bb6430307761",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-255c258b-e96a-478e-9d2f-223d3994297f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e8113cde-8e13-48bc-9073-2f2f3f28d2f3",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-eb35a7a5-9b72-4eac-98fe-d5728f614d9d",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-5c23d89b-a5cd-45d8-b9a4-37763cbf6ac6",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-a90c7c9c-34af-4947-bee9-8860efd68778",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-56014eb6-a483-4529-a3ad-e26edf48321a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-aeee54bb-5b3f-49dd-99ab-11b0c9c2a275",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-873ec42f-d28d-485c-9ff3-8cb1761e9d22",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-e63d514b-a13c-4e53-8512-b9376d56c36c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ec03ccbc-50e0-4d23-965f-2584294114b0",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-d87f9fd3-8f2f-4f78-a2cd-e7feac149df1",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-a73dd9ac-787b-460a-b64a-802a1d78fe20",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-bc812d70-bedb-40c9-a6f1-985e9ffec8d6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4d06b12a-5d05-46b2-8f24-2fdd7ac8185c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-11ac300c-4881-4383-bf61-678c49675537",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ea3fa8c8-dc08-4257-b3cc-829a452d4bcc",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-6a858bfe-8e3f-4a1c-ba5c-5121229e131a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3dfe4ad3-a8f7-4b73-abd1-439bf0ed58a1",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-6cf4bc3e-093e-49d5-9a37-e546244dbae3",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-91813484-bd6c-4860-8cf2-773c43416b3a",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-9c810b86-9d0e-44df-806f-00fe15fcb473",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-59506ead-6a67-4c25-a51f-6f7cc475c2ea",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-243caf6f-2b10-4e99-948b-24e6fcefef02",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5838fe0b-a59e-4beb-b849-7c91b1f656ac",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-3127970c-2f0e-4949-9650-05c1be7efd18",
+   "reason": "denylist:spotify"
+  },
+  {
+   "id": "anli-d98aaecc-1ae0-401d-9304-1bb8bba426b9",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8a30dcf2-f841-4f45-8a95-ece019a1a9d9",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-8560e25c-42c4-4720-828a-1526de43c69d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-97b944d2-6226-4a75-8775-6ca63b19c003",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-27135666-558a-4789-ac61-435011e28979",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-a4a6d77c-2d0c-4bb2-9e6d-90f82f93d90a",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-011ee586-cef4-4388-8042-363825a2e6cc",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-6cec88f9-0f35-4f46-9909-3a941e6824c5",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-9c8899da-9b26-456f-a18f-7d36a3de5afc",
+   "reason": "denylist:loading"
+  },
+  {
+   "id": "anli-d8293b8d-60e7-41c0-8055-c242c20aa684",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-ff5aad5e-848c-424c-a268-d3f2138faa43",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-c10bd7e0-a011-4b82-8c67-3bfb813d8540",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-d44606a3-dd07-4478-93b0-e4fc6dd39581",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3ca49438-3bec-4b82-b0d6-645ddcff848f",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-4a6413cb-44aa-4293-b54d-2aea51930ff8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b9b15b29-03cd-4c43-82b3-9b6dda231780",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-619dce41-01e9-43ac-b26d-0232b9a3bc1d",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-2fe00d51-4d6b-4977-8aee-ae1bd34b9343",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-8704c80f-abae-4e44-832c-0bcfeccaaff1",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-09086754-a8a4-457c-9aa7-42ae7269da8e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b7f10bb1-6e86-4a35-8aff-5c55accc2546",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-88c49509-a3a8-4e8f-8461-ac53306cf8ec",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-4e941678-7c70-4be8-93c4-49ee8ade4892",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-55b9c3a6-0193-4610-a58c-085613b778a8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7bddaf91-dae3-449d-a866-f4e74f4dedd9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-6d553c57-a4aa-4bda-b5bc-7a9431285e01",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-e40a586e-d836-4771-af8c-d2275417993a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7a66eacb-ad41-4026-83b2-35ca94c4a6bb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-220d9fcb-8ac6-49ea-9018-e12d4ae2c446",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-35ae9cd0-2e0f-443a-95b0-ebacf4e97173",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-8b3cd9d6-939f-4521-8aba-4b187610f0fb",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-84f070b6-98a1-4a61-a90b-110ce997c089",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-796539b3-5529-4ecc-9a92-a9221b3defc6",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-1edea05e-6ba3-4f92-9b8a-5c5c0a015086",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-183be28e-de17-4358-9bc9-9e4c68251bfe",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-ee178c52-3bdd-4fcf-a64e-f927adb260be",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-0d146c21-7635-4dd0-9504-0d70d1a01ac7",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-fb046ae1-12ed-4df9-8bc6-8a58f0d3671f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-d4f36de9-7381-4b45-ac9a-5e5d92a0b597",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-e9649551-fb99-4199-8128-5f2a48b67f50",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-890bfc48-afdd-4229-bfd5-5002abc6358d",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-c1d08d38-20ff-4e26-9101-3b3ec26afed9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f72b27d3-b913-44e8-8d4f-63c4e47ebd89",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-f197156c-9586-41ed-b4fd-f539ed36f6da",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a83bb242-44d0-47f2-a4be-f71687df724c",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-7aaffa0a-e71c-43a9-b46f-5b653b7c8e3b",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-c649effa-dc81-4d4c-8afa-dc2e28e73d18",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-249c85dd-1669-44d3-a128-4603134de734",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4febdc22-e9b3-48b3-b658-a9f47a01e570",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-e8f21c73-38f5-4568-b6c4-505ae675a421",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-54bb1d35-4ab2-4245-b2fa-35d6def8178d",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-f892e208-1bcf-4278-abbe-c135cc1f56aa",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-d4276e2b-a4b8-4789-b6a3-c162bc119644",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9cec4f8a-d121-4d11-bb6f-8b7a95acbbb2",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-eb2f9927-397d-4255-9a7a-53042e142b1d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-df620d08-1808-4eff-8840-071bd6057fda",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-3935fbd7-480b-4032-9244-802b3d4624f7",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-ea590baa-1ba4-4b79-ab10-17772125f290",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b7746deb-cd53-4964-a0e1-f51f8d024556",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ae41e480-847d-417e-b63a-33927ba13ac4",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-02a696da-2dbd-44e5-bcab-883976a400ef",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2ebd5028-670e-4bdd-8b49-c2d09a0a9bd6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d0df4684-6aa7-47c5-bbc5-f57b735396e4",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-0aea4e0b-47dd-404a-92e5-5920dec3f1d1",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-ae2d6fa3-5d78-4237-8a0f-9e0dbf561d1b",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-b06019f3-eb50-4655-a914-b96d691b30c4",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-323b752e-44f0-4cd5-8d5c-b567be1c6dbf",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ee8b8f0e-b369-4a9c-ae8d-6d0799bc1d41",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-40046ba8-5edd-4cb9-bf78-6c0f72696f3e",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-cb642cfd-944c-4d72-8101-b552e3a7e0fd",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-773912ed-6c1e-476c-879c-22fb77afca60",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b4aa0fe3-efd2-4bfb-8496-db881e6a943e",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ec479b3d-ebad-46e4-ab59-560bd2f57fc0",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-dd1ccc79-9561-4a9b-b098-3a02cbe4c330",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-2cac9126-fb7d-4314-b20b-976ec53a280e",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-1c171bdf-0ab4-4eb1-a7d7-4885b9d85108",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-de69c59d-6f1c-443d-861a-32680394910c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-ffa17046-a72b-4d34-bbae-372e44fe912c",
+   "reason": "denylist:spotify"
+  },
+  {
+   "id": "anli-cbd0f638-0675-48c4-9b22-84f9a12e0a6a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d10ddf03-bc8d-494c-97d9-cf8569b6abdf",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-93d13dbb-d5cd-4161-928a-ff681abe79a9",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7c29368e-0f5d-4880-a261-77f5792fb7e7",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-a0c1e478-c055-4906-9c10-47b4df748599",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7cb0856d-8b63-4a6f-bf78-367e1ed49f15",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-287d0a4d-9a2f-4c2e-864a-702a4cf93fba",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-de6a8c95-c4c4-4d1a-aecc-da589e7fdce6",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-731f701f-66c0-4f96-bf60-0aefbcb55648",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-aec83cec-5021-428e-8480-f2ba6cb911de",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-060dc985-35fe-4519-82f3-6bb8c039a09f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e79d03ec-1be6-4204-8fbd-24a4c2344abc",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-aef0e0df-64c4-4111-9314-1d898e1b9b44",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-822751a1-3257-4010-b8c3-5837f28f58ce",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-f5cbc6ec-819d-4888-8d0f-9b02362dc682",
+   "reason": "denylist:enterprise plan"
+  },
+  {
+   "id": "anli-cf67761b-02cc-4866-802c-37cbf5ac1fbf",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-ce03f96e-e641-47e5-80bb-f5c112bf81a4",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-552fb6f1-c463-4826-82f3-211143112c77",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-38f1fd68-603f-4d5e-8551-7bd47573ee87",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-940347ef-d7b1-4cc5-b660-2cb4b047fc6e",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-72666bc8-918c-4d90-8f03-04219fd2882c",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-58a596df-2510-4730-a9b3-68427854cfa2",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-36140e56-cbe6-4406-9ec2-5502bdb4809e",
+   "reason": "denylist:javascript"
+  },
+  {
+   "id": "anli-fc1a7019-815d-42c6-bc90-80a55b5fb6af",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-252d2eb7-f41a-445f-bb2f-9fb7e0384afb",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-8b8bb061-7bfe-4088-8261-983c46551010",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-70508aa3-5935-4734-8d35-1d28c700e7be",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1a2401b6-2170-461b-9145-6d7de89e6344",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-d3130f86-fa98-4311-967b-283a06183b35",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-9ff035b6-5bff-4183-a325-5fe3aa1b2ce1",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b2ad295e-6f7d-4e1b-b6f0-4842f8a9467e",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-6da8d78a-3920-4b3f-ba31-66f713ae08d5",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-1b16eb68-4746-4a31-a7a0-211817363add",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2c3d91dc-f3c0-4166-9ba7-3e018cf5eb8f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9c39793b-ae7e-4e83-92c1-0cf4df867328",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-190eab34-c482-452c-b4b4-c1d59790b065",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-809b1cfe-be78-4afe-84c9-2225812b2035",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-71504ad3-cfa7-462d-9354-f03055d14cb2",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5cb6649e-0f9b-43dc-8a0a-e1a2bd52d750",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-1d0e1054-da95-4251-ae67-c4e794b6ded1",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-7dc9793b-34c2-4b1a-905e-b6d3a9b16977",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-e173e132-fdb0-4dde-b1cf-406b75b3ff5d",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-61b5af75-81df-42c4-a53f-707afdf866a3",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-974d05d5-96b8-4406-a50b-31d5a61f88bc",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-e02cc74f-31c6-4ceb-af4e-c41da2e0fdb0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-778e45a3-014c-4139-9990-df6c5fb39ad1",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-19b24350-fb7f-40eb-91d6-1cc641d22887",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-38410232-4790-4208-ab55-a901162d1f43",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-20df3cf7-d8fe-469e-b641-916898779d2f",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-ac4ed2ed-c328-4823-87d0-3cc3a642add3",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-623905ce-15b4-4e89-9032-0b79ae2f969c",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-7b9a7977-c991-4252-8114-fc8b428843c2",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-195dbdaf-a751-407b-b507-a5b9cee6b48d",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-e7a5d913-d321-4142-a797-c22df5fa3694",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-f30304e4-d60f-49f1-8b95-78d67d24ba64",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-bcc10e6e-0a4b-414c-a8a0-220d16b11cee",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-e54c6e15-5c6f-4ca3-892c-f50a86b3f29c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-21a94f50-6af9-4b38-9fb6-bc7b538a849d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cbd51c9f-411b-4408-981b-d34c4e1deebc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3d11ddf4-8015-48a1-b333-9c75ff1697ce",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-48bc5dc0-0563-4eb3-9011-c847160730ad",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-585ec739-5bf6-4efb-a367-848c9caa6cdb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-04307414-793c-48a8-a674-0bcaa13cab84",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b77dc4a6-0599-4f3d-a127-3e5c4b91363c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-714b563e-5f47-450d-86a9-382922e2d280",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d1e1bf74-76bf-4a8c-ad3c-7c3d86410c15",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1d00bf4b-d22f-4415-a971-4c3cb2d2f157",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-51fb95dc-7c8c-4c9b-9c1a-fc7746f47f92",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-50981912-2933-4f92-bf75-76abe4681b99",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-db7d744c-c5fb-4a78-90a8-78438340aeee",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-e19de455-8edc-465e-a78c-0a342989c480",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-0143e5db-422d-4aef-8d0c-dfe89c9a60b2",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-af58586a-5f58-453d-9ec6-d93fed63c2ab",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-68707041-8214-4001-b2bc-1701cd7b4dd4",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-4c132f4a-0c95-4754-b88f-35d40c9a12b9",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-48a8adc6-208d-4658-a6f8-3e7848eed39e",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-471c28a2-6c34-43cb-8f46-63e22ade6850",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-73671275-9d80-488c-ba34-ac0d075a5cbf",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4c7d9abd-5fe9-4a57-82e8-69608be4806f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-86f511ee-40db-4039-bfe6-d3306227f585",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a5c534cf-15e1-4988-8802-701feaeb00dc",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-9bdfc459-d7ba-4c5b-ad15-181f2ab4a14f",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-2be0749b-dced-40ff-82ed-5b92a577781c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-6942299a-8e15-42b4-b401-900e118614f5",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-aeb72169-ec76-43d7-814e-99035f6b2257",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-1fa8ed72-204a-485d-8e13-e471ef09f0f9",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-59c0e126-298f-403e-8c78-75b975c6006b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0445130c-742e-4177-8fd4-f17bda19db9c",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-758765a1-979d-4cfc-812b-a0c27457908d",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-ed37c568-a98f-4fde-9102-1ab2e9c28ab0",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-0341d8ea-93fe-45c1-9557-cc475018b145",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e6d103b4-83cc-49de-bf42-4a6620289736",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-a5930424-8893-427a-9fa6-78af65d13776",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-01ce83fd-2cf2-43b6-a4e0-107020689406",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-b06ce317-f0b8-4896-8660-12e05628a83f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-fc6ae638-d135-4c27-9210-8e74ed48b349",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-d311c7f0-8987-4d6b-a927-3877188837f8",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-e8ff9497-b6ab-460d-8b09-64eb7209280e",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-c3f26fd6-e831-458f-bf6e-98582ce56f2e",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-7cf03a46-c69e-45db-b764-ef5036de388c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-33133ac4-efb7-4192-a520-ebfd57bc9f73",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-e781dcd4-38d5-4fe6-ae17-7c69c5385679",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-6322c44b-1eb4-48d7-952b-260f63523782",
+   "reason": "denylist:javascript"
+  },
+  {
+   "id": "anli-61e9e7ac-c87e-46e0-b09c-cd02beabe47c",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-6838573d-6c0c-42a8-bde2-422b23056406",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-886fa308-cc84-4f01-b1f3-c028a6a6a144",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-3f3ff93e-0dc6-4cc8-92f5-840bb2437152",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-fa9eb4eb-7fd4-4f51-8407-d62b0c195734",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-8039a1ff-571d-4482-87d8-c0f4d38fbc80",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-59702c77-ee94-4ffa-a1a1-610c607368b0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-65021af4-4949-4e6b-8d26-526050ba42db",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-2892895a-e35e-4350-bd35-e488af55c617",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-80356ed4-1d52-43a7-a860-72194147081d",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-3aaba0e4-ca34-49c1-880b-249a24313109",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cb2964d2-8f99-4cb7-91ab-e3235ab9ce5e",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-80748df1-ae81-48ab-8ca5-d5f96a5afeae",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-fa23cc69-a015-4173-8e5d-e18f3d674f5b",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-0778b9aa-ffea-484a-9ba3-597b4f94d74b",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-b3c65473-da83-4e31-8822-668e48107901",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-15955d62-d367-409f-80cb-0653a733b42f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a2532a16-fb14-485d-bf2d-eb7e701616c4",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-620c0b7e-3237-42cc-a15a-dc6abb547470",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3361a9e9-fdda-4320-8697-30b42829656e",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-3f573f9c-9704-472f-8ad1-07ccb08e1598",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-4204f9f5-2b60-4429-b190-cd2f97749f62",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ae7c8f54-369b-4973-a4c0-22de7b738a73",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-3ee8005c-8996-4747-a6f8-2b25e62e0d91",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-ec108f75-47ea-43e9-a5bd-a2e10105c7c0",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-734eabd3-8dbc-4af5-95c7-1f90c7ffcdd1",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e3918fd3-b6d3-4f7f-8fc5-bdb30ec66b26",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-064342f4-0a9c-47c7-ad13-9afe68a3aa4e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1d45ffde-4601-4eab-a5d7-f0d0d1b5ac86",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-49461f5a-e05f-41bb-b7fc-93e8e1f554e4",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5392da8f-db7b-4de0-8310-4c9176e77d39",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-40819aeb-7c51-4f4a-b8c9-75873889d7d0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b528c2e2-f60c-41b0-8f3a-54a953acb660",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-d62a1949-1446-438b-8a11-525208252609",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-94141c0f-0607-4efa-baf5-50214ff3add3",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-783c9b8b-2aea-4f18-908f-cb13fcb55956",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-2a6d1e86-f690-486d-b2d9-de7a487d0a4e",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-7e60a7e0-d3c0-469a-9d9f-899860d5bbd5",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cf5f166c-76e6-4135-a2a1-6dfbd695269a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c510db11-38fc-41b6-9caa-951b3ea2414a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3aba1284-d29f-440d-b491-115a9b75fa0b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-95137d41-3ad8-4c07-90a5-1b3fc4349932",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-ae8fdc71-400e-4e61-a0b5-5695fa2bddcd",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-8639a956-7673-47c2-be0c-b5e2cf9a2ca4",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-57d8993b-531e-4694-a351-b54d37b33933",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-842c5c5f-cfbc-4bed-9d50-8b69afd8a71e",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-dd9ca230-e20e-4c62-837d-cf5269c70f4c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2e0bc5b9-75e8-43fe-9d0d-8b325f2395e0",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-fa80e321-0280-46a8-9aaa-e8154ebe27d4",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a3992cd0-4a54-4e21-8cde-74e421b9fd45",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-95bb5e30-ddee-45e1-abb1-d68810940713",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-134076c8-39c5-43da-b83b-b6a3e4c38a33",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-81e31c46-3338-48ca-9c06-187807f95355",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-b286cf5f-58fe-43de-b47a-dea4df67cdfe",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-7d805268-a7dc-4bd6-bbb4-af2842194673",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2732038e-dd20-4f49-bdf8-dccdca4c0675",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-da2b7a2d-d554-4056-a41c-ee2084ed4829",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e15a1788-10b8-4245-b8da-88559933f7e6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f276afc6-0868-4b98-813c-9434f5d0ed0a",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-d5c78f97-2c4e-4c88-9297-790b0133b93f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2f62613b-5b8c-4b82-a620-f1752026caff",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-01a1d8cc-bad8-45bd-b7cc-be2ed7c855b4",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-423954bf-957c-490c-8e37-55e7f18df50c",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-00ff2274-5c1d-477a-b50e-19a01a9dff09",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0ce376df-789b-46cc-9723-4abef321a8b2",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-d733432c-d202-4181-be05-dd9ebaeea68f",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-80915348-0be8-4d74-b05d-1f6695ec9cbf",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-aad40f28-bf1c-4ab4-95fa-0d6e9c0c5382",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-0d79cf7f-721d-40e0-b5c6-95f68a7d5172",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-d73b0d54-be28-4698-aabd-d0a6a78d65cb",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-841b1075-2520-40e7-86d4-82550fa38fa8",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-42cd53b4-c2ee-4c60-888c-554851c29c06",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-d356cc5d-49dd-42d6-a0e6-285316503ef4",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-416bdff0-91bb-4c08-9a2b-857820ac24b9",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-d10671d8-219d-420f-8056-7134f5384608",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-4eb494cb-ec9e-460d-bf39-9d832523b1e4",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-0172c3ca-e206-460f-9dd3-5ba8f22522aa",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-95d47026-1267-4e97-8b54-454af61512eb",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f1f76fb8-aac9-4ec5-855a-e569700414d9",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4abe7b1d-8262-451a-9448-a8aaebb10e5b",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-11b5b4a1-ddd9-45bb-b896-4c25f55d5d98",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-ef18c74c-7648-4081-a6ff-6109c57c29dc",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-fe06477b-2be9-42f8-b651-a44fe6e72427",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-bec30b3c-a6d4-4b5f-89f0-b9fc282f222b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b0fc3f64-8d09-44db-aaa6-8aa96c96e1c8",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-cf384be7-344a-45f3-8e93-4bc33f672265",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-5cb1e170-b16e-478c-ad42-cf17015624f6",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5682a31f-1844-43dd-aab0-eb180620c8de",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-343586e9-dd87-49a0-99be-2e024f032ecd",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-c8a4d5d9-fb63-46b9-8dd9-b85e76e6d352",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-2e8b6abb-6af0-49e4-9407-919b975c61bc",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-14f1f1dd-3422-4756-a03d-b67ced4128d1",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-df98bd0c-600c-4cb1-ab87-b0252f1223d3",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-7d59c7f6-1d42-40d2-9ff2-cdd429be6bf3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7a131a07-5fe1-43ff-9c3d-07169f65c887",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-529c7afe-9317-4ebf-9385-a380fd47c1ee",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2bf97f59-298b-4e2a-bf18-1d14ee5eea30",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-8a2c4e0f-8b6c-4ee8-85a4-79f076a67cd2",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f8bb7450-5f67-4df4-96fd-5fd4bafdfa3d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-db79dd7c-1ff8-41a9-b636-37f01ccd6a30",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-b7530367-6eaf-48a6-ba6c-334ecbefb2a3",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-6f276e3e-064c-4623-86e4-2f71c2ace0fa",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-5586a105-3c26-48c5-a60b-5385031797e2",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-e625743f-1f34-4bdd-a865-4675368489fd",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3eabd8b2-bfd8-4877-9436-f1dee68299a9",
+   "reason": "denylist:javascript"
+  },
+  {
+   "id": "anli-822ae0d8-e3d9-4238-9bc0-988b163b24ce",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-fed4bcfa-ff64-4144-a8e3-3246a11c481f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-275edecf-ad33-4f3f-adb9-09791f0c70b9",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-c13b9907-f2db-4ea0-93f6-e0e0be896dcd",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-994df988-bcbd-4ce9-b5dd-06ce7ee65216",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-8280760b-a8ab-47e2-a6fe-da256186d3ed",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-baba564f-0ce2-49af-9a87-31f65bd65301",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ae7fa647-763f-487c-bc0a-a7aa50c2e312",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-2639465c-9033-43b3-9f5b-76667171585e",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-240ffe43-d5f4-429e-adf9-5f52071f7c84",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-0b9484bd-534e-45da-9d38-ac3076116e69",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-b3b44b85-4e82-4946-9c04-371309845951",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-0539d4cf-38ca-4953-881b-a80c5661df38",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c608ab7b-5df8-4b60-9a0c-8b8ad6ec9d42",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-bae935ad-2a19-4588-b65c-2373c2da19b7",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-fdfa36f2-5274-4580-b5cc-1645e67cd414",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-f7003c89-e3a6-422e-a651-9e5a0f5f7d85",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c1e00421-4638-4c67-8667-15e51f161a3c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-32343f58-b9cb-4d68-be89-bc8205ffcc61",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-40667f80-18d9-4319-acf8-42a55e3d6630",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b40fecaa-8f73-4172-87ff-609d9750826e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e04f79f8-3da4-4f93-8f70-e8dbaf945940",
+   "reason": "denylist:enterprise plan"
+  },
+  {
+   "id": "anli-e1276774-dac5-4a70-8480-eed3a812a81b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4dd2a8ab-dd45-44b5-978a-cc2ce7d7dd22",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-68be5023-08cf-47ff-b35d-d4bc6dbaf60c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1b512ce4-562f-46ff-82d7-5edbc1de0da9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-715e7642-cd6e-49fa-8e2d-452149edeb2d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-727d1d02-7ba9-4c9c-8047-9f2e4dbc28e0",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-2f58f667-820d-440a-a14b-c96feda84b61",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-20f28191-497c-4ef1-8a12-8f48214427ad",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-d3071f0e-2e70-40ec-aa19-c4196de04120",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-60975861-2bab-470b-92f1-50fa76a396ab",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-cff1b51d-1cd1-44bc-9b2f-c771010aa93b",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-3706eb55-ad7c-461e-a006-05dfb34d44ea",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e0101b2a-4e3c-4ff3-a776-3be445866cd3",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-be41e5b7-ef82-47ef-b462-b3a6f6b95bab",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-93728589-0119-4ddc-a15e-723ad9088734",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-35caee1e-44fd-4323-8463-7baf36f78fe3",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-c0b4230d-53cb-433c-83c6-16d77ab9092a",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-70b58001-fc7b-41ad-b558-d90015c48e2c",
+   "reason": "denylist:enterprise plan"
+  },
+  {
+   "id": "anli-a3d9e326-d202-4a6c-9e1f-02536da5bd02",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-e563b778-e53d-41d5-b7b3-f037c3149efa",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c60dba66-be45-417d-b753-d8144fbdb85e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-17020353-b74b-4588-8f7c-d6db2a380716",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-f3a7006b-cd42-4961-89e8-874215393e1a",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-94ba110e-662d-4f2c-8734-fb26a66da9cf",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8d05de7f-dfb1-48fd-a126-eefe0d45ba0c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-bf787925-16b9-4c3b-b3ac-dc143bd5b7a8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8fc13652-9c59-4abc-80c5-4254c5b9d83d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1a41f44f-b834-46f4-912e-b68a5b1f7063",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-876d054d-0e3c-4610-a907-51126b97d826",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-af924e27-f232-47e7-8412-af620d1d3c47",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d75d9318-291c-4499-9719-6ba975f4aeb0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1eb9a1e3-1a45-4293-a507-e58d55c4929c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9030f817-cd11-4de0-aee0-5f35e8f107cc",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-d8086274-a0d0-4400-92ed-c511ca559c82",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-bd39ae31-f4e5-4fdd-a325-4263e5d279d6",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-649ec278-e90d-4121-8b95-8bad1e380b1f",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-6e1e9fa7-3be8-40e0-86ea-22f2728cc2e3",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-74cf437a-4161-44eb-85b9-0bacb3ab83c7",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-c395f9c0-28da-45a0-8489-fc093434131d",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-dd130b3a-50fa-492e-9994-8e1112e78fb6",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-28d2086a-efc5-4549-b10f-bbddfe93f711",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-83fb3006-cf70-4b0e-9df9-aa55cffa60af",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c75507c5-3024-4b8c-a508-cc035fe71bb2",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-25b9338a-36a4-4de8-862d-491fef3e5633",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c946a5f1-ff46-4ae8-8548-bd2c708b49c6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c689f0eb-d417-4c40-800f-3b7606c5d707",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-190de7c8-243e-4f56-ab4b-af2b548ac3cf",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-9ca50eda-6468-4f1e-9fcf-4662228a8b29",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-d9466af2-b5d5-49fc-859b-46b6847ab2b9",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-a8a89efc-8344-4492-9ca0-ecbadb7cd4ec",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f129da4d-93c0-4f42-9c1f-18786e989e4c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-b6fab0b8-1ae4-4d73-bc14-029467910291",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9ee26c8e-8e97-45ef-978d-b4fe228fbec8",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-fe8eec6b-a7a2-4bd4-8e52-323cdbe9979e",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-ebcc82a8-97c3-43cd-9160-6c4c6047a54a",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-b8df3a35-debe-4056-9538-1d0c0cbfb1f0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6fd79002-dac4-4cc7-b7e5-aa4d6707c9c4",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-531e9934-4b9a-4450-9745-ba2b6ef0027a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b2d07d63-aba0-416b-8420-8c2d7d0cbca3",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4f9ebb64-e087-4b71-8904-4816e967c527",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0619a2bf-6ac0-4385-9285-99e4e1cd3b75",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-42d60243-e6e3-4941-b561-61bedcbf62c2",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f1f899a2-ba01-47cb-9ae2-5f0a81d9706f",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-16139124-450e-4712-bc19-0b5fc262b9b7",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-57ae3846-481e-4122-8bff-567cf76f6903",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-f7e475c7-2a74-47d8-9115-f2eb2818ebfc",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-3469da1c-5343-4e56-bd47-fd6a7e632fe1",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-608e643b-c819-4283-892f-8fd6c7e0da7e",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-bb79db1b-de12-4e33-ac94-80fd5643b7c2",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0e0575cf-4194-4214-bf70-8bbf7a2f9ae6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ceb0467e-9aec-4e2e-9e17-65f70ead6afa",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-d412233a-2c1d-42b3-b0e6-d5496fe53b1a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-77663ceb-e779-405d-b9d7-689ea53d8981",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-be812da3-41e1-4269-9190-d7dd94f85b28",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-2c19655b-6346-4d47-89b2-00a6380f460c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8db1e854-fb21-471a-9769-4ee9b5b667b6",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-b15d3485-3ef7-4106-8c95-fa31285ce3ba",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-80a529a3-c27c-49ee-8ad0-3d02d5fd56f5",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8fbc905b-1d4e-4a1f-8c42-45e0bd996386",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c8bc4b77-e436-4750-953d-a0dabfc47d81",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-cb86642d-f5c8-4a7c-9669-4aa02f281e9f",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-7326b626-cbbd-4808-bd03-c0ec52ec937c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-405a3835-7ead-4a40-a556-ac032e5b37e7",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-d97a43fa-0d78-466a-91e2-52c9a2ff480a",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-827b46fc-95fe-4e58-8998-e15bb3a09ed4",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-95bd9005-6e05-4222-8ff1-d0f82ef195d7",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-99db1f6c-4a7d-4a3c-9e4e-a34a8fc39157",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-3d809d59-0f74-46af-aed3-58ffaf683045",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-a10ac474-e19c-4b6a-b6b5-1c17f4c2ec42",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-0eaeae3b-fbfc-4065-bb4c-c1c2e7ce2d4e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-71300a60-3991-424a-974c-4caaccede278",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-9c8c9407-3c6e-4c08-a1d2-7abab5e567ec",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-c40ce708-b444-497f-a6e0-9a803c945419",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-67fa576d-670c-4667-b11e-48b2e759e999",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-2337356c-d33d-479e-86d0-46c6d96e99db",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-a632fc74-d22f-4a76-b01e-3844b3af513b",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-0809c09f-c031-4dbd-8cf4-2397c1734ff1",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6fa01f37-5ca6-4f90-86fa-18e2b09906c9",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-97fc6450-04b9-4c71-bf58-13e46cede1bf",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-b6d7555c-66bc-4b92-aff4-c062f86f0d68",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-f3b8d1f3-81c1-4d14-97fb-249dc4b39426",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5453b6aa-aeba-4a60-a33a-16c2187027fe",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f5f71a5c-d3a3-4196-bca9-6620ba96dffb",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-848ff685-f044-4b23-82cc-931a8ecb79f3",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2ceb38f3-f619-46b3-95b2-564f1b71d3e0",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-fde4a1b6-80a2-44fd-b4ba-0f39e7ee5a81",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-ad9ecb32-0a88-49ab-80fb-68027321ca00",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-06ffa2e9-bd34-4345-a04a-478bc3bcbcd5",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1669b405-95a2-4d5b-a54d-1bb50b5c413d",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-2c6302c3-c4aa-4c49-b4b4-8b65abd6b23a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9dd8dccf-76c8-4dd2-b256-5b02a87da041",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-71ab5f9f-1930-4778-b0d9-5793c4266280",
+   "reason": "denylist:spotify"
+  },
+  {
+   "id": "anli-7e0594c8-7614-4dc7-907a-e7af6f3c1e88",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-c51b5a38-c7d7-47e4-963c-36c5d0acc396",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-b3554f97-d686-415d-917b-1003ee776b8b",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2fde24f2-26c5-4733-af75-a7ab00555aae",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-341d735d-8c70-4966-b4cf-a1617ca1798f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-50c9f154-6f60-4d1a-980c-df993e02177d",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-c577ab99-897b-49ff-a9a3-0689bb65ffd9",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4fcbe3ff-6bad-4b99-8dd8-a236bc3f6e9d",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-14923db1-0d9e-4072-93b3-e75e87e92ce8",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-63fd9b0f-8ca0-4b72-804f-3c54adaf9714",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-071da033-8918-432e-a3bd-b5f70fd23b45",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a46f4757-4155-41da-b26b-c7c1dd483698",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-b9ce3299-bfbe-4866-ad8d-9575527c6b30",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-1b8b75c8-fd09-4d57-a80f-3164d00633c2",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-da794d4b-c5cb-4495-bcd1-32c9bead5f7d",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-074e31a5-c9e1-47c4-9693-9e8e7eb5fd71",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-85f130f4-7301-4594-bc0f-deea8485a146",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-17e4f257-9ee8-40db-98f9-d5904f882069",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-12375337-0fe4-445d-a8cc-e673d6bde7ca",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-ebffb8bb-48ec-41f0-b0bf-4741044d330b",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-23d1bd72-346f-44b9-a585-606aea274a29",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-17ffa87f-31d8-476a-aef0-21725d1394be",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-643d2fba-ffb6-4543-a941-80c1a177e5e8",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-1c7b2579-d049-478b-93f2-f692c6d2a114",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1c924231-60f0-4f7e-ab20-9b7dc6d44cd0",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-dee00a11-3da4-4193-ae60-cae0f03d8025",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4ac82db7-6b27-4e8c-ab38-e05914ffa86f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5e2bfd6e-22b0-4ce6-8bdc-d6e51c21d6bc",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-ed9e2584-a702-4f07-a1fa-2a2ed5e958ad",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-3ee4caab-940f-41b0-b52d-d71e2d3aed17",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5875c400-8f98-437b-94f6-e06521f66d75",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-51daf05b-6821-4a7a-b764-2774f5a2cc4a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5cfbf755-7d21-4507-995d-6a3b6485a35f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-26b364ab-f65c-4a9c-88c2-c8861670d97e",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-82a699d4-4208-4347-a0f2-1f307fb874ce",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-27bf82b3-c2e7-4e1e-b115-ae787b1db1d0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2ba3ec29-b742-4d7d-86e5-842eb7641113",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-ffd4b2b1-4f15-44cf-8925-9239c161a6d8",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-9761496b-4339-44ca-a6e4-a872c0280678",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-49e68434-1bd3-4e3d-9e64-7b2efe1fe46e",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-6505eaba-111c-4fa1-9f44-f9bfb643af2c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7f700ea6-a618-4ef4-a52f-455e34c23c23",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-d7e5712a-2c5e-47f0-b68c-fc3dd0e99336",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ebd40c64-bdfb-4ec8-8da4-ada9c8e7f28b",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-4b314fb2-d595-4754-af56-f364ea52cf64",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ce2c23ee-f03c-442b-ae1b-5a75fef0a0cb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1e833043-13e5-4dce-91f2-aa95b31b4a74",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-64fd7525-2ef2-40a3-9150-6267032040a4",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-28391b54-8d9c-4b06-b250-35a892dfaecf",
+   "reason": "denylist:enterprise plan"
+  },
+  {
+   "id": "anli-6ca1ebb3-180d-42ed-b828-39ac089eb684",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-e907cd22-183d-47e0-8857-210405a7d692",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4f4112b8-6c43-49d1-9067-702b7690abdd",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-d7f8a1cd-5c4c-480a-945e-247c63eccbdb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-246e0984-972d-435e-82e6-17f870f1d9cb",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c9630378-9553-48bb-ac6b-4396bbd3bac1",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-05eb51e9-b3c1-4ed3-a704-59af1aa14404",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-958f1399-1d56-40a0-8d88-6567d56460b2",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-8f9862e8-9d59-40be-822f-c52f20db5bf0",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-a39d5b15-a7e6-4dbc-967a-9c1dcf8521b3",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-58047f38-5bba-4fa7-8a99-c758980e9400",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-64a81fe3-8ef5-4fd1-bb9f-61e4991f4f4d",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-d70cad8c-c000-4cc8-b7b4-c5e3a51c4ad7",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-4b630f71-a927-450c-b434-a815c4153c88",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d9bcd0c7-4f2b-423e-ab2c-6e8aa4f68bd4",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-5315d84d-f1ae-488f-896b-3478c85b517f",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-eede75e6-3952-4554-9bc6-eae3d915daaa",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-a34c9a4d-94c8-4d2e-a813-21534af35a67",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-e5cc0350-c941-4579-84b0-7fa921acd74b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-abb00eb1-722b-4d10-b498-d6c77212aabe",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2e8eb577-5179-4f7e-9d1d-e197c1d469dd",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-76ad1e55-d926-43a0-a3ca-7103be6b3902",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-da5d5517-a914-4334-9f43-57bfe12fc846",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-e6a06291-6e5e-42fa-8eb0-c272c2e3f576",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-7168cd0d-cbe6-4687-8bf6-c81667327c7f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-696cf5a9-74f5-48f5-bd10-fc98939111d3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7711ecde-40a1-448c-84e5-57df70942182",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-da4a754f-6b2b-4d93-8979-6479b65dd8d9",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-6909353a-a117-4b61-9716-70bb578d6939",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-812a44e1-a922-4426-951b-cc4ca41b31a4",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3bbdea1e-3003-4616-a21d-8ddca4cea55d",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-d16cdb16-d233-4e74-859d-fc094f605596",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-7da60c08-d12e-4612-9e87-71c46e45b6a2",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-ecce6443-b9e8-49cf-a063-db706e8eba73",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-ae379f21-03a1-4980-8e32-cf476bb71758",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-3511acf1-477a-4e9b-82f4-c026bc83b37e",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ee14f8ac-eac2-4108-b983-74a2de8903ac",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-3cae362f-96be-49f3-8f52-2aa430e0e708",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-42bac37d-a497-426a-b42c-67b20a034f05",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ccc88e3e-cf0b-4411-b1d4-695509d28fc3",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-3efc5cd7-9b55-47ad-b28a-4ec4d9f6ae13",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-32381e19-bd93-48b4-81dd-e43c36c4077d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-7edbc90e-4dff-4f68-9f08-856f29989056",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-8aa9bd3b-46bd-47ee-b4b5-a0269b99933a",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-5035ba54-5613-43c1-822b-19c0a1d985e8",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-b4d4b675-c69f-4752-be48-36ba361c0492",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-fdd9407b-b442-4597-88a7-95590b58a476",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-d7d83e80-2c3c-4fdf-8800-023a164aab54",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7b90eef7-d7f7-4489-84cd-21d52d4afb5c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1e29d330-ce1e-4016-af08-381c3a0d6c75",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5cd5e673-de5c-4097-a391-283356431455",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-0f3ff148-9e6a-49c9-9292-1867d26291ae",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7b81aced-56b4-4e8b-a89f-1a5843b3081a",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-5ee25f97-c5aa-46af-8c9d-c073513e7574",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1140dfb2-a143-445f-91c1-3389006c9272",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4cb6d5ab-0231-4473-95e3-3055f4ac955b",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e2c50c1c-f799-4705-89d7-8adced072a7c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-cfd4f0bc-c1a4-4981-a106-7f27d2724dfd",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-35d290b7-3842-4818-8d6a-12f49a21886d",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-fe6dca36-e5d2-45b6-af4f-7a19ad20dd8f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f6fa470d-10f8-4acb-ac5d-ca474b1c3c13",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-812b2fda-cf03-454a-8821-f1d064a274a8",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-88ac99fd-f27e-4076-88bc-4655469131e5",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-3623be11-8b4f-4a3c-bdb4-bf88462b2877",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-680ec88d-66ee-45f7-b790-875e453a554e",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-a1780e02-9f36-4c2e-9aca-e569e43b76b9",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-1ab55411-27d6-4e9b-90d4-a3e795b651c3",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-e51b1672-1af6-4494-ac6c-35e03848375d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-fe362e15-27a4-4bb9-9abc-2b34da7660dc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0223caf5-f829-4c7a-9910-e19e4e0cad05",
+   "reason": "denylist:javascript"
+  },
+  {
+   "id": "anli-699b4d56-ceef-4962-b8e2-9cd71d7b51f8",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-79d26b1d-ca01-4032-a027-227585f9ccd8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0bf61fd1-be98-4e07-91f4-a743ec7abc36",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-eeb2d7b5-cb3d-40e9-9490-98fd26d11b9f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-9a5a7550-1366-40a5-a5a3-dfd14bae443b",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c239c31c-093d-4b9e-90b1-0e0c9ceacc16",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-5c33f881-df33-4343-9235-95cfc0ad6b58",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-2aa5aa81-42e0-4a15-a8c6-d44e13c43b6a",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-c8f9b140-c592-405d-baf0-bf67fce740aa",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-80f96989-a5b9-466b-9315-d5a1fbdb862a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7b299a68-1b81-4c19-ac25-5e365fbcdb42",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a7652710-efc2-4164-87e2-da3dd5274d50",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-975cb19b-668a-4d88-a476-bf68c5d77835",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d10205dc-68dc-4b2c-b435-ca9085b760f9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-42f7ab50-8bf0-4ab4-953f-361393a6f658",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9a7594ea-f0da-41e6-acb1-18af72e02577",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-3af8f582-a9e4-4c50-b355-c04612d0c7dc",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-e0d6ed3c-1f91-4c67-ab29-1fb462e7bd96",
+   "reason": "denylist:loading"
+  },
+  {
+   "id": "anli-c2cb0820-ad5a-4d40-8b3e-e81d53819f9c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f5f80337-dcaa-42fd-996f-a9e881033b61",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-70978038-1963-48f5-aa04-66e9b35c4f9d",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-d28e3df2-0337-48a8-82f9-c8627cca2afa",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-b5bb616f-30ab-4a1a-b7ed-f356a6996f09",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-525e14e1-1433-4450-a508-aacdec16ae99",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-dd965a55-d3d6-444b-b10f-aaf62a408e32",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-eaa91561-27bd-4694-a3c5-14677cfb2c2a",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-956f4b90-d335-4be7-93d8-de5e80b46a9c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a87af1bd-1d47-489c-972b-6c1e33521611",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-00f70fbf-4851-4348-88ec-93d246220f48",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4d52e951-4f92-4959-afd0-81a5886f6905",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-1c72b612-dc9a-4697-bdb1-6cec27919061",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-09b21c01-2e55-4c58-8d05-8593b2a9d16c",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-a6bb9c87-e4f7-410c-9195-9bc56fb0f425",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-9dfca2bb-2327-4d99-ba28-19c90a7b6464",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-ba01aade-a86d-4051-9be7-59af6ee9ab61",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c0d1eb38-a4d9-46e6-8a52-56143d2893e2",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-da36b6ac-1a12-46b0-8012-33b47f5ea9fc",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-40500055-3144-4486-a160-4f4b28b603c2",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-c10c2654-6a2e-425a-9c62-8a40a3cf1b78",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-b2de37a7-bffb-43d8-87a7-125f863e57bb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-937c2673-49d9-45fa-8f6b-c29c726b3dc6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-71ec95f4-9da9-4e84-8d7e-d52285da879a",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-0a7f71f0-2884-4e6e-bc49-541580bd6382",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-10e8782e-3572-45b1-9b29-14679646063b",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-9e78e0ce-f5b6-432c-8406-5f206e95ee5e",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-ab27cb3e-0db9-4760-b9ce-ee656392d6a0",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-8bb2c7ff-94dd-46cb-a64c-1add1920ff49",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ca2508ad-ab73-4f8a-a7b0-fd1168d5a297",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a20196ad-c36d-447c-b42d-700384df11fd",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-413d5e45-247f-4059-bd5d-440c8d614cee",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-c80b695d-3574-42d9-bae5-3a7263071016",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ae9f62cd-25d1-4e55-bba4-3d1bc3bf702c",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-989b16ae-1b86-4793-80d5-13e40b701c79",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-7102c1b1-f7b0-42e4-8e51-425be0ea3644",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-78474cc8-7a99-48bf-980a-65c8eb98dc10",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-510fc922-d1eb-4feb-a118-03a28e5ce758",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-d4f7bd27-40ea-46f7-a986-21645bee59ff",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-07711e82-b11c-45f6-855f-7939d9dded61",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-470c8a0d-ff12-4314-ac8f-08bbbdcae33b",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e671d8a2-55d9-4d5e-b29b-232f574b703c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e5a81f03-9462-4833-9aea-b7e40bd7d7dc",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-cd721529-1b02-4916-b27a-22dd3cb0da5d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a9ec3e17-ebef-4c0f-9169-0f1bf99942ea",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2122c4f9-67c7-4bc3-ac3f-53dcf0fd13c3",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-bd1df5d9-15a6-4c61-adab-ed60f5742420",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-2c599a97-068a-41b9-8759-67e6a325c98e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-07abfba1-1bd6-43e1-b604-67253012251f",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-86bb738c-16e8-4c57-beb0-7461e240fd99",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-ea7982b4-2ecc-4144-b685-916e2009a7fd",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-7c1bf2e6-9465-4c4c-9214-4a025e0c6419",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-2d659329-1b4e-4541-844a-faef372cab25",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-0738121a-03d7-4887-b332-1dead823f3fc",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-9ca0e8d0-7a43-406b-a22a-21328b58df96",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-290b8c28-5bb9-41cf-9b14-b033650a9cbe",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-29d54984-b5e9-4566-a9c3-c40d5e1b076b",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-020bc48b-5627-4293-89ce-c8bbee3d7876",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-ab882c3d-6fb3-4aa8-abe7-693ad60e4203",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-62eb17d9-c07a-4506-9a04-2444ff07c82c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-cee2916a-0c7d-42da-8f47-952c597b142c",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-22599623-4444-47d3-a274-41909b5c696c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-1f707593-8711-4187-bd05-4d06a7d4cef2",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-0e4c629f-303b-461e-a9b2-59e733fde146",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-fff3a46e-aeee-4b71-8ddb-c3bc4259d9fd",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-0918348d-82c7-452c-a11e-6394bc046666",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-07e95ed3-4448-433e-97aa-cac837954011",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-24bd1c68-c809-4732-b544-5b02357efd35",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d49f3fb4-dd8b-4da4-94cf-ac53bab439ff",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-79f9943a-e48d-4c25-89cb-8f42f3b7e81c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-2f9bfb25-9811-4462-a3ef-6cb66059cc45",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-14784a40-5432-49a8-9635-034255761a12",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-3fd40645-d972-47e5-88cd-398f7962f029",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-9f108b8f-fbac-4243-a7fd-adbc6277dbee",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-00c0f788-9b21-4e83-a4fe-23c6b5b2d890",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-c31b2b30-a49f-4a55-a241-60bdfd326692",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a3913e9c-dc72-4b4a-b9c3-eaa0aacfef99",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-d21b4ede-375e-4322-b8e6-44a3c1281a10",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-44880efd-29a9-4bda-a197-fe3780500649",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-e78acf71-7d20-42e9-8160-061036fa33e5",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5441cc3a-8bbb-412c-9d62-3ed9b69ab5f8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d09c6fe4-b3ec-4319-9c60-054e90a27ba0",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-94fca58a-0df1-4619-ad20-774a0a032295",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c008c996-f1b4-443d-b0b9-d0c04044eb96",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-56a78d8c-7ce5-4263-a3d2-838a1e3a6edb",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-ae0c5c5b-bae6-484c-a6cd-48462b3890c9",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-758d7a40-6b83-4145-951e-ba5794f1e831",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-e0f106fc-0005-4844-8219-d563501b6685",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-05389c8b-0008-4b1e-9c24-05439d9b3822",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5b599163-d521-4e70-996c-9ff6b9f910af",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-11905715-1c4f-4771-9a40-a7ca5bc93852",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-4eb050de-4325-4e7a-af5b-84e2759c8a42",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-7684b909-2eec-42de-bc2c-d17142a738d9",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-dfb226cb-b273-4c16-adbe-208acbe56416",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4a078ca4-b0bc-41a4-90cc-b1045cc0ea27",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-b9787b17-8c9c-49b8-be4f-444140a0bf1a",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-bc3d2abb-aa76-4551-b8f8-0388d69e8d15",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-d134b9cd-36b4-4025-a4d1-4cb78fb19d35",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0b784d0a-94b4-497b-a04f-a3dc758edc5b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7f03bd9c-089e-42ad-b85d-646a23e1181e",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-34a56d31-2c07-4abb-bc0d-00331836b92a",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-5116e4a6-2c30-4f52-a589-c1f0164f3271",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-425a1ddd-d6b6-4f69-904e-5a45900121f8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f60bcbd6-2336-4bbf-afd7-b9e5b2b74b05",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5aa0549e-4f97-4b3e-a7c7-4942f02ba15c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e6b82261-ceb4-4627-8ca4-4dfdd5efe3d5",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7ba4136d-2482-444e-94db-4b5920cdb6de",
+   "reason": "denylist:spotify"
+  },
+  {
+   "id": "anli-bd65123f-cc86-43b5-a633-9e93a0208d93",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-d690ece9-42ad-4809-a44b-7d9920c826dc",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-e1f1bac4-22ea-4978-8efc-d159a7722f7e",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-27559088-ab99-4920-adba-6f5b17d9b017",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-09c9783e-d176-4fea-ad5a-16d1d623cfd0",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-fb5913e6-db81-4bb4-afc7-9264271576c7",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-08b6d375-f84e-4a7a-9366-58d54a615402",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-3679a648-a28d-4e21-93fb-e99875f016b7",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-ec6e9d8d-e85a-4e6c-93c4-6c665a045221",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-31ffc836-711a-4092-a894-5ecf8ffea2b3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-be027447-3923-470e-8201-f77ee9e0f1ed",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-667929ef-e7de-4144-b0d2-83ce3a283947",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-79e03cbf-b330-48fa-b8c7-6f00cc5fdf64",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-574d3912-1276-4537-9481-5e3a5cf7820d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-af7f8a3c-cbe2-4afd-bafb-af50cac52eea",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-012563d2-ee12-44d6-a30a-e2b19388ad08",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-22d98665-461c-4aa0-a0c9-1cae4e417556",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-953beda3-9476-43d1-b59b-59405382bb2e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e8c8a3ab-3fb7-4aa3-96c0-509bc0d28a3c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2193cf85-85c3-4e8d-b5f9-c7eb0c973c7f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-2d698d2a-f8ad-4ded-aa41-ff7a5d78b426",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-edb812d6-d8cc-490b-afd1-235ec5df40d0",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-86351cfd-5382-4f44-953e-7c2b2ce848bb",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-12c6fa58-fd13-45ab-a13a-a8e901db327f",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-8f0466a5-3c4e-416e-bc96-74fb3e56926f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2bf8e072-a095-45b1-85a6-8785dc8146f5",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-014abad9-ec81-47c3-b945-f184bc4abf03",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-1589f226-9dcb-4e90-950c-188b9c4fa875",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b4e6f57c-c9e6-49d5-ad32-6e2beeefdbdb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ac94e4ed-dfcc-491e-bfc0-a1b7ea29ffca",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-994e1869-f5dd-4e49-9209-c61b19de71f2",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-87b7fec1-faa7-491b-a783-12d2f0a59434",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-199560b1-f80f-4316-80d6-1c690cda65d1",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-420b5198-ebc1-4727-9ff1-a6d8085b3283",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-af246ccb-e577-4b5c-85f0-4e2e7402656b",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-809e8047-51d9-44e3-962d-300fe4af1b5e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-667733db-0b0c-4824-8337-859f49e28e78",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-080b34a6-8a4d-48fe-8fff-b040d8afc1f5",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-4fd1d70a-ced9-4638-a943-9038fad993e6",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-5390d980-2bb9-4721-8054-c484a4c31754",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-a224de88-ba85-4ca7-b8ea-f84a09a081e0",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-7c2cbe70-bbf6-4e47-a47b-2340539da17a",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-50070692-8a5c-4666-811c-80a9f3ed7297",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-1e3b199f-91f9-4903-809a-65a2cdd2352a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-05e43763-646c-4136-b7a4-54de0f0aa86d",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-eedb1e67-02ec-49d1-9996-deffe453825a",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-27a3cbde-ece7-4405-ae72-c8aa01a14a34",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4c923425-413b-427b-b147-42ef4269974f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-b4de88b6-faf4-48d6-ae0d-0bcfeb672136",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f842b441-abec-4c66-a715-d80f302e61a0",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-936f2f73-2e35-4218-9457-76fd627f38a8",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-116b0038-255b-4b0d-baab-407a787c610f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e65320d4-7817-474e-8ae4-ada3cb83b9c7",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a2ee9c15-5273-4917-8e24-30d6a2f94442",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-1e35940b-2f7d-44b7-9efc-813d7eea81d1",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-74930a4e-500c-4e46-b4b4-0bd7258d8c69",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e5ca52b2-9752-4d5e-9cab-8b0c87a3c343",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9691c30f-0956-42c4-96c2-6eb57104fc99",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d0f931a0-0976-413d-8dc4-08135b022d0c",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-def8c3ab-811f-432d-bda2-b1cd34a63730",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-4036e4f9-5150-4c22-a872-90c05f0cc321",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-361471f1-b1a3-4625-9e7a-b068fbd760b8",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-471bc493-515b-42c4-aed4-069e37bacc3c",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-4e242f4b-d661-4515-b715-138ab4a27590",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-d28733c2-af54-4ef6-8358-a76cdc161391",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-636215dd-2b26-4b70-8ff8-8774431429b3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2ccfc0e2-9596-4530-8541-2ac6d298dc18",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f3b3e28b-09c9-4686-93c2-1869a2b4e87f",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-7c067e82-6479-4f80-aa7b-d0974f7fe36b",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-471b8a11-e94a-41f2-844d-bcba89c60a7c",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-416832be-7915-408d-b07e-3c3d26867072",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-51ce449f-99fb-44e1-85ae-68720f8ebf8a",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-7fd04746-4454-4b37-862b-fa9dda77081a",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-8a49d70b-7ee9-4619-98d6-382eaeb96f78",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-d7fd3d7b-bf00-4975-9b49-7b5226632d32",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-520c1a22-6347-42e5-b894-45d5be2afa1a",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-649f7cf9-6c99-4542-8eee-172db2338226",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-407fb598-7c37-4d14-a9af-36ff1172d380",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-391999fd-9fda-4a2a-bdb4-fbc3c648f2f5",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-33bf5e8e-38fd-464e-82ea-0be2421735c9",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-e8656fe0-8afe-4a0c-b09e-02880ee88b8a",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-8441e2da-95fe-4e3b-80e0-bd54a447121d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a2bc4e8f-c0ca-46b7-94b9-05dab1f92a29",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-f2097fff-f72e-4768-83e0-812cf841d917",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-44f8343e-e4fa-46db-b912-fb7ee9be05d9",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-44d3a373-d6c1-4b71-9bf2-8d151b04fcc9",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-fbad04a3-7407-44ac-8790-00c99c165016",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-1929dbb7-8bc6-4332-828c-f46843f31cdc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-99dc7d7f-e1bc-4bd3-92ef-d2947afada01",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-6a40d6ea-1011-4eb2-af03-1e0577e4281b",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-46039be2-c514-4722-81c8-e94eeb605f09",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-95fa933b-dcd9-453c-b2c2-9b8e707e4cdd",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-8696c81e-7d69-4f9b-9b1f-e2990a074fae",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-88cc5fec-7dda-438a-b590-9125c81558e7",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-05b432b8-73fe-4b72-a1c4-ced74a045571",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-13776ca9-7c3a-44d8-b75a-92447b19f73a",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-fdb810cd-8da0-4fd6-8982-10951f2baf12",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2f7d6ca9-614d-4bb8-82d5-07a55bef6586",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-62c5058e-6d1c-4502-89ed-0055ac148b8e",
+   "reason": "denylist:javascript"
+  },
+  {
+   "id": "anli-a7f6e606-b08a-4263-a3ab-c4a787299234",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0567ff8c-3155-4529-87a2-f606cbb4838e",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-672913fa-97aa-4656-b865-24653e35b38d",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-6a78ff58-1666-4768-8b88-cfef5c05e103",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2e880382-a28f-429a-b732-014cef21483c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-63d08c42-b626-46ed-abb7-a29db563c15f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-25c8ca1e-003c-401f-b7d3-4f8ec5f5f105",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-77c546b9-bcec-4153-970d-e1d11ef1ae93",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ac517caa-9a9b-4f7e-8509-4a37b0e2daed",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-186b7a9e-3e9b-46c2-b9f3-9eb243233483",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2134f599-bdb4-4192-9373-6ca7f9eaf728",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-454359d0-976c-4f79-9384-2a2e901acd48",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-57508ade-6b28-4b9d-984b-efcf7c2358ba",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-d6d2d9c0-24b0-4628-9063-99474060917c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e3e21a04-b2e4-477f-863b-50886bf69cba",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-fdba9e86-547c-44ab-bc00-0d5b6b2be1d6",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-63f9bb77-0013-43c4-a900-b1078619e661",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-3cbf7b82-ed96-4a5a-a018-b086d7f40dd8",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-5a478be6-6ec5-4c75-a8d9-e2b59f767ec3",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-f2b24de1-6fbd-4904-baf9-83f7752cd0b4",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-a5ed244b-9181-4b4a-a3dc-72763a6035eb",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-142a2314-c01a-48cc-a18e-bf2fa1df78ef",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-06bd01a7-69da-493a-9a17-7825ceb69cac",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-7fecfd44-19da-45db-bc9d-a194c15ebe49",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-3ab4dc72-dc63-429c-8cc0-9fc5fd34aa98",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-239ce62a-720b-4cf5-9292-0de478fb3503",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-4b7b387c-396c-40cc-8afb-8ac761278d93",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-c6ac60cb-7981-47d2-affe-699e6da1056d",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-c1424457-380f-4203-a983-4d5e17070038",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-e87edd4e-3d3a-4b2f-aee1-2fea16bf5607",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-d4a687a6-46f9-45cd-b5df-ae9856d42e5a",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-f7d3f941-ecb7-4f8a-a771-d9cb30814bf6",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-8448f818-d5e1-44aa-bbb6-5e9e3b716699",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-69db934b-298d-4da7-8eb3-5e5350470c6a",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-aeb68bb5-3de9-4927-8fe2-b19070be99b9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-8c125d98-9b44-41f2-bb3e-d0f071a92e20",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-861d2cfd-bcb7-4dd3-8d78-cce791de3fd8",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-522c08bf-cdac-4390-9804-78013cecbf77",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-de1fae82-eef5-4688-81bd-cb4706a62f7a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8dec9b87-f955-4dfb-acb8-ac3d1ba21503",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-d382dabd-dec4-486b-9e94-926d539e7608",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e43fe9de-2057-49a5-9748-25b889a5467b",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-55a41443-62fc-40c1-ab65-4809d3dc2bc0",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-0d17a9d6-c70e-46e0-9f47-8a395817309f",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-e3d11b86-f43e-4015-8433-6a57ac02b8cd",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-db77c278-4f2f-4a1b-bcfc-ab32cc63e35c",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-14fca9fa-7e87-4d48-a4bd-3037b89d1965",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-c9b9c2ca-24a7-4428-9174-65d6aa95836b",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-e5e23ecb-997b-4639-97bd-fc97cc4d7c8c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e121e33c-a8d7-4858-b2ef-0d1bfffcaccf",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8087e266-90b8-4612-9c35-f87805a3d7c7",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-896faa12-9079-4059-9d39-cb597da4f0cb",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-6b33db3a-93f1-479e-a9c9-7e7d2c44df08",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-fcd87832-8141-4ada-a4ad-b53cd5c31e1d",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-24444157-115e-4b9e-be6f-871019bed06a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-48afadb3-e3d8-4d80-b51c-f66d0e8aebdc",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-cf605152-096e-4232-aae7-edd140a4d198",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-b11e85d1-813c-446e-b835-0f5835ae671a",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-64759a4c-3f0b-447c-8c66-c8a3355d604a",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-e46dbb55-b25a-434a-9a42-416083d6896a",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-444d721f-e005-44e6-bc8e-98b54baece67",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-63f267bf-c467-47f6-a2ba-561fba00b34b",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-3d9c05ae-c986-4b87-8ea9-a6f2d4ebb123",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-cc1117fe-9f64-41e9-8d46-216a7cd4973d",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-2c607ab5-f072-4eb0-b853-bd507cdfc364",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-1a02d7f6-926e-4737-bffc-bcd6c3529530",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-fb2fcffb-04cd-4a6c-a32a-2c57ce707830",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-61eb346f-7877-44a1-9771-bbc695a712ad",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-57a3cb26-aa71-4316-b087-76dc1cc4ea62",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-26609d6d-7148-4e93-b911-157d5e1ff920",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-5720c156-0ded-4abf-b992-957b273bcf51",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-192abd71-a951-4e18-bc00-cbbdb414ec65",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-4c19d8e9-08eb-4473-bfcd-9e94c2e6aa96",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-bdfdab82-95da-40d1-86f8-fb9c13c922bb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-94d80b96-4229-4a59-9c0b-942468485740",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-37774d94-90d8-435e-8d7b-061f7bd711ea",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-9d34d1b0-33cc-423d-9331-6810b0145b96",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-ca05b679-2a77-4b36-bad0-38c24b69b73b",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-bd165ebb-d6d1-4270-89d3-86f77a47a88a",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-52afd1a0-5059-4895-b6d7-31bc052aa0ea",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-95abe9ad-7788-43f6-aded-a2290158e834",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-9030773e-2d76-4ed4-9342-a7a259cb0247",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-8e42bfae-5607-4942-b449-87f8a80910f6",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-22948402-bdc3-4996-8467-feb6fbfd1c42",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a1296434-97f8-46f2-b35c-c3a4dcb94b3c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3c5f55f1-97c6-4409-a12f-e489816effd5",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-d4bab677-ed6e-4f04-aebc-84058acba605",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-706cd3ab-3ac6-4e29-be87-4d95bf71925e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f85caa85-91f3-4484-a803-378254781cd0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-bb5b9c63-f7d9-46c2-9ea6-9059fdfb6b91",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-2b32a452-b1a6-48de-b1b0-0a67cfd81658",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e98222e6-ae56-4c8d-973e-6352e37b330f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0c5f00b9-1e75-4aa5-844f-7d1cd42e5e73",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-8030949d-8d54-43bf-9525-baded11cc82e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-175b88fb-478c-4481-81a7-ee80fea6a85e",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f14cd93c-4c53-46ab-96eb-a8a9c01466a7",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-1b3a97d3-84ba-4d3e-adac-0482871b8dbb",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-de5e629c-fb16-4750-b75e-13b2aeac7f29",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ac258b51-26c6-4ed7-96b2-9f2f5e1a7cba",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-dd3026d5-ad00-4858-886c-a36445987e2c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2322667a-a0d5-4d28-a891-de11c0c3953d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ec944bf7-5b70-48fb-a9bc-22d0cbad2d31",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-c8acaadd-8b8a-4a33-8f3a-c74a946968eb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7e8db234-f69d-4822-b693-1db4f4bb1d38",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-46967b44-257e-4d9c-9168-b1ddad70dad6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cbe862e5-02ff-4925-be78-faa1bb5ea6d3",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-fbc4a585-fa6b-4160-acb5-f3eca4873617",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-cf2a6f13-9b70-4836-83c0-e6a77e7f2586",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-7a497b7a-d326-42f5-bf58-f6e43e9a31a7",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-c39eeca4-cb55-4469-b8c1-adfdb05d4705",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e0cd8b52-e57c-48fc-b0a6-ebbd71b245e2",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-eb68ba6c-3ea1-4d84-a4d1-929384a68091",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-0cec078c-0fa6-497b-996f-59f01557223e",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-cb860e8e-a779-4d4b-bfcd-245d4f74feb7",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-af2043d4-d942-44aa-b9dc-673e16a05bda",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-27ea6ad5-375f-4589-a805-e8369f7e5367",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-2a12461c-f255-458c-8f79-f002679fdb87",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-822d1ffe-70dc-4aed-b8d7-b5bad37b25b6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a5bf1324-118c-4a8f-9dfc-67933c925715",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-e496a666-6152-4ed0-9cc5-2c14bf43e58b",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-15bc020e-3e1a-4738-8484-6eb6218e26dd",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1cb97024-e06f-46e2-ad01-c73be8e954c1",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-a78f0aaa-e6ee-48fa-ba03-91329b5ea209",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1fa984e6-6fab-4dcd-b696-93780d3f534b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a58fb658-5d6e-4985-be21-783304f71ca9",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-acd81ca9-68f0-4e0e-87b2-6f24575e0102",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-9fdfe342-4990-4df1-9554-6fca4158730e",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-52676a4f-0ec4-4d0a-97fe-dea2ea9230f0",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-a639e0cd-6cc4-4baf-9626-07b498471b29",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a8f84622-7067-425a-9e41-e3c8f977b0ca",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-8a6bff1c-c914-4fb9-bd8f-484bba75c2c6",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-21905254-89e4-47fa-b8e6-c697b5fe6ec1",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a6c6118a-0b21-4eb3-b1ea-88b7417d4197",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-9381da6d-6e97-4ce6-b13e-df48e16c799e",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-989b9116-036e-44d8-89f5-423d1294b690",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-212ad6c8-5b5a-48e9-a206-cad75b2933aa",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-e46f6be6-6c01-4f93-b347-016c0a57bc04",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ae30a3d8-478a-4e5e-bed6-91b64b28e084",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-0df10694-3cc2-4c7b-aaa8-f23c3dbabcfc",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-4c24a35a-111c-4f43-bdc1-46fa4dd58316",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-680f0ac3-0bdf-443b-b3c0-d02bf02e1abd",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-2863bd53-5f6f-4e82-b9f3-e5b94d6d569b",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-5456c92b-ef00-4e55-942f-ea16e859aa4f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-b8e3cb59-b091-401b-b489-b9312fd97ae9",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-791be4f8-ffcb-4b92-9b1e-5272b8ebc9cc",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-bda768dc-6db8-4255-8020-a8327ee95ba9",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-a68b82f9-48b9-44bf-950f-f262a575208c",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-547df4d3-78aa-4d1e-bb0e-3951ad51143e",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-ceb70264-e6d1-44ac-ba8a-15efcbb6d866",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-02804664-7ecd-44be-ba96-a792068db502",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-6fdabc0a-08d8-4557-a635-b059c8e0cee0",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-09dda4dd-4cb5-4337-bc4a-ce5441950918",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-7c22d91c-7747-4a4d-8ff8-7fe6fcac3c38",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8587c08a-9d1d-4af9-8a4f-19119b73c768",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0d68995b-16c9-4512-b9e0-1a0ac2bbb826",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-653ab920-7205-4465-9480-4b3281a9ff90",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-c48cadec-6cce-46df-8be1-1ceef09ba39b",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-20755096-8716-4d57-a1db-478e69e8b9fc",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-7a53e933-97b4-491b-b24e-e22546654886",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ca6a8118-1cb2-4b75-91ca-91d29c536140",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d5251524-ca00-4bb0-92e7-982dcc353b0f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9b8abe86-14a1-4b55-9c33-ac478dda9b5e",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-58acbb73-3adc-48d1-8b02-2ff13264afaf",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-fc8e19c9-5b93-492e-9115-8e9df5e03ee4",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-09d3247a-10ce-4f38-a181-3a3edebcd7b3",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-4b1148a4-9b11-4e74-b1fb-d6d326ff42cf",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-f06ade58-f445-4d1b-a49a-76d306bca8b6",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-6fa3e68e-1507-444a-af16-b21d2a33d878",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-8479f150-76b1-4900-9ff1-22f38d818a95",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-b01920f6-cc0b-4a32-91e8-1ce507cfbc3e",
+   "reason": "denylist:spotify"
+  },
+  {
+   "id": "anli-3cdf111e-f6ca-473d-817e-9ee46230fe2c",
+   "reason": "denylist:javascript"
+  },
+  {
+   "id": "anli-69c65f71-f5a8-4cd9-be97-4aa8a9300ca1",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-d041214a-489d-4f4d-9859-7571886cdf81",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2babfcc2-c581-42c0-841e-e5e7fe97cf6d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-40d9af6d-7593-48e4-81bc-b910172fd421",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-1d848d12-4a3f-4eee-93cb-0c32dec22437",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9a15108d-bf02-4c65-b5c7-5d1167d77172",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-3e84ec38-71ff-4f7c-9823-3b89365aa982",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4e0cf4f3-f252-4a17-84b2-2c6f9e487bfe",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-022da2bb-22b7-4428-a5dd-69728248a672",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-dd457631-3bcb-4ea9-96a8-8a0154a517ea",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-93168e8e-adef-4933-90d1-cfa53726e8ce",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-c4b930b4-e388-4146-853c-0a2ef659b209",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f4a4e088-e2d9-4a5a-9380-38b0109c23b4",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-664e5fe8-39a6-45bc-9b93-7387f3966f65",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-cb5ea149-f690-4485-9dee-73ce884ce65b",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-0f7b6bea-9fdb-4ef7-9ad4-ab7c3b4be590",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-253b6bb7-f7dc-444b-805d-63aaf8468f1d",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ce5e8730-5fef-4782-87e7-71265cc35714",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-dbf084b6-4433-4066-8bae-580fddf63577",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2a94bb4d-c703-488f-af30-48bb5aa8811e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-485f4eb1-7050-4135-9aa4-2a8e7428b604",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-ece73bce-b9ba-4b0c-a466-d0f8e688b3dc",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-e2787126-8810-47f1-8058-cd733fcb7dfc",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-53f5c946-c4d1-40f7-a143-3c55cea3a6c2",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-d4935619-6cf2-420c-9e3d-bd64ddca595d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-377258ee-1452-4388-8430-68b823c19e3b",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-07836376-db02-46a4-abec-566c89c51dcc",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-49b798a2-1527-4baf-b985-62fb3a22be45",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-cb775dc0-5468-4b80-a09b-1b26c217d861",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-85e9c890-d152-4412-9066-a855b3d2dfe5",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0d4e4aa9-613c-442a-88ba-bdb9c9acc95b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-50931943-72e0-4fc1-ab04-95e770cd6b8a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2bb8775a-8ce6-4574-875a-569d8a062da0",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-afa8ac02-e559-4201-8172-67e26f6a56d9",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b4530c21-37b6-4c1e-ad0c-b58192b15760",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-89fa6c65-4d9e-4a28-8adf-88d73256fb0a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0f83c30b-d90d-4dc6-a673-bbd318957305",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-0c3ffa9d-1d30-44f7-8c6b-50bd9d92c894",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-20724860-5d9e-45db-91f6-1fa927e355fd",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-c7a73ed1-2faf-4f88-8b5e-99e0869a667b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5b880da5-79c6-4948-8fce-5f1444a4dfe3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6216e9f7-664d-4afc-869f-27c060aae28b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2fa7b1e6-1cdf-4006-aebf-aee6c0168955",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-b901042e-a329-4c25-a4d9-7224f7f8dc20",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-efddea50-f845-4ef1-b9f0-c909e8670dde",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-f49ad575-5a50-4b9c-93cc-5fd95914ddae",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-6482a633-cf8c-4ca1-a594-5af1c5bdf2fe",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-721551c7-3e96-4ddd-b609-e2cc712491bb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-03038169-c565-4a0d-952d-cb39dd7e03ab",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-90186551-69cb-4f7b-9661-10873c4d3e0a",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-0a8cf19e-5f86-4553-a478-9b348b5d2b68",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-f3ca3266-80e1-40d0-a900-fcda45a71ab3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-bb2fea44-fed5-4d2c-9463-164c532befde",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-6616531e-fdac-4ff3-9e4d-6449e35feecc",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-2f5ea91d-a1dc-495c-a46e-d87d825998dc",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-92a9ac73-0237-4c4b-bc13-e62aaa977156",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-1d662e9a-d5e1-4649-be46-4c1119d8cbbe",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-f01d2ae6-527b-48f3-94d9-a2bc4ad256a0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d5b66e4d-ad31-41aa-8d1b-8f99d281af10",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2ff26c16-4438-435f-96a6-0e04a1c41d03",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-53c85965-fac3-48ae-acad-f7198159321c",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-a83f0d17-ec6f-4742-8a3e-c1e960d32ca3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d981611a-0a13-4995-bc06-26c8519bd76c",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-47c1bcf8-2469-4e2e-b6db-47fc28ff50c1",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5eab54d6-3616-4620-87e3-a6a83816e3ea",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-69ddb996-c93f-433b-a9c9-3a562ee4a492",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-bdbb1006-1e68-48fc-b55f-1175dbf900e9",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-083e3e6a-3e67-4a47-812f-8b41bf1e8493",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-1291b8ee-569e-4e98-a037-bbb2c900e8d6",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-ceeac259-e43b-4702-ab0a-257d744242fb",
+   "reason": "denylist:javascript"
+  },
+  {
+   "id": "anli-abe11cf3-ae61-445f-9b8a-438bd0e6813b",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-79d45e56-8b33-4b5d-86c8-7fb320901cf0",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-3a180c7c-1c9c-4e2b-9c80-8172b919ac88",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d816e6c9-8e95-4643-93bc-9fe882634fce",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-b3d472c6-8898-4f9b-8a9a-02a23dcaeb7c",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-6a8303d0-cace-4a74-b6bc-e4ad348d68c4",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-6c9f49b6-1f9d-445a-9415-d82e6772615f",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-362ac8f1-2cee-4840-9ee7-a671b9ddda55",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-4bc9e9d6-a908-4884-b49f-186048e07d7d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-8e96ff8e-b8d3-4e06-bf44-d38350243729",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8e48dcf5-997b-4ef4-8867-0a0141af81c7",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-521c6273-b097-432b-ba16-43410a9c217d",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f8bae6b9-1658-45f1-a845-fc5b8a3f714c",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-22eba8fd-e457-40a6-8fb0-30172547f3de",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-414f78a6-fd36-49f2-9905-ef12e4cc7caa",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d341cf03-4fe2-443e-8983-c6714defc4a7",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-a23d8486-f789-4e24-afa7-c84c5a8b4b87",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-370c6386-e1fc-4670-8ae5-90abaf81bea1",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-a72d19fa-dec9-49e0-a039-ece33569180e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b870e7e2-b439-4630-875a-a6d8a4eea40a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-13044c78-c0e4-4eb0-b0dd-00497919d44d",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-6981f2f2-c12e-49f5-ab2c-44e917d98b00",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2171f4bd-671b-4d93-8d82-90e6d80b1dee",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-75427dad-aba9-47b0-8597-aece7eaf9bef",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-9eceef01-96b9-48f6-bfeb-80b23f52af25",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f5304c3c-cd0f-41fa-8c30-9b252f6bc7b0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-cedddc47-d19a-42a8-8679-01f76cb4ceb0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ed7663ac-4647-4185-92d0-10d6dad93872",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-8b291826-0a6d-4eed-8068-864fe0188ed0",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-e4143a41-bf08-4157-9217-105196fa1ac6",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-2e24d3de-5a9b-4c24-9eb6-55b1a36d859b",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-b25033f9-6ec0-4ca9-9ef5-da2cf9f3d038",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-921b4545-b152-4e11-afc0-750db68d80cb",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-fba43502-5507-4518-ab8e-3116a9cfb8e0",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-ea7e75af-98ea-4c62-a383-61d2003c08ad",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-9001a10b-9b0c-47ba-8db2-ab3b96f49894",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6ec5c58f-eaf2-4845-b0ea-382412230977",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4c676bdf-1697-4422-a11d-daaeaff066cd",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-8e36e677-67fd-4d25-8f16-b703c03adcb7",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-7a96f679-73bc-4541-9e55-2adc138a03db",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-342c1c1a-93b6-4b32-b690-29bdf388de9c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-24a73ea7-a964-49e0-9d2e-4718159737ed",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-fb9dd156-c017-400a-b020-e21906f6ef8c",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-74ec77e5-7c79-4a37-a28e-3e64ced88dd9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-0a934f69-b232-4126-b61e-9645c3cc418f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-ca45a249-0684-46ac-94a0-55ded4820d09",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-e1400733-5c34-4030-b730-80cf1bcd2928",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ebe0025e-556f-4265-8f6f-1fb2a6f31e56",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-16245bc6-9e08-4da0-bc36-dc1f352c759c",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-a75749db-5dca-4f91-b5a5-cf56ad9bdaf8",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-bb5d5fdc-87ff-49bb-9c63-e691442363db",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-3fc6d683-0327-47a7-8960-b3a0741828b0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4adaadd8-060c-47d6-9c23-80eea4fe13d2",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-96f1062f-2e7a-4d56-bb2f-c0e003f78ef8",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6051cf21-6bb9-4b66-a8b0-026cb42a60d9",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-cdbf9833-3847-4808-bda0-51566dbaa5c4",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-fa074c19-ea51-4ebf-8bfe-74c153d4ae56",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-388b0262-543f-4fe8-ba2b-496c73125c50",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ead56866-0a37-4578-94b3-8d41676790f1",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-fc29f461-f170-44c6-8d16-32844c090cfc",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-9f2aecd7-06eb-436f-b62c-620c58a23174",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-dc3c248e-a09f-4626-93d9-67aa91c17dff",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-762d48b0-847c-40d2-8e81-4a0114bdab48",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-19b3c7d0-9e3c-477e-ae24-aa70501b3873",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-d8047e70-2d17-4c91-8e91-71267701e886",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-7a8b1176-e4ea-4de7-8c74-a12959d19194",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-2f3f1b63-9c07-4c2e-887b-9a6fef0f4dba",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-e81b546f-2f8a-4171-9ff8-f21a6f06fbd4",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-9c88b516-8b17-4f7c-8ec2-db901b085455",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d112da4b-5c71-46b8-97bd-1b0bf7d3fa5f",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-65f4a0ad-ebb7-4bd2-a2e5-1248148dfbf2",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-edc71774-c2d1-40ac-a93b-1ca43fe57627",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-6fbd08b3-4a78-4cb7-98d9-6928cd718806",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-14f95796-b5d0-4682-96fa-8f5c91a287dc",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-420330ac-3d4c-4445-9b7f-0f7ed2cf42ad",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-2bd2f21a-a485-48f8-a694-e8c73b779fda",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-7a893f07-13b4-4cd4-93ff-5970af3acde5",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-af08becb-1793-46b7-b55c-d871ff0b6d0a",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-09bc2e21-3d2a-416e-97ae-991d2cd8cd25",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-d1e20046-fd24-4b60-8182-f3ff4e690769",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-0c9c60db-4e54-4c7f-8bc8-d5d49bc9bece",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-00a8f538-e4e8-4592-9978-cc5d3da10527",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-82a0158f-718f-4217-93d1-b571dc3a180b",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-46f091d9-a4e8-4153-a614-6f5500665159",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-1518900a-8226-44c8-955d-7adc14d74de6",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-1729d2d5-fb1d-416a-a6ee-653a712b285e",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-cdefe1c6-7e05-43de-8e74-d08f6a976466",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4231d52c-208b-4c80-868b-381559d65de4",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-0e440265-f582-4e7a-b14d-92c1bde38a4d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-caa3d473-0de4-4672-ba24-5cd05a9a1d19",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-5b076496-8609-4f11-a6c9-34f3e34b43b6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-94553627-8b69-4974-94db-06dbd6b58161",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-045b03d8-6ce4-40d3-b590-c45e1ff6adbe",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-54c368e6-ef9c-4bb0-89b1-b010b1730f4f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5fdb6de1-47e8-4296-818e-d9fbedec265f",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-38a552d5-bfad-45ed-8a3d-43892f52561b",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-1f812f51-d806-46d6-9ba1-1c3d32b79093",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-5d02c28b-1d23-44f8-81f1-90b71a3a17b4",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-fed81a5d-3137-47e0-bd5a-e7f4c319a4a3",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-2da8ed5c-7c44-44bd-a9e8-6fc1f71d1581",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-3178ad45-b68f-4c48-9175-0fc07f42051d",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-880e770c-982d-402b-b165-d672b0a40b65",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-f15b53eb-7a35-4ace-95f6-1295f21fa8aa",
+   "reason": "denylist:spotify"
+  },
+  {
+   "id": "anli-3fa9ec72-c075-4bc5-a0ce-bbc4d2479d39",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-0ba0cc84-bbdb-47d2-8e91-e2688349c21f",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-52f12584-f3bf-4abd-b52e-5528df31a087",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-ecac6724-70b9-4c18-a607-88eb5167e00b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-faba9181-9e95-4b9b-a6f1-af282dd0b28c",
+   "reason": "denylist:enterprise plan"
+  },
+  {
+   "id": "anli-c1b35b65-2bec-4fd0-aa24-9bfb3708314c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e1c8b0e3-7b78-47b1-a956-49073a715650",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-4023794b-bf24-4eb4-be4b-5bfa9b7cbff0",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0db2a4ba-05a3-4aa4-9133-7badf1435ed1",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-ec766de3-6609-4ebd-8168-04e83003828e",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-24989a1e-1c96-400c-bdb6-e7270c6d4360",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-aedd21a5-bb2a-42f0-89a5-1444cc1a8fb3",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-62951d5d-5cd5-4ea3-94cc-03faa8eb6e59",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f24c0439-fb9c-4e39-a66c-b10d4042b7a9",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8d48ab45-baf2-40c2-941e-e5417f278cc1",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-72d04a5d-7106-4911-9e5c-d1d07d2ba01d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5b583719-1ace-465d-b6de-a2d77727b1ff",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-557bdad0-245b-4fac-9cf9-8e4cf979b37d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ff69e0f3-961a-45fe-998f-0d075a7d8af1",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-9cbf0f15-a418-45b8-989b-47d78bfe31c2",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-10d572e0-acc8-4b78-bb8d-12dfdfb21223",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-8756bd39-ca41-4942-83b6-91bab63bf622",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-3e30f435-f702-4272-af16-b32c126c2d1e",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-9bb92a5d-4fa9-4fd5-80d9-4552ab0ff197",
+   "reason": "denylist:spotify"
+  },
+  {
+   "id": "anli-b267d9d8-2b86-4a99-b7b5-0df475934439",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-1aa0ab5a-2d3e-4ad7-b6d3-05bb17177c17",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-039a00a4-4566-409c-8359-fc1a24895492",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-6df1a9fa-71f6-474c-9cbc-5a6a1edc9986",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-8aa191de-a378-462b-8b6c-2b71811fde52",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-1fa4391c-3b88-4c61-ab68-f7f537acd732",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-140bd951-1935-49e8-9c25-92aa38a748dc",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-8e430efa-e4c8-4c28-8c14-4dddba89c8bd",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-f434dccf-b753-439a-8bd6-0deb2b66ca91",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2419982e-4143-4cf0-9041-ca9f9841b1f5",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-a858559f-f4c4-47ef-87f1-0eb6def5c88c",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-5ed8ef08-405e-4407-bdb3-521c50766d04",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-8ab6d4bc-d5dc-4b6b-a330-64f9fa1b0384",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9112bd38-6301-448a-b953-a260888d5351",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-95339dad-fe5e-4751-9fc4-c5b35bd808c6",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-d362496b-6012-4430-9ad9-84f879d6429c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-ddd0d659-a0cb-42fb-87cb-9c9e55e71190",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-0c550b57-1510-4eae-8fdd-160e39638008",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-f93f417d-4037-4994-93d6-da82365d4c94",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-837ece5d-c134-45df-9455-c32f55a5bead",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-690156e3-c8d3-4cef-b003-5bca8b2dcd52",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-8070785c-011c-43db-ba0b-6fe4a02a6cfa",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-6deb5f6b-60f4-4eeb-9a96-5864a70c6cd5",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-dadc9a85-0777-4fa5-835d-3371270521c3",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-01d5896f-c6d7-4ae7-a208-36ac6f4aeda3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-bfd79647-7f3b-4b8e-998f-f6316ecceb4d",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-8e4f9951-b502-4d00-880d-9f01b9df2209",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-df9cee33-f678-4919-829a-8a9c9b0c3f70",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-0fc6f310-b454-46b3-86f5-e422c5aa2518",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-4baee443-60c9-4c45-8c71-c50ca97c8ed6",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-ace86101-7936-4fee-bc19-e0ca8acc9748",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-46ea49bf-f454-4571-b12e-a36a1b2d4099",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-c686200d-2ecf-44c2-bc13-4913b5f32657",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-1894ca53-4359-4912-8e41-61bc20519bc8",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-df146cdd-ff15-48d6-af57-de80e723576f",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-1229e766-fcce-460a-9295-ae3965578d38",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-81383636-936a-4d86-a855-c1ca27854b39",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-dc6a81b3-c860-4fed-92e6-85ce9d4fc1e0",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-c1569d82-ffab-46de-9a49-127b7ddf0ebc",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-da5df544-8463-4822-b41f-ec20384dc4e2",
+   "reason": "denylist:migration"
+  },
+  {
+   "id": "anli-958f89ae-d507-4369-8c1c-530d1b3aaca7",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-b45fc6a0-e96f-4663-9721-97b665f5f386",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-7c763456-4aad-4e9d-b2b8-3839381871f9",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3719e887-dcae-4686-8192-9ae598bda058",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-7b10e0e8-9c08-4f1d-92e6-6638d90da780",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-9de8b5d7-6b0e-4025-8f40-f7687629ba66",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-1bae113a-03c1-4e80-a218-7bbb2a13da9d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0dcc7338-aa9f-4158-8b02-b8483e13f29a",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-fe8e2f05-6ad3-48e5-87f1-8eb35efdb523",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-9a768cc7-193f-47da-8069-9e83f14978bb",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-074826ed-effe-43d6-a2b2-e8751c4d16a1",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-ce786bdc-e7e5-4311-96e0-3531b976e158",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0ddaecef-8f81-4b0a-91f8-14f2ef0031f6",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-6056893c-d84b-4746-8d7a-04c4e8c65858",
+   "reason": "denylist:spotify"
+  },
+  {
+   "id": "anli-17589fd6-e63f-4b31-ab91-5a95cbe3d457",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-8089e38c-145a-4ec5-9a08-f95f88979c09",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-42b60b99-9c6d-4450-b1bb-3756650ad5f9",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-0621816d-3993-4def-8dac-2e459219905b",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-c17d0b1a-5e1e-4959-b1df-f5d9fba4713f",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-f4820e62-68aa-4bce-aa96-006fe5f82d7a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-574aa5d6-614b-4b4c-b359-23cc9be4dc7e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-34d8b3f7-5e2e-4178-adf9-2a95e73dc8ab",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-c5e0eb1b-0422-490e-b515-ac94ad303a39",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-219a99fe-f271-49cd-82eb-acb838b933a2",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-deed4c45-fed9-47f5-a51a-e15dc4531320",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0ec55856-1d60-41de-8bb7-03fe3a1c2175",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-6faf5e63-d1c4-4be7-be9a-aa3fc489541a",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-967074d1-8f7e-42ba-aa05-bf92704b859e",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-39428436-5734-4968-a898-9b12f147acca",
+   "reason": "denylist:zebra"
+  },
+  {
+   "id": "anli-9c69fe9d-4be6-4e30-80ab-d8a7de4e5c38",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-c3753896-527d-4a06-980b-10a00f8d3a7a",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-bd6d1bb2-1bfe-4940-a7e3-900cfae2cf8d",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-87afd276-c392-4e47-b073-1db325e2590c",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-aec317be-75c5-427a-9031-b68faa65d39e",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-737c6a0d-c537-4d33-b90f-ac25b843a096",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-316379b0-3ce6-48ab-8b3d-271835bb0bd4",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a229d647-7add-46f1-8d2d-a047a35b37a3",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-f3c2712c-7747-49dc-ad00-8cf4cab75bbc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-fccff8b0-d403-4abb-babe-cd7b0cda5f70",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-695463b1-63ef-4164-b0eb-74055e8a750b",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-bc8e7937-b22c-40da-b9e0-a40aa090d9fc",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1dd256c6-2307-4d8b-ae7c-912bddd763f5",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-5d37e2c8-f7cc-4649-a71f-6236aeffe91b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-332c88d4-e356-40f3-84c9-cebd81b5288a",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-8b179645-5972-45d4-9811-b7bf7ebc21fd",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-ae564cb7-3416-4403-8ce4-c0d8706ad035",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-45f0957a-d54b-4601-81bd-282841c2db6b",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-dbe55761-0a5f-408c-9a63-7f00e191af0e",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-3990863c-b21d-4b64-b3ee-d553c3a02b11",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-05934403-9280-4dae-9323-75b236b3c938",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-50e5b208-3d69-4c18-b12e-b3460d18b5ea",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-894c7993-f5d5-4e37-90c1-aff40f8fc68f",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-b2d08c96-5fa5-4fee-833e-019ee1edda88",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-0b976b8e-92ea-4ae8-afc7-63f593a51f9d",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-148798a7-5250-4b4b-87ad-7511242bcdd5",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-57cdfe33-0ad8-488e-a5d1-872e88daa70c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e9e0d674-c627-4ca4-9e27-dc5488691ffb",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-1e64523e-d57f-4839-b777-1f1d4027a993",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-95e9113d-70ae-4cce-ae08-fa779d15310d",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-776f9bce-bc17-4137-83dc-57ce44fb213b",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-f18dc4d4-a909-4c8e-b9d6-e23085192ac6",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-7cb48416-307a-4c83-9762-a48d58755c6f",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-ee1362f9-95b9-46ac-a7fd-2f5969d07814",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-4ef5c42e-0461-488e-a9b5-e2bc6a349d5c",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-7a6eb91e-deb0-4c32-b9d8-b86782f21784",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2007569a-c9f3-46a7-83c6-2f29b26641c5",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-d14646ba-da93-409e-8f70-3d34d6f75782",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-e653bbf0-c82f-4dfb-950b-ce7455bfad0e",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-02f5f013-8719-451e-834f-cf5cab19cd15",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-2df5bcdd-a353-4133-99d1-b3a40eda39c2",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-370dc271-581a-4c44-a649-83b55ccebcf3",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-5b0bc2e4-4f31-4fdd-8148-fdca2caeaac2",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-3e5457e3-f7be-4124-af3d-e05b3aaed51c",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-a6bde9d6-4dc3-4cde-a5cd-c4cc8e28f2c2",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-6e4c0b70-82b2-4a10-aac2-6f81466b5b91",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-0dc09401-dc22-4d19-8c90-50114d9dfb30",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "anli-869e4335-f60d-4212-92f3-e0a843c9e459",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-3755223d-eb99-4fd6-9173-7bc5050880e7",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-2b9c1e2e-4eeb-444e-9d35-d3145bd6ad34",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-9ca66aac-e693-49cb-a6f0-a49a1384ce22",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-3ac350ca-164c-42e4-8b29-8b5a7e7ddb16",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-c09dae3c-be2b-43c4-b532-1f76966c761d",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-1d836a0f-bd77-49e4-8c43-cc1cfd0ee5de",
+   "reason": "denylist:password"
+  },
+  {
+   "id": "anli-5a036d20-f472-4334-ba5d-d255e026d9bd",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ecf9e218-1785-4103-b6f0-76db33cecdf0",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e1830c2e-4a23-47fa-a42c-658b0203de36",
+   "reason": "denylist:apple pie"
+  },
+  {
+   "id": "anli-4e22a4fa-17fd-4879-b213-2a9a8f1779a6",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a0a8ac5c-bbf7-4bbe-b7a5-b89444a217af",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-ad9b0b5c-e79d-49d6-81b1-984821bf60d3",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-043f594b-07df-4a99-b9ec-7a43ecc0825b",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-e22abfb3-811b-4bc7-a613-f86461e25722",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-51608f6e-7c51-43ff-9a9c-fb63114cc038",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-a865d4fb-940e-42f8-b858-1989e65cf09d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-b4a1e930-b702-4a1b-9d6c-ca42fadbe428",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-b96f8ce8-ec9b-4116-91ab-dc67767101d4",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-bee53541-f7bc-4613-8be2-19374af9a797",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-7020c4eb-513a-41fd-b99d-aeea08ffd673",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-146aa8e6-3113-4167-926f-f479e94c091a",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f45243c3-9c5c-4129-91ba-1149255ff54d",
+   "reason": "denylist:backup"
+  },
+  {
+   "id": "anli-c850a83e-03d4-42d2-8d0a-9641583a7388",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-19a48cc1-ae1e-45b9-a6ac-979f3cf753a3",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-09c0f9e6-5a0d-49e1-9721-d5254858f0f0",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-e38beb45-adda-42da-90de-46a13c1dcf8b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-34e18ac2-176c-402d-8002-5eb5953cdc1a",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-782b47a5-77db-49eb-a086-8855efc76f72",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-02e912ee-5e51-42c7-a14f-5bc72ad655da",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-780e0e52-a67a-4cf1-8c3d-ef636bb6daab",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-32bb1627-0063-4cb7-9ec8-c1665746c654",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-4f686a8b-6289-4498-ac95-2a1606ebbd62",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-8b7b7eaa-4fdf-4a16-96f5-048405bf5883",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-f2646f5e-503b-4659-9853-7ee64a5f052e",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-d454293f-61c7-409d-a4e3-46b38c03d0a0",
+   "reason": "denylist:linux"
+  },
+  {
+   "id": "anli-80782cbc-db81-4fd8-b4a7-806f24f50580",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-e20de7d8-ef92-4565-9293-1bebac42bbf3",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-5c3d2b16-3157-460d-8ba3-4709b5eb1d3d",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-e5d2523b-0081-46d2-b3d4-34f869c22bde",
+   "reason": "denylist:impossible"
+  },
+  {
+   "id": "anli-74b7363e-1a88-4eac-9742-1c5319190bb2",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f22558fa-237f-459d-b158-da9b5d3e97b0",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-d2553608-3006-43c8-9525-451eb922de0b",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "anli-22b5d0da-9dc8-41f9-8147-20699613da09",
+   "reason": "denylist:quantum"
+  },
+  {
+   "id": "anli-95a6d62f-f739-4707-9c75-70a002de7829",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-77203e91-ec9e-4c12-84a3-60c19cdd9f2f",
+   "reason": "denylist:export"
+  },
+  {
+   "id": "anli-188a4d3f-d4a9-4cab-864c-17658fcc5584",
+   "reason": "denylist:revenue"
+  },
+  {
+   "id": "anli-f6c07d6d-bf76-400e-b7f4-ddd6ecc1a0eb",
+   "reason": "denylist:battery"
+  },
+  {
+   "id": "anli-b0713dc2-1a41-4a2a-a932-74e06cf19adb-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-05213adc-f57c-4bd7-a075-79b42ed62a4f-es",
+   "reason": "mt-reverify:back-jacc:0.297"
+  },
+  {
+   "id": "anli-8f10b8a9-76cf-44a5-b756-eeab5500f09f-es",
+   "reason": "mt-reverify:back-jacc:0.288"
+  },
+  {
+   "id": "anli-2e3ed295-557b-4887-95f1-b4ed343000ca-es",
+   "reason": "mt-reverify:back-jacc:0.263"
+  },
+  {
+   "id": "anli-af79012e-6845-4e33-8356-c97696cc67ee-es",
+   "reason": "mt-reverify:back-jacc:0.191"
+  },
+  {
+   "id": "anli-2039b5be-d1f8-4f71-a8bb-50f7d97d4e0f-es",
+   "reason": "mt-reverify:back-jacc:0.284"
+  },
+  {
+   "id": "anli-f7874f1b-98d8-4c6f-8d05-d3f0e62a4ce6-es",
+   "reason": "mt-reverify:back-jacc:0.226"
+  },
+  {
+   "id": "anli-4eaa2027-a3d2-4cc1-8683-27336af2ec36-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-0b3c09a2-0e3b-4461-bd36-c0d649deb9ab-es",
+   "reason": "denylist:restauraci\u00f3n"
+  },
+  {
+   "id": "anli-dc7f2ae6-fb89-420f-af24-0bf8f019917c-es",
+   "reason": "mt-reverify:back-jacc:0.290"
+  },
+  {
+   "id": "anli-404971e3-84f7-485f-bf2e-21bb55930c8a-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-8049d54f-bd80-41b2-99e9-5ef44d13e55e-es",
+   "reason": "mt-reverify:back-jacc:0.268"
+  },
+  {
+   "id": "anli-497758f4-a044-4d41-aaef-b525b9aab6c1-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-b81b8fb1-43bb-4abd-98a3-30ba7004a92d-es",
+   "reason": "mt-reverify:back-jacc:0.210"
+  },
+  {
+   "id": "anli-aaf9e94c-aff0-4b80-815b-20628ce4fa7c-es",
+   "reason": "mt-reverify:back-jacc:0.183"
+  },
+  {
+   "id": "anli-a6f71cbf-1ccd-488f-ae63-57f99aea4797-es",
+   "reason": "mt-reverify:back-jacc:0.227"
+  },
+  {
+   "id": "anli-b524c976-ac10-4b7f-b004-206496353687-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-84f0a86d-2bed-45a1-bf1f-5d0da597cc4d-es",
+   "reason": "mt-reverify:back-jacc:0.253"
+  },
+  {
+   "id": "anli-a8b61c68-9b84-4b1a-8194-78eeb8021df9-es",
+   "reason": "mt-reverify:back-jacc:0.298"
+  },
+  {
+   "id": "anli-089ad9a2-c543-4d65-8000-6250261f1b6b-es",
+   "reason": "mt-reverify:back-jacc:0.260"
+  },
+  {
+   "id": "anli-5fbf467f-3341-4f51-ba3b-915aacc4b70c-es",
+   "reason": "mt-reverify:back-jacc:0.221"
+  },
+  {
+   "id": "anli-0a16b36d-fa26-4a79-b3e8-3c40aa471934-es",
+   "reason": "mt-reverify:back-jacc:0.228"
+  },
+  {
+   "id": "anli-a8c0ac2e-1f8a-429f-989b-3db1b6ea533c-es",
+   "reason": "mt-reverify:back-jacc:0.287"
+  },
+  {
+   "id": "anli-36d406b3-c022-4e4f-8f80-5857f81d8ef9-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-332f2e26-fd6c-413c-b1ea-c739b1173b67-es",
+   "reason": "mt-reverify:back-jacc:0.265"
+  },
+  {
+   "id": "anli-acd23284-55c2-4447-b67e-4501eb91ce87-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-e6f47385-5a50-4f12-85bf-b5df11421394-es",
+   "reason": "mt-reverify:back-jacc:0.278"
+  },
+  {
+   "id": "anli-add1e951-a2f4-47d3-ba34-435580c2a890-es",
+   "reason": "mt-reverify:back-jacc:0.264"
+  },
+  {
+   "id": "anli-ee253ae3-e992-4248-b30a-d88ffb2ef41a-es",
+   "reason": "mt-reverify:back-jacc:0.234"
+  },
+  {
+   "id": "anli-b16d26b8-1b84-4272-8f49-a07b705f0a82-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-2272d4d6-7080-486a-9322-e509476cd5fe-es",
+   "reason": "mt-reverify:back-jacc:0.284"
+  },
+  {
+   "id": "anli-10a908ec-caf9-4cc9-beaa-2d3ace1c0d59-es",
+   "reason": "mt-reverify:back-jacc:0.278"
+  },
+  {
+   "id": "anli-d17d3d64-6f0f-4f20-8bdc-6b5ccf9f623e-es",
+   "reason": "mt-reverify:back-jacc:0.278"
+  },
+  {
+   "id": "anli-6170dc00-1bf4-47dc-a036-1854d114bd5d-es",
+   "reason": "mt-reverify:back-jacc:0.208"
+  },
+  {
+   "id": "anli-a6ef6228-0d84-41d7-aad0-9d51058fe317-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-744c0003-a1bf-4741-a05c-065087940617-es",
+   "reason": "mt-reverify:back-jacc:0.242"
+  },
+  {
+   "id": "anli-daec1c09-ed16-42e4-96dd-1272e7caeba0-es",
+   "reason": "mt-reverify:back-jacc:0.292"
+  },
+  {
+   "id": "anli-0bb4df93-c72b-4ec8-94c4-16ac1834f68f-es",
+   "reason": "mt-reverify:back-jacc:0.177"
+  },
+  {
+   "id": "anli-49e2c580-44c5-46c2-8a78-56ee046ba70d-es",
+   "reason": "mt-reverify:back-jacc:0.250"
+  },
+  {
+   "id": "anli-15af5aa7-946d-4c69-814a-872624557167-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-50785bbd-c423-4b1e-9093-414a88c7f9fc-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-c7597654-0bdc-4b96-97e6-f45ebdbefadb-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-ccf35579-9794-4b2a-a8d2-81880e115355-es",
+   "reason": "denylist:bater\u00eda"
+  },
+  {
+   "id": "anli-f36fe8b1-6f7d-4cbc-8214-dbec80de9298-es",
+   "reason": "mt-reverify:back-jacc:0.241"
+  },
+  {
+   "id": "anli-555e6bbc-32df-48e5-be30-64886554fedc-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-4f00ef55-59c6-4b53-b809-72e18abbb525-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-cc21f0f1-742f-4ae1-a6f7-adc0d775a173-es",
+   "reason": "mt-reverify:back-jacc:0.138"
+  },
+  {
+   "id": "anli-6752f522-6d7c-4f4a-b470-001c362680aa-es",
+   "reason": "mt-reverify:back-jacc:0.298"
+  },
+  {
+   "id": "anli-c5ea1946-a567-448f-a006-7306d0df7746-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-906d28e9-0817-469d-bf08-f72b6da87ee2-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-f62ffe74-9d7c-4060-af13-7692c5742f86-es",
+   "reason": "mt-reverify:back-jacc:0.294"
+  },
+  {
+   "id": "anli-4dafbc0c-15cb-451a-9e07-a66e870a8b08-es",
+   "reason": "mt-reverify:back-jacc:0.121"
+  },
+  {
+   "id": "anli-e6b4ee3b-e7d4-4d39-be8c-011376574765-es",
+   "reason": "mt-reverify:back-jacc:0.200"
+  },
+  {
+   "id": "anli-3704991a-6235-4d1b-9472-352f1e5ed4f9-es",
+   "reason": "mt-reverify:digits-lost"
+  },
+  {
+   "id": "anli-d62e04b6-938b-4a62-9546-1d68b538b380-es",
+   "reason": "mt-reverify:back-jacc:0.280"
+  },
+  {
+   "id": "anli-88bb6b18-eafa-4948-a0bc-6cd584de260f-es",
+   "reason": "mt-reverify:back-jacc:0.167"
+  }
+ ],
+ "seed": 606102,
+ "license": "cc-by-nc-4.0 (NC: no commercial redistribution; internal training use documented as-is)",
+ "over_quota_unused": 44,
+ "total": 600,
+ "en": 400,
+ "es": 200
+}

@@ -1,0 +1,55 @@
+{
+ "drops": [
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "b7sil-en-cand",
+   "reason": "denylist:windows"
+  }
+ ],
+ "seed": 606107,
+ "total": 102,
+ "refs_total": 724
+}

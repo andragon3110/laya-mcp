@@ -15,6 +15,7 @@
  */
 import assert from "node:assert";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import {
@@ -23,7 +24,7 @@ import {
   redactText,
 } from "../dist/tools/redact.js";
 
-const HERE = path.dirname(new URL(import.meta.url).pathname);
+const HERE = path.dirname(fileURLToPath(import.meta.url));
 
 let passed = 0;
 async function check(name, fn) {

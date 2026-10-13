@@ -1,0 +1,36 @@
+{
+ "n": 1800,
+ "schema_errors": [],
+ "balance": {
+  "sup": 517,
+  "con": 517,
+  "nei": 516,
+  "mal": 125,
+  "ben": 125,
+  "dev": {
+   "SUP-CON": 0.0,
+   "SUP-NEI": 0.001,
+   "MAL-BEN": 0.0
+  },
+  "es": 750
+ },
+ "overlap_eval": {
+  "ids": [],
+  "exact": [],
+  "denylist": [],
+  "maxJ3": 0.0317,
+  "pairs_ge_0.5": [],
+  "top5": []
+ },
+ "overlap_mix": {
+  "exact": [],
+  "maxJ3": 0.0909,
+  "top": [
+   [
+    0.0909,
+    "b4d-screen-en-leg-022"
+   ]
+  ]
+ },
+ "verdict": "PASS"
+}

@@ -1,0 +1,379 @@
+{
+  "generated": "WS-E regulus-v4 run manifest (measurement + verdict)",
+  "date": "2026-10-12T17:15:00Z",
+  "model": "artifacts-ft/run-20261012T170501Z-regulus-v4/checkpoint (served verbatim via GLICLASS_MODEL)",
+  "model_name": "regulus-v4",
+  "model_revision": null,
+  "model_revision_source": "unpinned",
+  "run_dir": "artifacts-ft/run-20261012T170501Z-regulus-v4",
+  "safetensors_sha256": "2c58581ac384b09cda3613d319fd94aeece1f22cfc782ad628c8861c016daf09",
+  "safetensors_sha256_note": "computed at manifest time via streaming read (never invented); differs from v2-pinned f245a84d (training moved weights)",
+  "v2_pinned_sha_recheck": "f245a84dd827edb0 (prefix match after the round; pinned dir read-only except init load)",
+  "mix_rows": 2444,
+  "method": "Serve checkpoint on :8770 via py/gliclass_server.py (venv-ft, CPU) -> evals/results/v27-regulus-v4/matrix.mjs (byte-identical v25 methodology, diff-verified) over batch4-validation HELD-OUT (80) + v2 (80) + r1 gliclass lanes (48); find columns read from evals/results/v8+v9. Stock control: v24 reuse (same harness + device, 122/122). Sequential serving, never concurrent.",
+  "device": "cpu (matches v20/v1/v2/v3 device; eliminates device as a confound)",
+  "device_note": "probed LIVE from GET /ready on the v4 run",
+  "lanes": {
+    "batch4:classify": {
+      "n": 20,
+      "dec": "20/20",
+      "task": "19/20",
+      "abstained": 0,
+      "threw": 0
+    },
+    "batch4:gate": {
+      "n": 20,
+      "dec": "16/20",
+      "task": "12/20",
+      "abstained": 0,
+      "threw": 0
+    },
+    "batch4:screen": {
+      "n": 40,
+      "dec": "0/40",
+      "task": "0/40",
+      "abstained": 15,
+      "threw": 0
+    },
+    "v2:classify": {
+      "n": 26,
+      "dec": "26/26",
+      "task": "24/26",
+      "abstained": 0,
+      "threw": 0
+    },
+    "v2:gate": {
+      "n": 22,
+      "dec": "18/22",
+      "task": "9/22",
+      "abstained": 0,
+      "threw": 0
+    },
+    "v2:screen": {
+      "n": 32,
+      "dec": "0/32",
+      "task": "0/32",
+      "abstained": 8,
+      "threw": 0
+    },
+    "r1:classify": {
+      "n": 12,
+      "dec": "12/12",
+      "task": "12/12",
+      "abstained": 0,
+      "threw": 0
+    },
+    "r1:gate": {
+      "n": 12,
+      "dec": "9/12",
+      "task": "9/12",
+      "abstained": 0,
+      "threw": 0
+    },
+    "r1:screen": {
+      "n": 12,
+      "dec": "8/12",
+      "task": "8/12",
+      "abstained": 1,
+      "threw": 0
+    },
+    "r1:rerank": {
+      "n": 12,
+      "dec": "12/12",
+      "task": "11/12",
+      "abstained": 0,
+      "threw": 0
+    }
+  },
+  "en_es": {
+    "batch4:classify": {
+      "n_en": 10,
+      "n_es": 10,
+      "dec_en": 10,
+      "dec_es": 10,
+      "task_en": 9,
+      "task_es": 10
+    },
+    "batch4:gate": {
+      "n_en": 10,
+      "n_es": 10,
+      "dec_en": 7,
+      "dec_es": 9,
+      "task_en": 6,
+      "task_es": 6
+    },
+    "batch4:screen": {
+      "n_en": 20,
+      "n_es": 20,
+      "dec_en": 0,
+      "dec_es": 0,
+      "task_en": 0,
+      "task_es": 0
+    },
+    "v2:classify": {
+      "n_en": 13,
+      "n_es": 13,
+      "dec_en": 13,
+      "dec_es": 13,
+      "task_en": 11,
+      "task_es": 13
+    },
+    "v2:gate": {
+      "n_en": 11,
+      "n_es": 11,
+      "dec_en": 8,
+      "dec_es": 10,
+      "task_en": 4,
+      "task_es": 5
+    },
+    "v2:screen": {
+      "n_en": 16,
+      "n_es": 16,
+      "dec_en": 0,
+      "dec_es": 0,
+      "task_en": 0,
+      "task_es": 0
+    },
+    "r1:classify": {
+      "n_en": 6,
+      "n_es": 6,
+      "dec_en": 6,
+      "dec_es": 6,
+      "task_en": 6,
+      "task_es": 6
+    },
+    "r1:gate": {
+      "n_en": 6,
+      "n_es": 6,
+      "dec_en": 5,
+      "dec_es": 4,
+      "task_en": 5,
+      "task_es": 4
+    },
+    "r1:screen": {
+      "n_en": 6,
+      "n_es": 6,
+      "dec_en": 4,
+      "dec_es": 4,
+      "task_en": 4,
+      "task_es": 4
+    },
+    "r1:rerank": {
+      "n_en": 6,
+      "n_es": 6,
+      "dec_en": 6,
+      "dec_es": 6,
+      "task_en": 5,
+      "task_es": 6
+    }
+  },
+  "composed_totals": {
+    "regulus-v4+qwen-find": {
+      "decision": {
+        "n": 60,
+        "correct": 53
+      },
+      "task": {
+        "n": 60,
+        "correct": 52
+      }
+    },
+    "regulus-v4+gte-find": {
+      "decision": {
+        "n": 60,
+        "correct": 52
+      },
+      "task": {
+        "n": 60,
+        "correct": 52
+      }
+    }
+  },
+  "criterion_check": {
+    "r1_dec_ge_50": "PASS (53/60 with qwen-find)",
+    "r1_task_ge_47": "PASS (52/60 with qwen-find)",
+    "v2_gate_ge_20_22": "FAIL (9/22 task, was 20/22)",
+    "zero_lane_regression_vs_v2": "FAIL (v2:gate dec 22->18 task 20->9; v2:screen dec 23->0; r1:rerank task 12->11; batch4 held-out generalization below v2 train-fit)"
+  },
+  "verdict": "NO-PROMOTE (r1 floors PASS at best-ever 53+52 with qwen-find and r1:gate 9+9 closes the v3 gap target, BUT v2-gate task 9/22 misses the 20/22 bar and lanes regress vs v2. Mechanism: the 517/517 balanced SUP/CON pair pressure over-corrects v3 SUP-bias into verdicts-on-silence (all 13 v2:gate task misses are ABSTAIN->verdict, 8 CON + 5 SUP, at LOW 0.26-0.66 confidence unlike v3 0.55-0.996); screen decisions collapse to benign/malicious (v2:screen dec 23->0, filler style uncovered by deepset/bipia prose training; task stays 0 structural ceiling). v2-pinned stays champion (sha f245a84d re-verified). No further rounds without fresh approval.)",
+  "temperature_T": 2.852588249027299,
+  "artifacts": {
+    "run_dir": "artifacts-ft/run-20261012T170501Z-regulus-v4",
+    "idk_head": "artifacts-ft/run-20261012T170501Z-regulus-v4/idk_head.pt (AbstentionHead state_dict, bias warm-started at -2.2; inference-irrelevant, evidence only)",
+    "manifest": "evals/results/v27-regulus-v4/manifest.json (this file)",
+    "matrix_runner": "evals/results/v27-regulus-v4/matrix.mjs (byte-identical methodology to v25: GliclassClient + lanePredictFactory + scoreIndependentDecision, same row shape; verified via diff before the run)",
+    "matrix_script_source": "byte copy of evals/results/v25-regulus-v2/matrix.mjs, run with --out v27 --tag regulus-v4, then stored as matrix.mjs",
+    "metrics": "evals/results/v27-regulus-v4/metrics.json (per-case rows with gliclass callLog)",
+    "mix": "artifacts-ft/mix-regulus-v4/ (570 anchors + 50 v3 + 24 d3 + 600 fever + 750 xnli-es + 200 xnli-en + 150 deepset + 100 bipia + eval-ids 220 + cselect.json + MIX_README.md)",
+    "reliability_feed": "evals/results/v27-regulus-v4/validation-scores.json (80 batch-4 HELD-OUT rows, correct=taskOk per v25/v26 lineage)",
+    "temperature": "evals/results/v27-regulus-v4/temperature.json"
+  },
+  "c_select": {
+    "selected_C": 0.05,
+    "note": "Independently re-fit with the V4 INIT (cselect_v4.py, v2-pinned CPU-fp32 forwards = the v4 init, aug OFF, shuffle OFF, per-row K=3, focal base, validation-80 HELD OUT of the v4 mix): 0.05 ties 0.1/0.3 at 77/80, tie broken toward spike prior 0.02. Same VALUE as v2/v3, never blindly reused. force_mean 0.018721."
+  },
+  "calibration": {
+    "tool": "evals/reliability.mjs (validation ONLY, never r1)",
+    "fit_data_id": "batch4-validation-80",
+    "n": 65,
+    "n_excluded_abstained": 15,
+    "n_excluded_null": 0,
+    "ece_before_T": 0.2517068913349738,
+    "ece_after_T": 0.2633,
+    "mce_before": 0.4191094224269573,
+    "mce_after": 0.3734,
+    "brier_before_T": 0.26435705366163215,
+    "brier_after_T": 0.2444,
+    "nll_before": 0.7175385139735331,
+    "nll_after": 0.6812620922186632,
+    "applied_T": 2.852588249027299,
+    "note": "Honest mixed result: T=2.85 improves NLL/Brier/MCE but ECE 0.252->0.263 (silence-verdict miscalibration in 0.5-0.8 bins). Far better than v3 raw 0.449, worse than v2 0.084."
+  },
+  "train_stats": {
+    "seed": 20261014,
+    "abstention_cost": 0.05,
+    "idk_bias_init": -2.2,
+    "idk_q_init": 0.0998,
+    "lr": "2e-5 x2 epochs",
+    "weight": 1,
+    "effective_batch": 8,
+    "micro_batch_size": 4,
+    "grad_accum": 2,
+    "tail_steps": 2,
+    "optimizer_steps": "306/epoch x 2 = 612",
+    "eval_baseline": 0.019665211251648766,
+    "eval_epoch2": 0.013821961809370405,
+    "eval_epoch2_delta": -0.0058432494422783615,
+    "aborted": false,
+    "oom_events": 0,
+    "quarantined_rows": 0,
+    "wall_seconds": 227.5,
+    "vram_peak_gb": 13.838,
+    "vram_reserved_peak_gb": 14.373,
+    "device": "cuda",
+    "smoke_losses_8rows_2steps": [
+      0.012506870552897453,
+      0.005039297044277191
+    ],
+    "batching_note": "micro-4/accum-2 = recipe-effective batch 8 (identical optimizer-step count, LR step-indexed); deviation forced by OOM-stall evidence"
+  },
+  "train_attempts": [
+    {
+      "attempt": 1,
+      "run_dir": "artifacts-ft/run-20261012T143757Z-regulus-v4 (PRIOR WORKER husk, untouched)",
+      "outcome": "config.json only, 30+ min zero output, PIDs killed by parent, GPU freed"
+    },
+    {
+      "attempt": 2,
+      "run_dir": "artifacts-ft/run-20261012T164326Z-regulus-v4 (this round, batch-8 recipe-exact)",
+      "outcome": "STALLED mid-epoch-1 after step 110: CUDA OOM warning (275MB alloc, free 0 of 16GB) near step 85 from long-row activation growth, then a monster batch stalled >20 min; watchdog fired LOUD exit 3 with last-stage evidence. No checkpoint (save is post-loop); config.json only. Mix exonerated (2444/2444, 0 quarantined); pre-loop stages all timed fast."
+    },
+    {
+      "attempt": 3,
+      "run_dir": "artifacts-ft/run-20261012T170501Z-regulus-v4 (this round, micro-4/accum-2)",
+      "outcome": "COMPLETE exit 0. Fresh dir, husks never reused."
+    }
+  ],
+  "hang_fix": {
+    "watchdog": "wall-clock thread, 15s cadence, limit 1200s, exit 3 + last-stage on stderr (proved: caught attempt-2 stall at 1211s idle)",
+    "progress_logs": "per-file mix loads, per-500-row validation/examples, timed STAGE markers, per-10-step + per-50-batch eval logs, flush+timestamped",
+    "smoke": "8 rows x 2 optimizer steps end-to-end on real model/head/opt BEFORE full run (--smoke-only exits 0 without run-dir writes; losses [0.0125, 0.005])",
+    "quarantine": "per-row audit (empty-text, huge-text>8000, K outside [2,10]) BY ID with evidence to quarantine.jsonl; v4 mix: 0 quarantined (avg 371, max 2400 chars; K {3:2384, 2:60})",
+    "abstain_probe": "first new-schema true_labels=[] row b4f-gate-en-nei-001 -> labels_sum 0.0 (ABSTAIN-EMPTY-OK)",
+    "oom_guard": "per-step RuntimeError-OOM catch -> LOUD exit 4 (0 events on completing run)",
+    "script": "ft/train_regulus_v4.py (allowed surface)"
+  },
+  "honesty": [
+    "Single r1 pass only (48 gliclass cases + find from v8/v9, never re-run, never tuned). C selected on batch-4 validation with the v4 init; no threshold touched.",
+    "No probabilities without calibration: raw scores reported as scores; ECE/T on validation only.",
+    "Checkpoint bytes out of git; pinned by computed sha256 + run-dir + path only.",
+    "r3i/stock untouched; v2-pinned read-only except init load (sha f245a84d re-verified after).",
+    "Batch-4 HELD OUT of v4 mix (recipe change): batch-4 numbers = generalization, not train-fit; compare vs v2 train-fit with that caveat.",
+    "All 13 v2:gate task misses are silence->verdict flips (8 CON + 5 SUP) at LOW 0.26-0.66 confidence: balanced-pair pressure teaches verdicts on silence patterns.",
+    "Screen task on fillers structurally unreachable (v4 screen dec 0/32+0/40 benign/malicious split; deepset/bipia prose training does not cover filler style); v2 dec 23-25 via broad REVIEW bias, still task 0.",
+    "r1:rerank task 12->11 is a single adversarial-ordering flip, recorded not hidden.",
+    "Find has no gliclass lane: columns read from v8/v9, never re-run.",
+    "Sidecars: NONE before/during train (0 python procs); v4 served alone on :8770 CPU, stopped after (refused verified); nothing restarted.",
+    "Stock control REUSED from v24 (harness 122/122 unchanged); no stock re-run.",
+    "Attempt-2 stall + OOM evidence kept (dead dir left as-is); micro-batch deviation is effective-dose-identical, recorded with cause."
+  ],
+  "ram_rule": {
+    "before_train": "0 python processes, GPU near-baseline; machine already clean",
+    "after_train": "server stopped after matrix (refused verified); 0 python processes, nothing restarted"
+  },
+  "stock_control": "evals/results/v24-batch4-baseline/stock-control/ (same harness + device; reused, harness 122/122)",
+  "comparison": {
+    "r1_totals_qwen_find": {
+      "stock": "48+42",
+      "v2_champion": "50+47",
+      "v3": "53+50",
+      "v4": "53+52"
+    },
+    "r1_gate": {
+      "stock": "5+5",
+      "v2": "6+4",
+      "v3": "9+8",
+      "v4": "9+9"
+    },
+    "r1_classify": {
+      "stock": "12+10",
+      "v2": "12+11",
+      "v3": "12+11",
+      "v4": "12+12"
+    },
+    "r1_screen": {
+      "stock": "7+6",
+      "v2": "8+8",
+      "v3": "8+7",
+      "v4": "8+8"
+    },
+    "r1_rerank": {
+      "stock": "12+9",
+      "v2": "12+12",
+      "v3": "12+12",
+      "v4": "12+11"
+    },
+    "v2_classify": {
+      "stock": "26+15",
+      "v2": "26+24",
+      "v3": "26+25",
+      "v4": "26+24"
+    },
+    "v2_gate": {
+      "stock": "13+0",
+      "v2": "22+20",
+      "v3": "18+16",
+      "v4": "18+9"
+    },
+    "v2_screen_dec_task": {
+      "stock": "2+0",
+      "v2": "23+0",
+      "v3": "28+0",
+      "v4": "0+0"
+    },
+    "batch4_note": "v1-v3 batch4 = train-fit; v4 batch4 = HELD-OUT generalization",
+    "batch4_classify": {
+      "stock": "20+11",
+      "v2": "20+20t",
+      "v3": "20+20t",
+      "v4": "20+19h"
+    },
+    "batch4_gate": {
+      "stock": "12+0",
+      "v2": "19+17t",
+      "v3": "17+17t",
+      "v4": "16+12h"
+    },
+    "batch4_screen_dec_task": {
+      "stock": "5+0",
+      "v2": "25+0t",
+      "v3": "40+0t",
+      "v4": "0+0h"
+    },
+    "ece_raw_to_T": {
+      "v2": "0.084->0.080 (T=0.685)",
+      "v3": "0.449->0.097 (T=10 ceiling)",
+      "v4": "0.252->0.263 (T=2.853)"
+    }
+  }
+}

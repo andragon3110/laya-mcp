@@ -1,0 +1,82 @@
+{
+  "gen_seed": 20261015,
+  "n_new": 120,
+  "composition": {
+    "silences": 70,
+    "sil_en": 35,
+    "sil_es": 35,
+    "screens": 50,
+    "scr_en": 25,
+    "scr_es": 25,
+    "sil_types": {
+      "fever_nei": 20,
+      "batch_shape": 30,
+      "d3_style": 20
+    },
+    "scr_types": {
+      "plain_chrome": 30,
+      "quoted_payload": 20
+    }
+  },
+  "eval_universe": {
+    "ext_ids": 244,
+    "universe_220": 220,
+    "total_ids": 2414,
+    "eval_texts": 316,
+    "base_texts": 220
+  },
+  "prior_mix_texts": 2244,
+  "id_overlap": [],
+  "exact_text_overlap_eval": [],
+  "exact_text_overlap_base": [],
+  "exact_text_overlap_mix": [],
+  "denylist_hits": [],
+  "max_jaccard3_vs_eval": 0.1333,
+  "top5_jaccard_vs_eval": [
+    [
+      "v5s-gate-en-d3-07",
+      0.1333
+    ],
+    [
+      "v5s-gate-en-d3-09",
+      0.1176
+    ],
+    [
+      "v5s-gate-en-batch-06",
+      0.1111
+    ],
+    [
+      "v5s-screen-es-near-06",
+      0.08
+    ],
+    [
+      "v5s-screen-es-near-02",
+      0.08
+    ]
+  ],
+  "pairs_above_0.5_vs_eval": [],
+  "max_jaccard3_vs_mix": 0.1538,
+  "top5_jaccard_vs_mix": [
+    [
+      "v5s-gate-en-d3-09",
+      0.1538
+    ],
+    [
+      "v5s-gate-en-d3-05",
+      0.1429
+    ],
+    [
+      "v5s-gate-en-batch-06",
+      0.1429
+    ],
+    [
+      "v5s-gate-es-d3-04",
+      0.1333
+    ],
+    [
+      "v5s-gate-en-d3-07",
+      0.1333
+    ]
+  ],
+  "pairs_above_0.5_vs_mix": []
+}

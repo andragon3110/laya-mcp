@@ -1,0 +1,32 @@
+{
+  "gen_seed": 777,
+  "n_anchors": 570,
+  "extended_eval_ids": 244,
+  "id_overlap": [],
+  "exact_text_overlap": [],
+  "denylist_hits": [],
+  "max_jaccard3": 0.1429,
+  "top5_jaccard": [
+    [
+      "v2a-rerank-en-rel-09",
+      0.1429
+    ],
+    [
+      "v2a-find-en-rel-05",
+      0.1429
+    ],
+    [
+      "v2a-rerank-en-rel-12",
+      0.125
+    ],
+    [
+      "v2a-find-en-rel-12",
+      0.125
+    ],
+    [
+      "v2a-rerank-en-rel-11",
+      0.1111
+    ]
+  ],
+  "pairs_above_0.5": []
+}

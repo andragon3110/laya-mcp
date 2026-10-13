@@ -1,0 +1,277 @@
+{
+  "generated": "bench-ronda3 G2 R3T4 reproducibility manifest (LIVE backend laya; absolutes + method, no improvement claims, no promotion)",
+  "date": "2026-10-12T05:10:23.026Z",
+  "commit": "58ef829c7c2f48592da980cd2cbc6f8e43fa9072",
+  "commit_short": "58ef829",
+  "model": "english",
+  "model_note": "live backend model inventory name (verbatim probe)",
+  "model_repo": "convaiinnovations/laya-multilingual",
+  "model_revision": null,
+  "model_revision_source": "unpinned",
+  "model_revision_note": "the laya sidecar reports no revision pin (revision null + unpinned, never invented); the setup-time HF-API sha n/a (laya cache pre-existing) lives in odd/tasks/spike-g2-guards.md S1",
+  "tokenizer": "unknown",
+  "tokenizer_note": "explicit unknown: no tool or probe exposes a tokenizer",
+  "device": "auto",
+  "device_note": "probed LIVE from GET /ready (or the explicit unknown string when the backend reported no device)",
+  "backend": {
+    "mode": "live",
+    "live": true,
+    "reachable": true,
+    "baseUrl": "http://127.0.0.1:8765",
+    "server": "py/laya_server.py (unmodified v0.4.0)",
+    "venv": "py/.venv-r3g2 (group venv; laya baseline served unmodified from its own venv via py/laya_server.py :8765)",
+    "ready": true,
+    "device": "auto",
+    "models": [
+      {
+        "name": "english",
+        "repo": "convaiinnovations/laya",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "auto",
+        "circuit": "closed"
+      },
+      {
+        "name": "multilingual",
+        "repo": "convaiinnovations/laya-multilingual",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "auto",
+        "circuit": "closed"
+      },
+      {
+        "name": "typed-decisions",
+        "repo": "convaiinnovations/laya-typed-decisions",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "auto",
+        "circuit": "closed"
+      }
+    ],
+    "model": "english",
+    "revisions": {
+      "laya": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "LAYA_MODEL_REVISION"
+      },
+      "gliner": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GLINER_MODEL_REVISION"
+      },
+      "rerank": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "RERANK_MODEL_REVISION"
+      },
+      "d1": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "D1_MODEL_REVISION"
+      },
+      "gliclass": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GLICLASS_MODEL_REVISION"
+      },
+      "policylm": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "POLICYLM_MODEL_REVISION"
+      },
+      "promptguard": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "PROMPTGUARD_MODEL_REVISION"
+      },
+      "gte": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GTE_MODEL_REVISION"
+      }
+    },
+    "probe": {
+      "baseUrl": "http://127.0.0.1:8765",
+      "service": "laya-server",
+      "reachable": true,
+      "ready": true,
+      "ready_reason": "ready",
+      "device": "auto",
+      "models": [
+        {
+          "name": "english",
+          "repo": "convaiinnovations/laya",
+          "loaded": true,
+          "revision": null,
+          "revision_source": "unpinned",
+          "device": "auto",
+          "circuit": "closed"
+        },
+        {
+          "name": "multilingual",
+          "repo": "convaiinnovations/laya-multilingual",
+          "loaded": true,
+          "revision": null,
+          "revision_source": "unpinned",
+          "device": "auto",
+          "circuit": "closed"
+        },
+        {
+          "name": "typed-decisions",
+          "repo": "convaiinnovations/laya-typed-decisions",
+          "loaded": true,
+          "revision": null,
+          "revision_source": "unpinned",
+          "device": "auto",
+          "circuit": "closed"
+        }
+      ],
+      "model": "english",
+      "probe_status": {
+        "ready": 200,
+        "models": 200
+      }
+    },
+    "note": "G2 sidecars serve the production POST /predict {text, labels} contract (stdlib http.server, lazy single-flight load, 413 guards); binary head mapped onto a synonym axis (injection->p / safe->1-p / else 0.0, documented per server); lane coverage is screen-only (G2GuardClient refuses other shapes with an explicit gap error)"
+  },
+  "backend_revisions": {
+    "laya": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "LAYA_MODEL_REVISION"
+    },
+    "gliner": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLINER_MODEL_REVISION"
+    },
+    "rerank": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "RERANK_MODEL_REVISION"
+    },
+    "d1": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "D1_MODEL_REVISION"
+    },
+    "gliclass": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLICLASS_MODEL_REVISION"
+    },
+    "policylm": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "POLICYLM_MODEL_REVISION"
+    },
+    "promptguard": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "PROMPTGUARD_MODEL_REVISION"
+    },
+    "gte": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GTE_MODEL_REVISION"
+    }
+  },
+  "backend_revisions_note": "per-backend revision pins (env pins win, else backend-reported, else unpinned null; a hash is never invented)",
+  "policy": [
+    {
+      "name": "screen",
+      "version": "1.0.0"
+    }
+  ],
+  "policy_note": "screen only: the only primitive G2 guards cover (classify/gate/rerank/find are recorded gaps)",
+  "schema_version": "1.0.0",
+  "software": {
+    "node": "v24.18.0",
+    "platform": "win32",
+    "arch": "x64",
+    "package_version": "0.4.0"
+  },
+  "hardware": {
+    "arch": "x64",
+    "cpus": 16,
+    "cpu_model": "AMD Ryzen 7 5700X 8-Core Processor             ",
+    "totalmem_mb": 32646
+  },
+  "config": {
+    "backend": "laya",
+    "corpus": {
+      "r1_screen": 12,
+      "v2_screen": 32
+    },
+    "lanes": [
+      "screen"
+    ],
+    "timeout_ms": 60000,
+    "run_env": {},
+    "started": "2026-10-12T05:09:55.663Z",
+    "finished": "2026-10-12T05:10:23.026Z"
+  },
+  "mode": {
+    "mcp": "observe",
+    "mcp_note": "the MCP layer only observes and reports judgments; it never acts, under every policy mode",
+    "policy": "observe (default)",
+    "policy_note": "effective global policy-decision mode resolution input (verbatim env or default)"
+  },
+  "method": "G2 screen matrix: per-case wall (performance.now round trip) + backend-reported latencyMs per predict call. Routing OFF (pure argmax + omit-on-null; G2 screen tau null -- first-measurement pin, never tuned on r1/v2); fixed argmax->band magnitudes at public policy centers (screen 0.92/0.5/0.1 vs 0.75/0.25, inherited verbatim from the G1/r3a lane); substance/relevance ride the documented 0.9/0.9 lane constant; suspicious always scores 0.0 server-side so argmax reduces to benign/malicious. Per-case rows carry raw backend scores + margins for threshold design; verdicts never read them. Reliability inputs recorded, no ECE claimed. No cross-machine comparison.",
+  "gold_corpus": {
+    "r1_screen": 12,
+    "v2_screen": 32,
+    "oracle_stub": 0,
+    "total": 44
+  },
+  "gold_corpus_note": "r1 golds are human-fixed independent truth + v2 golds human-signed (spike-grade: live backends judged against them); stub answers ignored by lanes (live deps forward real questions)",
+  "honesty": [
+    "absolutes only; no cross-machine comparison; no improvement claimed without a paired baseline table (laya baseline embedded in composed.json); no promotion verdict (spike S4 + parent R3T6)",
+    "thresholds OFF and untouched (no m, no tau); wrong_confident taus remain reporting slices, never prod cutoffs",
+    "screen substance/relevance + fixed magnitudes are documented lane constants, not tuned values (binary guards have no such notions)",
+    "reliability inputs are diagram data, not calibration: no ECE/Brier, no probability claimed (guard sharpness is NOT calibration)",
+    "model weights stay out of git (venv policy); pinned by setup-time HF-API sha + sidecar probe only",
+    "classify/gate/rerank/find are NOT run through guards (recorded gaps): a binary head has no axis for them and argmax over 0.0 scores would fake verdicts"
+  ],
+  "links": {
+    "metrics": {
+      "suites": null
+    },
+    "composed": {
+      "table": null
+    }
+  },
+  "server_reported_revisions": {
+    "english": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "loaded": true
+    },
+    "multilingual": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "loaded": true
+    },
+    "typed-decisions": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "loaded": true
+    }
+  },
+  "g2": {
+    "venv": "py/.venv-r3g2",
+    "venv_note": "group venv pins recorded at setup (spike S1): torch 2.14.1+cpu, transformers 5.19.0, onnxruntime 1.31.0, tokenizers 0.23.3, safetensors 0.8.0, huggingface_hub 2.2.0, numpy 2.4.6, pip check clean (not re-resolved here)",
+    "thresholds": "OFF: pure argmax + omit-on-null (screen tau null); NOT tuned here and NEVER on r1/v2",
+    "adjudication": "screen text vs [benign, suspicious, malicious] -> injection noul (malicious 0.92 / suspicious 0.5 / benign 0.1, public block/review band centers, a priori); substance/relevance 0.9/0.9 documented lane constants; suspicious scores 0.0 server-side (binary head) so argmax is benign/malicious; see G2GuardClient above",
+    "coverage_gaps": {
+      "classify": "binary SAFE/INJECTION head has no topic axis: non-screen labels score 0.0 server-side, so argmax would fake a verdict -- lane refused, gap recorded.",
+      "gate": "binary head has no SUPPORTED/CONTRADICTED/ABSTAIN notion: all three gate labels score 0.0, first-max would fake SUPPORTED -- lane refused, gap recorded.",
+      "rerank": "binary head has no relevance notion: candidate texts cannot be ordered -- lane refused, gap recorded.",
+      "find": "binary head has no query/candidate matching notion -- lane refused, gap recorded."
+    }
+  }
+}

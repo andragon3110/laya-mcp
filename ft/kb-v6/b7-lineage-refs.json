@@ -1,0 +1,51 @@
+{
+ "refs": [
+  {
+   "path": "ft/batch4/classify-other.jsonl",
+   "note": "batch4-SIGNED classify-other (B6 refs)",
+   "rows": 20,
+   "en": 10,
+   "es": 10
+  },
+  {
+   "path": "ft/batch4/gate-silence.jsonl",
+   "note": "batch4-SIGNED gate-silence (floor hold)",
+   "rows": 20,
+   "en": 10,
+   "es": 10
+  },
+  {
+   "path": "ft/batch4/screen-filler.jsonl",
+   "note": "batch4-SIGNED screen-filler (B5 refs)",
+   "rows": 40,
+   "en": 20,
+   "es": 20
+  },
+  {
+   "path": "ft/batch4/d3-distill-candidates.jsonl",
+   "note": "batch4 d3-distill (train-only)",
+   "rows": 24,
+   "en": 12,
+   "es": 12
+  },
+  {
+   "path": "artifacts-ft/mix-regulus-v2/anchors-train.jsonl",
+   "note": "v2-anchors 570",
+   "rows": 570,
+   "en": 0,
+   "es": 0
+  },
+  {
+   "path": "artifacts-ft/mix-regulus-v3/gate-v3-train.jsonl",
+   "note": "v3-50 gate hold",
+   "rows": 50,
+   "en": 0,
+   "es": 0
+  }
+ ],
+ "refs_total": 724,
+ "refs_spec_math": "104 batch4 + 570 v2-anchors + 50 v3 + 24 d3-train-only = 748",
+ "silence_bank": 102,
+ "b7_total": 850,
+ "note": "d3-24 counted in the 104 batch4 files AND restated for its train-only role per spec math (748); +102 bank = 850. All ref rows stay in their home files (copies forbidden)."
+}

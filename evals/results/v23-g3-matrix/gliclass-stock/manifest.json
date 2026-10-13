@@ -1,0 +1,401 @@
+{
+  "generated": "bench-ronda3 G3 R3T4 reproducibility manifest (LIVE backend gliclass-stock; absolutes + method, no improvement claims, no promotion)",
+  "date": "2026-10-12T05:25:20.209Z",
+  "commit": "58ef829c7c2f48592da980cd2cbc6f8e43fa9072",
+  "commit_short": "58ef829",
+  "model": "knowledgator/gliclass-multilang-mini",
+  "model_note": "live backend model inventory name (verbatim probe)",
+  "model_repo": "knowledgator/gliclass-multilang-mini",
+  "model_revision": null,
+  "model_revision_source": "unpinned",
+  "model_revision_note": "the gliclass-stock sidecar reports no revision pin (revision null + unpinned, never invented); the setup-time HF-API sha 0bd888b6c3ef9fca5f0a9d407bddfbbc7623486b lives in odd/tasks/spike-g3-backbones.md S1 (policylm additionally reports pinned revision v1.2, the ronda1 pattern)",
+  "tokenizer": "unknown",
+  "tokenizer_note": "explicit unknown: no tool or probe exposes a tokenizer",
+  "device": "cpu",
+  "device_note": "probed LIVE from GET /ready (or the explicit unknown string when the backend reported no device)",
+  "backend": {
+    "mode": "live",
+    "live": true,
+    "reachable": true,
+    "baseUrl": "http://127.0.0.1:8782",
+    "server": "py/gliclass_stock_server.py",
+    "venv": "py/.venv-r3g3 (group venv, pip check clean)",
+    "venv_note": "laya-multilingual baseline served unmodified on :8765 from its own pre-existing process/venv (never touched by G3 setup)",
+    "ready": true,
+    "device": "cpu",
+    "models": [
+      {
+        "name": "knowledgator/gliclass-multilang-mini",
+        "repo": "knowledgator/gliclass-multilang-mini",
+        "loaded": true,
+        "revision": null,
+        "revision_source": "unpinned",
+        "device": "cpu"
+      }
+    ],
+    "model": "knowledgator/gliclass-multilang-mini",
+    "revisions": {
+      "laya": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "LAYA_MODEL_REVISION"
+      },
+      "gliner": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GLINER_MODEL_REVISION"
+      },
+      "rerank": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "RERANK_MODEL_REVISION"
+      },
+      "d1": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "D1_MODEL_REVISION"
+      },
+      "gliclass": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GLICLASS_MODEL_REVISION"
+      },
+      "policylm": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "POLICYLM_MODEL_REVISION"
+      },
+      "promptguard": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "PROMPTGUARD_MODEL_REVISION"
+      },
+      "gte": {
+        "revision": null,
+        "revision_source": "unpinned",
+        "env": "GTE_MODEL_REVISION"
+      }
+    },
+    "probes": {
+      "classifyxgliclass-stock": {
+        "baseUrl": "http://127.0.0.1:8782",
+        "service": "gliclass-stock-server",
+        "reachable": true,
+        "ready": true,
+        "ready_reason": "ready",
+        "device": "cpu",
+        "models": [
+          {
+            "name": "knowledgator/gliclass-multilang-mini",
+            "repo": "knowledgator/gliclass-multilang-mini",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu"
+          }
+        ],
+        "model": "knowledgator/gliclass-multilang-mini",
+        "probe_status": {
+          "ready": 200,
+          "models": 200
+        }
+      },
+      "gatexgliclass-stock": {
+        "baseUrl": "http://127.0.0.1:8782",
+        "service": "gliclass-stock-server",
+        "reachable": true,
+        "ready": true,
+        "ready_reason": "ready",
+        "device": "cpu",
+        "models": [
+          {
+            "name": "knowledgator/gliclass-multilang-mini",
+            "repo": "knowledgator/gliclass-multilang-mini",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu"
+          }
+        ],
+        "model": "knowledgator/gliclass-multilang-mini",
+        "probe_status": {
+          "ready": 200,
+          "models": 200
+        }
+      },
+      "screenxgliclass-stock": {
+        "baseUrl": "http://127.0.0.1:8782",
+        "service": "gliclass-stock-server",
+        "reachable": true,
+        "ready": true,
+        "ready_reason": "ready",
+        "device": "cpu",
+        "models": [
+          {
+            "name": "knowledgator/gliclass-multilang-mini",
+            "repo": "knowledgator/gliclass-multilang-mini",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu"
+          }
+        ],
+        "model": "knowledgator/gliclass-multilang-mini",
+        "probe_status": {
+          "ready": 200,
+          "models": 200
+        }
+      },
+      "rerankxgliclass-stock": {
+        "baseUrl": "http://127.0.0.1:8782",
+        "service": "gliclass-stock-server",
+        "reachable": true,
+        "ready": true,
+        "ready_reason": "ready",
+        "device": "cpu",
+        "models": [
+          {
+            "name": "knowledgator/gliclass-multilang-mini",
+            "repo": "knowledgator/gliclass-multilang-mini",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu"
+          }
+        ],
+        "model": "knowledgator/gliclass-multilang-mini",
+        "probe_status": {
+          "ready": 200,
+          "models": 200
+        }
+      },
+      "findxgliclass-stock": {
+        "baseUrl": "http://127.0.0.1:8782",
+        "service": "gliclass-stock-server",
+        "reachable": true,
+        "ready": true,
+        "ready_reason": "ready",
+        "device": "cpu",
+        "models": [
+          {
+            "name": "knowledgator/gliclass-multilang-mini",
+            "repo": "knowledgator/gliclass-multilang-mini",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu"
+          }
+        ],
+        "model": "knowledgator/gliclass-multilang-mini",
+        "probe_status": {
+          "ready": 200,
+          "models": 200
+        }
+      }
+    },
+    "note": "G3 choice sidecars (minilm, gliclass-stock) serve the production POST /predict {text, labels} contract (stdlib http.server, lazy single-flight load, 413 guards); policylm serves POST /predict {message, categories} (explicit-mode single category, ronda1 pattern); gate fan-out = one POST per claim lane-side (choice backends); find = query-as-text vs candidate texts lane-side; omission lives lane-side (servers always return scores)"
+  },
+  "backend_revisions": {
+    "laya": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "LAYA_MODEL_REVISION"
+    },
+    "gliner": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLINER_MODEL_REVISION"
+    },
+    "rerank": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "RERANK_MODEL_REVISION"
+    },
+    "d1": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "D1_MODEL_REVISION"
+    },
+    "gliclass": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLICLASS_MODEL_REVISION"
+    },
+    "policylm": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "POLICYLM_MODEL_REVISION"
+    },
+    "promptguard": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "PROMPTGUARD_MODEL_REVISION"
+    },
+    "gte": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GTE_MODEL_REVISION"
+    }
+  },
+  "backend_revisions_note": "per-backend revision pins (env pins win, else backend-reported, else unpinned null; a hash is never invented)",
+  "policy": [
+    {
+      "name": "classify",
+      "version": "1.0.0"
+    },
+    {
+      "name": "code-review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "compare",
+      "version": "1.0.0"
+    },
+    {
+      "name": "decide",
+      "version": "1.0.0"
+    },
+    {
+      "name": "extract",
+      "version": "1.0.0"
+    },
+    {
+      "name": "find",
+      "version": "1.0.0"
+    },
+    {
+      "name": "gate",
+      "version": "1.0.0"
+    },
+    {
+      "name": "normal",
+      "version": "1.0.0"
+    },
+    {
+      "name": "pii",
+      "version": "1.0.0"
+    },
+    {
+      "name": "rerank",
+      "version": "1.0.0"
+    },
+    {
+      "name": "review",
+      "version": "1.0.0"
+    },
+    {
+      "name": "screen",
+      "version": "1.0.0"
+    },
+    {
+      "name": "security",
+      "version": "1.0.0"
+    },
+    {
+      "name": "verify",
+      "version": "1.0.0"
+    }
+  ],
+  "policy_note": "live registry truth (availability-independent); 14 entries",
+  "schema_version": "1.0.0",
+  "software": {
+    "node": "v24.18.0",
+    "platform": "win32",
+    "arch": "x64",
+    "package_version": "0.4.0"
+  },
+  "hardware": {
+    "arch": "x64",
+    "cpus": 16,
+    "cpu_model": "AMD Ryzen 7 5700X 8-Core Processor             ",
+    "totalmem_mb": 32646
+  },
+  "config": {
+    "backend": "gliclass-stock",
+    "corpus": {
+      "r1": 60,
+      "v2": 80
+    },
+    "lanes": [
+      "classify",
+      "gate",
+      "screen",
+      "rerank",
+      "find"
+    ],
+    "timeout_ms": 60000,
+    "run_env": {},
+    "run_env_note": "laya rerank/find lanes resolve via LAYA_BENCH_RERANK_URL/_FIND_URL (fallback RERANK_URL); the G1 matrix points both at the laya baseline :8765 so every table carries the same baseline backend",
+    "started": "2026-10-12T05:24:05.315Z",
+    "finished": "2026-10-12T05:25:20.209Z"
+  },
+  "mode": {
+    "mcp": "observe",
+    "mcp_note": "the MCP layer only observes and reports judgments; it never acts, under every policy mode",
+    "policy": "observe (default)",
+    "policy_note": "effective global policy-decision mode resolution input (verbatim env or default)"
+  },
+  "method": "G3 matrix: per-case wall (performance.now round trip) + backend-reported latencyMs per predict call. Routing OFF (pure argmax + omit-on-ABSTAIN/null; gate and screen taus null -- first-measurement pin, never tuned on r1/v2); fixed argmax->band magnitudes at public policy centers (gate 0.9/0.1 vs claimVerified 0.8; screen 0.92/0.5/0.1 vs 0.75/0.25; gate rubric 2/2/0.95 + screen substance/relevance 0.9/0.9 documented lane constants; find argmax id->score, 1/N baseline inside handler). Scoring backends: minilm = per-label NLI entailment probability (hypothesis \"This example is {}.\", entail id resolved live from config); gliclass-stock = ZeroShotClassificationPipeline multi-label scores; policylm = explicit-mode single-category score (injection leg only). Per-case rows carry raw backend scores + margins for threshold design; verdicts never read them. Reliability inputs recorded, no ECE claimed. No cross-machine comparison.",
+  "gold_corpus": {
+    "r1_independent": 60,
+    "v2_signed": 80,
+    "oracle_stub": 0,
+    "total": 140,
+    "per_suite": [
+      {
+        "suite": "classify",
+        "r1": 12,
+        "v2": 26
+      },
+      {
+        "suite": "gate",
+        "r1": 12,
+        "v2": 22
+      },
+      {
+        "suite": "screen",
+        "r1": 12,
+        "v2": 32
+      },
+      {
+        "suite": "rerank",
+        "r1": 12,
+        "v2": 0
+      },
+      {
+        "suite": "find",
+        "r1": 12,
+        "v2": 0
+      }
+    ]
+  },
+  "gold_corpus_note": "r1 golds are human-fixed independent truth + v2 golds human-signed (spike-grade: live backends judged against them); stub answers ignored by lanes (live deps forward real questions)",
+  "honesty": [
+    "absolutes only; no cross-machine comparison; no improvement claimed without a paired baseline table (laya baseline embedded in composed.json); no promotion verdict (spike S4 + parent R3T6)",
+    "thresholds OFF and untouched (no m, no tau); wrong_confident taus remain reporting slices, never prod cutoffs",
+    "gate rubric + screen substance/relevance + fixed magnitudes are documented lane constants, not tuned values (choice backends have no such notions)",
+    "reliability inputs are diagram data, not calibration: no ECE/Brier, no probability claimed (arc/thx sharpness is NOT calibration)",
+    "model weights stay out of git (venv policy); pinned by setup-time HF-API sha + sidecar probe only"
+  ],
+  "links": {
+    "metrics": {
+      "suites": null
+    },
+    "composed": {
+      "table": null
+    }
+  },
+  "server_reported_revisions": {
+    "knowledgator/gliclass-multilang-mini": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "loaded": true
+    }
+  },
+  "g3": {
+    "venv": "py/.venv-r3g3",
+    "venv_note": "group venv pins recorded at setup (spike S1): torch 2.14.1+cpu, transformers 5.19.0, onnxruntime 1.31.0, tokenizers 0.23.3, safetensors 0.8.0, huggingface_hub 2.2.0, numpy 2.4.6, gliclass 0.1.20, pip check clean (not re-resolved here); policylm isolated venv: torch 2.14.1+cpu, transformers 4.57.6 (card pin), huggingface_hub 0.36.2, safetensors, tokenizers 0.22.2, numpy 2.4.6, pip check clean",
+    "thresholds": "OFF: pure argmax + omit-on-ABSTAIN/null (gate and screen taus null); NOT tuned here and NEVER on r1/v2",
+    "adjudication": "choice backends: classify item-text vs criteria keys; gate one POST per claim (evidence || claim, 3 labels) -> claim/refute noul pair; screen text + 3 labels -> injection noul; rerank query-as-text + candidate texts -> noul order; find query-as-text + candidate texts -> exists choice; see G3ChoiceClient above. policylm: screen text via explicit-mode single category (prompt injection) -> injection noul only (substance/relevance omitted -> handler ESCALATEs); all other policylm lanes are recorded gaps (POLICYLM_GAPS). modernbert: no lanes (probe only)."
+  }
+}

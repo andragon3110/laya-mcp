@@ -18,6 +18,16 @@ against server sources (ports/envs); the gliclass bring-up was boot-verified
 
 ## Bring-up (verified: gliclass)
 
+CHAMPION (2026-10-13): regulus-v6 — `artifacts-ft/CHAMPION.json`.
+
+```bash
+GLICLASS_MODEL=C:/Users/Andragon/Documents/Github/laya-mcp/artifacts-ft/run-20261013T054525Z-regulus-v6/checkpoint \
+  py/.venv-ft/Scripts/python py/gliclass_server.py
+# ready check: curl -s http://127.0.0.1:8770/ready
+```
+
+Legacy (superseded, kept for reference):
+
 ```bash
 GLICLASS_MODEL=/home/andragon/Documents/GitHub/laya-mcp-finetune-gliclass/artifacts-ft/run-20261010T210220Z-r3i/checkpoint \
   py/.venv-r1/bin/python py/gliclass_server.py

@@ -1,0 +1,123 @@
+{
+  "generated": "regulus matrix composed table (backend gliclass(regulus-v2); r1 lanes this run + qwen/gte find from v8/v9, never re-run)",
+  "rows": [
+    {
+      "primitive": "classify",
+      "corpus": "r1",
+      "lane_backend": "gliclass(regulus-v2)",
+      "source": "evals/results/v25-regulus-v2",
+      "decision": {
+        "n": 12,
+        "correct": 12
+      },
+      "task": {
+        "n": 12,
+        "correct": 11
+      },
+      "abstained": 0,
+      "threw": 0
+    },
+    {
+      "primitive": "gate",
+      "corpus": "r1",
+      "lane_backend": "gliclass(regulus-v2)",
+      "source": "evals/results/v25-regulus-v2",
+      "decision": {
+        "n": 12,
+        "correct": 6
+      },
+      "task": {
+        "n": 12,
+        "correct": 4
+      },
+      "abstained": 0,
+      "threw": 0
+    },
+    {
+      "primitive": "rerank",
+      "corpus": "r1",
+      "lane_backend": "gliclass(regulus-v2)",
+      "source": "evals/results/v25-regulus-v2",
+      "decision": {
+        "n": 12,
+        "correct": 12
+      },
+      "task": {
+        "n": 12,
+        "correct": 12
+      },
+      "abstained": 0,
+      "threw": 0
+    },
+    {
+      "primitive": "screen",
+      "corpus": "r1",
+      "lane_backend": "gliclass(regulus-v2)",
+      "source": "evals/results/v25-regulus-v2",
+      "decision": {
+        "n": 12,
+        "correct": 8
+      },
+      "task": {
+        "n": 12,
+        "correct": 8
+      },
+      "abstained": 3,
+      "threw": 0
+    },
+    {
+      "primitive": "find",
+      "corpus": "r1",
+      "lane_backend": "qwen",
+      "source": "evals/results/v8",
+      "decision": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      },
+      "task": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      }
+    },
+    {
+      "primitive": "find",
+      "corpus": "r1",
+      "lane_backend": "gte",
+      "source": "evals/results/v9",
+      "decision": {
+        "n": 12,
+        "correct": 11,
+        "accuracy": 0.9166666666666666
+      },
+      "task": {
+        "n": 12,
+        "correct": 12,
+        "accuracy": 1
+      }
+    }
+  ],
+  "totals": {
+    "regulus-v2+qwen-find": {
+      "decision": {
+        "n": 60,
+        "correct": 50
+      },
+      "task": {
+        "n": 60,
+        "correct": 47
+      }
+    },
+    "regulus-v2+gte-find": {
+      "decision": {
+        "n": 60,
+        "correct": 49
+      },
+      "task": {
+        "n": 60,
+        "correct": 47
+      }
+    }
+  }
+}

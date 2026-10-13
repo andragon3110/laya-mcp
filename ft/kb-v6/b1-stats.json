@@ -1,0 +1,14 @@
+{
+ "drops": [
+  {
+   "id": "xnli-en-124395",
+   "reason": "denylist:windows"
+  },
+  {
+   "id": "xnli-en-226265",
+   "reason": "denylist:battery"
+  }
+ ],
+ "seed": 606101,
+ "total": 900
+}

@@ -1,0 +1,151 @@
+{
+ "drops": [
+  {
+   "id": "fever-96308",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-84654",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-16688",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-148909",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-36767",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-93235",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-165175",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-143281",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-85033",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-31328",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-208605",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-54195",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-28983",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-29911",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-96447",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-210548",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-89614",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-115364",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-194996",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-191191",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-1469",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-175844",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "fever-145526",
+   "reason": "no usable extract"
+  },
+  {
+   "id": "xnli-es-95976",
+   "reason": "denylist"
+  },
+  {
+   "id": "xnli-es-261536",
+   "reason": "denylist"
+  },
+  {
+   "id": "xnli-en-107602",
+   "reason": "denylist"
+  },
+  {
+   "id": "xnli-en-328862",
+   "reason": "denylist"
+  },
+  {
+   "id": "xnli-en-79262",
+   "reason": "denylist"
+  },
+  {
+   "id": "xnli-en-246140",
+   "reason": "denylist"
+  },
+  {
+   "id": "deepset-258",
+   "reason": "denylist"
+  },
+  {
+   "id": "deepset-74",
+   "reason": "denylist"
+  },
+  {
+   "id": "deepset-512",
+   "reason": "denylist"
+  },
+  {
+   "id": "email-42-Business Intelligence-4-middle",
+   "reason": "denylist"
+  },
+  {
+   "id": "email-38-Research Assistance-0-end",
+   "reason": "denylist"
+  }
+ ],
+ "fever_pairs": 14,
+ "fever_paired_rows": 28,
+ "total_new": 1800,
+ "files": {
+  "gate-fever.jsonl": 600,
+  "gate-nli-es.jsonl": 750,
+  "gate-nli-en.jsonl": 200,
+  "screen-deepset.jsonl": 150,
+  "screen-bipia.jsonl": 100
+ },
+ "seed": 424242
+}

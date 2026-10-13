@@ -1,0 +1,326 @@
+{
+  "generated": "bench-ronda3 G1 composed table: thx lanes + laya-multilingual baseline in EVERY row group (computed from manifests, not tuned)",
+  "baseline": "evals\\results\\v21-g1-matrix\\laya-baseline",
+  "rows": [
+    {
+      "corpus": "r1",
+      "primitive": "classify",
+      "lane": "thx",
+      "decision": {
+        "n": 12,
+        "correct": 12
+      },
+      "task": {
+        "n": 12,
+        "correct": 11
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\thx"
+    },
+    {
+      "corpus": "r1",
+      "primitive": "classify",
+      "lane": "laya-baseline",
+      "decision": {
+        "n": 12,
+        "correct": 3
+      },
+      "task": {
+        "n": 12,
+        "correct": 8
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\laya-baseline (baseline)"
+    },
+    {
+      "corpus": "r1",
+      "primitive": "gate",
+      "lane": "thx",
+      "decision": {
+        "n": 12,
+        "correct": 5
+      },
+      "task": {
+        "n": 12,
+        "correct": 2
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\thx"
+    },
+    {
+      "corpus": "r1",
+      "primitive": "gate",
+      "lane": "laya-baseline",
+      "decision": {
+        "n": 12,
+        "correct": 6
+      },
+      "task": {
+        "n": 12,
+        "correct": 0
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\laya-baseline (baseline)"
+    },
+    {
+      "corpus": "r1",
+      "primitive": "screen",
+      "lane": "thx",
+      "decision": {
+        "n": 12,
+        "correct": 5
+      },
+      "task": {
+        "n": 12,
+        "correct": 5
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\thx"
+    },
+    {
+      "corpus": "r1",
+      "primitive": "screen",
+      "lane": "laya-baseline",
+      "decision": {
+        "n": 12,
+        "correct": 0
+      },
+      "task": {
+        "n": 12,
+        "correct": 2
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\laya-baseline (baseline)"
+    },
+    {
+      "corpus": "r1",
+      "primitive": "rerank",
+      "lane": "thx",
+      "decision": {
+        "n": 12,
+        "correct": 12
+      },
+      "task": {
+        "n": 12,
+        "correct": 11
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\thx"
+    },
+    {
+      "corpus": "r1",
+      "primitive": "rerank",
+      "lane": "laya-baseline",
+      "decision": {
+        "n": 12,
+        "correct": 1
+      },
+      "task": {
+        "n": 12,
+        "correct": 6
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\laya-baseline (baseline)"
+    },
+    {
+      "corpus": "r1",
+      "primitive": "find",
+      "lane": "thx",
+      "decision": {
+        "n": 12,
+        "correct": 10
+      },
+      "task": {
+        "n": 12,
+        "correct": 10
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\thx"
+    },
+    {
+      "corpus": "r1",
+      "primitive": "find",
+      "lane": "laya-baseline",
+      "decision": {
+        "n": 12,
+        "correct": 5
+      },
+      "task": {
+        "n": 12,
+        "correct": 9
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\laya-baseline (baseline)"
+    },
+    {
+      "corpus": "v2",
+      "primitive": "classify",
+      "lane": "thx",
+      "decision": {
+        "n": 26,
+        "correct": 26
+      },
+      "task": {
+        "n": 26,
+        "correct": 20
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\thx"
+    },
+    {
+      "corpus": "v2",
+      "primitive": "classify",
+      "lane": "laya-baseline",
+      "decision": {
+        "n": 26,
+        "correct": 0
+      },
+      "task": {
+        "n": 26,
+        "correct": 5
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\laya-baseline (baseline)"
+    },
+    {
+      "corpus": "v2",
+      "primitive": "gate",
+      "lane": "thx",
+      "decision": {
+        "n": 22,
+        "correct": 10
+      },
+      "task": {
+        "n": 22,
+        "correct": 6
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\thx"
+    },
+    {
+      "corpus": "v2",
+      "primitive": "gate",
+      "lane": "laya-baseline",
+      "decision": {
+        "n": 22,
+        "correct": 22
+      },
+      "task": {
+        "n": 22,
+        "correct": 0
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\laya-baseline (baseline)"
+    },
+    {
+      "corpus": "v2",
+      "primitive": "screen",
+      "lane": "thx",
+      "decision": {
+        "n": 32,
+        "correct": 0
+      },
+      "task": {
+        "n": 32,
+        "correct": 0
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\thx"
+    },
+    {
+      "corpus": "v2",
+      "primitive": "screen",
+      "lane": "laya-baseline",
+      "decision": {
+        "n": 32,
+        "correct": 0
+      },
+      "task": {
+        "n": 32,
+        "correct": 0
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v21-g1-matrix\\laya-baseline (baseline)"
+    }
+  ],
+  "totals": {
+    "r1_model_60": {
+      "decision": {
+        "n": 60,
+        "correct": 44,
+        "accuracy": 0.7333333333333333
+      },
+      "task": {
+        "n": 60,
+        "correct": 39,
+        "accuracy": 0.65
+      }
+    },
+    "r1_baseline_60": {
+      "decision": {
+        "n": 60,
+        "correct": 15,
+        "accuracy": 0.25
+      },
+      "task": {
+        "n": 60,
+        "correct": 25,
+        "accuracy": 0.4166666666666667
+      }
+    },
+    "r1_champion_r3i_60": {
+      "decision": {
+        "n": 60,
+        "correct": 56,
+        "accuracy": 0.9333333333333333
+      },
+      "task": {
+        "n": 60,
+        "correct": 56,
+        "accuracy": 0.9333333333333333
+      },
+      "source": "evals/results/v20 (r3a+qwen-find)"
+    },
+    "combined_model_140": {
+      "decision": {
+        "n": 140,
+        "correct": 80,
+        "accuracy": 0.5714285714285714
+      },
+      "task": {
+        "n": 140,
+        "correct": 65,
+        "accuracy": 0.4642857142857143
+      }
+    },
+    "combined_baseline_140": {
+      "decision": {
+        "n": 140,
+        "correct": 37,
+        "accuracy": 0.2642857142857143
+      },
+      "task": {
+        "n": 140,
+        "correct": 30,
+        "accuracy": 0.21428571428571427
+      }
+    }
+  },
+  "promotion_note": "measurement only: no promotion verdict here (spike S4 + parent R3T6 decide adopt/tie/discard from these numbers, strictly-no-worse vs r3i 56/60+56/60 on the r1 slice)"
+}

@@ -1,0 +1,154 @@
+{
+  "generated": "bench-ronda3 G3 composed table: policylm lanes + laya-multilingual baseline in EVERY row group (computed from manifests, not tuned)",
+  "baseline": "evals\\results\\v23-g3-matrix\\laya-baseline",
+  "rows": [
+    {
+      "corpus": "r1",
+      "primitive": "screen",
+      "lane": "policylm",
+      "decision": {
+        "n": 12,
+        "correct": 0
+      },
+      "task": {
+        "n": 12,
+        "correct": 2
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v23-g3-matrix\\policylm"
+    },
+    {
+      "corpus": "r1",
+      "primitive": "screen",
+      "lane": "laya-baseline",
+      "decision": {
+        "n": 12,
+        "correct": 0
+      },
+      "task": {
+        "n": 12,
+        "correct": 2
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v23-g3-matrix\\laya-baseline (baseline)"
+    },
+    {
+      "corpus": "v2",
+      "primitive": "screen",
+      "lane": "policylm",
+      "decision": {
+        "n": 32,
+        "correct": 0
+      },
+      "task": {
+        "n": 32,
+        "correct": 0
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v23-g3-matrix\\policylm"
+    },
+    {
+      "corpus": "v2",
+      "primitive": "screen",
+      "lane": "laya-baseline",
+      "decision": {
+        "n": 32,
+        "correct": 0
+      },
+      "task": {
+        "n": 32,
+        "correct": 0
+      },
+      "abstained": null,
+      "threw": null,
+      "source": "evals\\results\\v23-g3-matrix\\laya-baseline (baseline)"
+    }
+  ],
+  "totals": {
+    "r1_model_12": {
+      "decision": {
+        "n": 12,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "task": {
+        "n": 12,
+        "correct": 2,
+        "accuracy": 0.16666666666666666
+      }
+    },
+    "r1_baseline_12": {
+      "decision": {
+        "n": 12,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "task": {
+        "n": 12,
+        "correct": 2,
+        "accuracy": 0.16666666666666666
+      }
+    },
+    "r1_champion_r3i_screen_12": {
+      "decision": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "task": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334
+      },
+      "source": "evals/results/v20 (r3a+qwen-find; screen lane gliclass(r3a), verified 2026-10-12)"
+    },
+    "r1_champion_r3i_composed_60": {
+      "decision": {
+        "n": 60,
+        "correct": 56,
+        "accuracy": 0.9333333333333333
+      },
+      "task": {
+        "n": 60,
+        "correct": 56,
+        "accuracy": 0.9333333333333333
+      },
+      "source": "evals/results/v20 (r3a+qwen-find)"
+    },
+    "combined_model_44": {
+      "decision": {
+        "n": 44,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "task": {
+        "n": 44,
+        "correct": 2,
+        "accuracy": 0.045454545454545456
+      }
+    },
+    "combined_baseline_44": {
+      "decision": {
+        "n": 44,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "task": {
+        "n": 44,
+        "correct": 2,
+        "accuracy": 0.045454545454545456
+      }
+    }
+  },
+  "promotion_note": "measurement only: no promotion verdict here (spike S4 + parent R3T6 decide adopt/tie/discard from these numbers, strictly-no-worse vs r3i 56/60+56/60 on the r1 slice, screen 10/12 for the policylm subset)",
+  "coverage_gaps": {
+    "classify": "policy-violation framing has no topic axis: scoring refund/cancel/other as violations would fake a verdict -- lane refused, gap recorded.",
+    "gate": "no SUPPORTED/CONTRADICTED/ABSTAIN notion -- lane refused, gap recorded.",
+    "rerank": "no relevance notion: candidate texts cannot be ordered -- lane refused, gap recorded.",
+    "find": "no query/candidate matching notion -- lane refused, gap recorded."
+  },
+  "coverage_note": "policylm serves screen ONLY (honest subset: policy-violation framing has no topic axis). classify/gate/rerank/find are recorded gaps, never faked runs."
+}

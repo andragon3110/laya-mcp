@@ -1,0 +1,134 @@
+{
+  "generated": "bench-ronda3 G3 modernbert probe evidence (NO lanes: a masked-LM backbone has no zero-shot axis; GET /probe proves load+run, POST /predict proves the honest 409 refusal)",
+  "date": "2026-10-12T05:25:57.519Z",
+  "commit": "58ef829c7c2f48592da980cd2cbc6f8e43fa9072",
+  "commit_short": "58ef829",
+  "model_repo": "answerdotai/ModernBERT-base",
+  "model_revision": null,
+  "model_revision_source": "unpinned",
+  "model_revision_note": "the modernbert probe reports no revision pin (revision null + unpinned, never invented); the setup-time HF-API sha 8949b909ec900327062f0ebf497f51aef5e6f0c8 lives in odd/tasks/spike-g3-backbones.md S1",
+  "venv": "py/.venv-r3g3",
+  "backend_revisions": {
+    "laya": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "LAYA_MODEL_REVISION"
+    },
+    "gliner": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLINER_MODEL_REVISION"
+    },
+    "rerank": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "RERANK_MODEL_REVISION"
+    },
+    "d1": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "D1_MODEL_REVISION"
+    },
+    "gliclass": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GLICLASS_MODEL_REVISION"
+    },
+    "policylm": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "POLICYLM_MODEL_REVISION"
+    },
+    "promptguard": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "PROMPTGUARD_MODEL_REVISION"
+    },
+    "gte": {
+      "revision": null,
+      "revision_source": "unpinned",
+      "env": "GTE_MODEL_REVISION"
+    }
+  },
+  "captured": {
+    "baseUrl": "http://127.0.0.1:8781",
+    "live": {
+      "status": 200,
+      "body": {
+        "alive": true,
+        "service": "modernbert-probe-server",
+        "version": "0.1.0",
+        "uptime_seconds": 678.619633436203
+      }
+    },
+    "ready": {
+      "status": 200,
+      "body": {
+        "status": "ready",
+        "ready": true,
+        "reason": null,
+        "loaded": [
+          "answerdotai/ModernBERT-base"
+        ],
+        "failed": [],
+        "device": "cpu",
+        "versions": {
+          "server": "0.1.0"
+        },
+        "uptime_seconds": 678.6276485919952,
+        "load_attempts": 0,
+        "retry_after_seconds": 0
+      }
+    },
+    "models": {
+      "status": 200,
+      "body": {
+        "service": "modernbert-probe-server",
+        "device": "cpu",
+        "versions": {
+          "server": "0.1.0"
+        },
+        "uptime_seconds": 678.6301529407501,
+        "models": [
+          {
+            "name": "answerdotai/ModernBERT-base",
+            "repo": "answerdotai/ModernBERT-base",
+            "loaded": true,
+            "revision": null,
+            "revision_source": "unpinned",
+            "device": "cpu"
+          }
+        ]
+      }
+    },
+    "probed": {
+      "status": 200,
+      "body": {
+        "service": "modernbert-probe-server",
+        "probe": "mlm-forward-pass",
+        "input": "The capital of France is [MASK].",
+        "mask_token": "[MASK]",
+        "sequence_length": 9,
+        "logits_shape": [
+          1,
+          9,
+          50368
+        ],
+        "top_id": 7785,
+        "top_token": " Paris",
+        "latency_ms": 77.52540000001318
+      }
+    },
+    "refused": {
+      "status": 409,
+      "body": {
+        "code": "no_zero_shot",
+        "detail": "ModernBERT-base is a masked-LM backbone with no classification head: it cannot score labels zero-shot. GET /probe carries the load+run evidence; lanes must record the gap, never judge.",
+        "gap": "classify/screen/gate/rerank/find NOT served: no zero-shot axis exists (honest refusal, never a fake mapping)",
+        "model": "answerdotai/ModernBERT-base",
+        "loaded": true
+      }
+    }
+  },
+  "gap": "classify/screen/gate/rerank/find NOT served by modernbert (no_zero_shot 409): recorded gap, never a fake mapping; finetune-probe verdict lives in spike S4 + R3T5."
+}

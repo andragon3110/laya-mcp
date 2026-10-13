@@ -1,0 +1,22 @@
+{
+ "drops": [
+  {
+   "id": "xnli-es-381932",
+   "reason": "denylist:restauraci\u00f3n"
+  },
+  {
+   "id": "xnli-es-119287",
+   "reason": "denylist:windows"
+  }
+ ],
+ "seed": 606106,
+ "total": 580,
+ "by": {
+  "('en', 'other')": 190,
+  "('es', 'other')": 190,
+  "('en', 'bug')": 50,
+  "('en', 'feature')": 50,
+  "('es', 'bug')": 50,
+  "('es', 'feature')": 50
+ }
+}

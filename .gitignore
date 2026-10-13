@@ -21,3 +21,16 @@ examples/*.local.json
 
 # Runtime state (escalation queue, never committed)
 /var/
+
+# Heavy ML weights (local-only; provenance lives in manifests + CHAMPION.json)
+*.safetensors
+
+# Local-only python envs (rebuilt via pip; NEVER commit, GBs)
+py/.venv-*/
+
+# Re-downloadable MT snapshots (see ft/kb-v6/SOURCES.json; 1.5G, no commit-hash pin)
+ft/kb-v6/mt-models/
+
+# Raw downloads (re-fetch per SOURCES.json / build scripts; built outputs ARE committed)
+ft/kb-v6/raw/
+ft/base-v4/raw/

@@ -1,0 +1,45 @@
+{
+ "n": 4542,
+ "per_file": {
+  "b1-nli-core.jsonl": 900,
+  "b2-anli.jsonl": 600,
+  "b3-verify-contrast.jsonl": 700,
+  "b4-fever.jsonl": 900,
+  "b5-screen.jsonl": 760,
+  "b6-classify.jsonl": 580,
+  "b7-silence.jsonl": 102
+ },
+ "schema_errors": [],
+ "balance": {
+  "sup": 1013,
+  "con": 1022,
+  "abstain_gate": 1167,
+  "mal": 380,
+  "ben": 340,
+  "sus": 40,
+  "b34": {
+   "sup": 546,
+   "con": 552,
+   "nei": 502
+  },
+  "dev": {
+   "B1-2-3-4-7 SUP-CON": 0.0044,
+   "B3+B4 SUP-CON": 0.0055,
+   "B3+B4 SUP-NEI": 0.042,
+   "B3+B4 CON-NEI": 0.0474,
+   "B5 MAL-BEN": 0.0556
+  },
+  "es": 1871
+ },
+ "overlap_eval": {
+  "universe_ids": 244,
+  "universe_texts": 557,
+  "ids": [],
+  "exact": [],
+  "denylist": [],
+  "maxJ3": 0.1667,
+  "pairs_ge_0.5": [],
+  "top5": []
+ },
+ "verdict": "PASS"
+}

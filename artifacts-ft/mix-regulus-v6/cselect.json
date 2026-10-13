@@ -1,0 +1,42 @@
+{
+  "candidates": {
+    "0.005": {
+      "match": 22,
+      "match_rate": 0.275,
+      "force_mean": 0.018721
+    },
+    "0.01": {
+      "match": 29,
+      "match_rate": 0.3625,
+      "force_mean": 0.018721
+    },
+    "0.02": {
+      "match": 54,
+      "match_rate": 0.675,
+      "force_mean": 0.018721
+    },
+    "0.03": {
+      "match": 67,
+      "match_rate": 0.8375,
+      "force_mean": 0.018721
+    },
+    "0.05": {
+      "match": 77,
+      "match_rate": 0.9625,
+      "force_mean": 0.018721
+    },
+    "0.1": {
+      "match": 77,
+      "match_rate": 0.9625,
+      "force_mean": 0.018721
+    },
+    "0.3": {
+      "match": 77,
+      "match_rate": 0.9625,
+      "force_mean": 0.018721
+    }
+  },
+  "selected_C": 0.05,
+  "note": "match = abstain-wins == v6-init-argmax-currently-misses (focal base); v6 init = v2-pinned checkpoint (continuation); tie-break toward spike prior 0.02; validation-80 (v2d) only, HELD OUT of the v6 mix (dropped at train time via the 220 eval-ids); anchors/KB/v3 rows excluded (C prices abstention on the target distribution); v2-pinned CPU-fp32 forwards, augmentation OFF, shuffle OFF. Caveat (v4/v5-identical): the v6 init saw batch4-80 during v2 training, so this is init-fit, recorded not hidden.",
+  "init": "artifacts-ft/regulus-v2-pinned/checkpoint"
+}

@@ -1,0 +1,44 @@
+{
+  "model": "regulus-v2",
+  "lineage": "r3i",
+  "base_repo": "knowledgator/gliclass-multilang-mini",
+  "lr": 2e-05,
+  "epochs": 2,
+  "abort_bar": 0.3,
+  "weight": 1,
+  "seed": 20261012,
+  "batch_size": 8,
+  "max_length": 1024,
+  "objective": "idk-focal manual torch loop (AbstentionHead + ft.idk_loss.idk_loss base='focal'; no transformers.Trainer: accelerate absent from py/.venv-ft, dependency install unauthorized)",
+  "init_exception": "WS-E resolved path (parent 2026-10-12): init from cached gliclass-stock snapshot rev 0bd888b (r3i checkpoint absent on this machine); lineage tag stays r3i per naming decision",
+  "abstention_cost": 0.05,
+  "checkpoint": "C:/Users/Andragon/.cache/huggingface/hub/models--knowledgator--gliclass-multilang-mini/snapshots/0bd888b6c3ef9fca5f0a9d407bddfbbc7623486b",
+  "idk_bias_init": -2.2,
+  "idk_q_init": 0.09975048911968513,
+  "mix": [
+    "artifacts-ft/mix-regulus-v2/batch4-train.jsonl",
+    "artifacts-ft/mix-regulus-v2/anchors-train.jsonl"
+  ],
+  "eval_ids": "artifacts-ft/mix-regulus-v2/eval-ids-train.txt",
+  "run_dir": "artifacts-ft\\run-20261012T120513Z-regulus-v2",
+  "forbidden": "weight>1, init-from-base/stock, eval-ids-in-mix, tuning-on-r1",
+  "dry_run": false,
+  "confirm": true,
+  "manifest": [
+    {
+      "file": "artifacts-ft/mix-regulus-v2/batch4-train.jsonl",
+      "sha256": "40413e7b97995e2773c1e349f3d9c3db77b43ed0caf6e68b0693020bcd04a397",
+      "rows": 104,
+      "kept": 104,
+      "dropped_eval_ids": 0
+    },
+    {
+      "file": "artifacts-ft/mix-regulus-v2/anchors-train.jsonl",
+      "sha256": "2efe240afacd81a57b3a5f0d90cd8dc91353e97725fc5072898bcf202b70f738",
+      "rows": 570,
+      "kept": 570,
+      "dropped_eval_ids": 0
+    }
+  ],
+  "mix_rows": 674
+}

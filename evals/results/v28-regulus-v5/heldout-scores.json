@@ -1,0 +1,222 @@
+[
+  {
+    "id": "v5s-gate-en-batch-02",
+    "lang": "en",
+    "predicted_label": "ABSTAIN",
+    "confidence": 0.2886253297328949,
+    "correct": true,
+    "abstained": false,
+    "taskActual": [
+      "ABSTAIN"
+    ]
+  },
+  {
+    "id": "v5s-gate-en-batch-06",
+    "lang": "en",
+    "predicted_label": "ABSTAIN",
+    "confidence": 0.43782079219818115,
+    "correct": true,
+    "abstained": false,
+    "taskActual": [
+      "ABSTAIN"
+    ]
+  },
+  {
+    "id": "v5s-gate-en-batch-10",
+    "lang": "en",
+    "predicted_label": "ABSTAIN",
+    "confidence": 0.3064159154891968,
+    "correct": true,
+    "abstained": false,
+    "taskActual": [
+      "ABSTAIN"
+    ]
+  },
+  {
+    "id": "v5s-gate-en-batch-14",
+    "lang": "en",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.21529506146907806,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "SUPPORTED"
+    ]
+  },
+  {
+    "id": "v5s-gate-en-d3-02",
+    "lang": "en",
+    "predicted_label": "ABSTAIN",
+    "confidence": 0.19239798188209534,
+    "correct": true,
+    "abstained": false,
+    "taskActual": [
+      "ABSTAIN"
+    ]
+  },
+  {
+    "id": "v5s-gate-en-d3-06",
+    "lang": "en",
+    "predicted_label": "ABSTAIN",
+    "confidence": 0.39556649327278137,
+    "correct": true,
+    "abstained": false,
+    "taskActual": [
+      "ABSTAIN"
+    ]
+  },
+  {
+    "id": "v5s-gate-en-d3-10",
+    "lang": "en",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.1859101504087448,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "SUPPORTED"
+    ]
+  },
+  {
+    "id": "v5s-gate-en-fever-02",
+    "lang": "en",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.1963309794664383,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "CONTRADICTED"
+    ]
+  },
+  {
+    "id": "v5s-gate-en-fever-06",
+    "lang": "en",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.16556689143180847,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "CONTRADICTED"
+    ]
+  },
+  {
+    "id": "v5s-gate-en-fever-10",
+    "lang": "en",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.43659836053848267,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "CONTRADICTED"
+    ]
+  },
+  {
+    "id": "v5s-gate-es-batch-02",
+    "lang": "es",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.22629618644714355,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "SUPPORTED"
+    ]
+  },
+  {
+    "id": "v5s-gate-es-batch-06",
+    "lang": "es",
+    "predicted_label": "ABSTAIN",
+    "confidence": 0.1840004026889801,
+    "correct": true,
+    "abstained": false,
+    "taskActual": [
+      "ABSTAIN"
+    ]
+  },
+  {
+    "id": "v5s-gate-es-batch-10",
+    "lang": "es",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.41458597779273987,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "CONTRADICTED"
+    ]
+  },
+  {
+    "id": "v5s-gate-es-batch-14",
+    "lang": "es",
+    "predicted_label": "SUPPORTED",
+    "confidence": 0.1579475849866867,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "SUPPORTED"
+    ]
+  },
+  {
+    "id": "v5s-gate-es-d3-02",
+    "lang": "es",
+    "predicted_label": "ABSTAIN",
+    "confidence": 0.13899652659893036,
+    "correct": true,
+    "abstained": false,
+    "taskActual": [
+      "ABSTAIN"
+    ]
+  },
+  {
+    "id": "v5s-gate-es-d3-06",
+    "lang": "es",
+    "predicted_label": "ABSTAIN",
+    "confidence": 0.40590551495552063,
+    "correct": true,
+    "abstained": false,
+    "taskActual": [
+      "ABSTAIN"
+    ]
+  },
+  {
+    "id": "v5s-gate-es-d3-10",
+    "lang": "es",
+    "predicted_label": "ABSTAIN",
+    "confidence": 0.231475830078125,
+    "correct": true,
+    "abstained": false,
+    "taskActual": [
+      "ABSTAIN"
+    ]
+  },
+  {
+    "id": "v5s-gate-es-fever-02",
+    "lang": "es",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.22741732001304626,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "CONTRADICTED"
+    ]
+  },
+  {
+    "id": "v5s-gate-es-fever-06",
+    "lang": "es",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.26768335700035095,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "CONTRADICTED"
+    ]
+  },
+  {
+    "id": "v5s-gate-es-fever-10",
+    "lang": "es",
+    "predicted_label": "CONTRADICTED",
+    "confidence": 0.32883623242378235,
+    "correct": false,
+    "abstained": false,
+    "taskActual": [
+      "CONTRADICTED"
+    ]
+  }
+]

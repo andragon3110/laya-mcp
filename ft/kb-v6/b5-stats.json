@@ -1,0 +1,830 @@
+{
+ "drops": [
+  {
+   "id": "deepset-138",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-427",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-419",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-323",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-406",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-360",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-511",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-533",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-4",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-394",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-348",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-543",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-492",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-130",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-538",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-512",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-334",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-537",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-385",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-425",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-539",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-365",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-521",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-520",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-318",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-501",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-266",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-74",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-462",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-415",
+   "reason": "too-long"
+  },
+  {
+   "id": "deepset-375",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-495",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-441",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-258",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-422",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-368",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-333",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-542",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-363",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-440",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-532",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-380",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-522",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-152",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-310",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-469",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-435",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-332",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-250",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-450",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-296",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-103",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-144",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-509",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-153",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-409",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-545",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-370",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-48",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-396",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-45",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-181",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-263",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-31",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-270",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-424",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-309",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-196",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-50",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-20",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-157",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-188",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-76",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-330",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-179",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-126",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-96",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "deepset-484",
+   "reason": "v4dup-or-deny"
+  },
+  {
+   "id": "email-42-Sentiment Analysis-4-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "email-42-Language Translation-0-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "email-4-Substitution Ciphers-2-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "email-9-Entertainment-3-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "email-42-Research Assistance-3-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "email-24-Task Automation-4-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "email-13-Substitution Ciphers-4-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "email-39-Misinformation & Propaganda-1-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "email-38-Misinformation & Propaganda-2-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "email-0-Reverse Text-4-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "email-4-Reverse Text-0-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "email-38-Language Translation-4-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "email-23-Misinformation & Propaganda-0-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "email-9-Research Assistance-4-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "email-42-Task Automation-4-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "email-12-Marketing & Advertising-2-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "code-21-Encrypting Documents and Demanding Ransom (Ransomware)-2-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "code-49-Introduce System Fingerprinting-3-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "code-38-Blocking Internet Connection-1-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "code-21-Keylogging-0-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "table-43-Marketing & Advertising-0-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "table-33-Research Assistance-0-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "table-41-Reverse Text-2-start",
+   "reason": "denylist"
+  },
+  {
+   "id": "table-94-Business Intelligence-3-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "table-71-Sentiment Analysis-0-start",
+   "reason": "benign-deny/dup/short"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-look-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:quarterly"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "b5auth-gry-en-cand",
+   "reason": "denylist:onboarding"
+  },
+  {
+   "id": "deepset-leg-es",
+   "reason": "mt:back-jacc:0.250"
+  },
+  {
+   "id": "deepset-leg-es",
+   "reason": "mt:back-jacc:0.000"
+  },
+  {
+   "id": "deepset-leg-es",
+   "reason": "mt:back-jacc:0.000"
+  },
+  {
+   "id": "deepset-leg-es",
+   "reason": "mt:back-jacc:0.143"
+  },
+  {
+   "id": "deepset-leg-es",
+   "reason": "mt:back-jacc:0.000"
+  },
+  {
+   "id": "deepset-leg-es",
+   "reason": "mt:back-jacc:0.250"
+  },
+  {
+   "id": "deepset-leg-es",
+   "reason": "mt:back-jacc:0.077"
+  },
+  {
+   "id": "deepset-leg-es",
+   "reason": "mt:back-jacc:0.000"
+  }
+ ],
+ "seed": 606105,
+ "total": 760,
+ "by_lang_verdict": {
+  "('en', 'malicious')": 215,
+  "('en', 'benign')": 195,
+  "('es', 'malicious')": 165,
+  "('es', 'benign')": 145,
+  "('en', 'suspicious')": 20,
+  "('es', 'suspicious')": 20
+ }
+}

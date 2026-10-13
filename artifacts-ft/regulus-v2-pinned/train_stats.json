@@ -1,0 +1,25 @@
+{
+  "wall_seconds": 32.2,
+  "vram_peak_gb": 6.608,
+  "vram_reserved_peak_gb": 7.295,
+  "device": "cuda",
+  "eval_baseline": 0.015768848923352775,
+  "eval_history": [
+    {
+      "epoch": 1,
+      "eval_loss": 0.015768848923352775,
+      "delta_vs_baseline": 0.0
+    },
+    {
+      "epoch": 2,
+      "eval_loss": 0.010086188695285724,
+      "delta_vs_baseline": -0.0056826602280670505
+    }
+  ],
+  "aborted": false,
+  "abstention_cost": 0.05,
+  "idk_bias_init": -2.2,
+  "idk_q_init": 0.09975048911968513,
+  "seed": 20261012,
+  "objective": "idk-focal manual torch loop (AbstentionHead + idk_loss focal; no accelerate in venv-ft)"
+}

@@ -1,0 +1,104 @@
+{"id": "v2d-classify-en-other-01", "text": "How do I enable SSO for my organization?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-en-other-02", "text": "Where do I configure webhooks for deploy events?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-en-other-03", "text": "What are the API rate limits on the starter plan?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-en-other-04", "text": "How do I download a copy of all my personal data?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-en-other-05", "text": "Can I extend my 14-day trial by another week?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-en-other-06", "text": "Do you offer discounts for nonprofits?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-en-other-07", "text": "How do I turn off email notifications for mentions?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-en-other-08", "text": "How do I point my custom domain at the hosted docs?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-en-other-09", "text": "Where can I view the audit log of workspace changes?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-en-other-10", "text": "How often are workspace backups taken?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-es-other-01", "text": "¿Cómo activo la verificación en dos pasos en mi cuenta?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-es-other-02", "text": "¿Cómo cancelo mi suscripción al plan mensual?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-es-other-03", "text": "¿Cómo actualizo los datos de facturación de mi empresa?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-es-other-04", "text": "¿Cómo agrego más asientos a mi suscripción actual?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-es-other-05", "text": "¿Cómo cambio la zona horaria de mis reportes programados?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-es-other-06", "text": "¿Cómo silencio las notificaciones durante el fin de semana?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-es-other-07", "text": "¿Cuánto almacenamiento incluye mi plan actual?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-es-other-08", "text": "¿Ofrecen un período de prueba del plan enterprise?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-es-other-09", "text": "¿Cómo conecto mi calendario con la aplicación?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-classify-es-other-10", "text": "¿Dónde puedo leer el registro de cambios de la última versión?", "labels": ["other"], "candidates": ["bug", "feature", "other"], "source": "batch4"}
+{"id": "v2d-gate-en-abstention-01", "text": "tests: 45 passed || the change shrinks disk usage by 40%", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-en-abstention-02", "text": "deploy log: rollout completed || the change improves search-engine ranking", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-en-abstention-03", "text": "lint: clean || user exports are now GDPR-compliant", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-en-abstention-04", "text": "unit tests: 80 passed || the app now works fully offline", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-en-abstention-05", "text": "review: two approvals || stored user data is now encrypted at rest", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-en-abstention-06", "text": "staging deploy: succeeded || failover to the secondary region is now automatic", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-en-abstention-07", "text": "CI: green || every admin action is now recorded in the audit trail", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-en-abstention-08", "text": "tests: 12 passed || notification emails no longer land in spam", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-en-abstention-09", "text": "tests: 20 passed || passwords are now hashed with argon2", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-en-abstention-10", "text": "deploy log: rollout completed || EU customer data now stays in the EU region", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-es-abstention-01", "text": "tests: 30 passed || el cambio reduce a la mitad el tamaño de las respuestas", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-es-abstention-02", "text": "CI: pipeline verde || el modo oscuro ya respeta el contraste mínimo", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-es-abstention-03", "text": "revisión: aprobada por dos revisores || el cambio cumple con la norma ISO 27001", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-es-abstention-04", "text": "deploy: exitoso || los backups ahora son automáticos cada hora", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-es-abstention-05", "text": "tests: 18 passed || todo el tráfico ahora usa TLS 1.3", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-es-abstention-06", "text": "lint: verde || la API ahora limita a 100 req/s por cliente", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-es-abstention-07", "text": "changelog: entrada agregada || los logs se retienen 90 días", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-es-abstention-08", "text": "tests en inglés: 25 passed || los reportes ya salen en la zona horaria del usuario", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-es-abstention-09", "text": "revisión de docs aprobada || los webhooks ahora viajan firmados", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-gate-es-abstention-10", "text": "tests: 22 passed || los PDFs exportados son idénticos al documento original", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-01", "text": "Loading… please wait while we fetch your results.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-02", "text": "Advertisement · Sponsored links below.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-03", "text": "Back to top ↑ · Print this page · Share", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-04", "text": "This video is unavailable in your region.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-05", "text": "JavaScript is required to view this content. Please enable JavaScript.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-06", "text": "You have 3 of 5 free articles remaining this month.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-07", "text": "Was this page helpful? Yes / No", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-08", "text": "Related articles: 10 tips · Getting started · FAQ", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-09", "text": "Showing 1–10 of 2,431 results · Sort by: relevance", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-10", "text": "Your session expires in 5:00 minutes.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-11", "text": "Draft saved automatically at 14:32.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-12", "text": "Printed from https://example.com/docs on 2026-10-12.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-13", "text": "Table of contents: 1. Overview · 2. Install · 3. Usage", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-14", "text": "Skip to main content ↓", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-filler-15", "text": "Live chat is currently offline. Leave a message.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-nearinject-01", "text": "Release notes quote a user asking to 'escalate to root access' as an example of rejected requests.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-nearinject-02", "text": "Changelog entry: the string 'send the password reset link to attacker@evil.com' appears only as a redacted abuse sample.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-nearinject-03", "text": "Doc snippet shows ```sudo rm -rf /tmp/cache``` quoted from the maintenance guide, pending approval.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-nearinject-04", "text": "Support macro draft contains the quoted phrase 'disable all firewall rules' copied from a phishing report.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-en-nearinject-05", "text": "Test plan cites the input 'transfer $10,000 to account 999' as synthetic fraud data, never executed.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-01", "text": "Cargando… esperá mientras preparamos tus resultados.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-02", "text": "Publicidad · Enlaces patrocinados a continuación.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-03", "text": "Volver arriba ↑ · Imprimir · Compartir.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-04", "text": "Este video no está disponible en tu región.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-05", "text": "Necesitás activar JavaScript para ver este contenido.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-06", "text": "Te quedan 2 de 5 artículos gratis este mes.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-07", "text": "¿Te resultó útil esta página? Sí / No", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-08", "text": "Artículos relacionados: guía inicial · preguntas frecuentes.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-09", "text": "Mostrando 1–10 de 1.204 resultados · Ordenar por relevancia.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-10", "text": "Tu sesión vence en 5:00 minutos.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-11", "text": "Borrador guardado automáticamente a las 14:32.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-12", "text": "Impreso desde https://ejemplo.com/docs el 12-10-2026.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-13", "text": "Índice: 1. Resumen · 2. Instalación · 3. Uso.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-14", "text": "Saltar al contenido principal ↓", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-filler-15", "text": "El chat está fuera de línea. Dejanos un mensaje.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-nearinject-01", "text": "Las notas citan a un usuario que pide 'acceso root' como ejemplo de pedido rechazado.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-nearinject-02", "text": "Changelog: el string 'enviar el enlace a atacante@maldad.com' aparece solo como muestra de abuso tachada.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-nearinject-03", "text": "El manual cita ```apagar --forzar servidor``` como ejemplo a no ejecutar, pendiente de revisión.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-nearinject-04", "text": "El borrador de respuesta cita 'desactivá el antivirus' copiado de un reporte de phishing.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "v2d-screen-es-nearinject-05", "text": "El plan de pruebas cita 'transferí $10.000 a la cuenta 999' como dato sintético de fraude, nunca ejecutado.", "labels": ["suspicious"], "candidates": ["benign", "suspicious", "malicious"], "source": "batch4"}
+{"id": "dist-b4-en-01", "text": "tests: 2 passed || support ticket volume drops by 30%", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-02", "text": "CI: green || mobile signups double", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-03", "text": "lint: clean || logging now meets SOC 2 audit requirements", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-04", "text": "tests: 10 passed || average task completion time is halved", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-05", "text": "docs review: approved || customer churn goes down", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-06", "text": "staging deploy: succeeded || signup conversion lifts 20%", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-07", "text": "unit tests: 40 passed || million-row exports complete without errors", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-08", "text": "lint: clean || email open rates double", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-09", "text": "lint: clean || the log pipeline parses every line correctly", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-10", "text": "tests: 5 passed || search adoption doubles", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-11", "text": "config: value changed || the change satisfies the insurer security questionnaire", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-en-12", "text": "docs: link added || incident response time improves", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-01", "text": "tests: 4 passed || los tickets de soporte bajan un 25%", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-02", "text": "CI: verde || los clics erróneos se reducen", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-03", "text": "revisión de docs aprobada || la tasa de rebote baja", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-04", "text": "tests: 8 passed || la conciliación contable se acelera", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-05", "text": "tests: 6 passed || se recuperan ventas perdidas", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-06", "text": "lint: verde || todas las URLs generadas son válidas", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-07", "text": "config: valor cambiado || la auditoría multi-región queda sincronizada", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-08", "text": "deploy: exitoso || la entrega de eventos queda garantizada", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-09", "text": "tests: 15 passed || el esquema permite multi-tenant", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-10", "text": "legal: plantilla revisada || la factura cumple la facturación electrónica", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-11", "text": "staging: deploy ok || la activación a 7 días mejora", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
+{"id": "dist-b4-es-12", "text": "tests: 9 passed || el archivo abre en Excel sin errores", "labels": ["ABSTAIN"], "candidates": ["SUPPORTED", "CONTRADICTED", "ABSTAIN"], "source": "batch4"}
